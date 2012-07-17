@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
+
+	<!-- Servlets -->
+	<servlet>
+		<servlet-name>getStats</servlet-name>
+		<servlet-class>org.daxplore.presenter.server.GetStatsServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>getStats</servlet-name>
+		<url-pattern>/getStats</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>getCsv</servlet-name>
+		<servlet-class>org.daxplore.presenter.server.GetCsvServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>getCsv</servlet-name>
+		<url-pattern>/getCsv/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>getDefinitions</servlet-name>
+		<servlet-class>org.daxplore.presenter.server.GetDefinitionsServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>getDefinitions</servlet-name>
+		<url-pattern>/getDefinitions</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>getPixel</servlet-name>
+		<servlet-class>org.daxplore.presenter.server.png.GetPixelServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>getPixel</servlet-name>
+		<url-pattern>/pixel/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>remoteapi</servlet-name>
+		<servlet-class>com.google.apphosting.utils.remoteapi.RemoteApiServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>remoteapi</servlet-name>
+		<url-pattern>/remote_api</url-pattern>
+	</servlet-mapping>
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>remoteapi</web-resource-name>
+			<url-pattern>/remote_api</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+	<!-- Default page to serve -->
+	<welcome-file-list>
+		<welcome-file>presentation.jsp</welcome-file>
+	</welcome-file-list>
+
+</web-app>

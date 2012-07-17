@@ -1,0 +1,17 @@
+<ui:UiBinder
+	xmlns:ui='urn:ui:com.google.gwt.uibinder'
+	xmlns:g='urn:import:com.google.gwt.user.client.ui'
+	xmlns:chart='urn:import:org.daxplore.presenter.chart'
+	xmlns:client='urn:import:org.daxplore.presenter.client.ui'>
+
+	<g:HorizontalPanel>
+		
+		<client:QuestionPanel ui:field='questionPanel'/>
+		
+		<g:VerticalPanel>
+			<chart:ChartPanel ui:field='chartPanel'/>
+			<client:PerspectivePanel ui:field='perspectivePanel'/>
+		</g:VerticalPanel>
+		
+	</g:HorizontalPanel>
+</ui:UiBinder>

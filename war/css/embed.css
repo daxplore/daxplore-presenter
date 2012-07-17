@@ -1,0 +1,16 @@
+body {
+	background: none transparent !important;
+}
+
+.EmbedView-sidebarArea {
+	margin-left: 10px;
+	display: table;
+}
+
+.EmbedView-cell {
+	display:table-cell;
+	vertical-align:middle;
+}
+
+.EmbedView-legend {
+}

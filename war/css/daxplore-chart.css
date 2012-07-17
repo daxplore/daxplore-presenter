@@ -1,0 +1,94 @@
+/*** ChartWrapPanel.java ***/
+	
+	.daxplore-ChartWrapPanel {
+		padding-right: 7px;
+	}
+	
+	
+/*** GChart ***/
+
+	.gchart-GChart {
+		overflow: hidden !important; /* needed to get right size inside scrollpanel */
+		padding: 0px;
+		padding-left: 15px;
+		padding-top: 10px;
+		padding-bottom: 10px;
+		margin: 0px;	
+	}
+	
+	.gchart-GChart-IE {
+		padding-bottom: 20px;
+	}
+	
+	.gchart-GChart-compare {
+		padding-bottom: 15px;
+	}
+	
+	.gchart-GChart-compare-IE {
+		padding-bottom: 30px;
+	}
+		
+	.gwt-Image[src^='/pixel/'] {
+		-moz-border-radius: 2px 2px 0 0;
+		border-radius: 2px 2px 0 0;
+	}
+	
+	.gwt-Image[src$='gchart.gif'] {
+		z-index: 100 !important;
+	}
+
+
+/*** ChartBar annotation ***/
+	.daxplore-BarAnnotation {
+		border: none;
+		padding:6px;
+		margin-top:5px;
+		-moz-border-radius: 5px;
+		border-radius: 5px;
+		text-align: center;
+	}
+
+
+/*** External legend ***/
+
+	.daxplore-ExternalLegend {
+		white-space: nowrap;
+		padding-right: 5px;
+	}
+	
+	.daxplore-ExternalLegend div, img {
+		width: 1.1em;
+		height: 1.1em;
+		-moz-border-radius: 2px;
+		border-radius: 2px;
+	}
+	
+	.daxplore-ExternalLegend-hiddenCount {
+		color: #888888;
+		font-size: 80%;
+		text-align: center;
+		padding-top: 3px;
+	}
+	
+	
+/*** External header ***/
+	.daxplore-ExternalHeader {
+		text-align: center;
+		padding-top: 5px;
+		padding-left: 3px;
+		padding-right: 3px;
+	}
+	
+	/* external-header-warning is used directly in questions_**.json */
+	.external-header-warning {
+		color: #888888;
+	}
+	
+
+/*** Query Active Animation ***/
+	.daxplore-QueryActiveAnimation {
+		position: relative;
+		left: -35px;
+		top: 25px;	
+	}
+	
