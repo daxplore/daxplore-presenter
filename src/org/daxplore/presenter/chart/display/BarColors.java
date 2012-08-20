@@ -45,9 +45,17 @@ class BarColors {
 	protected final String annotation;
 
 	/**
-	 * Define the default chart color set.
+	 * Defines the default chart color set.
 	 */
-	protected static final BarColors[] chartColorSet = { new BarColors(95.0 / 360), new BarColors(200.0 / 360), new BarColors(240.0 / 360, 0.00, 0.03), new BarColors(270.0 / 360, 0.00, 0.03), new BarColors(5.0 / 360), new BarColors(35.0 / 360, 0.10, -0.03), new BarColors(60.0 / 360, 0.10, -0.03) };
+	protected static final BarColors[] chartColorSet = {
+		new BarColors(95.0),
+		new BarColors(200.0),
+		new BarColors(240.0, 0.0, 0.03),
+		new BarColors(270.0, 0.0, 0.03),
+		new BarColors(5.0),
+		new BarColors(35.0,  0.1, -0.03),
+		new BarColors(60.0,  0.1, -0.03)
+	};
 
 	/**
 	 * Create a new color set, based on a hue. Adjusting for saturation and

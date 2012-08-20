@@ -42,11 +42,11 @@ public class Color {
 	 * Instantiates a new color from RGB values.
 	 * 
 	 * @param r
-	 *            the red part of the RGB representation
+	 *            the red part of the RGB representation [0, 255]
 	 * @param g
-	 *            the green part of the RGB representation
+	 *            the green part of the RGB representation [0, 255]
 	 * @param b
-	 *            the blue part of the RGB representation
+	 *            the blue part of the RGB representation [0, 255]
 	 */
 	public Color(int r, int g, int b) {
 		this.r = r;
@@ -60,18 +60,18 @@ public class Color {
 	 * Instantiates a new color from HSL or HSV values.
 	 * 
 	 * @param h
-	 *            the hue
+	 *            the hue [0.0, 360.0)
 	 * @param s
-	 *            the saturation
+	 *            the saturation [0.0, 1.0]
 	 * @param lightnessOrValue
-	 *            the lightness (if HSL) or value (if HSV) 
+	 *            the lightness (if HSL) or value (if HSV) [0.0, 1.0]
 	 * @param model
 	 *            the color model used to interpret the lightnessOrValue argument
 	 */
 	public Color(double h, double s, double lightnessOrValue, Model model) {
 		double r = 0, g = 0, b = 0;
 		
-		h = h%1;
+		h = h%360;
 		
 		if (s < 0) {
 			s = 0;
@@ -92,7 +92,7 @@ public class Color {
 
 			// Code based on math from http://en.wikipedia.org/wiki/HSL_and_HSV#From_HSL
 			double C = (1 - Math.abs(2 * lightnessOrValue - 1)) * s;
-			double hprim = 360 * h / 60;
+			double hprim = h / 60;
 			double X = C * (1 - Math.abs(hprim % 2 - 1));
 			if (hprim < 1) {
 				r = C;
@@ -127,13 +127,14 @@ public class Color {
 			this.r = (int) Math.round(r * 255);
 			this.g = (int) Math.round(g * 255);
 			this.b = (int) Math.round(b * 255);
+			calcHSV();
 			break;
 		case HSV:
 			hsvh = h;
 			hsvs = s;
 			hsvv = lightnessOrValue;
 			int i = (int) Math.round(Math.floor(h * 6));
-			double f = h * 6 - i;
+			double f = 6 * h/360 - i;
 			double p = lightnessOrValue * (1 - s);
 			double q = lightnessOrValue * (1 - f * s);
 			double t = lightnessOrValue * (1 - (1 - f) * s);
@@ -173,19 +174,20 @@ public class Color {
 			this.r = (int) Math.round(r * 255);
 			this.g = (int) Math.round(g * 255);
 			this.b = (int) Math.round(b * 255);
+			calcHSL();
 			break;
 		}
 	}
 
 	/**
-	 * Conveniance method for converting a HSL color to a RGB representation.
+	 * Convenience method for converting a HSL color to a RGB representation.
 	 * 
 	 * @param h
-	 *            the hue part of a HSL representation
+	 *            the hue part of a HSL representation [0.0, 360.0)
 	 * @param s
-	 *            the saturation part of a HSL representation
+	 *            the saturation part of a HSL representation [0.0, 1.0]
 	 * @param l
-	 *            the lightness part of a HSL representation
+	 *            the lightness part of a HSL representation [0.0, 1.0]
 	 * @return the three RGB values as an int[]
 	 */
 	public static int[] hslToRgb(double h, double s, double l) {
@@ -198,11 +200,11 @@ public class Color {
 	 * Convenience method for converting a RGB color to a HSV representation.
 	 * 
 	 * @param r
-	 *            the red part of the RGB representation
+	 *            the red part of the RGB representation [0, 255]
 	 * @param g
-	 *            the green part of the RGB representation
+	 *            the green part of the RGB representation [0, 255]
 	 * @param b
-	 *            the blue part of the RGB representation
+	 *            the blue part of the RGB representation [0, 255]
 	 * @return the three HSV values as a double[]
 	 */
 	public static double[] rgbToHsv(int r, int g, int b) {
@@ -215,11 +217,11 @@ public class Color {
 	 * Convenience method for converting a RGB color to a HSL representation.
 	 * 
 	 * @param r
-	 *            the red part of the RGB representation
+	 *            the red part of the RGB representation [0, 255]
 	 * @param g
-	 *            the green part of the RGB representation
+	 *            the green part of the RGB representation [0, 255]
 	 * @param b
-	 *            the blue part of the RGB representation
+	 *            the blue part of the RGB representation [0, 255]
 	 * @return the three HSL values as a double[]
 	 */
 	public static double[] rgbToHsl(int r, int g, int b) {
@@ -231,7 +233,7 @@ public class Color {
 	/**
 	 * Get the red value if the color is represented as RGB.
 	 * 
-	 * @return the red
+	 * @return the red part of the RGB representation [0, 255]
 	 */
 	public int getRed() {
 		return r;
@@ -240,7 +242,7 @@ public class Color {
 	/**
 	 * Get the green value if the color is represented as RGB.
 	 * 
-	 * @return the green
+	 * @return the green part of the RGB representation [0, 255]
 	 */
 	public int getGreen() {
 		return g;
@@ -249,7 +251,7 @@ public class Color {
 	/**
 	 * Get the blue value if the color is represented as RGB.
 	 * 
-	 * @return the blue
+	 * @return the blue part of the RGB representation [0, 255]
 	 */
 	public int getBlue() {
 		return b;
@@ -258,7 +260,7 @@ public class Color {
 	/**
 	 * Get the blue value if the color is represented as HSV.
 	 * 
-	 * @return the HSV hue
+	 * @return the HSV hue [0.0, 360.0)
 	 */
 	public double getHSVHue() {
 		return hsvh;
@@ -267,7 +269,7 @@ public class Color {
 	/**
 	 * Get the saturation if the color is represented as HSV.
 	 * 
-	 * @return the HSV saturation
+	 * @return the HSV saturation [0.0, 1.0]
 	 */
 	public double getHSVSaturation() {
 		return hsvs;
@@ -276,7 +278,7 @@ public class Color {
 	/**
 	 * Get the value if the color is represented as HSV.
 	 * 
-	 * @return the HSV value
+	 * @return the HSV value [0.0, 1.0]
 	 */
 	public double getHSVValue() {
 		return hsvv;
@@ -285,7 +287,7 @@ public class Color {
 	/**
 	 * Get the hue if the color is represented as HSL.
 	 * 
-	 * @return the HSL hue
+	 * @return the HSL hue [0.0, 360.0)
 	 */
 	public double getHSLHue() {
 		return hslh;
@@ -294,7 +296,7 @@ public class Color {
 	/**
 	 * Get the saturation if the color is represented as HSL.
 	 * 
-	 * @return the HSL saturation
+	 * @return the HSL saturation [0.0, 1.0]
 	 */
 	public double getHSLSaturation() {
 		return hsls;
@@ -303,7 +305,7 @@ public class Color {
 	/**
 	 * Get the lightness if the color is represented as HSL.
 	 * 
-	 * @return the HSL lightness
+	 * @return the HSL lightness [0.0, 1.0]
 	 */
 	public double getHSLLightness() {
 		return hsll;
@@ -315,7 +317,7 @@ public class Color {
 	 * @return the hex color representation
 	 */
 	public String getHexValue() {
-		return "#" + pad(Integer.toHexString(r)) + pad(Integer.toHexString(g)) + pad(Integer.toHexString(b));
+		return ("#" + pad(Integer.toHexString(r)) + pad(Integer.toHexString(g)) + pad(Integer.toHexString(b))).toUpperCase();
 	}
 	
 	/**
@@ -323,11 +325,11 @@ public class Color {
 	 * useful in CSS.
 	 * 
 	 * @param h
-	 *            the hue part of a HSV representation
+	 *            the hue part of a HSV representation [0.0, 360.0)
 	 * @param s
-	 *            the saturation part of a HSV representation
+	 *            the saturation part of a HSV representation [0.0, 1.0]
 	 * @param v
-	 *            the value part of a HSV representation
+	 *            the value part of a HSV representation [0.0, 1.0]
 	 * @return the string
 	 */
 	public static String hsvToHex(double h, double s, double v) {
@@ -339,11 +341,11 @@ public class Color {
 	 * useful in CSS.
 	 * 
 	 * @param h
-	 *            the hue part of a HSL representation
+	 *            the hue part of a HSL representation [0.0, 360.0)
 	 * @param s
-	 *            the saturation part of a HSL representation
+	 *            the saturation part of a HSL representation [0.0, 1.0]
 	 * @param l
-	 *            the lightness part of a HSL representation
+	 *            the lightness part of a HSL representation [0.0, 1.0]
 	 * @return the string
 	 */
 	public static String hslToHex(double h, double s, double l) {
@@ -370,7 +372,7 @@ public class Color {
 	}
 
 	private void calcHSL() {
-		double nr = r / 255, ng = g / 255, nb = b / 255;
+		double nr = r / 255.0, ng = g / 255.0, nb = b / 255.0;
 		double max = Math.max(nr, Math.max(ng, nb));
 		double min = Math.min(nr, Math.min(ng, nb));
 		double h, s, l = (max + min) / 2;
@@ -389,13 +391,13 @@ public class Color {
 			}
 			h = h / 6;
 		}
-		hslh = h;
+		hslh = h * 360;
 		hsls = s;
 		hsll = l;
 	}
 
 	private void calcHSV() {
-		double nr = r / 255, ng = g / 255, nb = b / 255;
+		double nr = r / 255.0, ng = g / 255.0, nb = b / 255.0;
 		double max = Math.max(nr, Math.max(ng, nb));
 		double min = Math.min(nr, Math.min(ng, nb));
 		double h = max, s = max, v = max;
@@ -415,7 +417,7 @@ public class Color {
 			}
 			h /= 6;
 		}
-		hsvh = h;
+		hsvh = h * 360;
 		hsvs = s;
 		hsvv = v;
 	}
