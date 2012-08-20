@@ -28,7 +28,7 @@ package org.daxplore.presenter.shared;
 public class Color {
 
 	/**
-	 * An enum represeting different color models.
+	 * An enum representing different color models.
 	 */
 	public enum Model {
 		RGB, HSV, HSL
@@ -195,7 +195,7 @@ public class Color {
 	}
 
 	/**
-	 * Conveniance method for converting a RGB color to a HSV representation.
+	 * Convenience method for converting a RGB color to a HSV representation.
 	 * 
 	 * @param r
 	 *            the red part of the RGB representation
@@ -212,7 +212,7 @@ public class Color {
 	}
 
 	/**
-	 * Conveniance method for converting a RGB color to a HSL representation.
+	 * Convenience method for converting a RGB color to a HSL representation.
 	 * 
 	 * @param r
 	 *            the red part of the RGB representation
@@ -319,7 +319,7 @@ public class Color {
 	}
 	
 	/**
-	 * Conveniance method for converting a HSV color to a hex representation,
+	 * Convenience method for converting a HSV color to a hex representation,
 	 * useful in CSS.
 	 * 
 	 * @param h
@@ -327,7 +327,7 @@ public class Color {
 	 * @param s
 	 *            the saturation part of a HSV representation
 	 * @param v
-	 *            the valye part of a HSV representation
+	 *            the value part of a HSV representation
 	 * @return the string
 	 */
 	public static String hsvToHex(double h, double s, double v) {
@@ -335,7 +335,7 @@ public class Color {
 	}
 
 	/**
-	 * Conveniance method for converting a HSL color to a hex representation,
+	 * Convenience method for converting a HSL color to a hex representation,
 	 * useful in CSS.
 	 * 
 	 * @param h
@@ -362,7 +362,7 @@ public class Color {
 	}
 
 	/**
-	 * An human-readable representation of the color as RGB.
+	 * A human-readable representation of the color as RGB.
 	 */
 	@Override
 	public String toString() {
