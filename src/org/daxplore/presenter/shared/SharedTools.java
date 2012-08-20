@@ -135,19 +135,29 @@ public class SharedTools {
 	/**
 	 * Get a map from parameters in a String "var1=a&var2=b&var3=c".
 	 * 
+	 * <p>Splits on the character '&' and creates key-value pairs given in the
+	 * key=value format.</p>
+	 * 
 	 * @param tokens
 	 *            a string containing the tokens
-	 * @return the linked hash map
+	 * @return a linked hash map that contains the key-value pairs
+	 * @throws IllegalArgumentException
+	 *             thrown if the token string is in an incorrect format or there
+	 *             are duplicate keys
 	 */
-	public static LinkedHashMap<String, String> parseTokens(String tokens) {
-
+	public static LinkedHashMap<String, String> parseTokens(String tokens) throws IllegalArgumentException {
 		String[] arStr = tokens.split("&");
 
 		LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
 		for (int i = 0; i < arStr.length; i++) {
 			String[] substr = arStr[i].split("=");
-			if (substr.length == 2) {
+			if (substr.length == 2 && !substr[0].equals("")) {
+				if (params.containsKey(substr[0])) {
+					throw new IllegalArgumentException("Duplicate key: '" + substr[0] + "'");
+				}
 				params.put(substr[0], substr[1]);
+			} else {
+				throw new IllegalArgumentException("Bad key-value definition: '" + tokens + "'");
 			}
 		}
 
@@ -413,6 +423,9 @@ public class SharedTools {
 	/**
 	 * Justify a string left with wordwrap, formatted so that it works in HTML.
 	 * 
+	 * <p><b>Note:</b> Mutilates proper HTML by replacing <code><br /></code>
+	 * tag with <code><br><code>.</p>
+	 * 
 	 * @param text
 	 *            the text
 	 * @param width
@@ -420,7 +433,9 @@ public class SharedTools {
 	 * @return the string
 	 */
 	public static String justifyHTML(String text, int width) {
-		return justifyLeft(text, width).replace("\n", "<br>");
+		text = text.replace("<br>","\n").replace("<br />", "\n");
+		text = justifyLeft(text, width);
+		return text.replace("\n", "<br>");
 	}
 
 	/**
@@ -432,13 +447,15 @@ public class SharedTools {
 	 * @return the formatted text
 	 */
 	public static String splitInTwoHTML(String text) {
-		int splitPosition = text.length() / 2;
-		splitPosition = text.indexOf(' ', splitPosition);
-		if (splitPosition > 0) {
-			return justifyHTML(text, splitPosition);
-		} else {
-			return text;
+		int midpoint = text.length() / 2;
+		for(int i = 0; i<text.length()/2; i++) {
+			if (midpoint+i < text.length()-1 && text.charAt(midpoint + i)==' ') {
+				return text.substring(0, midpoint+i) + "<br>" + text.substring(midpoint+i+1);
+			} else if (text.charAt(midpoint - i)==' ') {
+				return text.substring(0, midpoint-i) + "<br>" + text.substring(midpoint-i+1);
+			}
 		}
+		return text;
 	}
 
 	/**
