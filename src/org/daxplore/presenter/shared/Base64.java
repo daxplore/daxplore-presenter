@@ -75,8 +75,7 @@ public class Base64 {
 
 	/**
 	 * Encodes a byte array into Base 64 format and breaks the output into lines
-	 * of 76 characters. This method is compatible with
-	 * <code>sun.misc.BASE64Encoder.encodeBuffer(byte[])</code>.
+	 * of 76 characters.
 	 * 
 	 * @param in
 	 *            An array containing the data bytes to be encoded.
@@ -199,8 +198,7 @@ public class Base64 {
 	/**
 	 * Decodes a byte array from Base64 format and ignores line separators, tabs
 	 * and blanks. CR, LF, Tab and Space characters are ignored in the input
-	 * data. This method is compatible with
-	 * <code>sun.misc.BASE64Decoder.decodeBuffer(String)</code>.
+	 * data.
 	 * 
 	 * @param s
 	 *            A Base64 String to be decoded.

@@ -15,11 +15,13 @@
 // This module is provided "as is", without warranties of any kind.
 package org.daxplore.presenter.shared;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.util.Random;
-import static org.junit.Assert.fail;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertArrayEquals;
+
 import org.junit.Test;
 
 public class Base64Test {
@@ -47,30 +49,28 @@ public class Base64Test {
 	}
 
 	/**
-	 * Test Base64Coder against sun.misc.BASE64Encoder/Decoder with random data.
-	 * 
-	 * <p>Line length below 76, as the Sun encoder adds a CR/LF when a line is
-	 * longer.</p>
+	 * Test Base64Coder against Apache Commons Base64 Encoder/Decoder with
+	 * random data.
 	 * 
 	 * @throws IOException
-	 *             Thrown by the Sun decoder
+	 *             Thrown by the Apache decoder.
 	 */
 	@Test
 	public void test2() throws IOException {
-		final int maxLineLen = 76 - 1;
+		final int maxLineLen = 100;
 		final int maxDataBlockLen = (maxLineLen * 3) / 4;
-		sun.misc.BASE64Encoder sunEncoder = new sun.misc.BASE64Encoder();
-		sun.misc.BASE64Decoder sunDecoder = new sun.misc.BASE64Decoder();
+		org.apache.commons.codec.binary.Base64 apacheCoder =
+				new org.apache.commons.codec.binary.Base64();
 		Random rnd = new Random(0x538afb92);
-		for (int i = 0; i < 50000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			int len = rnd.nextInt(maxDataBlockLen + 1);
 			byte[] b0 = new byte[len];
 			rnd.nextBytes(b0);
 			String e1 = new String(Base64.encode(b0));
-			String e2 = sunEncoder.encode(b0);
+			String e2 = new String(apacheCoder.encode(b0));
 			assertEquals(e2, e1);
 			byte[] b1 = Base64.decode(e1);
-			byte[] b2 = sunDecoder.decodeBuffer(e2);
+			byte[] b2 = apacheCoder.decode(e2.getBytes());
 			assertArrayEquals(b0, b1);
 			assertArrayEquals(b0, b2);
 		}
@@ -78,7 +78,7 @@ public class Base64Test {
 
 	/**
 	 * Test Base64Coder line encoding/decoding against
-	 * sun.misc.BASE64Encoder/Decoder with random data.
+	 * Apache Commons Base64 Encoder/Decoder with random data.
 	 * 
 	 * @throws IOException
 	 *             Thrown by the Sun decoder
@@ -86,21 +86,30 @@ public class Base64Test {
 	@Test
 	public void test3() throws IOException {
 		final int maxDataBlockLen = 512;
-		sun.misc.BASE64Encoder sunEncoder = new sun.misc.BASE64Encoder();
-		sun.misc.BASE64Decoder sunDecoder = new sun.misc.BASE64Decoder();
+		org.apache.commons.codec.binary.Base64 apacheCoder =
+				new org.apache.commons.codec.binary.Base64();
 		Random rnd = new Random(0x39ac7d6e);
-		for (int i = 0; i < 10000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			int len = rnd.nextInt(maxDataBlockLen + 1);
 			byte[] b0 = new byte[len];
 			rnd.nextBytes(b0);
-			String e1 = new String(Base64.encodeLines(b0));
-			String e2 = sunEncoder.encodeBuffer(b0);
+			String e1 = Base64.encodeLines(b0);
+			
+			String e2 = new String(apacheCoder.encode(b0));
+			StringBuilder e2Lines= new StringBuilder();
+			for (int j=0; j<e2.length(); j+=76) {
+				e2Lines.append(e2.substring(j, Math.min(j+76, e2.length()))).append("\n");
+			}
+			e2 = e2Lines.toString();
+			
 			assertEquals(e2, e1);
 			byte[] b1 = Base64.decodeLines(e1);
-			byte[] b2 = sunDecoder.decodeBuffer(e2);
+			
+			e2.replace("\n", "");
+			byte[] b2 = apacheCoder.decode(e2.replace("\n", "").getBytes());
+			
 			assertArrayEquals(b0, b1);
 			assertArrayEquals(b0, b2);
 		}
 	}
-
 }
