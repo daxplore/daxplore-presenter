@@ -20,6 +20,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Random;
 
 import org.junit.Test;
@@ -30,7 +32,7 @@ public class Base64Test {
 	 * Test Base64Coder with constant strings using an example from RFC 2617.
 	 */
 	@Test
-	public void test1() {
+	public void testBase64Static() {
 		check("Aladdin:open sesame", "QWxhZGRpbjpvcGVuIHNlc2FtZQ==");
 		check("", "");
 		check("1", "MQ==");
@@ -56,7 +58,7 @@ public class Base64Test {
 	 *             Thrown by the Apache decoder.
 	 */
 	@Test
-	public void test2() throws IOException {
+	public void testBase64Random() throws IOException {
 		final int maxLineLen = 100;
 		final int maxDataBlockLen = (maxLineLen * 3) / 4;
 		org.apache.commons.codec.binary.Base64 apacheCoder =
@@ -84,8 +86,9 @@ public class Base64Test {
 	 *             Thrown by the Sun decoder
 	 */
 	@Test
-	public void test3() throws IOException {
+	public void testBase64LinesRandom() throws IOException {
 		final int maxDataBlockLen = 512;
+		final int lineLength = 76;
 		org.apache.commons.codec.binary.Base64 apacheCoder =
 				new org.apache.commons.codec.binary.Base64();
 		Random rnd = new Random(0x39ac7d6e);
@@ -97,8 +100,9 @@ public class Base64Test {
 			
 			String e2 = new String(apacheCoder.encode(b0));
 			StringBuilder e2Lines= new StringBuilder();
-			for (int j=0; j<e2.length(); j+=76) {
-				e2Lines.append(e2.substring(j, Math.min(j+76, e2.length()))).append("\n");
+			for (int j=0; j<e2.length(); j+=lineLength) {
+				e2Lines.append(e2.substring(j, Math.min(j+lineLength, e2.length())));
+				e2Lines.append("\n");
 			}
 			e2 = e2Lines.toString();
 			
@@ -110,6 +114,47 @@ public class Base64Test {
 			
 			assertArrayEquals(b0, b1);
 			assertArrayEquals(b0, b2);
+		}
+	}
+	
+	/**
+	 * Test encoding and decoding of longs, which was added for the Daxplore
+	 * project.
+	 */
+	@Test
+	public void testLongRandom() {
+		org.apache.commons.codec.binary.Base64 apacheCoder =
+				new org.apache.commons.codec.binary.Base64();
+		
+		Random rnd = new Random(0x8af3411e);
+		for (int i = 0; i < 1000; i++) {
+			long testLong;
+			switch (i) {
+			case 0: testLong=0; break;
+			case 1: testLong=-1; break;
+			case 2: testLong=Long.MAX_VALUE; break;
+			case 3: testLong=Long.MIN_VALUE; break;
+			default: testLong = rnd.nextLong();
+			}
+
+			String e1 = Base64.encodeLong(testLong);
+			long d1 = Base64.decodeLong(e1);
+			assertEquals(testLong, d1);
+			
+			byte[] bytes = ByteBuffer.allocate(8).putLong(testLong).array();
+			int firstRelevantByte = 0;
+			for (; firstRelevantByte<bytes.length && bytes[firstRelevantByte]==0; firstRelevantByte++) {
+			}
+			bytes = Arrays.copyOfRange(bytes, firstRelevantByte, bytes.length);
+			String e2 = new String(apacheCoder.encode(bytes));
+			
+			bytes = apacheCoder.decode(e2.getBytes());
+			ByteBuffer bb = ByteBuffer.allocate(8);
+			bb.position(8-bytes.length);
+			bb.put(bytes);
+			assertEquals(testLong, bb.getLong(0));
+			
+			assertEquals(e2, e1);
 		}
 	}
 }
