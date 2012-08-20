@@ -65,30 +65,30 @@ public class ColorTest {
 	@Test
 	public void testRgbToHsl() {
 		for (int line = 0; line<values.length; line++) {
-			double[] lv = values[line];
-			int r = (int)(255*lv[R] + 0.5);
-			int g = (int)(255*lv[G] + 0.5);
-			int b = (int)(255*lv[B] + 0.5);
+			double[] v = values[line];
+			int r = (int)(255*v[R] + 0.5);
+			int g = (int)(255*v[G] + 0.5);
+			int b = (int)(255*v[B] + 0.5);
 			double[] hsl = Color.rgbToHsl(r, g, b);
 
-			assertEquals(lv[H], hsl[0], 0.5);
-			assertEquals(lv[HSL_S], hsl[1], 0.1);
-			assertEquals(lv[L], hsl[2], 0.1);
+			assertEquals(v[H],		hsl[0], 0.5);
+			assertEquals(v[HSL_S], 	hsl[1], 0.01);
+			assertEquals(v[L], 		hsl[2], 0.01);
 		}
 	}
 
 	@Test
 	public void testRgbToHsv() {
 		for (int line = 0; line<values.length; line++) {
-			double[] lv = values[line];
-			int r = (int)(255*lv[R] + 0.5);
-			int g = (int)(255*lv[G] + 0.5);
-			int b = (int)(255*lv[B] + 0.5);
+			double[] v = values[line];
+			int r = (int)(255*v[R] + 0.5);
+			int g = (int)(255*v[G] + 0.5);
+			int b = (int)(255*v[B] + 0.5);
 			double[] hsv = Color.rgbToHsv(r, g, b);
 			
-			assertEquals(lv[H], hsv[0], 0.5);
-			assertEquals(lv[HSV_S], hsv[1], 0.01);
-			assertEquals(lv[V], hsv[2], 0.01);
+			assertEquals(v[H], 		hsv[0], 0.5);
+			assertEquals(v[HSV_S],	hsv[1], 0.01);
+			assertEquals(v[V],		hsv[2], 0.01);
 		}
 	}
 	
@@ -96,12 +96,24 @@ public class ColorTest {
 	@Test
 	public void testHslToRgb() {
 		for (int line = 0; line<values.length; line++) {
-			double[] lv = values[line];
-			int[] rgb = Color.hslToRgb(lv[H], lv[HSL_S], lv[L]);
+			double[] v = values[line];
+			double[] rgb = Color.hslToRgb(v[H], v[HSL_S], v[L]);
 
-			assertEquals((int)(255*lv[R] + 0.5), rgb[0]);
-			assertEquals((int)(255*lv[G] + 0.5), rgb[1]);
-			assertEquals((int)(255*lv[B] + 0.5), rgb[2]);
+			assertEquals(v[R]*255, rgb[0], 0.5);
+			assertEquals(v[G]*255, rgb[1], 0.5);
+			assertEquals(v[B]*255, rgb[2], 0.5);
+		}
+	}
+	
+	@Test
+	public void testHsvToRgb() {
+		for (int line = 0; line<values.length; line++) {
+			double[] v = values[line];
+			double[] rgb = Color.hsvToRgb(v[H], v[HSV_S], v[V]);
+			
+			assertEquals(v[R]*255, rgb[0], 0.5);
+			assertEquals(v[G]*255, rgb[1], 0.5);
+			assertEquals(v[B]*255, rgb[2], 0.5);
 		}
 	}
 }

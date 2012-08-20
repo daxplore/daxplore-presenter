@@ -34,7 +34,7 @@ public class Color {
 		RGB, HSV, HSL
 	}
 
-	private int r, g, b;
+	private double r, g, b;
 	private double hslh, hsls, hsll;
 	private double hsvh, hsvs, hsvv;
 
@@ -48,7 +48,7 @@ public class Color {
 	 * @param b
 	 *            the blue part of the RGB representation [0, 255]
 	 */
-	public Color(int r, int g, int b) {
+	public Color(double r, double g, double b) {
 		this.r = r;
 		this.g = g;
 		this.b = b;
@@ -84,6 +84,8 @@ public class Color {
 			lightnessOrValue = 1.0;
 		}
 		
+		double C = 0, hprim = 0, X = 0, m = 0;
+		
 		switch (model) {
 		case HSL:
 			hslh = h;
@@ -91,91 +93,63 @@ public class Color {
 			hsll = lightnessOrValue;
 
 			// Code based on math from http://en.wikipedia.org/wiki/HSL_and_HSV#From_HSL
-			double C = (1 - Math.abs(2 * lightnessOrValue - 1)) * s;
-			double hprim = h / 60;
-			double X = C * (1 - Math.abs(hprim % 2 - 1));
-			if (hprim < 1) {
-				r = C;
-				g = X;
-				b = 0;
-			} else if (hprim < 2) {
-				r = X;
-				g = C;
-				b = 0;
-			} else if (hprim < 3) {
-				r = 0;
-				g = C;
-				b = X;
-			} else if (hprim < 4) {
-				r = 0;
-				g = X;
-				b = C;
-			} else if (hprim < 5) {
-				r = X;
-				g = 0;
-				b = C;
-			} else if (hprim < 6) {
-				r = C;
-				g = 0;
-				b = X;
-			}
-			double m = lightnessOrValue - 0.5 * C;
-			r += m;
-			g += m;
-			b += m;
-
-			this.r = (int) Math.round(r * 255);
-			this.g = (int) Math.round(g * 255);
-			this.b = (int) Math.round(b * 255);
-			calcHSV();
+			C = (1 - Math.abs(2 * lightnessOrValue - 1)) * s;
+			hprim = h / 60;
+			X = C * (1 - Math.abs(hprim % 2 - 1));
+			m = lightnessOrValue - 0.5 * C;
+			
 			break;
 		case HSV:
 			hsvh = h;
 			hsvs = s;
 			hsvv = lightnessOrValue;
-			int i = (int) Math.round(Math.floor(h * 6));
-			double f = 6 * h/360 - i;
-			double p = lightnessOrValue * (1 - s);
-			double q = lightnessOrValue * (1 - f * s);
-			double t = lightnessOrValue * (1 - (1 - f) * s);
-
-			switch (i % 6) {
-			case 0:
-				r = lightnessOrValue;
-				g = t;
-				b = p;
-				break;
-			case 1:
-				r = q;
-				g = lightnessOrValue;
-				b = p;
-				break;
-			case 2:
-				r = p;
-				g = lightnessOrValue;
-				b = t;
-				break;
-			case 3:
-				r = p;
-				g = q;
-				b = lightnessOrValue;
-				break;
-			case 4:
-				r = t;
-				g = p;
-				b = lightnessOrValue;
-				break;
-			case 5:
-				r = lightnessOrValue;
-				g = p;
-				b = q;
-				break;
-			}
-			this.r = (int) Math.round(r * 255);
-			this.g = (int) Math.round(g * 255);
-			this.b = (int) Math.round(b * 255);
-			calcHSL();
+			
+			// Code based on math from http://en.wikipedia.org/wiki/HSL_and_HSV#From_HSV
+			C = lightnessOrValue * s;
+			hprim = h / 60;
+			X = C * (1 - Math.abs(hprim % 2 - 1));
+			m = lightnessOrValue - C;
+			
 			break;
+		}
+		
+		if (hprim < 1) {
+			r = C;
+			g = X;
+			b = 0;
+		} else if (hprim < 2) {
+			r = X;
+			g = C;
+			b = 0;
+		} else if (hprim < 3) {
+			r = 0;
+			g = C;
+			b = X;
+		} else if (hprim < 4) {
+			r = 0;
+			g = X;
+			b = C;
+		} else if (hprim < 5) {
+			r = X;
+			g = 0;
+			b = C;
+		} else if (hprim < 6) {
+			r = C;
+			g = 0;
+			b = X;
+		}
+		
+		r += m;
+		g += m;
+		b += m;
+		
+		this.r = r * 255;
+		this.g = g * 255;
+		this.b = b * 255;
+		
+		switch (model) {
+		case HSL: calcHSV(); break;
+		case HSV: calcHSL(); break;
 		}
 	}
 
@@ -190,9 +164,26 @@ public class Color {
 	 *            the lightness part of a HSL representation [0.0, 1.0]
 	 * @return the three RGB values as an int[]
 	 */
-	public static int[] hslToRgb(double h, double s, double l) {
+	public static double[] hslToRgb(double h, double s, double l) {
 		Color temp = new Color(h, s, l, Model.HSL);
-		int[] out = { temp.getRed(), temp.getGreen(), temp.getBlue() };
+		double[] out = { temp.getRed(), temp.getGreen(), temp.getBlue() };
+		return out;
+	}
+	
+	/**
+	 * Convenience method for converting a HSV color to a RGB representation.
+	 * 
+	 * @param h
+	 *            the hue part of a HSV representation [0.0, 360.0)
+	 * @param s
+	 *            the saturation part of a HSV representation [0.0, 1.0]
+	 * @param l
+	 *            the value part of a HSV representation [0.0, 1.0]
+	 * @return the three RGB values as an int[]
+	 */
+	public static double[] hsvToRgb(double h, double s, double v) {
+		Color temp = new Color(h, s, v, Model.HSV);
+		double[] out = { temp.getRed(), temp.getGreen(), temp.getBlue() };
 		return out;
 	}
 
@@ -207,7 +198,7 @@ public class Color {
 	 *            the blue part of the RGB representation [0, 255]
 	 * @return the three HSV values as a double[]
 	 */
-	public static double[] rgbToHsv(int r, int g, int b) {
+	public static double[] rgbToHsv(double r, double g, double b) {
 		Color temp = new Color(r, g, b);
 		double[] out = { temp.getHSVHue(), temp.getHSVSaturation(), temp.getHSVValue() };
 		return out;
@@ -224,7 +215,7 @@ public class Color {
 	 *            the blue part of the RGB representation [0, 255]
 	 * @return the three HSL values as a double[]
 	 */
-	public static double[] rgbToHsl(int r, int g, int b) {
+	public static double[] rgbToHsl(double r, double g, double b) {
 		Color temp = new Color(r, g, b);
 		double[] out = { temp.getHSLHue(), temp.getHSLSaturation(), temp.getHSLLightness() };
 		return out;
@@ -235,7 +226,7 @@ public class Color {
 	 * 
 	 * @return the red part of the RGB representation [0, 255]
 	 */
-	public int getRed() {
+	public double getRed() {
 		return r;
 	}
 
@@ -244,7 +235,7 @@ public class Color {
 	 * 
 	 * @return the green part of the RGB representation [0, 255]
 	 */
-	public int getGreen() {
+	public double getGreen() {
 		return g;
 	}
 
@@ -253,7 +244,7 @@ public class Color {
 	 * 
 	 * @return the blue part of the RGB representation [0, 255]
 	 */
-	public int getBlue() {
+	public double getBlue() {
 		return b;
 	}
 
@@ -317,7 +308,11 @@ public class Color {
 	 * @return the hex color representation
 	 */
 	public String getHexValue() {
-		return ("#" + pad(Integer.toHexString(r)) + pad(Integer.toHexString(g)) + pad(Integer.toHexString(b))).toUpperCase();
+		return ("#"
+				+ pad(Integer.toHexString((int)Math.round(r)))
+				+ pad(Integer.toHexString((int)Math.round(g)))
+				+ pad(Integer.toHexString((int)Math.round(b))))
+				.toUpperCase();
 	}
 	
 	/**
