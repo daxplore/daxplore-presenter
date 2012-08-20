@@ -30,7 +30,7 @@ import org.junit.Test;
 public class SharedToolsTest {
 
 	@Test
-	public void joinIntArray() {
+	public void testJoinIntArray() {
 		int[] join1 = {1, 2, 3};
 		assertEquals("1~2~3", SharedTools.join(join1, "~"));
 		
@@ -39,7 +39,7 @@ public class SharedToolsTest {
 	}
 	
 	@Test
-	public void joinGenericArray() {
+	public void testJoinGenericArray() {
 		Object[] join = {new Integer(3), new Double(1.1), "foo", new Object() {
 			public String toString() {
 				return "bar";
@@ -49,7 +49,7 @@ public class SharedToolsTest {
 	}
 	
 	@Test
-	public void joinGenericIterable() {
+	public void testJoinGenericIterable() {
 		List<Object> join = new LinkedList<Object>();
 		join.add(3);
 		join.add(1.1);
@@ -63,7 +63,7 @@ public class SharedToolsTest {
 	}
 	
 	@Test
-	public void equalsAny() {
+	public void testEqualsAny() {
 		// test equalsAny
 		String[] compareTo = {"foo", "BAR", "", "Test", " ", "\n"};
 		assertTrue(SharedTools.equalsAny("foo", compareTo));
@@ -100,7 +100,7 @@ public class SharedToolsTest {
 	}
 	
 	@Test
-	public void parseTokens() {
+	public void testParseTokens() {
 		LinkedHashMap<String, String > map =
 				SharedTools.parseTokens("foo=bar&answer=42& =\n&\n= ");
 		
@@ -147,21 +147,21 @@ public class SharedToolsTest {
 	}
 	
 	@Test
-	public void justifyLeft() {
+	public void testJustifyLeft() {
 		assertEquals("ab\nc", SharedTools.justifyLeft("abc", 2));
 		assertEquals("a\nbc\nde", SharedTools.justifyLeft("a\nbcde", 2));
 		assertEquals("a\nbcd", SharedTools.justifyLeft("a bcd", 3));
 	}
 
 	@Test
-	public void justifyHTML() {
+	public void testJustifyHTML() {
 		assertEquals("ab<br>c", SharedTools.justifyHTML("abc", 2));
 		assertEquals("a<br>bc<br>de", SharedTools.justifyHTML("a<br>bcde", 2));
 		assertEquals("a<br>bcd", SharedTools.justifyHTML("a bcd", 3));
 	}
 	
 	@Test
-	public void splitInTwoHTML() {
+	public void testSplitInTwoHTML() {
 		assertEquals("abc<br>def", SharedTools.splitInTwoHTML("abc def"));
 		assertEquals("a<br>bcdefg", SharedTools.splitInTwoHTML("a bcdefg"));
 		assertEquals("a b<br>cdefg", SharedTools.splitInTwoHTML("a b cdefg"));
