@@ -165,17 +165,6 @@ public class EmbedDefinition {
 	}
 	
 	/**
-	 * Instantiates a new embed definition from a bit-based representation
-	 * of the flags.
-	 * 
-	 * @param flags
-	 *            the flags as a series of bits
-	 */
-	public EmbedDefinition(long flags){
-		this.flags = EmbedFlag.decodeFlags(flags);
-	}
-	
-	/**
 	 * Get the String representation of the embed definition.
 	 * 
 	 * @return the definition as a string

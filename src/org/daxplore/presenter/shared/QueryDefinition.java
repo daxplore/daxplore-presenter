@@ -134,33 +134,6 @@ public class QueryDefinition {
 	protected QueryFlag[] flags;
 	protected QuestionMetadata questionMetadata;
 	
-	/**
-	 * Instantiates a new query definition from all the individual
-	 * definition-components, using a separate argument for each flag.
-	 * 
-	 * @param questionMetadata
-	 *            the question metadata, used to look up localized texts
-	 *            for the question and perspective
-	 * @param perspectiveID
-	 *            the perspective's questionID
-	 * @param questionID
-	 *            the question's questionID
-	 * @param usedPerspectiveOptions
-	 *            the used perspective options
-	 * @param flags
-	 *            the flags
-	 */
-	public QueryDefinition(QuestionMetadata questionMetadata, String perspectiveID, String questionID, List<Integer> usedPerspectiveOptions, QueryFlag... flags){
-		this.perspectiveID = perspectiveID;
-		this.questionID = questionID;
-		this.usedPerspectiveOptions = usedPerspectiveOptions;
-		this.questionMetadata = questionMetadata;
-		if(flags == null || flags.length == 0){
-			this.flags = new QueryFlag[0];
-		} else {
-			this.flags = flags;
-		}
-	}
 	
 	/**
 	 * Instantiates a new query definition from all the individual
@@ -179,29 +152,11 @@ public class QueryDefinition {
 	 *            the flags
 	 */
 	public QueryDefinition(QuestionMetadata questionMetadata, String perspectiveID, String questionID, List<Integer> usedPerspectiveOptions, List<QueryFlag> flags){
-		this(questionMetadata, perspectiveID, questionID, usedPerspectiveOptions);
+		this.perspectiveID = perspectiveID;
+		this.questionID = questionID;
+		this.usedPerspectiveOptions = usedPerspectiveOptions;
+		this.questionMetadata = questionMetadata;
 		this.flags = flags.toArray(new QueryFlag[0]);
-	}
-	
-	/**
-	 * Instantiates a new query definition from all the individual
-	 * definition-components, using an encoded long for the flags.
-	 * 
-	 * @param questionMetadata
-	 *            the question metadata, used to look up localized texts
-	 *            for the question and perspective
-	 * @param perspectiveID
-	 *            the perspective's questionID
-	 * @param questionID
-	 *            the question's questionID
-	 * @param usedPerspectiveOptions
-	 *            the used perspective options
-	 * @param flags
-	 *            the flags
-	 */
-	public QueryDefinition(QuestionMetadata questionMetadata, String perspectiveID, String questionID, List<Integer> usedPerspectiveOptions, long flags){
-		this(questionMetadata, perspectiveID, questionID, usedPerspectiveOptions);
-		this.flags = QueryFlag.decodeFlags(flags);
 	}
 	
 	/**
