@@ -151,12 +151,29 @@ public class QueryDefinition {
 	 * @param flags
 	 *            the flags
 	 */
-	public QueryDefinition(QuestionMetadata questionMetadata, String perspectiveID, String questionID, List<Integer> usedPerspectiveOptions, List<QueryFlag> flags){
+	public QueryDefinition(QuestionMetadata questionMetadata, String perspectiveID,
+			String questionID, List<Integer> usedPerspectiveOptions, List<QueryFlag> flags)
+					throws IllegalArgumentException {
 		this.perspectiveID = perspectiveID;
 		this.questionID = questionID;
 		this.usedPerspectiveOptions = usedPerspectiveOptions;
 		this.questionMetadata = questionMetadata;
 		this.flags = flags.toArray(new QueryFlag[0]);
+		
+		if (questionID == null || !questionMetadata.hasQuestion(questionID)) {
+			throw new IllegalArgumentException("Illegal questionID: " + questionID);
+		}
+
+		if (perspectiveID == null || !questionMetadata.hasQuestion(perspectiveID)) {
+			throw new IllegalArgumentException("Illegal perspectiveID: " + perspectiveID);
+		}
+		
+		int optionCount = questionMetadata.getOptionCount(perspectiveID);
+		for (int i : usedPerspectiveOptions) {
+			if (i>optionCount) {
+				throw new IllegalArgumentException("Illegal perspective option: " + i + " > " + optionCount);
+			}
+		}
 	}
 	
 	/**
@@ -170,7 +187,8 @@ public class QueryDefinition {
 	 * @throws IllegalArgumentException
 	 *             thrown if the restore string is invalid
 	 */
-	public QueryDefinition(QuestionMetadata questionMetadata, String restoreString) throws IllegalArgumentException {
+	public QueryDefinition(QuestionMetadata questionMetadata, String restoreString)
+			throws IllegalArgumentException {
 		if(restoreString == null || restoreString == "") {throw new IllegalArgumentException("No string to restore from");}
 		this.questionMetadata = questionMetadata;
 		LinkedHashMap<String, String> tokens = SharedTools.parseTokens(Base64.decodeString(restoreString));
