@@ -25,7 +25,6 @@ import org.junit.Test;
 
 public class ColorTest {
 	
-	
 	private static final int R=0, G=1, B=2, H=3, V=4, L=5, HSV_S=6, HSL_S=7;
 	
 	// Example values taken from http://en.wikipedia.org/wiki/HSL_color_space#Examples
@@ -64,36 +63,35 @@ public class ColorTest {
 	}
 	
 	@Test
-	public void testRgbToHsl() {
+	public void testFromRgb() {
 		for (int line = 0; line<values.length; line++) {
 			double[] v = values[line];
 			Color color = new Color(v[R], v[G], v[B]);
 			
+			assertEquals(v[R],		color.getRed(),				0.5);
+			assertEquals(v[G], 		color.getGreen(),			0.5);
+			assertEquals(v[B], 		color.getBlue(),			0.5);
 			assertEquals(v[H],		color.getHSLHue(),			0.5);
 			assertEquals(v[HSL_S], 	color.getHSLSaturation(),	0.005);
 			assertEquals(v[L], 		color.getHSLLightness(),	0.005);
+			assertEquals(v[H],		color.getHSVHue(),			0.5);
+			assertEquals(v[HSV_S], 	color.getHSVSaturation(),	0.005);
+			assertEquals(v[V], 		color.getHSVValue(),		0.005);
 		}
 	}
-	
 
 	@Test
-	public void testHslToRgb() {
+	public void testFromHsl() {
 		for (int line = 0; line<values.length; line++) {
 			double[] v = values[line];
 			Color color = new Color(v[H], v[HSL_S], v[L], Model.HSL);
 			
-			assertEquals(v[R],	color.getRed(),		0.5);
-			assertEquals(v[G], 	color.getGreen(),	0.5);
-			assertEquals(v[B], 	color.getBlue(),	0.5);
-		}
-	}
-	
-	@Test
-	public void testRgbToHsv() {
-		for (int line = 0; line<values.length; line++) {
-			double[] v = values[line];
-			Color color = new Color(v[R], v[G], v[B]);
-			
+			assertEquals(v[R],		color.getRed(),				0.5);
+			assertEquals(v[G], 		color.getGreen(),			0.5);
+			assertEquals(v[B], 		color.getBlue(),			0.5);
+			assertEquals(v[H],		color.getHSLHue(),			0.5);
+			assertEquals(v[HSL_S], 	color.getHSLSaturation(),	0.005);
+			assertEquals(v[L], 		color.getHSLLightness(),	0.005);
 			assertEquals(v[H],		color.getHSVHue(),			0.5);
 			assertEquals(v[HSV_S], 	color.getHSVSaturation(),	0.005);
 			assertEquals(v[V], 		color.getHSVValue(),		0.005);
@@ -101,15 +99,20 @@ public class ColorTest {
 	}
 	
 	@Test
-	public void testHsvToRgb() {
+	public void testFromHsv() {
 		for (int line = 0; line<values.length; line++) {
 			double[] v = values[line];
 			Color color = new Color(v[H], v[HSV_S], v[V], Model.HSV);
 			
-			assertEquals(v[R],	color.getRed(),		0.5);
-			assertEquals(v[G], 	color.getGreen(),	0.5);
-			assertEquals(v[B], 	color.getBlue(),	0.5);
+			assertEquals(v[R],		color.getRed(),				0.5);
+			assertEquals(v[G], 		color.getGreen(),			0.5);
+			assertEquals(v[B], 		color.getBlue(),			0.5);
+			assertEquals(v[H],		color.getHSLHue(),			0.5);
+			assertEquals(v[HSL_S], 	color.getHSLSaturation(),	0.005);
+			assertEquals(v[L], 		color.getHSLLightness(),	0.005);
+			assertEquals(v[H],		color.getHSVHue(),			0.5);
+			assertEquals(v[HSV_S], 	color.getHSVSaturation(),	0.005);
+			assertEquals(v[V], 		color.getHSVValue(),		0.005);
 		}
 	}
-	
 }
