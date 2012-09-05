@@ -18,17 +18,11 @@
  */
 package org.daxplore.presenter.chart;
 
-import static org.junit.Assert.*;
-
 import org.daxplore.presenter.chart.ChartTools;
 import org.junit.Test;
 
 import com.google.gwt.junit.client.GWTTestCase;
 
-/**
- * @author daniel
- *
- */
 public class ChartToolsTest extends GWTTestCase {
 	
 	/**
@@ -75,7 +69,6 @@ public class ChartToolsTest extends GWTTestCase {
 		"Mozilla/4.0 (Windows; MSIE 6.0; Windows NT 6.0)",
 		"Mozilla/4.0 (MSIE 6.0; Windows NT 5.0)",
 		"Mozilla/4.0 (compatible;MSIE 6.0;Windows 98;Q312461)",
-		"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; GTB6.5; QQDownload 534; Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1) ; SLCC2; .NET CLR 2.0.50727; Media Center PC 6.0; .NET CLR 3.5.30729; .NET CLR 3.0.30729)	"
 	};
 
 	String[] ie7 = {
@@ -92,7 +85,6 @@ public class ChartToolsTest extends GWTTestCase {
 		"Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
 		"Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; SLCC1; .NET CLR 1.1.4322)",
 		"Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.0; Trident/4.0; InfoPath.1; SV1; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 3.0.04506.30)",
-		"Mozilla/5.0 (compatible; MSIE 7.0; Windows NT 5.0; Trident/4.0; FBSMTWB; .NET CLR 2.0.34861; .NET CLR 3.0.3746.3218; .NET CLR 3.5.33652; msn OptimizedIE8;ENUS)",
 		"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; MS-RTC LM 8; .NET4.0C; .NET4.0E; Zune 4.7; InfoPath.3)"
 	};
 
@@ -117,27 +109,26 @@ public class ChartToolsTest extends GWTTestCase {
 	@Test
 	public void testGetInternetExplorerVersion() {
 		for (String useragent : nonIe) {
-			assertEquals(-1, Math.round(ChartTools.getInternetExplorerVersion(useragent)));
+			assertEquals(-1, (int)ChartTools.getInternetExplorerVersion(useragent));
 		}
 		for (String useragent : ie5) {
-			assertEquals(5, Math.round(ChartTools.getInternetExplorerVersion(useragent)));
+			assertEquals(5, (int)ChartTools.getInternetExplorerVersion(useragent));
 		}
 		for (String useragent : ie6) {
-			assertEquals(6, Math.round(ChartTools.getInternetExplorerVersion(useragent)));
+			assertEquals(6, (int)ChartTools.getInternetExplorerVersion(useragent));
 		}
 		for (String useragent : ie7) {
-			assertEquals(7, Math.round(ChartTools.getInternetExplorerVersion(useragent)));
+			assertEquals(7, (int)ChartTools.getInternetExplorerVersion(useragent));
 		}
 		for (String useragent : ie8) {
-			assertEquals(8, Math.round(ChartTools.getInternetExplorerVersion(useragent)));
+			assertEquals(8, (int)ChartTools.getInternetExplorerVersion(useragent));
 		}
 		for (String useragent : ie9) {
-			assertEquals(9, Math.round(ChartTools.getInternetExplorerVersion(useragent)));
+			assertEquals(9, (int)ChartTools.getInternetExplorerVersion(useragent));
 		}
 		for (String useragent : ie10) {
-			assertEquals(10, Math.round(ChartTools.getInternetExplorerVersion(useragent)));
+			assertEquals(10, (int)ChartTools.getInternetExplorerVersion(useragent));
 		}
-		fail();
 	}
 
 }

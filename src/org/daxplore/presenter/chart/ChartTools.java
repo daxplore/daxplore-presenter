@@ -85,7 +85,6 @@ public class ChartTools {
 			if (ma.length == 2) {
 				rv = Double.parseDouble(ma[1]);
 			}
-			;
 		}
 		return rv;
 	}
