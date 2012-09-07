@@ -38,6 +38,15 @@
 		<servlet-name>getPixel</servlet-name>
 		<url-pattern>/pixel/*</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>upload</servlet-name>
+		<servlet-class>org.daxplore.presenter.server.DataUploadServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>upload</servlet-name>
+		<url-pattern>/upload</url-pattern>
+	</servlet-mapping>
 
 	<servlet>
 		<servlet-name>remoteapi</servlet-name>
@@ -58,6 +67,8 @@
 			<role-name>admin</role-name>
 		</auth-constraint>
 	</security-constraint>
+	
+	
 
 	<!-- Default page to serve -->
 	<welcome-file-list>
