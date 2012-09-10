@@ -85,7 +85,8 @@ contentType="text/html;charset=utf-8"
 		}
 		
 		// 3. Add browser requested locales
-		Enumeration<Locale> locales = request.getLocales();
+		@SuppressWarnings("unchecked")
+		Enumeration<Locale> locales = (Enumeration<Locale>)request.getLocales();
 		while(locales.hasMoreElements()){
 			desiredLocales.add(locales.nextElement());
 		}
