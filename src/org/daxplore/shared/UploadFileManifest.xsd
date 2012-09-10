@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+	<xsd:element name="daxploreUploadFileManifest">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="fileVersion" type="fileVersionType" />
+				<xsd:element name="prefix" type="prefixType" />
+				<xsd:element name="supportedLanguages" type="supportedLanguagesType" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:complexType name="fileVersionType">
+		<xsd:sequence>
+			<xsd:element name="major" type="xsd:nonNegativeInteger"></xsd:element>
+			<xsd:element name="minor" type="xsd:nonNegativeInteger"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:simpleType name="prefixType">
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="([a-zA-Z0-9])+" />
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="language-BCP47-Type">
+		<xsd:restriction base="xsd:language" />
+	</xsd:simpleType>
+
+	<xsd:complexType name="supportedLanguagesType">
+		<xsd:sequence maxOccurs="unbounded">
+			<xsd:element name="language-BCP47" type="language-BCP47-Type" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+</xsd:schema>
