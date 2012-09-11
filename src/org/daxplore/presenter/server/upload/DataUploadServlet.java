@@ -14,8 +14,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.server;
+package org.daxplore.presenter.server.upload;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -24,16 +25,28 @@ import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.Schema;
 
-import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.IOUtils;
+import org.daxplore.presenter.server.PMF;
+import org.daxplore.shared.SharedResourceTools;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import com.google.appengine.api.datastore.Blob;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 
+@SuppressWarnings("serial")
 public class DataUploadServlet extends HttpServlet {
-	private static final long serialVersionUID = -7441057462034711317L;
 
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse res) {
@@ -41,27 +54,58 @@ public class DataUploadServlet extends HttpServlet {
 	    ServletFileUpload upload = new ServletFileUpload();
 	    PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
-			FileItemIterator iter = upload.getItemIterator(req);
-			while(iter.hasNext()) {
-				FileItemStream item = iter.next();
-				ZipInputStream zipIn = new ZipInputStream(item.openStream());
-				ZipEntry entry;
-				while ((entry = zipIn.getNextEntry()) != null) {
-					if(!entry.isDirectory()) {
-						byte[] data = new byte[(int) entry.getSize()];
-						zipIn.read(data);
-						TextBlob textBlob = new TextBlob(entry.getName(), new Blob(data));
-							pm.makePersistent(textBlob);
-						System.out.println(entry.getName());
+			FileItemStream item = upload.getItemIterator(req).next();
+			byte[] fileData = IOUtils.toByteArray(item.openStream());
+			ZipInputStream zipIn = new ZipInputStream(new ByteArrayInputStream(fileData));
+			ZipEntry entry;
+			while ((entry = zipIn.getNextEntry()) != null) {
+				if (entry.getName().equals("UploadFileManifest.xml")) {
+					Schema schema = SharedResourceTools.getUploadFileManifestSchema();
+					DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+					dbf.setNamespaceAware(true);
+					dbf.setSchema(schema);
+					DocumentBuilder builder = dbf.newDocumentBuilder();
+					try {
+						Document document = builder.parse(zipIn);
+						Node node = document.getElementsByTagName("major").item(0);
+						int versionMajor = Integer.parseInt(node.getTextContent());
+						node = document.getElementsByTagName("major").item(0);
+						int versionMinor = Integer.parseInt(node.getTextContent());
+						if (SharedResourceTools.isSupportedUploadFileVersion(versionMajor, versionMinor)) {
+							node = document.getElementsByTagName("prefix").item(0);
+							String prefix = node.getTextContent();
+							ZipBlob zipBlob = new ZipBlob(prefix+"-UploadFile", new Blob(fileData));
+							pm.makePersistent(zipBlob);
+							Queue queue = QueueFactory.getQueue("upload-unpack-queue");
+							queue.add(TaskOptions.Builder.withUrl("/admin/uploadUnpack").param("prefix", prefix));
+							// TODO give user feedback on creation of task
+							break;
+						} else {
+							// File version not supported
+							// TODO give user feedback on invalid file
+							continue;
+						}
+					} catch (SAXException e) {
+						// Document not valid according to XSD definition
+						// TODO give user feedback on invalid file
+						continue;
 					}
 				}
 			}
 		} catch (FileUploadException e) {
 			e.printStackTrace();
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			// TODO give user feedback on invalid file
 		} catch (IOException e) {
 			e.printStackTrace();
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			// TODO give user feedback on invalid file
+		} catch (SAXException e) {
+			e.printStackTrace();
+			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} finally {
 			pm.close();
 		}

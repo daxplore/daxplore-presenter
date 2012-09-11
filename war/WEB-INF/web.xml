@@ -2,7 +2,15 @@
 
 <web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
 
-	<!-- Servlets -->
+	<!-- Default page to serve -->
+	
+	<welcome-file-list>
+		<welcome-file>presentation.jsp</welcome-file>
+	</welcome-file-list>
+
+
+	<!-- Public servlets -->
+	
 	<servlet>
 		<servlet-name>getStats</servlet-name>
 		<servlet-class>org.daxplore.presenter.server.GetStatsServlet</servlet-class>
@@ -39,20 +47,40 @@
 		<url-pattern>/pixel/*</url-pattern>
 	</servlet-mapping>
 	
+	
+	<!-- Admin servlets -->
+	
 	<servlet>
 		<servlet-name>upload</servlet-name>
-		<servlet-class>org.daxplore.presenter.server.DataUploadServlet</servlet-class>
+		<servlet-class>org.daxplore.presenter.server.upload.DataUploadServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>upload</servlet-name>
-		<url-pattern>/upload</url-pattern>
+		<url-pattern>/admin/upload</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+		<servlet-name>uploadUnpack</servlet-name>
+		<servlet-class>org.daxplore.presenter.server.upload.DataUploadUnpackServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>uploadUnpack</servlet-name>
+		<url-pattern>/admin/uploadUnpack</url-pattern>
+	</servlet-mapping>
+
+	<security-constraint>
+		<web-resource-collection>
+			<url-pattern>/admin/*</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+		</auth-constraint>
+	</security-constraint>
+	
 	<servlet>
 		<servlet-name>remoteapi</servlet-name>
 		<servlet-class>com.google.apphosting.utils.remoteapi.RemoteApiServlet</servlet-class>
 	</servlet>
-
 	<servlet-mapping>
 		<servlet-name>remoteapi</servlet-name>
 		<url-pattern>/remote_api</url-pattern>
@@ -67,12 +95,5 @@
 			<role-name>admin</role-name>
 		</auth-constraint>
 	</security-constraint>
-	
-	
-
-	<!-- Default page to serve -->
-	<welcome-file-list>
-		<welcome-file>presentation.jsp</welcome-file>
-	</welcome-file-list>
 
 </web-app>
