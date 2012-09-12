@@ -106,4 +106,14 @@ public class ServerTools {
 			throw new ResourceReaderException(e);
 		}
 	}
+
+	public static boolean isSupportedUploadFileVersion(int major, int minor) {
+		//TODO test if file version is supported
+		return true;
+	}
+
+	public static boolean isSupportedLanguage(String language) {
+		// TODO Auto-generated method stub
+		return true;
+	}
 }

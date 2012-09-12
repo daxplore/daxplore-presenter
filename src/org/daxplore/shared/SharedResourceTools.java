@@ -16,7 +16,11 @@
  */
 package org.daxplore.shared;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
@@ -27,15 +31,22 @@ import org.xml.sax.SAXException;
 
 public class SharedResourceTools {
 	
-	public static Schema getUploadFileManifestSchema() throws SAXException {
+	public static Schema getUploadFileManifestSchema() throws SAXException, IOException {
 		InputStream stream = SharedResourceTools.class.getResourceAsStream("UploadFileManifest.xsd");
 		SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-		return sf.newSchema(new StreamSource(stream));
+		Schema schema = sf.newSchema(new StreamSource(stream));
+		stream.close();
+		return schema;
 	}
-	
-	public static boolean isSupportedUploadFileVersion(int major, int minor) {
-		//TODO test if file version is supported
-		return true;
+
+	public static List<String> findMissingUploadFiles(Set<String> keySet, List<String> languages) {
+		// TODO Auto-generated method stub
+		return new LinkedList<String>();
+	}
+
+	public static List<String> findUnwantedUploadFiles(Set<String> keySet, List<String> languages) {
+		// TODO Auto-generated method stub
+		return new LinkedList<String>();
 	}
 	
 }

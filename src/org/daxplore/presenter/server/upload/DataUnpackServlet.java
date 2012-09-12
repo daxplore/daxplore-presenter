@@ -16,7 +16,10 @@
  */
 package org.daxplore.presenter.server.upload;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -28,74 +31,103 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.daxplore.presenter.server.PMF;
+import org.daxplore.presenter.server.ServerTools;
 import org.daxplore.presenter.server.TextBlob;
+import org.daxplore.presenter.shared.SharedTools;
+import org.daxplore.shared.SharedResourceTools;
 
+import com.google.api.server.spi.response.BadRequestException;
+import com.google.api.server.spi.response.InternalServerErrorException;
 import com.google.appengine.api.datastore.Blob;
 
 @SuppressWarnings("serial")
 public class DataUnpackServlet extends HttpServlet {
 
 	@Override
-	public void doPost(HttpServletRequest req, HttpServletResponse res) {
-		String prefix = req.getParameter("prefix");
-		
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query query = pm.newQuery(ZipBlob.class);
-		query.setFilter("name == " + prefix);
+	public void doGet(HttpServletRequest req, HttpServletResponse res) {
+		res.setStatus(HttpServletResponse.SC_OK);
+		PersistenceManager pm = null;
+		ZipBlob zipBlob = null;
 		try {
+			String key = req.getParameter("key");
+			LinkedHashMap<String, byte[]> fileMap = new LinkedHashMap<String, byte[]>();
+			pm = PMF.get().getPersistenceManager();
+			
+			// Get the uploaded file
+			Query query = pm.newQuery(ZipBlob.class);
+			query.setFilter("name == " + key);
 			@SuppressWarnings("unchecked")
 			List<ZipBlob> zipBlobs = (List<ZipBlob>) query.execute();
-			ZipBlob zipBlob = zipBlobs.get(0);
+			zipBlob = zipBlobs.get(0);
 			ZipInputStream zipIn = zipBlob.getZipInputStream(); 
 			
+			// Unzip all the files and put them in a map
 			try {
 				ZipEntry entry;
 				while ((entry = zipIn.getNextEntry()) != null) {
 					if(!entry.isDirectory()) {
 						byte[] data = new byte[(int) entry.getSize()];
 						zipIn.read(data);
-						TextBlob textBlob = new TextBlob(prefix+"-"+entry.getName(), new Blob(data));
-						pm.makePersistent(textBlob);
-						System.out.println(entry.getName());
+						fileMap.put(entry.getName(), data);
 					}
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new BadRequestException("Error when reading uploaded file (invalid file?)");
+			}
+				
+			// Read the file manifest to get metadata about the file
+			if (!fileMap.containsKey("manifest.xml")) {
+				throw new InternalServerErrorException("No manifest.xml found in uploaded file");
+			}
+			InputStream manifestStream = new ByteArrayInputStream(fileMap.get("manifest.xml"));
+			UploadFileManifest manifest = new UploadFileManifest(manifestStream);
+			
+			
+			// Check manifest content and make sure that the file is in proper order
+			
+			if (!ServerTools.isSupportedUploadFileVersion(manifest.getVersionMajor(), manifest.getVersionMinor())) {
+				throw new BadRequestException("Unsupported file version");
 			}
 			
-			
-			
-			/*getServletContext().getResourceAsStream(arg0))
-			if (stream==null) {
-				throw new ResourceReaderException("Unable to locate resource: " + resource);
+			for (String language : manifest.getLanguages()) {
+				if (!ServerTools.isSupportedLanguage(language)) {
+					throw new BadRequestException("Unsupported language: " + language);
+				}
 			}
-			try {
-				return new BufferedReader(new InputStreamReader(stream, "UTF8"));
-			} catch (UnsupportedEncodingException e) {
-				throw new ResourceReaderException(e);
-			}*/
-	        /*Schema schema = sf.newSchema();
-
-	        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-	        dbf.setNamespaceAware(true);
-	        dbf.setSchema(schema);
-	        DocumentBuilder db = dbf.newDocumentBuilder();
-	        db.parse(new File("person.xml"));
-         	*/
-
-			/*
-			if(!entry.isDirectory()) {
-				byte[] data = new byte[(int) entry.getSize()];
-				zipIn.read(data);
-				TextBlob textBlob = new TextBlob(entry.getName(), new Blob(data));
+			
+			List<String> missingUploadFiles = SharedResourceTools.findMissingUploadFiles(fileMap.keySet(), manifest.getLanguages());
+			if (!missingUploadFiles.isEmpty()) {
+				throw new BadRequestException("Uploaded doesn't contain required files: " + SharedTools.join(missingUploadFiles, ", "));
+			}
+			
+			List<String> unwantedUploadFiles = SharedResourceTools.findUnwantedUploadFiles(fileMap.keySet(), manifest.getLanguages());
+			if (!unwantedUploadFiles.isEmpty()) {
+				throw new BadRequestException("Uploaded file contains extra files: " + SharedTools.join(unwantedUploadFiles, ", "));
+			}
+			
+			// Assume that all files are text-files and store them.
+			// This should be changed if we add other kinds of data
+			for (String fileName : fileMap.keySet()) {
+				String dataStoreKey = manifest.getPrefix() + "-" + fileName;
+				Blob fileDataBlob = new Blob(fileMap.get(fileName));
+				TextBlob textBlob = new TextBlob(dataStoreKey, fileDataBlob);
 				pm.makePersistent(textBlob);
-				System.out.println(entry.getName());
 			}
-			*/
-		
+		} catch (BadRequestException e) {
+			e.printStackTrace();
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			//TODO comminicate error to user
+		} catch (InternalServerErrorException e) {
+			e.printStackTrace();
+			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			//TODO comminicate error to user
 		} finally {
-			pm.close();
+			if (pm != null) {
+				if (zipBlob != null) {
+					pm.deletePersistent(zipBlob);
+				}
+				pm.close();
+			}
 		}
 	}
 }

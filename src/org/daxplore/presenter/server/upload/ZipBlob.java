@@ -45,6 +45,19 @@ public class ZipBlob {
 		return name;
 	}
 	
+	/**
+	 * Returns the file data interpreted as a {@link ZipInputStream}.
+	 * 
+	 * <p>This is not guaranteed to actually be a zip stream, as the blob could
+	 * have been created from an invalid user-uploaded file that wasn't a zip.
+	 * This is expected behaviour and should be handled
+	 * when trying to unpack the zip file.</p>
+	 * 
+	 * <p>Closing this stream has no effect, as it is backed by a
+	 * {@link ByteArrayInputStream}.</p>
+	 * 
+	 * @return A stream of the blob data
+	 */
 	public ZipInputStream getZipInputStream() {
 		return new ZipInputStream(new ByteArrayInputStream(zipFile.getBytes()));
 	}
