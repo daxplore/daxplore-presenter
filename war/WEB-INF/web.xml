@@ -61,7 +61,7 @@
 
 	<servlet>
 		<servlet-name>uploadUnpack</servlet-name>
-		<servlet-class>org.daxplore.presenter.server.upload.DataUploadUnpackServlet</servlet-class>
+		<servlet-class>org.daxplore.presenter.server.upload.DataUnpackServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>uploadUnpack</servlet-name>

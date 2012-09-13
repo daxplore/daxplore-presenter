@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -42,22 +44,28 @@ import com.google.appengine.api.datastore.Blob;
 
 @SuppressWarnings("serial")
 public class DataUnpackServlet extends HttpServlet {
+	protected static Logger logger = Logger.getLogger(DataUnpackServlet.class.getName());
 
 	@Override
 	public void doGet(HttpServletRequest req, HttpServletResponse res) {
 		res.setStatus(HttpServletResponse.SC_OK);
-		PersistenceManager pm = null;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Query query = pm.newQuery(ZipBlob.class);
+		query.setFilter("name == nameParam");
+		query.declareParameters("String nameParam");
 		ZipBlob zipBlob = null;
 		try {
 			String key = req.getParameter("key");
 			LinkedHashMap<String, byte[]> fileMap = new LinkedHashMap<String, byte[]>();
-			pm = PMF.get().getPersistenceManager();
 			
 			// Get the uploaded file
-			Query query = pm.newQuery(ZipBlob.class);
-			query.setFilter("name == " + key);
 			@SuppressWarnings("unchecked")
-			List<ZipBlob> zipBlobs = (List<ZipBlob>) query.execute();
+			List<ZipBlob> zipBlobs = (List<ZipBlob>) query.execute(key);
+			if (zipBlobs.isEmpty()) {
+				throw new InternalServerErrorException("The file to be unpacked could not be found");
+			} else if (zipBlobs.size() >= 2) {
+				throw new InternalServerErrorException("Multiple uploaded files have the same key");
+			}
 			zipBlob = zipBlobs.get(0);
 			ZipInputStream zipIn = zipBlob.getZipInputStream(); 
 			
@@ -74,10 +82,10 @@ public class DataUnpackServlet extends HttpServlet {
 			} catch (IOException e) {
 				throw new BadRequestException("Error when reading uploaded file (invalid file?)");
 			}
-				
+			
 			// Read the file manifest to get metadata about the file
 			if (!fileMap.containsKey("manifest.xml")) {
-				throw new InternalServerErrorException("No manifest.xml found in uploaded file");
+				throw new BadRequestException("No manifest.xml found in uploaded file");
 			}
 			InputStream manifestStream = new ByteArrayInputStream(fileMap.get("manifest.xml"));
 			UploadFileManifest manifest = new UploadFileManifest(manifestStream);
@@ -114,20 +122,17 @@ public class DataUnpackServlet extends HttpServlet {
 				pm.makePersistent(textBlob);
 			}
 		} catch (BadRequestException e) {
-			e.printStackTrace();
-			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			logger.log(Level.INFO, e.getMessage(), e);
 			//TODO comminicate error to user
 		} catch (InternalServerErrorException e) {
-			e.printStackTrace();
-			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			logger.log(Level.SEVERE, e.getMessage(), e);
 			//TODO comminicate error to user
 		} finally {
-			if (pm != null) {
-				if (zipBlob != null) {
-					pm.deletePersistent(zipBlob);
-				}
-				pm.close();
+			query.closeAll();
+			if (zipBlob != null) {
+				pm.deletePersistent(zipBlob);
 			}
+			pm.close();
 		}
 	}
 }
