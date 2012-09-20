@@ -225,7 +225,7 @@ contentType="text/html;charset=utf-8"
 	    <script type="text/javascript" src="/getDefinitions?def=perspectives&amp;js=true&amp;l=<%=locale.getLanguage()%>" charset="UTF-8"></script>
 	  	<script type="text/javascript" src="/getDefinitions?def=questions&amp;js=true&amp;l=<%=locale.getLanguage()%>" charset="UTF-8"></script>
 	  	<script type="text/javascript" src="/getDefinitions?def=groups&amp;js=true&amp;l=<%=locale.getLanguage()%>" charset="UTF-8"></script>
-	    <script type="text/javascript" src="presentation/presentation.nocache.js"></script>
+	    <script type="text/javascript" src="gwtPresentation/gwtPresentation.nocache.js"></script>
 	<% } 
 	if(!browserSupported) { %>
 		<link rel="stylesheet" type="text/css" href="css/browser-suggestions.css">

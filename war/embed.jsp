@@ -129,7 +129,7 @@ public void jspInit(){
 		<title>Daxplore embed</title>
 		<link type="text/css" rel="stylesheet" href="css/embed.css">
 	    <link type="text/css" rel="stylesheet" href="css/daxplore-chart.css">
-	    <script type="text/javascript" src="embed/embed.nocache.js"></script>
+	    <script type="text/javascript" src="gwtEmbed/gwtEmbed.nocache.js"></script>
 	</head>
 	<script type="text/javascript">
 		var jsondata = [ <%=jsondata %> ];

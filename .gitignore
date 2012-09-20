@@ -11,9 +11,11 @@ extras
 
 gwt-unitCache
 war/WEB-INF/classes
-war/embed
 
-war/presentation
+war/gwtAdmin
+war/gwtEmbed
+war/gwtPresentation
+
 war/WEB-INF/appengine-generated
 war/WEB-INF/deploy
 
