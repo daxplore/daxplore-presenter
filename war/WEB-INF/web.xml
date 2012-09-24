@@ -77,6 +77,9 @@
 		</auth-constraint>
 	</security-constraint>
 	
+	
+	<!-- Google Remote API -->
+	
 	<servlet>
 		<servlet-name>remoteapi</servlet-name>
 		<servlet-class>com.google.apphosting.utils.remoteapi.RemoteApiServlet</servlet-class>
