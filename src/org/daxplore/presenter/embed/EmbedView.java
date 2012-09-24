@@ -42,11 +42,11 @@ import com.google.gwt.user.client.ui.Widget;
  * The EmbedView is the base widget for the Daxplore embed mode.
  * 
  * <p>It contains all the components that make up the chart and
- * (possible) other UI-elements. It handles resizing of all
+ * (possibly) other UI-elements. It handles resizing of all
  * it's sub-widgets if the window is resized.</p>
  */
 public class EmbedView extends Composite {
-	
+	interface EmbedBinderUiBinder extends UiBinder<Widget, EmbedView> {}
 	private static EmbedBinderUiBinder uiBinder = GWT.create(EmbedBinderUiBinder.class);
 	
 	@UiField(provided=true)
@@ -72,7 +72,7 @@ public class EmbedView extends Composite {
 	private ScrollPanel chartScrollPanel = new ScrollPanel();
 	protected boolean scrolling = false, forceScrolling = false;
 	
-	interface EmbedBinderUiBinder extends UiBinder<Widget, EmbedView> {}
+	
 	interface EmbedStyle extends CssResource {
 		String transparent();
 		String opaque();
