@@ -37,10 +37,16 @@ import org.daxplore.presenter.server.PMF;
 
 import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.InternalServerErrorException;
+import com.google.appengine.api.channel.ChannelMessage;
+import com.google.appengine.api.channel.ChannelService;
+import com.google.appengine.api.channel.ChannelServiceFactory;
 import com.google.appengine.api.datastore.Blob;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
+import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 
 /**
  * A servlet for uploading data to the Daxplore Presenter.
@@ -60,7 +66,14 @@ public class DataUploadServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse res) {
 		logger.log(Level.INFO, "User is uploading a new file with presenter data");
+		
 		res.setStatus(HttpServletResponse.SC_OK);
+		ChannelService channelService = ChannelServiceFactory.getChannelService();
+		UserService userService = UserServiceFactory.getUserService();
+		User user = userService.getCurrentUser();
+		String channelToken = user.getUserId();
+		channelService.sendMessage(new ChannelMessage(channelToken, "Server sending on channel!"));
+
 	    ServletFileUpload upload = new ServletFileUpload();
 	    PersistenceManager pm = PMF.get().getPersistenceManager();
 	    Query query = pm.newQuery(ZipBlob.class);
@@ -99,7 +112,6 @@ public class DataUploadServlet extends HttpServlet {
 					.withUrl("/admin/uploadUnpack")
 					.param("key", key)
 					.method(TaskOptions.Method.GET));
-			// TODO give user feedback on creation of task
 		} catch (InternalServerErrorException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
 			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

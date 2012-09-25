@@ -20,7 +20,9 @@ package org.daxplore.presenter.admin.inject;
 
 
 
-import org.daxplore.presenter.admin.AdminPanel;
+import org.daxplore.presenter.admin.presenter.AdminPresenter;
+import org.daxplore.presenter.admin.view.AdminViewImpl;
+import org.daxplore.presenter.admin.view.AdminView;
 
 import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.inject.Singleton;
@@ -45,8 +47,11 @@ public class AdminModule extends AbstractGinModule {
 	@Override
 	protected void configure() {
 
-		/* org.daxplore.presenter.admin */
-		bind(AdminPanel.class).in(Singleton.class);
+		/* org.daxplore.presenter.admin.presenter */
+		bind(AdminPresenter.class).in(Singleton.class);
+
+		/* org.daxplore.presenter.admin.view */
+		bind(AdminView.class).to(AdminViewImpl.class).in(Singleton.class);
 		
 		/* com.google.web.bindery.event.shared */
 		bind(EventBus.class).to(SimpleEventBus.class).in(Singleton.class);

@@ -17,22 +17,21 @@
 package org.daxplore.presenter.admin;
 
 import org.daxplore.presenter.admin.inject.AdminInjector;
+import org.daxplore.presenter.admin.presenter.AdminPresenter;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.RootPanel;
 
 public class AdminEntryPoint implements EntryPoint {
-	private final AdminInjector injector = GWT.create(AdminInjector.class);
-	
 	/**
 	 * This is the entry point method. It is automatically called by GWT to
 	 * create the admin web page.
 	 */
 	@Override
 	public void onModuleLoad() {
-		RootPanel rootPanel = RootPanel.get("ID-AdminPanel");
-		AdminPanel adminPanel = injector.getAdminPanel();
-		rootPanel.add(adminPanel);
+		AdminInjector injector = GWT.create(AdminInjector.class);
+		AdminPresenter adminPresenter = injector.getAdminPresenter();
+		RootPanel.get().add(adminPresenter.getDisplay().asWidget());
 	}
 }

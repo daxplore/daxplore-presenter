@@ -8,6 +8,7 @@
 			<g:Label>Upload a file:</g:Label>
 			<g:FileUpload ui:field='uploadWidget' name='dataUpload'/>
 			<g:Button ui:field='uploadButton'>Submit</g:Button>
+			<g:TextArea ui:field='serverMessageArea'/>
 		</g:VerticalPanel>		
 	</g:FormPanel>
 	

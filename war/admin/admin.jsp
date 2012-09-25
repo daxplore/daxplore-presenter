@@ -1,3 +1,8 @@
+<%@page import="com.google.appengine.api.channel.ChannelServiceFactory"%>
+<%@page import="com.google.appengine.api.channel.ChannelService"%>
+<%@page import="com.google.appengine.api.users.User"%>
+<%@page import="com.google.appengine.api.users.UserServiceFactory"%>
+<%@page import="com.google.appengine.api.users.UserService"%>
 <%
 /*
  *  Copyright 2012 Axel Winkler, Daniel Dunér
@@ -43,14 +48,19 @@ contentType="text/html;charset=utf-8"
 	Locale locale = new Locale("en");
 	ResourceBundle htmlTextsBundle = JspBundles.getHTMLTextsBundle(locale);
 	String pageTitle = htmlTextsBundle.getString("pageTitle");
+	UserService userService = UserServiceFactory.getUserService();
+	User user = userService.getCurrentUser();
+	ChannelService channelService = ChannelServiceFactory.getChannelService();
+	String channelToken = channelService.createChannel(user.getUserId());
 %>
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <!-- Set the locale for the gwt-parts of the site. -->
    	<meta name="gwt:property" content="locale=<%=locale.getLanguage()%>">
+   	<meta name="channelToken" content="<%=channelToken%>">
 
-    <title><%=pageTitle%> - Admin</title>
+    <title><%=pageTitle%> - Administration</title>
     <script type="text/javascript" src="/gwtAdmin/gwtAdmin.nocache.js"></script>
   </head>
 

@@ -14,12 +14,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.admin;
+package org.daxplore.presenter.admin.view;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.logical.shared.ResizeEvent;
-import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -27,10 +25,12 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 
 /**
  * The StagePanel is the base widget for the admin page.
@@ -38,16 +38,20 @@ import com.google.inject.Inject;
  * <p>It contains all the UI-elements in the page. It handles resizing of all
  * it's sub-widgets if the window is resized.</p>
  */
-public class AdminPanel extends Composite implements ResizeHandler {
-	interface AdminViewPanel extends UiBinder<Widget, AdminPanel> {}
+public class AdminViewImpl extends Composite implements AdminView {
+	interface AdminViewPanel extends UiBinder<Widget, AdminViewImpl> {}
 	private static AdminViewPanel uiBinder = GWT.create(AdminViewPanel.class);
+	
+	protected EventBus eventBus;
 
-	@UiField FormPanel uploadForm;
-	@UiField FileUpload uploadWidget;
-	@UiField Button uploadButton;
+	@UiField protected FormPanel uploadForm;
+	@UiField protected FileUpload uploadWidget;
+	@UiField protected Button uploadButton;
+	@UiField protected TextArea serverMessageArea;
 	
 	@Inject
-	protected AdminPanel() {
+	protected AdminViewImpl(EventBus eventBus) {
+		this.eventBus = eventBus;
 		initWidget(uiBinder.createAndBindUi(this));
 		uploadForm.setAction("/admin/upload");
 		uploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
@@ -61,20 +65,18 @@ public class AdminPanel extends Composite implements ResizeHandler {
 
 	@UiHandler("uploadForm")
 	protected void handleSubmit(SubmitEvent event) {
-		// TODO Auto-generated method stub
 	}
 
 	@UiHandler("uploadForm")
 	protected void handleSubmitComplete(SubmitCompleteEvent event) {
-		// TODO Auto-generated method stub
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void onResize(ResizeEvent event) {
-		// TODO Auto-generated method stub
+	public void addServerMessage(String message) {
+		String text = serverMessageArea.getText() + "\n" + message;
+		serverMessageArea.setText(text);
 	}
-
 }
