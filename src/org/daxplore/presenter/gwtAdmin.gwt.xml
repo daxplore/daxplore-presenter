@@ -4,30 +4,22 @@
 	
 	<!-- Inherit the core Web Toolkit stuff. -->
 	<inherits name='com.google.gwt.user.User' />
-
 	<!-- Inherit the default GWT style sheet. -->
 	<inherits name='com.google.gwt.user.theme.standard.Standard' />
 
 	<!-- Other modules to inherit -->
-	<!-- Added by Daniel on 19 July 2010 -->
 	<inherits name='com.googlecode.gchart.GChart' />
-
-	<!-- Added by Daniel on 28 July 2010 -->
 	<inherits name="com.google.gwt.http.HTTP" />
-
-	<!-- Added by Axel on 14 October 2010 -->
 	<inherits name="com.google.gwt.i18n.I18N" />
-
-	<!-- Added by Axel on 15 October 2010 -->
 	<inherits name="com.google.gwt.resources.Resources" />
 	<inherits name="com.google.gwt.inject.Inject" />
-	
-	<!-- Added by Daniel on 26 September 2012 -->
 	<inherits name='com.google.gwt.appengine.channel.Channel'/> 
-	
+	<inherits name="com.google.gwt.json.JSON"/>
+
 	<!-- Specify the app entry point class. -->
 	<entry-point class="org.daxplore.presenter.admin.AdminEntryPoint" />
 
 	<!-- Specify the paths for translatable code -->
 	<source path='admin' />
+	<source path='shared' />
 </module>

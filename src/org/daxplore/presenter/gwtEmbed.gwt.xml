@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.4.0//EN" "http://google-web-toolkit.googlecode.com/svn/tags/2.4.0/distro-source/core/src/gwt-module.dtd">
-<module rename-to='embed'>
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.5.0//EN" "http://google-web-toolkit.googlecode.com/svn/tags/2.5.0/distro-source/core/src/gwt-module.dtd">
+<module rename-to='gwtEmbed'>
 	<!-- Add Google Analytics support -->
 	<script src="/js/ga.js" />
 	
@@ -11,16 +11,9 @@
 	<inherits name='com.google.gwt.user.theme.standard.Standard' />
 
 	<!-- Other modules to inherit -->
-	<!-- Added by Daniel on 19 July 2010 -->
 	<inherits name='com.googlecode.gchart.GChart' />
-
-	<!-- Added by Daniel on 28 July 2010 -->
 	<inherits name="com.google.gwt.http.HTTP" />
-
-	<!-- Added by Axel on 14 October 2010 -->
 	<inherits name="com.google.gwt.i18n.I18N" />
-
-	<!-- Added by Axel on 15 October 2010 -->
 	<inherits name="com.google.gwt.resources.Resources" />
 	<inherits name="com.google.gwt.inject.Inject" />
 	
