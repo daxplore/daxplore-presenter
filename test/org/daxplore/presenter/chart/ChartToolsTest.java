@@ -30,7 +30,7 @@ public class ChartToolsTest extends GWTTestCase {
 	 */
 	@Override
 	public String getModuleName() {
-		return "org.daxplore.presenter.Presentation";
+		return "org.daxplore.presenter.gwtPresentation";
 	}
 
 	@Test

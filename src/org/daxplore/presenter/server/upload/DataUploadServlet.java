@@ -34,19 +34,15 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.daxplore.presenter.server.PMF;
+import org.daxplore.presenter.shared.ClientMessage;
+import org.daxplore.presenter.shared.ClientServerMessage.MESSAGE_TYPE;
 
 import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.InternalServerErrorException;
-import com.google.appengine.api.channel.ChannelMessage;
-import com.google.appengine.api.channel.ChannelService;
-import com.google.appengine.api.channel.ChannelServiceFactory;
 import com.google.appengine.api.datastore.Blob;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
-import com.google.appengine.api.users.User;
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
 
 /**
  * A servlet for uploading data to the Daxplore Presenter.
@@ -66,13 +62,7 @@ public class DataUploadServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse res) {
 		logger.log(Level.INFO, "User is uploading a new file with presenter data");
-		
 		res.setStatus(HttpServletResponse.SC_OK);
-		ChannelService channelService = ChannelServiceFactory.getChannelService();
-		UserService userService = UserServiceFactory.getUserService();
-		User user = userService.getCurrentUser();
-		String channelToken = user.getUserId();
-		channelService.sendMessage(new ChannelMessage(channelToken, "Server sending on channel!"));
 
 	    ServletFileUpload upload = new ServletFileUpload();
 	    PersistenceManager pm = PMF.get().getPersistenceManager();
@@ -93,7 +83,6 @@ public class DataUploadServlet extends HttpServlet {
 			String key = null;
 			for (int attempts=0; ; attempts++) {
 				key = Integer.toString(new Random().nextInt(Integer.MAX_VALUE), 36);
-				System.out.println(key);
 				@SuppressWarnings("unchecked")
 				List<ZipBlob> zipBlobs = (List<ZipBlob>) query.execute(key);
 				if (zipBlobs.isEmpty()) {
@@ -112,6 +101,7 @@ public class DataUploadServlet extends HttpServlet {
 					.withUrl("/admin/uploadUnpack")
 					.param("key", key)
 					.method(TaskOptions.Method.GET));
+			ClientMessageSender.sendMessage(new ClientMessage(MESSAGE_TYPE.PROGRESS_UPDATE, "User is uploading a new file with presenter data"));
 		} catch (InternalServerErrorException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
 			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

@@ -51,8 +51,8 @@ public class AdminPresenter implements SocketListener {
 	            break;
 	        }
 	    }
-		System.out.println(token);
-		ChannelFactory.createChannel(token, new ChannelCreatedCallback() {
+
+	    ChannelFactory.createChannel(token, new ChannelCreatedCallback() {
 			@Override
 			public void onChannelCreated(Channel channel) {
 				channel.open(AdminPresenter.this);
@@ -77,7 +77,21 @@ public class AdminPresenter implements SocketListener {
 	 */
 	@Override
 	public void onMessage(String message) {
-		adminView.addServerMessage(message);
+		adminView.addServerMessage("message recieved");
+		ServerMessage serverMessage = new ServerMessage(message);
+		switch (serverMessage.getMessageType()) {
+		case PROGRESS_UPDATE:
+			adminView.addServerMessage("Some text: " + serverMessage.getMessage());
+			break;
+		case SERVER_ERROR:
+			adminView.addServerMessage("Server error: " + serverMessage.getMessage());
+			break;
+		case USER_ERROR:
+			adminView.addServerMessage("User error: " + serverMessage.getMessage());
+			break;
+		default:
+			adminView.addServerMessage("Internal error!");
+		}
 	}
 
 	/**
