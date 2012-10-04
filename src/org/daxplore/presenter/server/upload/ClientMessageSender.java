@@ -27,7 +27,7 @@ import com.google.appengine.api.users.UserServiceFactory;
 
 
 public class ClientMessageSender {
-	public static void sendMessage(ClientMessage message) {
+	public void send(ClientMessage message) {
 		ChannelService channelService = ChannelServiceFactory.getChannelService();
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();

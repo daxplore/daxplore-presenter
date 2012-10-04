@@ -41,26 +41,50 @@ import org.daxplore.shared.SharedResourceTools;
 import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.InternalServerErrorException;
 import com.google.appengine.api.datastore.Blob;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 
 @SuppressWarnings("serial")
 public class DataUnpackServlet extends HttpServlet {
 	protected static Logger logger = Logger.getLogger(DataUnpackServlet.class.getName());
-
+	public enum UnpackType {
+		UNZIP_ALL, LOAD_PROPERTIES, LOAD_DATA
+	}
+	
 	@Override
 	public void doGet(HttpServletRequest req, HttpServletResponse res) {
 		res.setStatus(HttpServletResponse.SC_OK);
+		ClientMessageSender messageSender = new ClientMessageSender();
+		UnpackType type = UnpackType.valueOf(req.getParameter("type"));
+		String fileKey = req.getParameter("file");
+		switch(type) {
+		case UNZIP_ALL:
+			unzipAll(fileKey, messageSender);
+			break;
+		case LOAD_PROPERTIES:
+			loadProperties(fileKey, messageSender);
+			break;
+		case LOAD_DATA:
+			//loadData(???);
+			break;
+		default:
+		}
+	}
+	
+	
+	protected void unzipAll(String fileKey, ClientMessageSender messageSender) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query query = pm.newQuery(ZipBlob.class);
 		query.setFilter("name == nameParam");
 		query.declareParameters("String nameParam");
 		ZipBlob zipBlob = null;
 		try {
-			String key = req.getParameter("key");
 			LinkedHashMap<String, byte[]> fileMap = new LinkedHashMap<String, byte[]>();
 			
 			// Get the uploaded file
 			@SuppressWarnings("unchecked")
-			List<ZipBlob> zipBlobs = (List<ZipBlob>) query.execute(key);
+			List<ZipBlob> zipBlobs = (List<ZipBlob>) query.execute(fileKey);
 			if (zipBlobs.isEmpty()) {
 				throw new InternalServerErrorException("The file to be unpacked could not be found");
 			} else if (zipBlobs.size() >= 2) {
@@ -116,17 +140,26 @@ public class DataUnpackServlet extends HttpServlet {
 			// Assume that all files are text-files and store them.
 			// This should be changed if we add other kinds of data
 			for (String fileName : fileMap.keySet()) {
-				String dataStoreKey = manifest.getPrefix() + "-" + fileName;
+				System.out.println(fileName);
+				String dataStoreKey = manifest.getPrefix() + "/" + fileName;
 				Blob fileDataBlob = new Blob(fileMap.get(fileName));
 				TextBlob textBlob = new TextBlob(dataStoreKey, fileDataBlob);
 				pm.makePersistent(textBlob);
+				if(fileName.startsWith("properties/")){
+					Queue queue = QueueFactory.getQueue("upload-unpack-queue");
+					queue.add(TaskOptions.Builder
+							.withUrl("/admin/uploadUnpack")
+							.param("type", UnpackType.LOAD_PROPERTIES.toString())
+							.param("file", dataStoreKey)
+							.method(TaskOptions.Method.GET));
+				}
 			}
 		} catch (BadRequestException e) {
 			logger.log(Level.INFO, e.getMessage(), e);
-			//TODO comminicate error to user
+			//TODO communicate error to user
 		} catch (InternalServerErrorException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
-			//TODO comminicate error to user
+			//TODO communicate error to user
 		} finally {
 			query.closeAll();
 			if (zipBlob != null) {
@@ -134,5 +167,11 @@ public class DataUnpackServlet extends HttpServlet {
 			}
 			pm.close();
 		}
+	}
+	
+	
+	protected void loadProperties(String fileKey, ClientMessageSender messageSender) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		//TODO
 	}
 }

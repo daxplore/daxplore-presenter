@@ -34,6 +34,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.daxplore.presenter.server.PMF;
+import org.daxplore.presenter.server.upload.DataUnpackServlet.UnpackType;
 import org.daxplore.presenter.shared.ClientMessage;
 import org.daxplore.presenter.shared.ClientServerMessage.MESSAGE_TYPE;
 
@@ -63,7 +64,8 @@ public class DataUploadServlet extends HttpServlet {
 	public void doPost(HttpServletRequest req, HttpServletResponse res) {
 		logger.log(Level.INFO, "User is uploading a new file with presenter data");
 		res.setStatus(HttpServletResponse.SC_OK);
-
+		ClientMessageSender messageSender = new ClientMessageSender();
+		
 	    ServletFileUpload upload = new ServletFileUpload();
 	    PersistenceManager pm = PMF.get().getPersistenceManager();
 	    Query query = pm.newQuery(ZipBlob.class);
@@ -80,11 +82,11 @@ public class DataUploadServlet extends HttpServlet {
 				throw new BadRequestException("More than one file uploaded in a single request");
 			}
 			
-			String key = null;
+			String fileKey = null;
 			for (int attempts=0; ; attempts++) {
-				key = Integer.toString(new Random().nextInt(Integer.MAX_VALUE), 36);
+				fileKey = Integer.toString(new Random().nextInt(Integer.MAX_VALUE), 36);
 				@SuppressWarnings("unchecked")
-				List<ZipBlob> zipBlobs = (List<ZipBlob>) query.execute(key);
+				List<ZipBlob> zipBlobs = (List<ZipBlob>) query.execute(fileKey);
 				if (zipBlobs.isEmpty()) {
 					// found unused key
 					break;
@@ -93,15 +95,16 @@ public class DataUploadServlet extends HttpServlet {
 					throw new InternalServerErrorException("Could not generate a unique key for uploaded file");
 				}
 			}
-			ZipBlob zipBlob = new ZipBlob(key, new Blob(fileData));
+			ZipBlob zipBlob = new ZipBlob(fileKey, new Blob(fileData));
 			pm.makePersistent(zipBlob);
 			pm.close();
 			Queue queue = QueueFactory.getQueue("upload-unpack-queue");
 			queue.add(TaskOptions.Builder
 					.withUrl("/admin/uploadUnpack")
-					.param("key", key)
+					.param("type", UnpackType.UNZIP_ALL.toString())
+					.param("file", fileKey)
 					.method(TaskOptions.Method.GET));
-			ClientMessageSender.sendMessage(new ClientMessage(MESSAGE_TYPE.PROGRESS_UPDATE, "User is uploading a new file with presenter data"));
+			messageSender.send(new ClientMessage(MESSAGE_TYPE.PROGRESS_UPDATE, "User is uploading a new file with presenter data"));
 		} catch (InternalServerErrorException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
 			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
