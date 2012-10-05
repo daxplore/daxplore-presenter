@@ -18,20 +18,31 @@ package org.daxplore.presenter.server.upload;
 
 import org.daxplore.presenter.shared.ClientMessage;
 
+import com.google.api.server.spi.response.BadRequestException;
+import com.google.api.server.spi.response.InternalServerErrorException;
 import com.google.appengine.api.channel.ChannelMessage;
 import com.google.appengine.api.channel.ChannelService;
 import com.google.appengine.api.channel.ChannelServiceFactory;
-import com.google.appengine.api.users.User;
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
 
 
 public class ClientMessageSender {
-	public void send(ClientMessage message) {
+	protected String channelToken;
+	
+	public ClientMessageSender(String channelToken) {
+		this.channelToken = channelToken;
+	}
+	
+	public void send(ClientMessage message) throws BadRequestException, InternalServerErrorException {
 		ChannelService channelService = ChannelServiceFactory.getChannelService();
-		UserService userService = UserServiceFactory.getUserService();
-		User user = userService.getCurrentUser();
-		String channelToken = user.getUserId();
-		channelService.sendMessage(new ChannelMessage(channelToken, message.toJsonString()));
+		try {
+			channelService.sendMessage(new ChannelMessage(channelToken, message.toJsonString()));
+		} catch (IllegalArgumentException e) {
+			throw new InternalServerErrorException("Error when sending client message: " + e.getMessage());
+		}
+			
+	}
+	
+	public String getChannelToken() {
+		return channelToken;
 	}
 }

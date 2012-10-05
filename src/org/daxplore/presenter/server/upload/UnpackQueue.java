@@ -14,43 +14,25 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.server;
+package org.daxplore.presenter.server.upload;
 
-import java.io.UnsupportedEncodingException;
+import org.daxplore.presenter.server.upload.DataUnpackServlet.UnpackType;
 
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.PrimaryKey;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 
-import com.google.appengine.api.datastore.Blob;
+public class UnpackQueue {
 
-@PersistenceCapable
-public class TextBlob {
-	@PrimaryKey
-	private String name;
-
-	@Persistent
-	private Blob text;
-
-	public TextBlob() {
-	}
-
-	public TextBlob(String name, Blob text) {
-		this.name = name;
-		this.text = text;
-	}
-
-	public String getName() {
-		return name;
-	}
-	
-	public String getText() {
-		try {
-			return new String(text.getBytes(), "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			return null;
-		}
+	public void addTask(String datastoreKey, UnpackType type, String channelToken) {
+		Queue queue = QueueFactory.getQueue("upload-unpack-queue");
+		TaskOptions task = TaskOptions.Builder
+				.withUrl("/admin/uploadUnpack")
+				.method(TaskOptions.Method.GET)
+				.param("key", datastoreKey)
+				.param("type", type.toString())
+				.param("channel", channelToken);
+		queue.add(task);
 	}
 
 }

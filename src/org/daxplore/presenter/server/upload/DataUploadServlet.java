@@ -41,9 +41,9 @@ import org.daxplore.presenter.shared.ClientServerMessage.MESSAGE_TYPE;
 import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.InternalServerErrorException;
 import com.google.appengine.api.datastore.Blob;
-import com.google.appengine.api.taskqueue.Queue;
-import com.google.appengine.api.taskqueue.QueueFactory;
-import com.google.appengine.api.taskqueue.TaskOptions;
+import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 
 /**
  * A servlet for uploading data to the Daxplore Presenter.
@@ -64,14 +64,21 @@ public class DataUploadServlet extends HttpServlet {
 	public void doPost(HttpServletRequest req, HttpServletResponse res) {
 		logger.log(Level.INFO, "User is uploading a new file with presenter data");
 		res.setStatus(HttpServletResponse.SC_OK);
-		ClientMessageSender messageSender = new ClientMessageSender();
 		
 	    ServletFileUpload upload = new ServletFileUpload();
 	    PersistenceManager pm = PMF.get().getPersistenceManager();
-	    Query query = pm.newQuery(ZipBlob.class);
+	    Query query = pm.newQuery(UploadBlob.class);
 		query.setFilter("name == nameParam");
 		query.declareParameters("String nameParam");
 	    try {
+	    	UserService userService = UserServiceFactory.getUserService();
+			User user = userService.getCurrentUser();
+			if(user==null) {
+				throw new BadRequestException("User not logged in");
+			}
+			String channelToken = user.getUserId(); //TODO something better
+			ClientMessageSender messageSender = new ClientMessageSender(channelToken);
+			
 			FileItemIterator fileIterator = upload.getItemIterator(req);
 			if (!fileIterator.hasNext()) {
 				throw new BadRequestException("No file uploaded");
@@ -86,7 +93,7 @@ public class DataUploadServlet extends HttpServlet {
 			for (int attempts=0; ; attempts++) {
 				fileKey = Integer.toString(new Random().nextInt(Integer.MAX_VALUE), 36);
 				@SuppressWarnings("unchecked")
-				List<ZipBlob> zipBlobs = (List<ZipBlob>) query.execute(fileKey);
+				List<UploadBlob> zipBlobs = (List<UploadBlob>) query.execute(fileKey);
 				if (zipBlobs.isEmpty()) {
 					// found unused key
 					break;
@@ -95,15 +102,12 @@ public class DataUploadServlet extends HttpServlet {
 					throw new InternalServerErrorException("Could not generate a unique key for uploaded file");
 				}
 			}
-			ZipBlob zipBlob = new ZipBlob(fileKey, new Blob(fileData));
+			UploadBlob zipBlob = new UploadBlob(fileKey, new Blob(fileData));
 			pm.makePersistent(zipBlob);
 			pm.close();
-			Queue queue = QueueFactory.getQueue("upload-unpack-queue");
-			queue.add(TaskOptions.Builder
-					.withUrl("/admin/uploadUnpack")
-					.param("type", UnpackType.UNZIP_ALL.toString())
-					.param("file", fileKey)
-					.method(TaskOptions.Method.GET));
+			
+			UnpackQueue unpackQueue = new UnpackQueue();
+			unpackQueue.addTask(fileKey, UnpackType.UNZIP_ALL, channelToken);
 			messageSender.send(new ClientMessage(MESSAGE_TYPE.PROGRESS_UPDATE, "User is uploading a new file with presenter data"));
 		} catch (InternalServerErrorException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);

@@ -16,7 +16,10 @@
  */
 package org.daxplore.presenter.server.upload;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.zip.ZipInputStream;
 
 import javax.jdo.annotations.PersistenceCapable;
@@ -26,19 +29,19 @@ import javax.jdo.annotations.PrimaryKey;
 import com.google.appengine.api.datastore.Blob;
 
 @PersistenceCapable
-public class ZipBlob {
+public class UploadBlob {
 	@PrimaryKey
 	private String name;
 
 	@Persistent
-	private Blob zipFile;
+	private Blob data;
 
-	public ZipBlob() {
+	public UploadBlob() {
 	}
 
-	public ZipBlob(String name, Blob zipFile) {
+	public UploadBlob(String name, Blob data) {
 		this.name = name;
-		this.zipFile = zipFile;
+		this.data = data;
 	}
 
 	public String getName() {
@@ -49,17 +52,32 @@ public class ZipBlob {
 	 * Returns the file data interpreted as a {@link ZipInputStream}.
 	 * 
 	 * <p>This is not guaranteed to actually be a zip stream, as the blob could
-	 * have been created from an invalid user-uploaded file that wasn't a zip.
-	 * This is expected behaviour and should be handled
-	 * when trying to unpack the zip file.</p>
+	 * have been created from non-zip data. This is expected behaviour and
+	 * should be handled when trying to unpack the zip file.</p>
 	 * 
 	 * <p>Closing this stream has no effect, as it is backed by a
 	 * {@link ByteArrayInputStream}.</p>
 	 * 
 	 * @return A stream of the blob data
 	 */
-	public ZipInputStream getZipInputStream() {
-		return new ZipInputStream(new ByteArrayInputStream(zipFile.getBytes()));
+	public ZipInputStream getAsZipInputStream() {
+		return new ZipInputStream(new ByteArrayInputStream(data.getBytes()));
+	}
+	
+	/**
+	 * Return the file data interpreted as an UTF-8 encoded Reader.
+	 * 
+	 * <p>The data is not guaranteed to actually be such a String, as it could
+	 * have been created from any data. This is expected behaviour and
+	 * should be handled when trying to use the String.</p>
+	 * @return
+	 */
+	public BufferedReader getAsReader() {
+		try {
+			return new BufferedReader(new InputStreamReader(new ByteArrayInputStream(data.getBytes()), "UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e); //UTF-8 should never be unsupported
+		}
 	}
 
 }
