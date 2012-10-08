@@ -27,22 +27,20 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.daxplore.presenter.server.PMF;
 import org.daxplore.presenter.server.ServerTools;
 import org.daxplore.presenter.shared.ClientMessage;
-import org.daxplore.presenter.shared.SharedTools;
 import org.daxplore.presenter.shared.ClientServerMessage.MESSAGE_TYPE;
+import org.daxplore.presenter.shared.SharedTools;
 import org.daxplore.shared.SharedResourceTools;
 
 import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.InternalServerErrorException;
-import com.google.appengine.api.datastore.Blob;
+import com.google.appengine.api.blobstore.BlobInfoFactory;
+import com.google.appengine.api.blobstore.BlobKey;
 
 @SuppressWarnings("serial")
 public class DataUnpackServlet extends HttpServlet {
@@ -54,42 +52,28 @@ public class DataUnpackServlet extends HttpServlet {
 	
 	@Override
 	public void doGet(HttpServletRequest req, HttpServletResponse res) {
-		PersistenceManager pm = null;
-		Query query = null;
-		UploadBlob blob = null;
+		BlobKey blobKey = new BlobKey(req.getParameter("key"));
 		try {
 			res.setStatus(HttpServletResponse.SC_OK);
 			String channelToken = req.getParameter("channel");
 			System.out.println("channel unpack: " + channelToken);
 			ClientMessageSender messageSender = new ClientMessageSender(req.getParameter("channel"));
 			UnpackQueue unpackQueue = new UnpackQueue();
-			UnpackType type = UnpackType.valueOf(req.getParameter("type"));
-			String datastoreKey = req.getParameter("key");
+			UnpackType type = UnpackType.valueOf(req.getParameter("type").toUpperCase());
 			
-			pm = PMF.get().getPersistenceManager();
-			query = pm.newQuery(UploadBlob.class);
-			query.setFilter("name == nameParam");
-			query.declareParameters("String nameParam");
-			
-		
-			@SuppressWarnings("unchecked")
-			List<UploadBlob> dataBlobs = (List<UploadBlob>) query.execute(datastoreKey);
-			if (dataBlobs.isEmpty()) {
-				throw new InternalServerErrorException("The file to be unpacked could not be found");
-			} else if (dataBlobs.size() >= 2) {
-				throw new InternalServerErrorException("Multiple uploaded files have the same key");
-			}
-			blob = dataBlobs.get(0);
-			System.out.println("reading file: " + blob.getName());
+			String fileName = new BlobInfoFactory().loadBlobInfo(blobKey).getFilename();
+			messageSender.send(new ClientMessage(MESSAGE_TYPE.PROGRESS_UPDATE, "Filename: " + fileName));
+			byte[] fileData = UploadBlobManager.readFile(blobKey);
+
 			switch(type) {
 			case UNZIP_ALL:
-				unzipAll(blob, pm, unpackQueue, messageSender);
+				unzipAll(fileData, unpackQueue, messageSender);
 				break;
 			case PROPERTIES:
-				unpackPropertyFile(blob, pm, unpackQueue, messageSender);
+				unpackPropertyFile(fileData, unpackQueue, messageSender);
 				break;
 			case STATISTICAL_DATA:
-				unpackStatisticalDataFile(blob, pm, unpackQueue, messageSender);
+				unpackStatisticalDataFile(fileData, unpackQueue, messageSender);
 				break;
 			default:
 			}
@@ -108,15 +92,7 @@ public class DataUnpackServlet extends HttpServlet {
 			// it will cause a requeue-loop in AppEngine, so we use an extra try here
 			// to be on the safe side.
 			try { 
-				if(query!=null) {
-					query.closeAll();
-				}
-				if(blob != null) {
-					pm.deletePersistent(blob);
-				}
-				if(pm != null) {
-					pm.close();
-				}
+				UploadBlobManager.delete(blobKey);
 			} catch (Exception e) {
 				logger.log(Level.SEVERE, e.getMessage(), e);
 				//TODO communicate error to user
@@ -124,12 +100,11 @@ public class DataUnpackServlet extends HttpServlet {
 		}
 	}
 	
-	protected void unzipAll(UploadBlob fileBlob, PersistenceManager pm,
-			UnpackQueue unpackQueue, ClientMessageSender messageSender)
+	protected void unzipAll(byte[] fileData, UnpackQueue unpackQueue, ClientMessageSender messageSender)
 					throws BadRequestException, InternalServerErrorException {
 		LinkedHashMap<String, byte[]> fileMap = new LinkedHashMap<String, byte[]>();
 		
-		ZipInputStream zipIn = fileBlob.getAsZipInputStream(); 
+		ZipInputStream zipIn = ServerTools.getAsZipInputStream(fileData); 
 		
 		// Unzip all the files and put them in a map
 		try {
@@ -137,7 +112,10 @@ public class DataUnpackServlet extends HttpServlet {
 			while ((entry = zipIn.getNextEntry()) != null) {
 				if(!entry.isDirectory()) {
 					byte[] data = new byte[(int) entry.getSize()];
-					zipIn.read(data);
+					int read = 0;
+					while (read < data.length) {
+						read += zipIn.read(data, read, Math.min(1024, data.length-read));
+					}
 					fileMap.put(entry.getName(), data);
 				}
 			}
@@ -178,28 +156,29 @@ public class DataUnpackServlet extends HttpServlet {
 		// Assume that all files are text-files and store them.
 		// This should be changed if we add other kinds of data
 		for (String filename : fileMap.keySet()) {
-			String datastoreKey = manifest.getPrefix() + "/" + filename;
-			Blob fileDataBlob = new Blob(fileMap.get(filename));
-			UploadBlob textBlob = new UploadBlob(datastoreKey, fileDataBlob);
-			pm.makePersistent(textBlob);
-			if(filename.startsWith("properties/")){
-				unpackQueue.addTask(datastoreKey, UnpackType.PROPERTIES, messageSender.getChannelToken());
-			} else if(filename.startsWith("data/")) {
-				unpackQueue.addTask(datastoreKey, UnpackType.STATISTICAL_DATA, messageSender.getChannelToken());
+			String fileName = manifest.getPrefix() + "/" + filename;
+			try {
+				BlobKey blobKey = UploadBlobManager.writeFile(fileName, fileMap.get(filename));
+				if(filename.startsWith("properties/")){
+					unpackQueue.addTask(blobKey.getKeyString(), UnpackType.PROPERTIES, messageSender.getChannelToken());
+				} else if(filename.startsWith("data/")) {
+					unpackQueue.addTask(blobKey.getKeyString(), UnpackType.STATISTICAL_DATA, messageSender.getChannelToken());
+				}
+			} catch (IOException e) {
+				new InternalServerErrorException(e);
 			}
 		}
 	}
 	
 	
-	protected void unpackPropertyFile(UploadBlob fileBlob, PersistenceManager pm,
+	protected void unpackPropertyFile(byte[] fileData,
 			UnpackQueue unpackQueue, ClientMessageSender messageSender) {
 		//TODO
 	}
 	
-	protected void unpackStatisticalDataFile(UploadBlob fileBlob, PersistenceManager pm,
-			UnpackQueue unpackQueue, ClientMessageSender messageSender) throws BadRequestException, InternalServerErrorException {
-		System.out.println("Unpacking data: " + fileBlob.getName());
-		BufferedReader reader = fileBlob.getAsReader();
+	protected void unpackStatisticalDataFile(byte[] fileData, UnpackQueue unpackQueue, ClientMessageSender messageSender)
+			throws BadRequestException, InternalServerErrorException {
+		BufferedReader reader = ServerTools.getAsBufferedReader(fileData);
 		String line;
 		try {
 			while ((line=reader.readLine())!=null) {
@@ -207,6 +186,7 @@ public class DataUnpackServlet extends HttpServlet {
 					line = line.substring(0,  100);
 				}
 				messageSender.send(new ClientMessage(MESSAGE_TYPE.PROGRESS_UPDATE, line));
+				//TODO unpack data
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

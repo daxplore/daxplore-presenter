@@ -17,13 +17,9 @@
 package org.daxplore.presenter.server.upload;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,14 +29,13 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
-import org.daxplore.presenter.server.PMF;
 import org.daxplore.presenter.server.upload.DataUnpackServlet.UnpackType;
 import org.daxplore.presenter.shared.ClientMessage;
 import org.daxplore.presenter.shared.ClientServerMessage.MESSAGE_TYPE;
 
 import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.InternalServerErrorException;
-import com.google.appengine.api.datastore.Blob;
+import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -66,10 +61,6 @@ public class DataUploadServlet extends HttpServlet {
 		res.setStatus(HttpServletResponse.SC_OK);
 		
 	    ServletFileUpload upload = new ServletFileUpload();
-	    PersistenceManager pm = PMF.get().getPersistenceManager();
-	    Query query = pm.newQuery(UploadBlob.class);
-		query.setFilter("name == nameParam");
-		query.declareParameters("String nameParam");
 	    try {
 	    	UserService userService = UserServiceFactory.getUserService();
 			User user = userService.getCurrentUser();
@@ -88,26 +79,9 @@ public class DataUploadServlet extends HttpServlet {
 			if (fileIterator.hasNext()) {
 				throw new BadRequestException("More than one file uploaded in a single request");
 			}
-			
-			String fileKey = null;
-			for (int attempts=0; ; attempts++) {
-				fileKey = Integer.toString(new Random().nextInt(Integer.MAX_VALUE), 36);
-				@SuppressWarnings("unchecked")
-				List<UploadBlob> zipBlobs = (List<UploadBlob>) query.execute(fileKey);
-				if (zipBlobs.isEmpty()) {
-					// found unused key
-					break;
-				}
-				if (attempts > 10) {
-					throw new InternalServerErrorException("Could not generate a unique key for uploaded file");
-				}
-			}
-			UploadBlob zipBlob = new UploadBlob(fileKey, new Blob(fileData));
-			pm.makePersistent(zipBlob);
-			pm.close();
-			
+			BlobKey blobKey = UploadBlobManager.writeFile(file.getFieldName(), fileData);
 			UnpackQueue unpackQueue = new UnpackQueue();
-			unpackQueue.addTask(fileKey, UnpackType.UNZIP_ALL, channelToken);
+			unpackQueue.addTask(blobKey.getKeyString(), UnpackType.UNZIP_ALL, channelToken);
 			messageSender.send(new ClientMessage(MESSAGE_TYPE.PROGRESS_UPDATE, "User is uploading a new file with presenter data"));
 		} catch (InternalServerErrorException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
@@ -125,11 +99,6 @@ public class DataUploadServlet extends HttpServlet {
 			logger.log(Level.INFO, e.getMessage(), e);
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			// TODO give user feedback on invalid file
-		} finally {
-			query.closeAll();
-			if (!pm.isClosed()) {
-				pm.close();
-			}
 		}
 	}
 }

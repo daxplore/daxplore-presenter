@@ -36,6 +36,7 @@ public class ClientMessageSender {
 		ChannelService channelService = ChannelServiceFactory.getChannelService();
 		try {
 			channelService.sendMessage(new ChannelMessage(channelToken, message.toJsonString()));
+			System.out.println(message.toJsonString());
 		} catch (IllegalArgumentException e) {
 			throw new InternalServerErrorException("Error when sending client message: " + e.getMessage());
 		}

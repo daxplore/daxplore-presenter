@@ -19,12 +19,14 @@
 package org.daxplore.presenter.server;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.ZipInputStream;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
@@ -56,11 +58,12 @@ public class ServerTools {
 	}
 
 	/**
-	 * Ignore bad browser.
+	 * Check if the user has set a cookie to allow viewing the site
+	 * despite of a bad (i.e. Internet Explorer) browser.
 	 * 
 	 * @param cookies
-	 *            the cookies
-	 * @return true, if successful
+	 *            the server request cookies
+	 * @return true, if site access should be allowed
 	 */
 	public static boolean ignoreBadBrowser(Cookie[] cookies) {
 		for (Cookie c : cookies) {
@@ -115,5 +118,33 @@ public class ServerTools {
 	public static boolean isSupportedLanguage(String language) {
 		// TODO Auto-generated method stub
 		return true;
+	}
+	
+	/**
+	 * Returns the data interpreted as a {@link ZipInputStream}.
+	 * 
+	 * <p>Closing this stream has no effect, as it is backed by a
+	 * {@link ByteArrayInputStream}.</p>
+	 * 
+	 * @return A zip input stream of the data
+	 */
+	public static ZipInputStream getAsZipInputStream(byte[] data) {
+		return new ZipInputStream(new ByteArrayInputStream(data));
+	}
+	
+	/**
+	 * Return the data interpreted as an UTF-8 encoded buffered reader.
+	 * 
+	 * <p>Closing this reader has no effect, as it is backed by a
+	 * {@link ByteArrayInputStream}.</p>
+	 * 
+	 * @return A buffered reader of the data
+	 */
+	public static BufferedReader getAsBufferedReader(byte[] data) {
+		try {
+			return new BufferedReader(new InputStreamReader(new ByteArrayInputStream(data), "UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e); //UTF-8 should never be unsupported
+		}
 	}
 }
