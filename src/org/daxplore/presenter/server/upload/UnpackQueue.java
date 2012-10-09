@@ -16,20 +16,28 @@
  */
 package org.daxplore.presenter.server.upload;
 
-import org.daxplore.presenter.server.upload.DataUnpackServlet.UnpackType;
+import org.daxplore.presenter.server.upload.DataUnpackServlet.UNPACK_TYPE;
 
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 
 public class UnpackQueue {
+	
+	protected String prefix, channelToken;
+	
+	public UnpackQueue(String prefix, String channelToken) {
+		this.prefix = prefix;
+		this.channelToken = channelToken;
+	}
 
-	public void addTask(String datastoreKey, UnpackType type, String channelToken) {
+	public void addTask(UNPACK_TYPE type, String blobKey) {
 		Queue queue = QueueFactory.getQueue("upload-unpack-queue");
 		TaskOptions task = TaskOptions.Builder
 				.withUrl("/admin/uploadUnpack")
 				.method(TaskOptions.Method.GET)
-				.param("key", datastoreKey)
+				.param("prefix", prefix)
+				.param("key", blobKey)
 				.param("type", type.toString())
 				.param("channel", channelToken);
 		queue.add(task);
