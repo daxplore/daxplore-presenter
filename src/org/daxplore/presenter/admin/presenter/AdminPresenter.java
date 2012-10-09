@@ -77,11 +77,10 @@ public class AdminPresenter implements SocketListener {
 	 */
 	@Override
 	public void onMessage(String message) {
-		adminView.addServerMessage("message recieved");
 		ServerMessage serverMessage = new ServerMessage(message);
 		switch (serverMessage.getMessageType()) {
 		case PROGRESS_UPDATE:
-			adminView.addServerMessage("Some text: " + serverMessage.getMessage());
+			adminView.addServerMessage(serverMessage.getMessage());
 			break;
 		case SERVER_ERROR:
 			adminView.addServerMessage("Server error: " + serverMessage.getMessage());

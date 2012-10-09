@@ -34,14 +34,14 @@ import org.daxplore.presenter.client.json.shared.StatDataItem;
  * with a specific key.</p>
  */
 @PersistenceCapable
-public class StatStore {
+public class StatDataItemStore {
 	@PrimaryKey
 	private String key;
 	@Persistent
 	private String json;
 
 	/**
-	 * Instantiates a new stat data item.
+	 * Instantiate a new stat data item and make it persistent.
 	 * 
 	 * @param key
 	 *            the key
@@ -50,7 +50,7 @@ public class StatStore {
 	 * @param pm
 	 *            the persistance manager
 	 */
-	public StatStore(String key, String json, PersistenceManager pm) {
+	public StatDataItemStore(String key, String json, PersistenceManager pm) {
 		this.key = key;
 		this.json = stripJson(json);
 		pm.makePersistent(this);

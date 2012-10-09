@@ -124,7 +124,7 @@ public class GetStatsServlet extends HttpServlet {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		for (String key : datastoreKeys) {
 			try {
-				StatStore statStore = pm.getObjectById(StatStore.class, key.toUpperCase());
+				StatDataItemStore statStore = pm.getObjectById(StatDataItemStore.class, key.toUpperCase());
 				datastoreJsons.add(statStore.getJson());
 			} catch (CapabilityDisabledException e) {
 				SharedTools.println("CapabilityDisabledException");

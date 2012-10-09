@@ -27,11 +27,14 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.daxplore.presenter.server.PMF;
 import org.daxplore.presenter.server.ServerTools;
+import org.daxplore.presenter.server.StatDataItemStore;
 import org.daxplore.presenter.shared.ClientMessage;
 import org.daxplore.presenter.shared.ClientServerMessage.MESSAGE_TYPE;
 import org.daxplore.presenter.shared.SharedTools;
@@ -59,21 +62,21 @@ public class DataUnpackServlet extends HttpServlet {
 			System.out.println("channel unpack: " + channelToken);
 			ClientMessageSender messageSender = new ClientMessageSender(req.getParameter("channel"));
 			UnpackQueue unpackQueue = new UnpackQueue();
-			UnpackType type = UnpackType.valueOf(req.getParameter("type").toUpperCase());
 			
+			UnpackType type = UnpackType.valueOf(req.getParameter("type").toUpperCase());
 			String fileName = new BlobInfoFactory().loadBlobInfo(blobKey).getFilename();
-			messageSender.send(new ClientMessage(MESSAGE_TYPE.PROGRESS_UPDATE, "Filename: " + fileName));
 			byte[] fileData = UploadBlobManager.readFile(blobKey);
+			messageSender.send(new ClientMessage(MESSAGE_TYPE.PROGRESS_UPDATE, "Unpacking: " + fileName));
 
 			switch(type) {
 			case UNZIP_ALL:
 				unzipAll(fileData, unpackQueue, messageSender);
 				break;
 			case PROPERTIES:
-				unpackPropertyFile(fileData, unpackQueue, messageSender);
+				unpackPropertyFile(fileData, messageSender);
 				break;
 			case STATISTICAL_DATA:
-				unpackStatisticalDataFile(fileData, unpackQueue, messageSender);
+				unpackStatisticalDataFile(fileName, fileData, messageSender);
 				break;
 			default:
 			}
@@ -155,13 +158,12 @@ public class DataUnpackServlet extends HttpServlet {
 		
 		// Assume that all files are text-files and store them.
 		// This should be changed if we add other kinds of data
-		for (String filename : fileMap.keySet()) {
-			String fileName = manifest.getPrefix() + "/" + filename;
+		for (String fileName : fileMap.keySet()) {
 			try {
-				BlobKey blobKey = UploadBlobManager.writeFile(fileName, fileMap.get(filename));
-				if(filename.startsWith("properties/")){
+				BlobKey blobKey = UploadBlobManager.writeFile(manifest.getPrefix() + "/" + fileName, fileMap.get(fileName));
+				if(fileName.startsWith("properties/")){
 					unpackQueue.addTask(blobKey.getKeyString(), UnpackType.PROPERTIES, messageSender.getChannelToken());
-				} else if(filename.startsWith("data/")) {
+				} else if(fileName.startsWith("data/")) {
 					unpackQueue.addTask(blobKey.getKeyString(), UnpackType.STATISTICAL_DATA, messageSender.getChannelToken());
 				}
 			} catch (IOException e) {
@@ -171,26 +173,31 @@ public class DataUnpackServlet extends HttpServlet {
 	}
 	
 	
-	protected void unpackPropertyFile(byte[] fileData,
-			UnpackQueue unpackQueue, ClientMessageSender messageSender) {
+	protected void unpackPropertyFile(byte[] fileData, ClientMessageSender messageSender) {
 		//TODO
 	}
 	
-	protected void unpackStatisticalDataFile(byte[] fileData, UnpackQueue unpackQueue, ClientMessageSender messageSender)
+	protected void unpackStatisticalDataFile(String fileName, byte[] fileData, ClientMessageSender messageSender)
 			throws BadRequestException, InternalServerErrorException {
 		BufferedReader reader = ServerTools.getAsBufferedReader(fileData);
-		String line;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		String prefix = fileName.substring(0, fileName.indexOf('/'));
 		try {
+			int unpacked = 0;
+			String line;
 			while ((line=reader.readLine())!=null) {
-				if (line.length()>100) {
-					line = line.substring(0,  100);
-				}
-				messageSender.send(new ClientMessage(MESSAGE_TYPE.PROGRESS_UPDATE, line));
-				//TODO unpack data
+				int splitPoint = line.indexOf(',');
+				String key = prefix + "/" + line.substring(0, splitPoint);
+				String value = line.substring(splitPoint+1);
+				new StatDataItemStore(key, value, pm);
+				unpacked++;
 			}
+			messageSender.send(new ClientMessage(MESSAGE_TYPE.PROGRESS_UPDATE,
+					"Unpacked " + unpacked + " statistical data items from " + fileName.substring(fileName.indexOf('/'))));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new InternalServerErrorException(e);
+		} finally {
+			pm.close();
 		}
 	}
 }
