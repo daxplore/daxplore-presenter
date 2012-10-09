@@ -192,8 +192,8 @@ public class DataUnpackServlet extends HttpServlet {
 				new StatDataItemStore(key, value, pm);
 				unpacked++;
 			}
-			messageSender.send(new ClientMessage(MESSAGE_TYPE.PROGRESS_UPDATE,
-					"Unpacked " + unpacked + " statistical data items from " + fileName.substring(fileName.indexOf('/'))));
+			messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE,
+					"Unpacked " + unpacked + " statistical data items from " + fileName.substring(fileName.indexOf('/')));
 		} catch (IOException e) {
 			throw new InternalServerErrorException(e);
 		} finally {

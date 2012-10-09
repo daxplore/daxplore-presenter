@@ -30,7 +30,6 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.daxplore.presenter.server.upload.DataUnpackServlet.UnpackType;
-import org.daxplore.presenter.shared.ClientMessage;
 import org.daxplore.presenter.shared.ClientServerMessage.MESSAGE_TYPE;
 
 import com.google.api.server.spi.response.BadRequestException;
@@ -82,7 +81,7 @@ public class DataUploadServlet extends HttpServlet {
 			BlobKey blobKey = UploadBlobManager.writeFile(file.getFieldName(), fileData);
 			UnpackQueue unpackQueue = new UnpackQueue();
 			unpackQueue.addTask(blobKey.getKeyString(), UnpackType.UNZIP_ALL, channelToken);
-			messageSender.send(new ClientMessage(MESSAGE_TYPE.PROGRESS_UPDATE, "User is uploading a new file with presenter data"));
+			messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "User is uploading a new file with presenter data");
 		} catch (InternalServerErrorException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
 			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

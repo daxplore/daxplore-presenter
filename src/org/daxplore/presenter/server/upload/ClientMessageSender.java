@@ -17,6 +17,7 @@
 package org.daxplore.presenter.server.upload;
 
 import org.daxplore.presenter.shared.ClientMessage;
+import org.daxplore.presenter.shared.ClientServerMessage.MESSAGE_TYPE;
 
 import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.InternalServerErrorException;
@@ -41,6 +42,10 @@ public class ClientMessageSender {
 			throw new InternalServerErrorException("Error when sending client message: " + e.getMessage());
 		}
 			
+	}
+	
+	public void send(MESSAGE_TYPE messageType, String message) throws BadRequestException, InternalServerErrorException {
+		send(new ClientMessage(messageType, message));
 	}
 	
 	public String getChannelToken() {
