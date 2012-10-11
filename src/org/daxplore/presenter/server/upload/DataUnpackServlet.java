@@ -36,7 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.daxplore.presenter.server.PMF;
 import org.daxplore.presenter.server.ServerTools;
-import org.daxplore.presenter.server.storage.SettingsItemStore;
+import org.daxplore.presenter.server.storage.SettingItemStore;
 import org.daxplore.presenter.server.storage.StatDataItemStore;
 import org.daxplore.presenter.server.storage.StaticFileItemStore;
 import org.daxplore.presenter.server.storage.BlobManager;
@@ -77,6 +77,7 @@ public class DataUnpackServlet extends HttpServlet {
 
 			switch(type) {
 			case UNZIP_ALL:
+				purgeExistingData(messageSender);
 				unzipAll(fileData, messageSender);
 				break;
 			case PROPERTIES:
@@ -110,6 +111,27 @@ public class DataUnpackServlet extends HttpServlet {
 				//TODO communicate error to user
 			}
 		}
+	}
+	
+	protected void purgeExistingData(ClientMessageSender messageSender) throws InternalServerErrorException {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		long time = System.currentTimeMillis();
+		
+		long deletedStatDataItems = pm.newQuery(StatDataItemStore.class).deletePersistentAll();
+		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Removed " + deletedStatDataItems + " old statistical data items");
+		
+		long deletedSettingItems = pm.newQuery(SettingItemStore.class).deletePersistentAll();
+		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Removed " + deletedSettingItems + " old settings");
+		
+		@SuppressWarnings("unchecked")
+		List<StaticFileItemStore> fileItems = (List<StaticFileItemStore>)pm.newQuery(StaticFileItemStore.class).execute();
+		for (StaticFileItemStore item : fileItems) {
+			BlobManager.delete(item.getBlobKey());
+		}
+		long deletedStaticFileItems = pm.newQuery(StaticFileItemStore.class).deletePersistentAll();
+		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Removed " + deletedStaticFileItems + " old static files");
+		long totalDeleted = deletedStatDataItems + deletedSettingItems + deletedStaticFileItems;
+		logger.log(Level.INFO, "Deleted " + totalDeleted + " old data items in " + ((System.currentTimeMillis()-time)/Math.pow(10, 6)) + "seconds");
 	}
 	
 	protected void unzipAll(byte[] fileData, ClientMessageSender messageSender)
@@ -198,7 +220,7 @@ public class DataUnpackServlet extends HttpServlet {
 				key = prefix + "/" + fileName + "/" + key;
 				String value = line.substring(splitPoint+1).trim();
 				
-				pm.makePersistent(new SettingsItemStore(key, value));
+				pm.makePersistent(new SettingItemStore(key, value));
 				count++;
 			}
 			messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE,
@@ -210,7 +232,8 @@ public class DataUnpackServlet extends HttpServlet {
 		}
 	}
 
-	protected void unpackStaticFile(String prefix, String fileName, BlobKey blobKey, ClientMessageSender messageSender) throws BadRequestException, InternalServerErrorException {
+	protected void unpackStaticFile(String prefix, String fileName, BlobKey blobKey, ClientMessageSender messageSender)
+			throws BadRequestException, InternalServerErrorException {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		String datstoreKey = prefix + "/" + fileName;
 		pm.makePersistent(new StaticFileItemStore(datstoreKey, blobKey));

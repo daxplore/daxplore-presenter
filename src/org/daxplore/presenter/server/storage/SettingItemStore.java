@@ -34,7 +34,7 @@ import org.daxplore.presenter.client.json.shared.StatDataItem;
  * with a specific key.</p>
  */
 @PersistenceCapable
-public class SettingsItemStore {
+public class SettingItemStore {
 	@PrimaryKey
 	private String key;
 	@Persistent
@@ -53,7 +53,7 @@ public class SettingsItemStore {
 	 * @param value
 	 *            the value of the setting
 	 */
-	public SettingsItemStore(String key, String value) {
+	public SettingItemStore(String key, String value) {
 		this.key = key;
 		this.value = value;
 	}
