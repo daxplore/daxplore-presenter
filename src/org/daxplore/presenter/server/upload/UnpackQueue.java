@@ -16,7 +16,7 @@
  */
 package org.daxplore.presenter.server.upload;
 
-import org.daxplore.presenter.server.upload.DataUnpackServlet.UNPACK_TYPE;
+import org.daxplore.presenter.server.upload.DataUnpackServlet.UnpackType;
 
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
@@ -31,7 +31,7 @@ public class UnpackQueue {
 		this.channelToken = channelToken;
 	}
 
-	public void addTask(UNPACK_TYPE type, String blobKey) {
+	public void addTask(UnpackType type, String blobKey) {
 		Queue queue = QueueFactory.getQueue("upload-unpack-queue");
 		TaskOptions task = TaskOptions.Builder
 				.withUrl("/admin/uploadUnpack")

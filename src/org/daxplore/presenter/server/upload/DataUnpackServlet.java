@@ -36,6 +36,7 @@ import org.daxplore.presenter.server.PMF;
 import org.daxplore.presenter.server.ServerTools;
 import org.daxplore.presenter.server.SettingsItemStore;
 import org.daxplore.presenter.server.StatDataItemStore;
+import org.daxplore.presenter.server.StaticFileItemStore;
 import org.daxplore.presenter.shared.ClientMessage;
 import org.daxplore.presenter.shared.ClientServerMessage.MESSAGE_TYPE;
 import org.daxplore.presenter.shared.SharedTools;
@@ -50,14 +51,14 @@ import com.google.appengine.api.blobstore.BlobKey;
 public class DataUnpackServlet extends HttpServlet {
 	protected static Logger logger = Logger.getLogger(DataUnpackServlet.class.getName());
 	
-	public enum UNPACK_TYPE {
-		UNZIP_ALL, PROPERTIES, STATISTICAL_DATA
+	public enum UnpackType {
+		UNZIP_ALL, PROPERTIES, STATIC_FILE, STATISTICAL_DATA
 	}
 	
 	@Override
 	public void doGet(HttpServletRequest req, HttpServletResponse res) {
 		String prefix = req.getParameter("prefix");
-		UNPACK_TYPE type = UNPACK_TYPE.valueOf(req.getParameter("type").toUpperCase());
+		UnpackType type = UnpackType.valueOf(req.getParameter("type").toUpperCase());
 		BlobKey blobKey = new BlobKey(req.getParameter("key"));
 		String channelToken = req.getParameter("channel");
 		
@@ -78,10 +79,12 @@ public class DataUnpackServlet extends HttpServlet {
 			case PROPERTIES:
 				unpackPropertyFile(prefix, fileName, fileData, messageSender);
 				break;
+			case STATIC_FILE:
+				unpackStaticFile(prefix, fileName, blobKey, messageSender);
+				break;
 			case STATISTICAL_DATA:
 				unpackStatisticalDataFile(prefix, fileData, messageSender);
 				break;
-			default:
 			}
 		
 		} catch (BadRequestException e) {
@@ -164,9 +167,11 @@ public class DataUnpackServlet extends HttpServlet {
 			try {
 				BlobKey blobKey = UploadBlobManager.writeFile(manifest.getPrefix() + "/" + fileName, fileMap.get(fileName));
 				if(fileName.startsWith("properties/")){
-					unpackQueue.addTask(UNPACK_TYPE.PROPERTIES, blobKey.getKeyString());
+					unpackQueue.addTask(UnpackType.PROPERTIES, blobKey.getKeyString());
 				} else if(fileName.startsWith("data/")) {
-					unpackQueue.addTask(UNPACK_TYPE.STATISTICAL_DATA, blobKey.getKeyString());
+					unpackQueue.addTask(UnpackType.STATISTICAL_DATA, blobKey.getKeyString());
+				} else if(fileName.startsWith("static/")) {
+					unpackQueue.addTask(UnpackType.STATIC_FILE, blobKey.getKeyString());
 				}
 			} catch (IOException e) {
 				new InternalServerErrorException(e);
@@ -201,6 +206,15 @@ public class DataUnpackServlet extends HttpServlet {
 			pm.close();
 		}
 	}
+
+	protected void unpackStaticFile(String prefix, String fileName, BlobKey blobKey, ClientMessageSender messageSender) throws BadRequestException, InternalServerErrorException {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		String key = prefix + "/" + fileName;
+		new StaticFileItemStore(key, blobKey.getKeyString(), pm);
+		pm.close();
+		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE,
+				"Stored the static file " + fileName);
+	}
 	
 	protected void unpackStatisticalDataFile(String prefix, byte[] fileData, ClientMessageSender messageSender)
 			throws BadRequestException, InternalServerErrorException {
@@ -210,7 +224,6 @@ public class DataUnpackServlet extends HttpServlet {
 		try {
 			int count = 0;
 			String line;
-			
 			while ((line=reader.readLine())!=null) {
 				// Assumes that the data is in a "key,json\n" format
 				int splitPoint = line.indexOf(',');
@@ -220,7 +233,7 @@ public class DataUnpackServlet extends HttpServlet {
 				count++;
 			}
 			time = System.nanoTime()-time;
-			String message = "Unpacked " + count + " statistical data items in " + (time/1000000000.0) + " seconds";
+			String message = "Unpacked " + count + " statistical data items in " + (time/Math.pow(10, 9)) + " seconds";
 			logger.log(Level.INFO, message);
 			messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, message);
 		} catch (IOException e) {

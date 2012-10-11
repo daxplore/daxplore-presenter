@@ -29,7 +29,7 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
-import org.daxplore.presenter.server.upload.DataUnpackServlet.UNPACK_TYPE;
+import org.daxplore.presenter.server.upload.DataUnpackServlet.UnpackType;
 import org.daxplore.presenter.shared.ClientServerMessage.MESSAGE_TYPE;
 
 import com.google.api.server.spi.response.BadRequestException;
@@ -80,7 +80,7 @@ public class DataUploadServlet extends HttpServlet {
 			}
 			BlobKey blobKey = UploadBlobManager.writeFile(file.getFieldName(), fileData);
 			UnpackQueue unpackQueue = new UnpackQueue("", channelToken);
-			unpackQueue.addTask(UNPACK_TYPE.UNZIP_ALL, blobKey.getKeyString());
+			unpackQueue.addTask(UnpackType.UNZIP_ALL, blobKey.getKeyString());
 			messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "User is uploading a new file with presenter data");
 		} catch (InternalServerErrorException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
