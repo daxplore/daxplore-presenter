@@ -20,7 +20,9 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -196,7 +198,7 @@ public class DataUnpackServlet extends HttpServlet {
 				key = prefix + "/" + fileName + "/" + key;
 				String value = line.substring(splitPoint+1).trim();
 				
-				new SettingsItemStore(key, value, pm);
+				pm.makePersistent(new SettingsItemStore(key, value));
 				count++;
 			}
 			messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE,
@@ -210,8 +212,8 @@ public class DataUnpackServlet extends HttpServlet {
 
 	protected void unpackStaticFile(String prefix, String fileName, BlobKey blobKey, ClientMessageSender messageSender) throws BadRequestException, InternalServerErrorException {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		String key = prefix + "/" + fileName;
-		new StaticFileItemStore(key, blobKey.getKeyString(), pm);
+		String datstoreKey = prefix + "/" + fileName;
+		pm.makePersistent(new StaticFileItemStore(datstoreKey, blobKey));
 		pm.close();
 		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE,
 				"Stored the static file " + fileName);
@@ -225,14 +227,18 @@ public class DataUnpackServlet extends HttpServlet {
 		try {
 			int count = 0;
 			String line;
+			Collection<StatDataItemStore> items = new LinkedList<StatDataItemStore>(); 
 			while ((line=reader.readLine())!=null) {
 				// Assumes that the data is in a "key,json\n" format
 				int splitPoint = line.indexOf(',');
 				String key = prefix + "/" + line.substring(0, splitPoint);
-				String value = line.substring(splitPoint+1);
-				new StatDataItemStore(key, value, pm);
+				String json = line.substring(splitPoint+1);
+				json = json.substring(1, json.length() - 1);
+				json = json.replaceAll("\"\"", "\"");
+				items.add(new StatDataItemStore(key, json));
 				count++;
 			}
+			pm.makePersistentAll(items);
 			time = System.nanoTime()-time;
 			String message = "Unpacked " + count + " statistical data items in " + (time/Math.pow(10, 9)) + " seconds";
 			logger.log(Level.INFO, message);

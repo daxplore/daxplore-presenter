@@ -18,10 +18,11 @@
  */
 package org.daxplore.presenter.server.storage;
 
-import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+
+import com.google.appengine.api.blobstore.BlobKey;
 
 
 @PersistenceCapable
@@ -32,23 +33,25 @@ public class StaticFileItemStore {
 	private String blobKey;
 
 	/**
-	 * Instantiate a new stat data item and make it persistent.
+	 * Instantiate a new static file item, which acts as a pointer to a file
+	 * stored in the BlobStore.
+	 * 
+	 * <p>The key should be on the format "prefix/name". The prefix defines
+	 * which presenter the setting belongs to and the name is the name
+	 * of the file.</p>
 	 * 
 	 * @param key
-	 *            the key
+	 *            a key on the format "prefix/name"
 	 * @param blobKey
-	 *            the string representation of a blob key
-	 * @param pm
-	 *            the persistance manager
+	 *            the {@link BlobKey} of the tracked file
 	 */
-	public StaticFileItemStore(String key, String blobKey, PersistenceManager pm) {
+	public StaticFileItemStore(String key, BlobKey blobKey) {
 		this.key = key;
-		this.blobKey = blobKey;
-		pm.makePersistent(this);
+		this.blobKey = blobKey.getKeyString();
 	}
 
 	/**
-	 * Get the key.
+	 * Get the datastore key.
 	 * 
 	 * @return the key
 	 */
@@ -57,11 +60,11 @@ public class StaticFileItemStore {
 	}
 
 	/**
-	 * Get the stat data item json.
+	 * Get the BlobKey.
 	 * 
-	 * @return the data
+	 * @return the BlobKey of the tracked BlobStore file
 	 */
-	public String getBlobKey() {
-		return blobKey;
+	public BlobKey getBlobKey() {
+		return new BlobKey(blobKey);
 	}
 }

@@ -27,7 +27,7 @@ import org.daxplore.presenter.client.json.shared.StatDataItem;
 
 /**
  * A representation of a {@link StatDataItem} and it's key that can be
- * persisted (stored) using a {@link PersistenceManager}.
+ * persisted (stored) using a JDO {@link PersistenceManager}.
  * 
  * <p>This acts like an item in a hash table (represented by the
  * {@linkplain PersistenceManager}), making it possible to fetch data items
@@ -41,19 +41,21 @@ public class SettingsItemStore {
 	private String value;
 
 	/**
-	 * Instantiate a new settings item and make it persistent.
+	 * Creates a new settings item to hold a setting uploaded by an administrator
+	 * using the admin console.
+	 * 
+	 * <p>The key should be on the format "prefix/name". The prefix defines
+	 * which presenter the setting belongs to and the name is the name of the
+	 * setting.</p>
 	 * 
 	 * @param key
-	 *            the key
-	 * @param json
-	 *            the data item as json
-	 * @param pm
-	 *            the persistance manager
+	 *            a key on the format "prefix/name"
+	 * @param value
+	 *            the value of the setting
 	 */
-	public SettingsItemStore(String key, String value, PersistenceManager pm) {
+	public SettingsItemStore(String key, String value) {
 		this.key = key;
 		this.value = value;
-		pm.makePersistent(this);
 	}
 
 	/**
@@ -66,7 +68,7 @@ public class SettingsItemStore {
 	}
 
 	/**
-	 * Get the value
+	 * Get the setting value.
 	 * 
 	 * @return the value
 	 */

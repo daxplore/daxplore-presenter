@@ -41,26 +41,23 @@ public class StatDataItemStore {
 	private String json;
 
 	/**
-	 * Instantiate a new stat data item and make it persistent.
+	 * Instantiate a new stat data item, which is a piece of anonymized
+	 * statistical data that can be presented to users.
+	 * 
+	 * <p>The key should be on the format "prefix/name". The prefix defines
+	 * which presenter the setting belongs to and the name is the name
+	 * of the data item.</p>
 	 * 
 	 * @param key
-	 *            the key
+	 *            a key on the format "prefix/name"
 	 * @param json
 	 *            the data item as json
-	 * @param pm
-	 *            the persistance manager
 	 */
-	public StatDataItemStore(String key, String json, PersistenceManager pm) {
+	public StatDataItemStore(String key, String json) {
 		this.key = key;
-		this.json = stripJson(json);
-		pm.makePersistent(this);
+		this.json = json;
 	}
 
-	private String stripJson(String json) {
-		json = json.substring(1, json.length() - 1);
-		json = json.replaceAll("\"\"", "\"");
-		return json;
-	}
 
 	/**
 	 * Get the key.
