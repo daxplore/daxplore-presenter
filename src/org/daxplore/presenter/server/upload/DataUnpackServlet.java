@@ -244,7 +244,7 @@ public class DataUnpackServlet extends HttpServlet {
 	
 	protected void unpackStatisticalDataFile(String prefix, byte[] fileData, ClientMessageSender messageSender)
 			throws BadRequestException, InternalServerErrorException {
-		long time = System.nanoTime();
+		long time = System.currentTimeMillis();
 		BufferedReader reader = ServerTools.getAsBufferedReader(fileData);
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
@@ -262,8 +262,8 @@ public class DataUnpackServlet extends HttpServlet {
 				count++;
 			}
 			pm.makePersistentAll(items);
-			time = System.nanoTime()-time;
-			String message = "Unpacked " + count + " statistical data items in " + (time/Math.pow(10, 9)) + " seconds";
+			time = System.currentTimeMillis()-time;
+			String message = "Unpacked " + count + " statistical data items in " + (time/Math.pow(10, 6)) + " seconds";
 			logger.log(Level.INFO, message);
 			messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, message);
 		} catch (IOException e) {
