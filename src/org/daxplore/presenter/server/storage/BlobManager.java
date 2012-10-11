@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.server.upload;
+package org.daxplore.presenter.server.storage;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -38,7 +38,7 @@ import com.google.appengine.api.files.FileServiceFactory;
 import com.google.appengine.api.files.FileWriteChannel;
 import com.google.appengine.api.files.LockException;
 
-public class UploadBlobManager {
+public class BlobManager {
 
 	public static BlobKey writeFile(String fileName, byte[] data) throws IOException {
 		FileService fileService = FileServiceFactory.getFileService();

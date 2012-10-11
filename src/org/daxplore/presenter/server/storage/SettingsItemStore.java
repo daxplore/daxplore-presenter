@@ -16,34 +16,43 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.server;
+package org.daxplore.presenter.server.storage;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
+import org.daxplore.presenter.client.json.shared.StatDataItem;
 
+/**
+ * A representation of a {@link StatDataItem} and it's key that can be
+ * persisted (stored) using a {@link PersistenceManager}.
+ * 
+ * <p>This acts like an item in a hash table (represented by the
+ * {@linkplain PersistenceManager}), making it possible to fetch data items
+ * with a specific key.</p>
+ */
 @PersistenceCapable
-public class StaticFileItemStore {
+public class SettingsItemStore {
 	@PrimaryKey
 	private String key;
 	@Persistent
-	private String blobKey;
+	private String value;
 
 	/**
-	 * Instantiate a new stat data item and make it persistent.
+	 * Instantiate a new settings item and make it persistent.
 	 * 
 	 * @param key
 	 *            the key
-	 * @param blobKey
-	 *            the string representation of a blob key
+	 * @param json
+	 *            the data item as json
 	 * @param pm
 	 *            the persistance manager
 	 */
-	public StaticFileItemStore(String key, String blobKey, PersistenceManager pm) {
+	public SettingsItemStore(String key, String value, PersistenceManager pm) {
 		this.key = key;
-		this.blobKey = blobKey;
+		this.value = value;
 		pm.makePersistent(this);
 	}
 
@@ -57,11 +66,11 @@ public class StaticFileItemStore {
 	}
 
 	/**
-	 * Get the stat data item json.
+	 * Get the value
 	 * 
-	 * @return the data
+	 * @return the value
 	 */
-	public String getBlobKey() {
-		return blobKey;
+	public String getValue() {
+		return value;
 	}
 }

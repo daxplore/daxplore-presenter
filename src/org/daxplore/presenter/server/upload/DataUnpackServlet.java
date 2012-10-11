@@ -34,9 +34,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.daxplore.presenter.server.PMF;
 import org.daxplore.presenter.server.ServerTools;
-import org.daxplore.presenter.server.SettingsItemStore;
-import org.daxplore.presenter.server.StatDataItemStore;
-import org.daxplore.presenter.server.StaticFileItemStore;
+import org.daxplore.presenter.server.storage.SettingsItemStore;
+import org.daxplore.presenter.server.storage.StatDataItemStore;
+import org.daxplore.presenter.server.storage.StaticFileItemStore;
+import org.daxplore.presenter.server.storage.BlobManager;
 import org.daxplore.presenter.shared.ClientMessage;
 import org.daxplore.presenter.shared.ClientServerMessage.MESSAGE_TYPE;
 import org.daxplore.presenter.shared.SharedTools;
@@ -69,7 +70,7 @@ public class DataUnpackServlet extends HttpServlet {
 			ClientMessageSender messageSender = new ClientMessageSender(req.getParameter("channel"));
 			
 			String fileName = new BlobInfoFactory().loadBlobInfo(blobKey).getFilename();
-			byte[] fileData = UploadBlobManager.readFile(blobKey);
+			byte[] fileData = BlobManager.readFile(blobKey);
 			messageSender.send(new ClientMessage(MESSAGE_TYPE.PROGRESS_UPDATE, "Unpacking: " + fileName));
 
 			switch(type) {
@@ -101,7 +102,7 @@ public class DataUnpackServlet extends HttpServlet {
 			// it will cause a requeue-loop in AppEngine, so we use an extra try here
 			// to be on the safe side.
 			try { 
-				UploadBlobManager.delete(blobKey);
+				BlobManager.delete(blobKey);
 			} catch (Exception e) {
 				logger.log(Level.SEVERE, e.getMessage(), e);
 				//TODO communicate error to user
@@ -165,7 +166,7 @@ public class DataUnpackServlet extends HttpServlet {
 		UnpackQueue unpackQueue = new UnpackQueue(manifest.getPrefix(), messageSender.getChannelToken());
 		for (String fileName : fileMap.keySet()) {
 			try {
-				BlobKey blobKey = UploadBlobManager.writeFile(manifest.getPrefix() + "/" + fileName, fileMap.get(fileName));
+				BlobKey blobKey = BlobManager.writeFile(manifest.getPrefix() + "/" + fileName, fileMap.get(fileName));
 				if(fileName.startsWith("properties/")){
 					unpackQueue.addTask(UnpackType.PROPERTIES, blobKey.getKeyString());
 				} else if(fileName.startsWith("data/")) {
