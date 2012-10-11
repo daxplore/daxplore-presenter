@@ -68,8 +68,7 @@ public class DataUnpackServlet extends HttpServlet {
 		try {
 			res.setStatus(HttpServletResponse.SC_OK);
 			
-			System.out.println("channel unpack: " + channelToken);
-			ClientMessageSender messageSender = new ClientMessageSender(req.getParameter("channel"));
+			ClientMessageSender messageSender = new ClientMessageSender(channelToken);
 			
 			String fileName = new BlobInfoFactory().loadBlobInfo(blobKey).getFilename();
 			byte[] fileData = BlobManager.readFile(blobKey);
