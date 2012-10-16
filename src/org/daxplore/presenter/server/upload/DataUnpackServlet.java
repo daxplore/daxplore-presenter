@@ -76,7 +76,7 @@ public class DataUnpackServlet extends HttpServlet {
 
 			switch(type) {
 			case UNZIP_ALL:
-				purgeExistingData(messageSender);
+				purgeExistingData(messageSender); // TODO verify manifest before purging
 				unzipAll(fileData, messageSender);
 				break;
 			case PROPERTIES:
