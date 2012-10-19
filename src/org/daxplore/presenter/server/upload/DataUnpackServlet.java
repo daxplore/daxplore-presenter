@@ -39,7 +39,7 @@ import org.daxplore.presenter.server.ServerTools;
 import org.daxplore.presenter.server.storage.SettingItemStore;
 import org.daxplore.presenter.server.storage.StatDataItemStore;
 import org.daxplore.presenter.server.storage.StaticFileItemStore;
-import org.daxplore.presenter.server.storage.BlobManager;
+import org.daxplore.presenter.server.storage.StorageTools;
 import org.daxplore.presenter.shared.ClientMessage;
 import org.daxplore.presenter.shared.ClientServerMessage.MESSAGE_TYPE;
 import org.daxplore.presenter.shared.SharedTools;
@@ -71,7 +71,7 @@ public class DataUnpackServlet extends HttpServlet {
 			ClientMessageSender messageSender = new ClientMessageSender(channelToken);
 			
 			String fileName = new BlobInfoFactory().loadBlobInfo(blobKey).getFilename();
-			byte[] fileData = BlobManager.readFile(blobKey);
+			byte[] fileData = StorageTools.readBlob(blobKey);
 			messageSender.send(new ClientMessage(MESSAGE_TYPE.PROGRESS_UPDATE, "Unpacking: " + fileName));
 
 			switch(type) {
@@ -104,7 +104,7 @@ public class DataUnpackServlet extends HttpServlet {
 			// it will cause a requeue-loop in AppEngine, so we use an extra try here
 			// to be on the safe side.
 			try { 
-				BlobManager.delete(blobKey);
+				StorageTools.deleteBlob(blobKey);
 			} catch (Exception e) {
 				logger.log(Level.SEVERE, e.getMessage(), e);
 				//TODO communicate error to user
@@ -125,7 +125,7 @@ public class DataUnpackServlet extends HttpServlet {
 		@SuppressWarnings("unchecked")
 		List<StaticFileItemStore> fileItems = (List<StaticFileItemStore>)pm.newQuery(StaticFileItemStore.class).execute();
 		for (StaticFileItemStore item : fileItems) {
-			BlobManager.delete(item.getBlobKey());
+			StorageTools.deleteBlob(item.getBlobKey());
 		}
 		long deletedStaticFileItems = pm.newQuery(StaticFileItemStore.class).deletePersistentAll();
 		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Removed " + deletedStaticFileItems + " old static files");
@@ -189,7 +189,7 @@ public class DataUnpackServlet extends HttpServlet {
 		UnpackQueue unpackQueue = new UnpackQueue(manifest.getPrefix(), messageSender.getChannelToken());
 		for (String fileName : fileMap.keySet()) {
 			try {
-				BlobKey blobKey = BlobManager.writeFile(manifest.getPrefix() + "/" + fileName, fileMap.get(fileName));
+				BlobKey blobKey = StorageTools.writeBlob(manifest.getPrefix() + "/" + fileName, fileMap.get(fileName));
 				if(fileName.startsWith("properties/")){
 					unpackQueue.addTask(UnpackType.PROPERTIES, blobKey.getKeyString());
 				} else if(fileName.startsWith("data/")) {

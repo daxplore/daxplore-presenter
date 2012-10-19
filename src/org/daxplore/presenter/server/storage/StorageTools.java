@@ -27,7 +27,6 @@ import java.nio.channels.Channels;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
-
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
@@ -38,9 +37,13 @@ import com.google.appengine.api.files.FileServiceFactory;
 import com.google.appengine.api.files.FileWriteChannel;
 import com.google.appengine.api.files.LockException;
 
-public class BlobManager {
+/**
+ * @author ladu5359
+ *
+ */
+public class StorageTools {
 
-	public static BlobKey writeFile(String fileName, byte[] data) throws IOException {
+	public static BlobKey writeBlob(String fileName, byte[] data) throws IOException {
 		FileService fileService = FileServiceFactory.getFileService();
 		AppEngineFile file = fileService.createNewBlobFile("application/octet-stream", fileName);
 		FileWriteChannel writeChannel = fileService.openWriteChannel(file, true);
@@ -54,7 +57,7 @@ public class BlobManager {
 	    return fileService.getBlobKey(file);
 	}
 	
-	public static byte[] readFile(BlobKey blobKey) throws IOException {
+	public static byte[] readBlob(BlobKey blobKey) throws IOException {
 		FileService fileService = FileServiceFactory.getFileService();
 		AppEngineFile file = fileService.getBlobFile(blobKey);
 		FileReadChannel readChannel = null;
@@ -78,7 +81,8 @@ public class BlobManager {
 		}
 	}
 	
-	public static void delete(BlobKey blobKey) {
+	public static void deleteBlob(BlobKey blobKey) {
 		BlobstoreServiceFactory.getBlobstoreService().delete(blobKey);
 	}
+
 }

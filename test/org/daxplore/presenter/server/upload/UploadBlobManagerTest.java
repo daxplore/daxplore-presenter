@@ -21,7 +21,7 @@ import static org.junit.Assert.assertArrayEquals;
 import java.io.IOException;
 import java.util.Random;
 
-import org.daxplore.presenter.server.storage.BlobManager;
+import org.daxplore.presenter.server.storage.StorageTools;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,10 +62,10 @@ public class UploadBlobManagerTest {
 			data[i+3] = (byte)(r>>0);
 		}
 		
-		BlobKey key = BlobManager.writeFile("foo", data);
+		BlobKey key = StorageTools.writeBlob("foo", data);
 		
 		String keyString = key.getKeyString();
-		byte[] dataCopy = BlobManager.readFile(new BlobKey(keyString));
+		byte[] dataCopy = StorageTools.readBlob(new BlobKey(keyString));
 		
 		assertArrayEquals(data, dataCopy);
 	}
