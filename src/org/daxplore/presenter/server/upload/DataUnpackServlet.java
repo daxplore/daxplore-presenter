@@ -171,7 +171,7 @@ public class DataUnpackServlet extends HttpServlet {
 		}
 		
 		for (String language : manifest.getLanguages()) {
-			if (!ServerTools.isSupportedLanguage(language)) {
+			if (!ServerTools.isSupportedLocale(language)) {
 				throw new BadRequestException("Unsupported language: " + language);
 			}
 		}

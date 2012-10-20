@@ -76,7 +76,7 @@ public class ServerTools {
 		return true;
 	}
 
-	public static boolean isSupportedLanguage(String language) {
+	public static boolean isSupportedLocale(String language) {
 		// TODO Auto-generated method stub
 		return true;
 	}
