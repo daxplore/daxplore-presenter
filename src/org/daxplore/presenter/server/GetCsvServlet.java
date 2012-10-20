@@ -18,9 +18,9 @@
  */
 package org.daxplore.presenter.server;
 
-import java.io.BufferedReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.daxplore.presenter.server.throwable.ResourceReaderException;
+import org.daxplore.presenter.server.storage.StorageTools;
 import org.daxplore.presenter.server.throwable.StatsException;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
@@ -71,6 +71,7 @@ public class GetCsvServlet extends HttpServlet {
 		
 		try {
 			String localeString = req.getParameter("l");
+			String prefix = req.getParameter("prefix");
 			if (localeString==null) {
 				localeString = "";
 			}
@@ -79,9 +80,8 @@ public class GetCsvServlet extends HttpServlet {
 			if(metadataMap.containsKey(locale.getLanguage())) {
 				questionMetadata = metadataMap.get(locale.getLanguage());
 			} else {
-				BufferedReader reader = ServerTools.getResourceReader(getServletContext(), "questions", locale, ".json");
-				questionMetadata = new QuestionMetadataServerImpl(reader);
-				reader.close();
+				String questionText = StorageTools.readStaticFile(prefix, "questions", locale, ".json");
+				questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
 				metadataMap.put(locale.getLanguage(), questionMetadata);
 			}
 			QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, req.getParameter("q"));
@@ -155,10 +155,6 @@ public class GetCsvServlet extends HttpServlet {
 			csvWriter.writeAll(csvOutput);
 			resp.setStatus(HttpServletResponse.SC_OK);
 			
-		} catch (ResourceReaderException e) {
-			e.printStackTrace();
-			resp.setContentType("text/html; charset=UTF-8");
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		} catch (StatsException e) {
 			e.printStackTrace();
 			resp.setContentType("text/html; charset=UTF-8");

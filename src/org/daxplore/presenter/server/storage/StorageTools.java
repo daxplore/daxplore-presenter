@@ -23,9 +23,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
+import java.util.Locale;
+
+import javax.jdo.PersistenceManager;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.daxplore.presenter.server.PMF;
 
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
@@ -83,6 +87,15 @@ public class StorageTools {
 	
 	public static void deleteBlob(BlobKey blobKey) {
 		BlobstoreServiceFactory.getBlobstoreService().delete(blobKey);
+	}
+	
+	public static String readStaticFile(String prefix, String name, Locale locale, String suffix) throws IOException {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		String statStoreKey = prefix + "/" + name + "_" + locale.getLanguage() + "suffix";
+		StaticFileItemStore item = pm.getObjectById(StaticFileItemStore.class, statStoreKey);
+		pm.close();
+		return new String(readBlob(item.getBlobKey()));
+		
 	}
 
 }

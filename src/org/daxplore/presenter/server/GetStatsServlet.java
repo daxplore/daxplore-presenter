@@ -18,9 +18,9 @@
  */
 package org.daxplore.presenter.server;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -34,7 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.daxplore.presenter.client.json.shared.StatDataItem;
 import org.daxplore.presenter.server.resources.JspBundles;
 import org.daxplore.presenter.server.storage.StatDataItemStore;
-import org.daxplore.presenter.server.throwable.ResourceReaderException;
+import org.daxplore.presenter.server.storage.StorageTools;
 import org.daxplore.presenter.server.throwable.StatsException;
 import org.daxplore.presenter.shared.SharedTools;
 import org.daxplore.presenter.shared.QueryDefinition;
@@ -67,12 +67,12 @@ public class GetStatsServlet extends HttpServlet {
 		
 		try {
 			if (questionMetadata == null) {
+				String prefix = req.getParameter("prefix");
 				//it shouldn't matter what locale we use here, as we don't read any localized data:
 				String defaultLocale = JspBundles.getLocalesBundle().getString("defaultLocale");
 				Locale locale = new Locale(defaultLocale);
-				BufferedReader reader = ServerTools.getResourceReader(getServletContext(), "questions", locale , ".json");
-				questionMetadata = new QuestionMetadataServerImpl(reader);
-				reader.close();
+				String questionFile = StorageTools.readStaticFile(prefix, "questions", locale , ".json");
+				questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionFile));
 			}
 			
 			QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, req.getParameter("q"));
@@ -90,10 +90,6 @@ public class GetStatsServlet extends HttpServlet {
 			resp.setContentType("text/html; charset=UTF-8");
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		} catch (StatsException e ) {
-			e.printStackTrace();
-			resp.setContentType("text/html; charset=UTF-8");
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
-		} catch (ResourceReaderException e) {
 			e.printStackTrace();
 			resp.setContentType("text/html; charset=UTF-8");
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
