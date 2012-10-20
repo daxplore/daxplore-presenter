@@ -94,7 +94,7 @@ public class StorageTools {
 		String statStoreKey = prefix + "/" + name + "_" + locale.getLanguage() + "suffix";
 		StaticFileItemStore item = pm.getObjectById(StaticFileItemStore.class, statStoreKey);
 		pm.close();
-		return new String(readBlob(item.getBlobKey()));
+		return new String(readBlob(item.getBlobKey()), "UTF-8");
 		
 	}
 
