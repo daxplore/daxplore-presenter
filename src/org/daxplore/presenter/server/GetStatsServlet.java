@@ -71,7 +71,7 @@ public class GetStatsServlet extends HttpServlet {
 				//it shouldn't matter what locale we use here, as we don't read any localized data:
 				String defaultLocale = JspBundles.getLocalesBundle().getString("defaultLocale");
 				Locale locale = new Locale(defaultLocale);
-				String questionFile = StorageTools.readStaticFile(prefix, "questions", locale , ".json");
+				String questionFile = StorageTools.readStaticFile(prefix, "definitions/questions", locale , ".json");
 				questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionFile));
 			}
 			

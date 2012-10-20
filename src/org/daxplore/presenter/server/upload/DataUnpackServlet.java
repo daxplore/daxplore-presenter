@@ -194,7 +194,7 @@ public class DataUnpackServlet extends HttpServlet {
 					unpackQueue.addTask(UnpackType.PROPERTIES, blobKey.getKeyString());
 				} else if(fileName.startsWith("data/")) {
 					unpackQueue.addTask(UnpackType.STATISTICAL_DATA, blobKey.getKeyString());
-				} else if(fileName.startsWith("static/")) {
+				} else if(fileName.startsWith("definitions/")) {
 					unpackQueue.addTask(UnpackType.STATIC_FILE, blobKey.getKeyString());
 				}
 			} catch (IOException e) {

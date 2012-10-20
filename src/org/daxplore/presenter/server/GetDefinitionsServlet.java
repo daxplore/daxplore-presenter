@@ -95,7 +95,7 @@ public class GetDefinitionsServlet extends HttpServlet {
 			if (asJS) {
 				respWriter.write("var " + definitionName + " = ");
 			}
-			String text = StorageTools.readStaticFile(prefix, definitionName, locale, ".json");
+			String text = StorageTools.readStaticFile(prefix, "definitions/" + definitionName, locale, ".json");
 			respWriter.write(text);
 		} else {
 			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);

@@ -80,7 +80,7 @@ public class GetCsvServlet extends HttpServlet {
 			if(metadataMap.containsKey(locale.getLanguage())) {
 				questionMetadata = metadataMap.get(locale.getLanguage());
 			} else {
-				String questionText = StorageTools.readStaticFile(prefix, "questions", locale, ".json");
+				String questionText = StorageTools.readStaticFile(prefix, "definitions/questions", locale, ".json");
 				questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
 				metadataMap.put(locale.getLanguage(), questionMetadata);
 			}
