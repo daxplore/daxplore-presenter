@@ -133,6 +133,16 @@ public class DataUnpackServlet extends HttpServlet {
 		logger.log(Level.INFO, "Deleted " + totalDeleted + " old data items in " + ((System.currentTimeMillis()-time)/Math.pow(10, 6)) + "seconds");
 	}
 	
+	protected void enqueueForUnpacking(UnpackQueue unpackQueue, String fileName, BlobKey blobKey) {
+		if(fileName.startsWith("properties/")){
+			unpackQueue.addTask(UnpackType.PROPERTIES, blobKey.getKeyString());
+		} else if(fileName.startsWith("data/")) {
+			unpackQueue.addTask(UnpackType.STATISTICAL_DATA, blobKey.getKeyString());
+		} else if(fileName.startsWith("definitions/") || fileName.startsWith("texts/")) {
+			unpackQueue.addTask(UnpackType.STATIC_FILE, blobKey.getKeyString());
+		}
+	}
+	
 	protected void unzipAll(byte[] fileData, ClientMessageSender messageSender)
 					throws BadRequestException, InternalServerErrorException {
 		LinkedHashMap<String, byte[]> fileMap = new LinkedHashMap<String, byte[]>();
@@ -190,15 +200,9 @@ public class DataUnpackServlet extends HttpServlet {
 		for (String fileName : fileMap.keySet()) {
 			try {
 				BlobKey blobKey = StorageTools.writeBlob(manifest.getPrefix() + "/" + fileName, fileMap.get(fileName));
-				if(fileName.startsWith("properties/")){
-					unpackQueue.addTask(UnpackType.PROPERTIES, blobKey.getKeyString());
-				} else if(fileName.startsWith("data/")) {
-					unpackQueue.addTask(UnpackType.STATISTICAL_DATA, blobKey.getKeyString());
-				} else if(fileName.startsWith("definitions/")) {
-					unpackQueue.addTask(UnpackType.STATIC_FILE, blobKey.getKeyString());
-				}
+				enqueueForUnpacking(unpackQueue, fileName, blobKey);
 			} catch (IOException e) {
-				new InternalServerErrorException(e);
+				throw new InternalServerErrorException(e);
 			}
 		}
 	}
