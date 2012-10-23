@@ -136,6 +136,8 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 		case CSV:
 			Window.open(getCsvDownloadSrc(), "_blank", "enabled");
 			break;
+		default:
+			break;
 		}
 	}
 	
