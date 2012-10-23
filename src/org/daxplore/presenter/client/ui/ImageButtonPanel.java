@@ -114,7 +114,9 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 	protected void openPrintPage(){
 		if(queryDefinition != null) {
 			String address = GWT.getModuleBaseURL(); //get address with module, e.g. http://127.0.0.1/presentation/
-			address = address.substring(0, address.length()-1); //remove last slash
+			if (address.charAt(address.length()-1) == '/') {
+				address = address.substring(0, address.length()-1); //remove trailing slash
+			}
 			address = address.substring(0, address.lastIndexOf("/")+1); //remove module name
 			String locale = LocaleInfo.getCurrentLocale().getLocaleName();
 			address += "print.jsp?q=" + queryDefinition.getAsString() + "&l=" + locale;
