@@ -27,7 +27,12 @@ import java.util.zip.DeflaterOutputStream;
  * {@code PngWriter} can write compressed PNG images from a {@link PixelSource}.
  * 
  * <p>
- * Note: this class generates PNGs directly, without the use of any third-party libraries, to avoid any external dependencies. Google App Engine applications are not allowed to use Java 2D, but the usage of a pure-Java image libary like Sanselan (http://incubator.apache.org/sanselan/site/index.html) might be preferable in a production application.
+ * Note: this class generates PNGs directly, without the use of any third-party
+ * libraries, to avoid any external dependencies. Google App Engine applications
+ * are not allowed to use Java 2D, but the usage of a pure-Java image libary like
+ * Sanselan (http://incubator.apache.org/sanselan/site/index.html) might be
+ * preferable in a production application.
+ * </p>
  * 
  * @author schwardo@google.com (Don Schwarz)
  */
