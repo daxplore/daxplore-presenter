@@ -173,10 +173,10 @@ public class QueryResultMean extends QueryResult {
 	 * @return The mean answer in the total data item group.
 	 */
 	public double getTotalMean() {
-		if (averages[0] != Double.NaN) {
-			return averages[0];
+		if (Double.isNaN(averages[0])) {
+			throw new Error("No total data exists");
 		}
-		throw new Error("No total data exists");
+		return averages[0];
 	};
 
 	/**
@@ -186,10 +186,10 @@ public class QueryResultMean extends QueryResult {
 	 *         group.
 	 */
 	public double getTotalStandardDeviation() {
-		if (deviations[0] != Double.NaN) {
-			return deviations[0];
+		if (Double.isNaN(deviations[0])) {
+			throw new Error("No total data exists");
 		}
-		throw new Error("No total data exists");
+		return deviations[0];
 	};
 
 	/**

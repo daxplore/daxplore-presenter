@@ -120,7 +120,8 @@ public class MeanChart extends GChartChart {
 		createCurves(queryDefinition.getQuestionOptionTexts(), printerMode);
 		setupMouseHandlers();
 		setupAxes();
-
+		
+		// Ugly hack: force subclasses to run this themselves so that they are properly initzialized first
 		if (this.getClass().equals(MeanChart.class)) {
 			if (query.hasResult()) {
 				addData();
@@ -303,6 +304,10 @@ public class MeanChart extends GChartChart {
 		});
 	}
 
+	/**
+	 * May not be called from constructor if the implementing class is a subclass,
+	 * as some variables may not have been initialized. This is an ugly hack.
+	 */
 	protected void addData() {
 		QueryResultMean queryResult = (QueryResultMean) query.getResult(false, true);
 		List<String> perspectiveOptionTexts = queryDefinition.getPerspectiveOptionTexts();
