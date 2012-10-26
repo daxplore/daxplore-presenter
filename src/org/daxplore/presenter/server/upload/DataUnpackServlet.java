@@ -78,7 +78,6 @@ public class DataUnpackServlet extends HttpServlet {
 
 			switch(type) {
 			case UNZIP_ALL:
-				purgeExistingData(prefix, messageSender);
 				unzipAll(prefix, fileData, messageSender);
 				break;
 			case PROPERTIES:
@@ -211,6 +210,9 @@ public class DataUnpackServlet extends HttpServlet {
 		if (!unwantedUploadFiles.isEmpty()) {
 			throw new BadRequestException("Uploaded file contains extra files: " + SharedTools.join(unwantedUploadFiles, ", "));
 		}
+		
+		// Purge all existing data that uses this prefix
+		purgeExistingData(prefix, messageSender);
 		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		pm.makePersistent(new PrefixStore(prefix));
