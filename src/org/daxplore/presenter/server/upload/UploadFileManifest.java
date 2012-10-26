@@ -40,8 +40,6 @@ import com.google.api.server.spi.response.InternalServerErrorException;
  */
 public class UploadFileManifest {
 	protected int versionMajor, versionMinor;
-
-	protected String prefix;
 	protected List<String> languages = new LinkedList<String>();
 	
 	public UploadFileManifest(InputStream manifestInputStream) throws InternalServerErrorException, BadRequestException {
@@ -75,9 +73,6 @@ public class UploadFileManifest {
 			node = document.getElementsByTagName("major").item(0);
 			versionMinor = Integer.parseInt(node.getTextContent());
 			
-			node = document.getElementsByTagName("prefix").item(0);
-			prefix = node.getTextContent(); 
-			
 			NodeList languageNodes = document.getElementsByTagName("language-BCP47");
 			for (int i=0; i<languageNodes.getLength(); i++) {
 				languages.add(languageNodes.item(i).getTextContent());
@@ -97,10 +92,6 @@ public class UploadFileManifest {
 
 	public int getVersionMinor() {
 		return versionMinor;
-	}
-
-	public String getPrefix() {
-		return prefix;
 	}
 
 	public List<String> getLanguages() {

@@ -18,11 +18,11 @@
  */
 package org.daxplore.presenter.server.throwable;
 
-import org.daxplore.presenter.server.GetStatsServlet;
+import org.daxplore.presenter.server.storage.StorageTools;
 import org.daxplore.presenter.shared.QueryDefinition;
 
 /**
- * An Exception thrown by {@link GetStatsServlet#getStats(QueryDefinition)} when
+ * An Exception thrown by {@link StorageTools#getStats(String, QueryDefinition)} when
  * unable to return a statistic.
  */
 @SuppressWarnings("serial")

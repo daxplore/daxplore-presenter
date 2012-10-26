@@ -30,15 +30,6 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>getDefinitions</servlet-name>
-		<servlet-class>org.daxplore.presenter.server.GetDefinitionsServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>getDefinitions</servlet-name>
-		<url-pattern>/getDefinitions</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
 		<servlet-name>getPixel</servlet-name>
 		<servlet-class>org.daxplore.presenter.server.png.GetPixelServlet</servlet-class>
 	</servlet>

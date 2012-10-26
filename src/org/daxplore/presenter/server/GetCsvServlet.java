@@ -55,6 +55,7 @@ import au.com.bytecode.opencsv.CSVWriter;
  * <ul>
  * <li>q, which is a queryString that defines the query</li>
  * <li>l, which defines the locale</li>
+ * <li>prefix, which defines which prefix to read the data from</li>
  * </ul>
  */
 @SuppressWarnings("serial")
@@ -96,7 +97,7 @@ public class GetCsvServlet extends HttpServlet {
 			questionOptionTexts.add(0,  queryDefinition.getPerspectiveShortText() + " \\ " + queryDefinition.getQuestionShortText());
 			csvOutput.add(questionOptionTexts.toArray(new String[0]));
 			LinkedList<String> datastoreJsons;
-			datastoreJsons = GetStatsServlet.getStats(queryDefinition);
+			datastoreJsons = StorageTools.getStats(prefix, queryDefinition);
 			
 			ContainerFactory containerFactory = new ContainerFactory() {
 				@Override

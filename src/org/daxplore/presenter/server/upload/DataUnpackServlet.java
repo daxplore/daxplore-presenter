@@ -30,12 +30,14 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.daxplore.presenter.server.PMF;
 import org.daxplore.presenter.server.ServerTools;
+import org.daxplore.presenter.server.storage.PrefixStore;
 import org.daxplore.presenter.server.storage.SettingItemStore;
 import org.daxplore.presenter.server.storage.StatDataItemStore;
 import org.daxplore.presenter.server.storage.StaticFileItemStore;
@@ -76,8 +78,8 @@ public class DataUnpackServlet extends HttpServlet {
 
 			switch(type) {
 			case UNZIP_ALL:
-				purgeExistingData(messageSender);
-				unzipAll(fileData, messageSender);
+				purgeExistingData(prefix, messageSender);
+				unzipAll(prefix, fileData, messageSender);
 				break;
 			case PROPERTIES:
 				unpackPropertyFile(prefix, fileName, fileData, messageSender);
@@ -112,23 +114,37 @@ public class DataUnpackServlet extends HttpServlet {
 		}
 	}
 	
-	protected void purgeExistingData(ClientMessageSender messageSender) throws InternalServerErrorException {
+	protected void purgeExistingData(String prefix, ClientMessageSender messageSender) throws InternalServerErrorException {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		long time = System.currentTimeMillis();
 		
-		long deletedStatDataItems = pm.newQuery(StatDataItemStore.class).deletePersistentAll();
+		Query query = pm.newQuery(StatDataItemStore.class);
+		query.declareParameters("String prefix");
+		query.setFilter("key.startsWith(prefix)");
+		long deletedStatDataItems = query.deletePersistentAll(prefix);
 		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Removed " + deletedStatDataItems + " old statistical data items");
 		
-		long deletedSettingItems = pm.newQuery(SettingItemStore.class).deletePersistentAll();
+		query = pm.newQuery(SettingItemStore.class);
+		query.declareParameters("String prefix");
+		query.setFilter("key.startsWith(prefix)");
+		long deletedSettingItems = query.deletePersistentAll(prefix);
 		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Removed " + deletedSettingItems + " old settings");
-		
+
+		query = pm.newQuery(StaticFileItemStore.class);
+		query.declareParameters("String prefix");
+		query.setFilter("key.startsWith(prefix)");
 		@SuppressWarnings("unchecked")
-		List<StaticFileItemStore> fileItems = (List<StaticFileItemStore>)pm.newQuery(StaticFileItemStore.class).execute();
+		List<StaticFileItemStore> fileItems = (List<StaticFileItemStore>)query.execute(prefix);;
 		for (StaticFileItemStore item : fileItems) {
 			StorageTools.deleteBlob(item.getBlobKey());
 		}
-		long deletedStaticFileItems = pm.newQuery(StaticFileItemStore.class).deletePersistentAll();
+		
+		query = pm.newQuery(StaticFileItemStore.class);
+		query.declareParameters("String prefix");
+		query.setFilter("key.startsWith(prefix)");
+		long deletedStaticFileItems = query.deletePersistentAll(prefix);
 		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Removed " + deletedStaticFileItems + " old static files");
+		
 		long totalDeleted = deletedStatDataItems + deletedSettingItems + deletedStaticFileItems;
 		logger.log(Level.INFO, "Deleted " + totalDeleted + " old data items in " + ((System.currentTimeMillis()-time)/Math.pow(10, 6)) + "seconds");
 	}
@@ -143,7 +159,7 @@ public class DataUnpackServlet extends HttpServlet {
 		}
 	}
 	
-	protected void unzipAll(byte[] fileData, ClientMessageSender messageSender)
+	protected void unzipAll(String prefix, byte[] fileData, ClientMessageSender messageSender)
 					throws BadRequestException, InternalServerErrorException {
 		LinkedHashMap<String, byte[]> fileMap = new LinkedHashMap<String, byte[]>();
 		
@@ -196,10 +212,16 @@ public class DataUnpackServlet extends HttpServlet {
 			throw new BadRequestException("Uploaded file contains extra files: " + SharedTools.join(unwantedUploadFiles, ", "));
 		}
 		
-		UnpackQueue unpackQueue = new UnpackQueue(manifest.getPrefix(), messageSender.getChannelToken());
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		pm.makePersistent(new PrefixStore(prefix));
+		pm.close();
+		logger.log(Level.INFO, "Added prefix to system: " + prefix);
+		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Added prefix to system: " + prefix);
+		
+		UnpackQueue unpackQueue = new UnpackQueue(prefix, messageSender.getChannelToken());
 		for (String fileName : fileMap.keySet()) {
 			try {
-				BlobKey blobKey = StorageTools.writeBlob(manifest.getPrefix() + "/" + fileName, fileMap.get(fileName));
+				BlobKey blobKey = StorageTools.writeBlob(prefix + "/" + fileName, fileMap.get(fileName));
 				enqueueForUnpacking(unpackQueue, fileName, blobKey);
 			} catch (IOException e) {
 				throw new InternalServerErrorException(e);

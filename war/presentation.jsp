@@ -1,3 +1,5 @@
+<%@page import="java.io.IOException"%>
+<%@page import="org.daxplore.presenter.server.storage.StorageTools"%>
 <%
 /*
  *  Copyright 2012 Axel Winkler, Daniel Dunér
@@ -44,11 +46,19 @@ contentType="text/html;charset=utf-8"
 	String pageTitle = "";
 	boolean browserSupported = true;
 	ResourceBundle filenameBundle = null;
+	String perspectives = "", groups = "", questions = "";
 	
 	try {
 		request.setCharacterEncoding("UTF-8");
 		response.setContentType("text/html; charset=UTF-8");
-
+		
+		String prefix = request.getParameter("prefix");
+		
+		// TODO Add caching for loaded files
+		perspectives = StorageTools.readStaticFile(prefix, "definitions/perspectives", locale, ".json");
+		questions = StorageTools.readStaticFile(prefix, "definitions/questions", locale, ".json");
+		groups = StorageTools.readStaticFile(prefix, "definitions/groups", locale, ".json");
+		
 		String useragent = request.getHeader("user-agent");
 		double ieversion = ServerTools.getInternetExplorerVersion(useragent);
 		SharedTools.println(useragent);
@@ -109,9 +119,10 @@ contentType="text/html;charset=utf-8"
 		if (filenameBundle == null) {
 			throw new NullPointerException("Could not load filename bundle");
 		}
-
+		
 		ResourceBundle htmlTextsBundle = JspBundles.getHTMLTextsBundle(locale);
 		pageTitle = htmlTextsBundle.getString("pageTitle");
+		
 	} catch (Exception e) {
 		e.printStackTrace();
 		response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -221,27 +232,26 @@ contentType="text/html;charset=utf-8"
 		}
 	</script>
 		
-	<%if(browserSupported){ %>
-	    <script type="text/javascript" src="/getDefinitions?def=perspectives&amp;js=true&amp;l=<%=locale.getLanguage()%>" charset="UTF-8"></script>
-	  	<script type="text/javascript" src="/getDefinitions?def=questions&amp;js=true&amp;l=<%=locale.getLanguage()%>" charset="UTF-8"></script>
-	  	<script type="text/javascript" src="/getDefinitions?def=groups&amp;js=true&amp;l=<%=locale.getLanguage()%>" charset="UTF-8"></script>
-	    <script type="text/javascript" src="gwtPresentation/gwtPresentation.nocache.js"></script>
-	<% } 
-	if(!browserSupported) { %>
+	<% if (browserSupported) { %>
+		<script type="text/javascript" charset="UFT-8">
+			var perspectives = <%=perspectives%>;
+			var questions = <%=questions%>;
+			var groups = <%=groups%>;
+		</script>
+		<script type="text/javascript" src="gwtPresentation/gwtPresentation.nocache.js"></script>
+	<% } else { %>
 		<link rel="stylesheet" type="text/css" href="css/browser-suggestions.css">
-	<% } %>
+ 	<% } %>
   	
   </head>
 
   <body>
 	<% if(browserSupported){ %>
-    <!-- OPTIONAL: include this if you want history support -->
-    <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
-    <% } %>
-    <% if(!browserSupported){ %>
+	    <!-- OPTIONAL: include this if you want history support -->
+	    <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
+	    <jsp:include page="<%=filenameBundle.getString(\"presentation-content\")%>" />
+    <% } else {%>
 		<jsp:include page="<%=filenameBundle.getString(\"browser-suggestions\")%>" />
-    <% }else{ //Here comes the design code. %>
-		<jsp:include page="<%=filenameBundle.getString(\"presentation-content\")%>" />
-	<%} %>
+    <% }%>
   </body>
 </html>
