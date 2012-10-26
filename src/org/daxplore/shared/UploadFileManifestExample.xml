@@ -6,7 +6,6 @@ xsi:noNamespaceSchemaLocation="UploadFileManifest.xsd">
 		<major>0</major>
 		<minor>0</minor>
 	</fileVersion>
-	<prefix>daxplore</prefix>
 	<supportedLanguages>
 		<language-BCP47>en</language-BCP47>
 		<language-BCP47>sv</language-BCP47>

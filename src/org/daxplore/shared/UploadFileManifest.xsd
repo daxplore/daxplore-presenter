@@ -5,7 +5,6 @@
 		<xsd:complexType>
 			<xsd:sequence>
 				<xsd:element name="fileVersion" type="fileVersionType" />
-				<xsd:element name="prefix" type="prefixType" />
 				<xsd:element name="supportedLanguages" type="supportedLanguagesType" />
 			</xsd:sequence>
 		</xsd:complexType>
@@ -17,12 +16,6 @@
 			<xsd:element name="minor" type="xsd:nonNegativeInteger"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
-
-	<xsd:simpleType name="prefixType">
-		<xsd:restriction base="xsd:token">
-			<xsd:pattern value="([a-zA-Z0-9])+" />
-		</xsd:restriction>
-	</xsd:simpleType>
 
 	<xsd:simpleType name="language-BCP47-Type">
 		<xsd:restriction base="xsd:language" />
