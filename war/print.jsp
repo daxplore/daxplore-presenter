@@ -1,3 +1,7 @@
+<%@page import="org.daxplore.presenter.server.PMF"%>
+<%@page import="javax.jdo.PersistenceManager"%>
+<%@page import="org.daxplore.presenter.server.storage.LocaleStore"%>
+<%@page import="javax.jdo.Query"%>
 <%
 /*
  *  Copyright 2012 Axel Winkler, Daniel Dunér
@@ -18,7 +22,6 @@
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
 %>
-<%@page import="org.daxplore.presenter.server.resources.JspLocales"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.ResourceBundle"%>
 <%@page import="org.daxplore.presenter.server.resources.JspBundles"%>
@@ -38,8 +41,11 @@
 %>
 
 <%
-	String serverPath = "", query = "", embedDefinition = "", pageTitle = "";
+	PersistenceManager pm = PMF.get().getPersistenceManager();
+	String serverPath = "", queryString = "", embedDefinition = "", pageTitle = "";
 	Locale locale = null;
+	String prefix = request.getParameter("prefix");
+	
 	try {
 		
 		serverPath = request.getRequestURL().toString();
@@ -53,7 +59,12 @@
 		serverPath = serverPath.substring(0, serverPath.lastIndexOf("/"));
 		
 		//Set up supported locales:
-		List<Locale> supportedLocales = JspLocales.getSupportedLocales();
+		Query query = pm.newQuery(LocaleStore.class);
+		query.declareParameters("String specificPrefix");
+		query.setFilter("prefix.equals(specificPrefix)");
+		@SuppressWarnings("unchecked")
+		LocaleStore localeStore = ((List<LocaleStore>)query.execute(prefix)).get(0);
+		List<Locale> supportedLocales = localeStore.getSupportedLocales();
 
 		//Build a queue of desired locales, enqueue the most desired ones first
 		Queue<Locale> desiredLocales = new LinkedList<Locale>();
@@ -65,7 +76,7 @@
 		}
 
 		// 2. Add default locale
-		desiredLocales.add(JspLocales.getDefaultLocale());
+		desiredLocales.add(localeStore.getDefaultLocale());
 
 		//Pick the first supported locale in the queue
 		FindLocale: for (Locale desired : desiredLocales) {
@@ -78,7 +89,7 @@
 			}
 		}
 
-		query = request.getParameter("q");
+		queryString = request.getParameter("q");
 		LinkedList<EmbedFlag> flags = new LinkedList<EmbedFlag>();
 		flags.add(EmbedFlag.LEGEND);
 		flags.add(EmbedFlag.TRANSPARENT);
@@ -105,7 +116,7 @@
 	</head>
 	<body>
 		<div id="main">
-			<iframe src="<%=serverPath%>/embed.jsp?q=<%=query%>&l=<%=locale.getLanguage()%>#<%=embedDefinition%>"
+			<iframe src="<%=serverPath%>/embed.jsp?q=<%=queryString%>&l=<%=locale.getLanguage()%>#<%=embedDefinition%>"
 			width="650" height="330" frameborder="0" allowtransparency="true"></iframe>
 		</div>
 	</body>

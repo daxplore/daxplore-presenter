@@ -25,7 +25,6 @@
 %>
 <!DOCTYPE html>
 
-<%@page import="org.daxplore.presenter.server.resources.JspLocales"%>
 <%@page import="java.util.List"%>
 <%@page import="java.io.UnsupportedEncodingException"%>
 <%@page import="org.daxplore.presenter.server.ServerTools"%>

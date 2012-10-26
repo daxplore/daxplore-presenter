@@ -3,8 +3,8 @@
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:noNamespaceSchemaLocation="UploadFileManifest.xsd">
 	<fileVersion>
-		<major>0</major>
-		<minor>0</minor>
+		<major>9</major>
+		<minor>32</minor>
 	</fileVersion>
 	<supportedLocales>
 		<language-BCP47>en</language-BCP47>

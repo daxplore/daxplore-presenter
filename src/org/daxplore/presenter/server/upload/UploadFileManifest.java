@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -39,8 +41,11 @@ import com.google.api.server.spi.response.InternalServerErrorException;
  * 
  */
 public class UploadFileManifest {
+	protected static Logger logger = Logger.getLogger(UploadFileManifest.class.getName());
+	
 	protected int versionMajor, versionMinor;
-	protected List<String> languages = new LinkedList<String>();
+	protected List<Locale> locales = new LinkedList<Locale>();
+	protected Locale defaultLocale; 
 	
 	public UploadFileManifest(InputStream manifestInputStream) throws InternalServerErrorException, BadRequestException {
 		DocumentBuilder documentBuilder = null;
@@ -65,17 +70,33 @@ public class UploadFileManifest {
 		}
 		
 		try {
+			//TODO replace xml parser
 			Document document = documentBuilder.parse(manifestInputStream);
 		
 			Node node = document.getElementsByTagName("major").item(0);
 			versionMajor = Integer.parseInt(node.getTextContent());
 			
-			node = document.getElementsByTagName("major").item(0);
+			node = document.getElementsByTagName("minor").item(0);
 			versionMinor = Integer.parseInt(node.getTextContent());
-			
-			NodeList languageNodes = document.getElementsByTagName("language-BCP47");
+
+			node = document.getElementsByTagName("supportedLocales").item(0);
+			NodeList languageNodes = node.getChildNodes();
 			for (int i=0; i<languageNodes.getLength(); i++) {
-				languages.add(languageNodes.item(i).getTextContent());
+				String text = languageNodes.item(i).getTextContent().trim();
+				if (text!=null && !text.equals("")) { // buggy parsing requires this test
+					locales.add(new Locale(text));
+				}
+			}
+			
+			node = document.getElementsByTagName("defaultLocale").item(0);
+			languageNodes = node.getChildNodes();
+			// strange parsing requires this work-around
+			for (int i=0; i<languageNodes.getLength(); i++) {
+				String text = languageNodes.item(i).getTextContent().trim();
+				if (text!=null && !text.equals("")) { 
+					defaultLocale = new Locale(text);
+					break;
+				}
 			}
 		} catch (SAXException e) {
 			e.printStackTrace();
@@ -94,7 +115,11 @@ public class UploadFileManifest {
 		return versionMinor;
 	}
 
-	public List<String> getLanguages() {
-		return languages;
+	public List<Locale> getSupportedLocales() {
+		return locales;
+	}
+	
+	public Locale getDefaultLocale() {
+		return defaultLocale;
 	}
 }

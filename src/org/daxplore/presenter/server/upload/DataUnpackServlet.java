@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -37,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.daxplore.presenter.server.PMF;
 import org.daxplore.presenter.server.ServerTools;
+import org.daxplore.presenter.server.storage.LocaleStore;
 import org.daxplore.presenter.server.storage.PrefixStore;
 import org.daxplore.presenter.server.storage.SettingItemStore;
 import org.daxplore.presenter.server.storage.StatDataItemStore;
@@ -117,35 +119,56 @@ public class DataUnpackServlet extends HttpServlet {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		long time = System.currentTimeMillis();
 		
-		Query query = pm.newQuery(StatDataItemStore.class);
+		// Delete the single prefix item, this should be enough to remove the prefix from the system
+		// We still need to remove all related datastore/blobstore items to prevent storage memory leaks
+		// and to make sure that no settings or data remains if the prefix is reused/overwritten later.
+		Query query = pm.newQuery(PrefixStore.class);
+		query.declareParameters("String specificPrefix");
+		query.setFilter("prefix.equals(specificPrefix)");
+		long deletedPrefixItems = query.deletePersistentAll(prefix); // should always be 1
+		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Removed the stored prefix '" + prefix + '"');
+		
+		// Delete the single locale entry for the prefix
+		query = pm.newQuery(LocaleStore.class);
+		query.declareParameters("String specificPrefix");
+		query.setFilter("prefix.equals(specificPrefix)");
+		long deletedLocaleItems = query.deletePersistentAll(prefix); // should always be 1
+		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Removed the locale item for prefix '" + prefix + '"');
+		
+		// Delete all statistical data items related to the prefix
+		query = pm.newQuery(StatDataItemStore.class);
 		query.declareParameters("String prefix");
 		query.setFilter("key.startsWith(prefix)");
-		long deletedStatDataItems = query.deletePersistentAll(prefix);
+		long deletedStatDataItems = query.deletePersistentAll(prefix + "/");
 		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Removed " + deletedStatDataItems + " old statistical data items");
 		
+		// Delete all setting items related to the prefix
 		query = pm.newQuery(SettingItemStore.class);
 		query.declareParameters("String prefix");
 		query.setFilter("key.startsWith(prefix)");
-		long deletedSettingItems = query.deletePersistentAll(prefix);
+		long deletedSettingItems = query.deletePersistentAll(prefix + "/");
 		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Removed " + deletedSettingItems + " old settings");
 
+		// Delete all the blobstore-stored files
 		query = pm.newQuery(StaticFileItemStore.class);
 		query.declareParameters("String prefix");
 		query.setFilter("key.startsWith(prefix)");
 		@SuppressWarnings("unchecked")
-		List<StaticFileItemStore> fileItems = (List<StaticFileItemStore>)query.execute(prefix);;
+		List<StaticFileItemStore> fileItems = (List<StaticFileItemStore>)query.execute(prefix + "/");
 		for (StaticFileItemStore item : fileItems) {
 			StorageTools.deleteBlob(item.getBlobKey());
 		}
 		
+		// Delete all the datastore entries that were tracking the blobstore files
 		query = pm.newQuery(StaticFileItemStore.class);
 		query.declareParameters("String prefix");
 		query.setFilter("key.startsWith(prefix)");
-		long deletedStaticFileItems = query.deletePersistentAll(prefix);
+		long deletedStaticFileItems = query.deletePersistentAll(prefix + "/");
 		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Removed " + deletedStaticFileItems + " old static files");
 		
-		long totalDeleted = deletedStatDataItems + deletedSettingItems + deletedStaticFileItems;
-		logger.log(Level.INFO, "Deleted " + totalDeleted + " old data items in " + ((System.currentTimeMillis()-time)/Math.pow(10, 6)) + "seconds");
+		long totalDeleted = deletedPrefixItems + deletedLocaleItems + deletedStatDataItems + deletedSettingItems + deletedStaticFileItems;
+		double timeSeconds = ((System.currentTimeMillis()-time)/Math.pow(10, 6));
+		logger.log(Level.INFO, "Deleted " + totalDeleted + " old data items in " + timeSeconds + "seconds");
 	}
 	
 	protected void enqueueForUnpacking(UnpackQueue unpackQueue, String fileName, BlobKey blobKey) {
@@ -195,18 +218,18 @@ public class DataUnpackServlet extends HttpServlet {
 			throw new BadRequestException("Unsupported file version");
 		}
 		
-		for (String language : manifest.getLanguages()) {
-			if (!ServerTools.isSupportedLocale(language)) {
-				throw new BadRequestException("Unsupported language: " + language);
+		for (Locale locale : manifest.getSupportedLocales()) {
+			if (!ServerTools.isSupportedLocale(locale)) {
+				throw new BadRequestException("Unsupported language: " + locale.toLanguageTag());
 			}
 		}
 		
-		List<String> missingUploadFiles = SharedResourceTools.findMissingUploadFiles(fileMap.keySet(), manifest.getLanguages());
+		List<String> missingUploadFiles = SharedResourceTools.findMissingUploadFiles(fileMap.keySet(), manifest.getSupportedLocales());
 		if (!missingUploadFiles.isEmpty()) {
 			throw new BadRequestException("Uploaded doesn't contain required files: " + SharedTools.join(missingUploadFiles, ", "));
 		}
 		
-		List<String> unwantedUploadFiles = SharedResourceTools.findUnwantedUploadFiles(fileMap.keySet(), manifest.getLanguages());
+		List<String> unwantedUploadFiles = SharedResourceTools.findUnwantedUploadFiles(fileMap.keySet(), manifest.getSupportedLocales());
 		if (!unwantedUploadFiles.isEmpty()) {
 			throw new BadRequestException("Uploaded file contains extra files: " + SharedTools.join(unwantedUploadFiles, ", "));
 		}
@@ -216,10 +239,13 @@ public class DataUnpackServlet extends HttpServlet {
 		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		pm.makePersistent(new PrefixStore(prefix));
-		pm.close();
 		logger.log(Level.INFO, "Added prefix to system: " + prefix);
 		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Added prefix to system: " + prefix);
 		
+		LocaleStore localeStore = new LocaleStore(prefix, manifest.getSupportedLocales(), manifest.getDefaultLocale());
+		pm.makePersistent(localeStore);
+		
+		pm.close();
 		UnpackQueue unpackQueue = new UnpackQueue(prefix, messageSender.getChannelToken());
 		for (String fileName : fileMap.keySet()) {
 			try {

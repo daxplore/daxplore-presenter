@@ -1,3 +1,7 @@
+<%@page import="org.daxplore.presenter.server.PMF"%>
+<%@page import="javax.jdo.PersistenceManager"%>
+<%@page import="javax.jdo.Query"%>
+<%@page import="org.daxplore.presenter.server.storage.LocaleStore"%>
 <%@page import="java.io.IOException"%>
 <%@page import="org.daxplore.presenter.server.storage.StorageTools"%>
 <%
@@ -22,7 +26,6 @@
 %>
 <!DOCTYPE html>
 
-<%@page import="org.daxplore.presenter.server.resources.JspLocales"%>
 <%@page import="java.util.List"%>
 <%@page import="java.io.UnsupportedEncodingException"%>
 <%@page import="org.daxplore.presenter.server.ServerTools"%>
@@ -42,6 +45,7 @@ contentType="text/html;charset=utf-8"
 %>
 
 <%
+	PersistenceManager pm = PMF.get().getPersistenceManager();
 	Locale locale = null;
 	String pageTitle = "";
 	boolean browserSupported = true;
@@ -61,8 +65,6 @@ contentType="text/html;charset=utf-8"
 		
 		String useragent = request.getHeader("user-agent");
 		double ieversion = ServerTools.getInternetExplorerVersion(useragent);
-		SharedTools.println(useragent);
-		SharedTools.println("IE version = "+ ieversion);
 		if(useragent == null || (ieversion > 0.0 && ieversion < 8.0)){
 			browserSupported = false;
 		}
@@ -74,7 +76,12 @@ contentType="text/html;charset=utf-8"
 		browserSupported = browserSupported || ignoreBadBrowser;
 	
 		//Set up supported locales:
-		List<Locale> supportedLocales = JspLocales.getSupportedLocales();
+		Query query = pm.newQuery(LocaleStore.class);
+		query.declareParameters("String specificPrefix");
+		query.setFilter("prefix.equals(specificPrefix)");
+		@SuppressWarnings("unchecked")
+		LocaleStore localeStore = ((List<LocaleStore>)query.execute(prefix)).get(0);
+		List<Locale> supportedLocales = localeStore.getSupportedLocales();
 		
 		//Build a queue of desired locales, enqueue the most desired ones first
 		Queue<Locale> desiredLocales = new LinkedList<Locale>();
@@ -102,7 +109,7 @@ contentType="text/html;charset=utf-8"
 		}
 		
 		// 4. Add default locale
-		desiredLocales.add(JspLocales.getDefaultLocale());
+		desiredLocales.add(localeStore.getDefaultLocale());
 		
 		//Pick the first supported locale in the queue
 		FindLocale: for(Locale desired : desiredLocales){
@@ -126,6 +133,8 @@ contentType="text/html;charset=utf-8"
 	} catch (Exception e) {
 		e.printStackTrace();
 		response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	} finally {
+		pm.close();
 	}
 %>
 <html>

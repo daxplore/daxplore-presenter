@@ -1,3 +1,6 @@
+<%@page import="org.daxplore.presenter.server.throwable.StatsException"%>
+<%@page import="javax.jdo.Query"%>
+<%@page import="org.daxplore.presenter.server.storage.LocaleStore"%>
 <%
 /*
  *  Copyright 2012 Axel Winkler, Daniel Dunér
@@ -19,12 +22,10 @@
  */
 %>
 
-<%@page import="org.daxplore.presenter.server.throwable.StatsException"%>
 <%@page import="org.json.simple.parser.ParseException"%>
 <%@page import="org.daxplore.presenter.server.GetDefinitionsServlet"%>
 <%@page import="org.daxplore.presenter.shared.SharedTools"%>
 <%@page import="org.daxplore.presenter.shared.QueryDefinition"%>
-<%@page import="org.daxplore.presenter.server.resources.JspLocales"%>
 <%@page import="java.util.LinkedList"%>
 <%@page import="java.util.Queue"%>
 <%@page import="java.io.IOException"%>
@@ -70,6 +71,9 @@ public void jspInit(){
 %>
 
 <%
+	PersistenceManager pm = PMF.get().getPersistenceManager();
+
+	String prefix = request.getParameter("prefix");
 	String jsondata = "";
 	String qdef = "";
 	String questionsString = "";
@@ -78,7 +82,12 @@ public void jspInit(){
 	
 	try {
 		//Set up supported locales:
-		List<Locale> supportedLocales = JspLocales.getSupportedLocales();
+		Query query = pm.newQuery(LocaleStore.class);
+		query.declareParameters("String specificPrefix");
+		query.setFilter("prefix.equals(specificPrefix)");
+		@SuppressWarnings("unchecked")
+		LocaleStore localeStore = ((List<LocaleStore>)query.execute(prefix)).get(0);
+		List<Locale> supportedLocales = localeStore.getSupportedLocales();
 		
 		//Build a queue of desired locales, enqueue the most desired ones first
 		Queue<Locale> desiredLocales = new LinkedList<Locale>();
@@ -90,7 +99,7 @@ public void jspInit(){
 		}
 		
 		// 2. Add default locale
-		desiredLocales.add(JspLocales.getDefaultLocale());
+		desiredLocales.add(localeStore.getDefaultLocale());
 		
 		//Pick the first supported locale in the queue
 		FindLocale: for(Locale desired : desiredLocales){
@@ -103,7 +112,6 @@ public void jspInit(){
 			}
 		}
 		
-		String prefix = request.getParameter("prefix");
 		String queryString = request.getParameter("q");
 		QueryDefinition queryDefinition = new QueryDefinition(metadataMap.get(prefix), queryString);
 		LinkedList<String> jsonString = StorageTools.getStats(prefix, queryDefinition);
@@ -128,6 +136,8 @@ public void jspInit(){
 	} catch (Exception e) {
 		logger.log(Level.SEVERE, "Something went horribly wrong in embed", e);
 		response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	} finally {
+		pm.close();
 	}
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
