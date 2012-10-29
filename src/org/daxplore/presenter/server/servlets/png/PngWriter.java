@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-package org.daxplore.presenter.server.png;
+package org.daxplore.presenter.server.servlets.png;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;

@@ -21,6 +21,7 @@ import static org.junit.Assert.*;
 import java.io.InputStream;
 import java.util.Locale;
 
+import org.daxplore.presenter.server.admin.UploadFileManifest;
 import org.junit.Test;
 
 import com.google.api.server.spi.response.BadRequestException;

@@ -16,7 +16,7 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.server;
+package org.daxplore.presenter.server.servlets;
 
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.daxplore.presenter.server.storage.QuestionMetadataServerImpl;
 import org.daxplore.presenter.server.storage.StorageTools;
 import org.daxplore.presenter.server.throwable.StatsException;
 import org.daxplore.presenter.shared.QueryDefinition;

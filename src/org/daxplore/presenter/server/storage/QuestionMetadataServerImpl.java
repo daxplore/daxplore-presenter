@@ -16,7 +16,7 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.server;
+package org.daxplore.presenter.server.storage;
 
 import java.io.IOException;
 import java.io.Reader;

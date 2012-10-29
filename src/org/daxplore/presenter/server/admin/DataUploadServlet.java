@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.server.upload;
+package org.daxplore.presenter.server.admin;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -29,8 +29,8 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
+import org.daxplore.presenter.server.admin.DataUnpackServlet.UnpackType;
 import org.daxplore.presenter.server.storage.StorageTools;
-import org.daxplore.presenter.server.upload.DataUnpackServlet.UnpackType;
 import org.daxplore.presenter.shared.ClientServerMessage.MESSAGE_TYPE;
 
 import com.google.api.server.spi.response.BadRequestException;

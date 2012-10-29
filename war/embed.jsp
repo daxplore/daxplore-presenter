@@ -23,13 +23,13 @@
 %>
 
 <%@page import="org.json.simple.parser.ParseException"%>
-<%@page import="org.daxplore.presenter.server.GetDefinitionsServlet"%>
+<%@page import="org.daxplore.presenter.server.servlets.GetDefinitionsServlet"%>
 <%@page import="org.daxplore.presenter.shared.SharedTools"%>
 <%@page import="org.daxplore.presenter.shared.QueryDefinition"%>
 <%@page import="java.util.LinkedList"%>
 <%@page import="java.util.Queue"%>
 <%@page import="java.io.IOException"%>
-<%@page import="org.daxplore.presenter.server.QuestionMetadataServerImpl"%>
+<%@page import="org.daxplore.presenter.server.storage.QuestionMetadataServerImpl"%>
 <%@page import="org.daxplore.presenter.server.storage.StorageTools"%>
 <%@page import="java.io.Reader"%>
 <%@page import="org.daxplore.presenter.server.storage.PrefixStore"%>
