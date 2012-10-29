@@ -70,9 +70,7 @@ public class QuestionMetadataServerImpl implements QuestionMetadata {
 		
 		try {
 			questionList = (List<JSONObject>)parser.parse(reader, containerFactory);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
+		} catch (IOException | ParseException e) {
 			e.printStackTrace();
 		}
 	}
