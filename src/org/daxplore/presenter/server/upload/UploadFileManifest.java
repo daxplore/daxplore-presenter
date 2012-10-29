@@ -58,12 +58,9 @@ public class UploadFileManifest {
 			if (documentBuilder==null) {
 				throw new ParserConfigurationException();
 			}
-		} catch (IOException e) {
+		} catch (IOException | SAXException e) {
 			e.printStackTrace();
 			throw new InternalServerErrorException("Could not read UploadFileManifest Schema");
-		} catch (SAXException e) {
-			e.printStackTrace();
-			throw new InternalServerErrorException("Could not create UploadFileManifest Schema");
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 			throw new InternalServerErrorException("Could not create document builder from UploadFileManifest Schema");
@@ -103,7 +100,7 @@ public class UploadFileManifest {
 			throw new BadRequestException("Manifest doesn't comply to the upload file schema");
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new BadRequestException("Failed to read the manifest data stream");
+			throw new BadRequestException("Failed to read the uploaded file's manifest");
 		}
 	}
 	

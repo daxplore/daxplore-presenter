@@ -121,16 +121,7 @@ public void jspInit(){
 		
 		jsondata = SharedTools.join(jsonString, ",");
 		questionsString = GetDefinitionsServlet.getDefinitions(questions, "_"+locale.getLanguage(), getServletContext());
-	} catch (IOException e) {
-		logger.log(Level.INFO, "Bad request made to embed", e);
-		response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-	} catch (ParseException e) {
-		logger.log(Level.INFO, "Bad request made to embed", e);
-		response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-	} catch (StatsException e) {
-		logger.log(Level.INFO, "Bad request made to embed", e);
-		response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-	} catch (IllegalArgumentException e) {
+	} catch (IOException | ParseException | StatsException  | IllegalArgumentException e) {
 		logger.log(Level.INFO, "Bad request made to embed", e);
 		response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 	} catch (Exception e) {

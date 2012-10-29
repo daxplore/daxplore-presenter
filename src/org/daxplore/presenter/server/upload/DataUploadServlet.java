@@ -87,15 +87,7 @@ public class DataUploadServlet extends HttpServlet {
 			logger.log(Level.WARNING, e.getMessage(), e);
 			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			//TODO communicate error to user
-		} catch (FileUploadException e) {
-			logger.log(Level.INFO, e.getMessage(), e);
-			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			// TODO give user feedback on invalid file
-		} catch (IOException e) {
-			logger.log(Level.INFO, e.getMessage(), e);
-			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			// TODO give user feedback on invalid file
-		} catch (BadRequestException e) {
+		} catch (FileUploadException | IOException | BadRequestException e) {
 			logger.log(Level.INFO, e.getMessage(), e);
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			// TODO give user feedback on invalid file
