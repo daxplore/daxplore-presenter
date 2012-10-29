@@ -39,9 +39,9 @@ import org.daxplore.presenter.server.servlets.png.PngWriter;
  * the format <hexvalue>.png, for example FF0000.png for a completely red
  * pixel.</p>
  */
+@SuppressWarnings("serial")
 public class GetPixelServlet extends HttpServlet {
 
-	private static final long serialVersionUID = -392753539863251554L;
 	private final int CACHE_DURATION_IN_SECOND = 60 * 60 * 24 * 14; // 14 days
 	private final long CACHE_DURATION_IN_MS = CACHE_DURATION_IN_SECOND * 1000;
 
