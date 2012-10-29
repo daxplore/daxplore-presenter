@@ -34,7 +34,7 @@
 <%@page import="java.io.Reader"%>
 <%@page import="org.daxplore.presenter.server.storage.PrefixStore"%>
 <%@page import="java.util.List"%>
-<%@page import="org.daxplore.presenter.server.PMF"%>
+<%@page import="org.daxplore.presenter.server.storage.PMF"%>
 <%@page import="javax.jdo.PersistenceManager"%>
 <%@page import="java.util.Locale"%>
 <%@page import="org.daxplore.presenter.shared.QuestionMetadata"%>

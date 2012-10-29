@@ -1,4 +1,4 @@
-<%@page import="org.daxplore.presenter.server.PMF"%>
+<%@page import="org.daxplore.presenter.server.storage.PMF"%>
 <%@page import="javax.jdo.PersistenceManager"%>
 <%@page import="org.daxplore.presenter.server.storage.LocaleStore"%>
 <%@page import="javax.jdo.Query"%>

@@ -33,7 +33,6 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.daxplore.presenter.server.PMF;
 import org.daxplore.presenter.server.throwable.StatsException;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.SharedTools;
