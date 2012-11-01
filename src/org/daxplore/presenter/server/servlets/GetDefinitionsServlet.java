@@ -28,13 +28,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.jdo.PersistenceManager;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.daxplore.presenter.server.storage.StorageTools;
+import org.daxplore.presenter.server.storage.PMF;
+import org.daxplore.presenter.server.storage.StaticFileItemStore;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.ContainerFactory;
 import org.json.simple.parser.JSONParser;
@@ -95,7 +97,9 @@ public class GetDefinitionsServlet extends HttpServlet {
 			if (asJS) {
 				respWriter.write("var " + definitionName + " = ");
 			}
-			String text = StorageTools.readStaticFile(prefix, "definitions/" + definitionName, locale, ".json");
+			PersistenceManager pm = PMF.get().getPersistenceManager();
+			String text = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/" + definitionName, locale, ".json");
+			pm.close();
 			respWriter.write(text);
 		} else {
 			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);

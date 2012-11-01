@@ -1,9 +1,3 @@
-<%@page import="org.daxplore.presenter.server.storage.PMF"%>
-<%@page import="javax.jdo.PersistenceManager"%>
-<%@page import="javax.jdo.Query"%>
-<%@page import="org.daxplore.presenter.server.storage.LocaleStore"%>
-<%@page import="java.io.IOException"%>
-<%@page import="org.daxplore.presenter.server.storage.StorageTools"%>
 <%
 /*
  *  Copyright 2012 Axel Winkler, Daniel Dunér
@@ -29,13 +23,19 @@
 <%@page import="java.util.List"%>
 <%@page import="java.io.UnsupportedEncodingException"%>
 <%@page import="org.daxplore.presenter.server.ServerTools"%>
-<%@page import="org.daxplore.presenter.server.resources.JspBundles"%>
 <%@page import="org.daxplore.presenter.shared.SharedTools"%>
 <%@page import="java.util.Arrays"%>
 <%@page import="java.util.LinkedList"%>
 <%@page import="java.util.Queue"%>
 <%@page import="java.util.ResourceBundle"%>
 <%@page import="java.util.Locale"%>
+<%@page import="org.daxplore.presenter.server.storage.PMF"%>
+<%@page import="javax.jdo.PersistenceManager"%>
+<%@page import="javax.jdo.Query"%>
+<%@page import="org.daxplore.presenter.server.storage.LocaleStore"%>
+<%@page import="java.io.IOException"%>
+<%@page import="org.daxplore.presenter.server.storage.LocalizedSettingItemStore"%>
+<%@page import="org.daxplore.presenter.server.storage.StaticFileItemStore"%>
 
 <%@ page
 language="java"
@@ -59,9 +59,9 @@ contentType="text/html;charset=utf-8"
 		String prefix = request.getParameter("prefix");
 		
 		// TODO Add caching for loaded files
-		perspectives = StorageTools.readStaticFile(prefix, "definitions/perspectives", locale, ".json");
-		questions = StorageTools.readStaticFile(prefix, "definitions/questions", locale, ".json");
-		groups = StorageTools.readStaticFile(prefix, "definitions/groups", locale, ".json");
+		perspectives = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/perspectives", locale, ".json");
+		questions = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/questions", locale, ".json");
+		groups = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/groups", locale, ".json");
 		
 		String useragent = request.getHeader("user-agent");
 		double ieversion = ServerTools.getInternetExplorerVersion(useragent);
@@ -122,13 +122,7 @@ contentType="text/html;charset=utf-8"
 			}
 		}
 		
-		filenameBundle = JspBundles.getFilenameBundle(locale);
-		if (filenameBundle == null) {
-			throw new NullPointerException("Could not load filename bundle");
-		}
-		
-		ResourceBundle htmlTextsBundle = JspBundles.getHTMLTextsBundle(locale);
-		pageTitle = htmlTextsBundle.getString("pageTitle");
+		pageTitle = LocalizedSettingItemStore.getLocalizedProperty(pm, prefix, locale, "pageTitle");
 		
 	} catch (Exception e) {
 		e.printStackTrace();
@@ -151,95 +145,7 @@ contentType="text/html;charset=utf-8"
 
     <title><%=pageTitle%></title>
     
-    <script type="text/javascript">
-		function setCookie(c_name, value, exdays){
-			var exdate=new Date();
-			exdate.setDate(exdate.getDate() + exdays);
-			var c_value=escape(value) + ((exdays==null) ? "" : "; expires="+exdate.toUTCString());
-			document.cookie=c_name + "=" + c_value;
-		}
-
-		/** http://www.quirksmode.org/js/cookies.html **/
-		function readCookie(name) {
-			var nameEQ = name + "=";
-			var ca = document.cookie.split(';');
-			for(var i=0;i < ca.length;i++) {
-				var c = ca[i];
-				while (c.charAt(0)==' ') c = c.substring(1,c.length);
-				if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-			}
-			return null;
-		}
-
-		function cookiesSupported(){
-			setCookie("cookies-supported", true);
-			if(readCookie("cookies-supported")){
-				return true;
-			}else{
-				return false;
-			}
-		}
-		
-		function badBrowserReload(){
-			setCookie("bad-browser", "ignore", 7);
-			window.location.reload();
-		}
-
-		function getQueryParameters(){
-			var query = location.search.substring(1);
-			var parameters = query.split('&');
-			var result = new Object();
-			for (var i=0; i<parameters.length; i++) {
-				var pos = parameters[i].indexOf('=');
-				if (pos > 0) {
-					var key = parameters[i].substring(0,pos);
-					var val = parameters[i].substring(pos+1);
-					result[key] = val;
-				}
-			}
-			return result;
-		}
-		
-		function queryStringWithNewLocale(locale) {
-			var queryPairs = new Array();
-			var parameters = getQueryParameters();
-			parameters.locale = locale;
-			var index = 0;
-			for(var key in parameters){
-				queryPairs[index] = key+"="+parameters[key];
-				index++;
-			}
-			return queryPairs.join('&');
-		}
-
-		function queryStringWithoutLocale() {
-			var queryPairs = new Array();
-			var parameters = getQueryParameters();
-			delete parameters.locale;
-			var index = 0;
-			for(var key in parameters){
-				queryPairs[index] = key+"="+parameters[key];
-				index++;
-			}
-			return queryPairs.join('&');
-		}
-
-		function setQueryStringLocale(locale){
-			var search = "?"+queryStringWithNewLocale(locale);
-			location.replace(location.protocol + "//" + location.host + search + location.hash);
-		}
-
-		function changeLocaleReload(locale){
-			setCookie("locale", locale, 30);
-			var parameters = getQueryParameters();
-			if(parameters.hasOwnProperty("locale")){
-				var search = "?"+queryStringWithoutLocale();
-				location.replace(location.protocol + "//" + location.host + search + location.hash);
-			}else{
-				location.reload();
-			}
-		}
-	</script>
+    <script type="text/javascript" src="js/cookie-locale-handling"></script>
 		
 	<% if (browserSupported) { %>
 		<script type="text/javascript" charset="UFT-8">

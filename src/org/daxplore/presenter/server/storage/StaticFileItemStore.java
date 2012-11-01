@@ -18,11 +18,34 @@
  */
 package org.daxplore.presenter.server.storage;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.util.Locale;
+
+import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+
 import com.google.appengine.api.blobstore.BlobKey;
+import com.google.appengine.api.blobstore.BlobstoreService;
+import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
+import com.google.appengine.api.files.AppEngineFile;
+import com.google.appengine.api.files.FileReadChannel;
+import com.google.appengine.api.files.FileService;
+import com.google.appengine.api.files.FileServiceFactory;
+import com.google.appengine.api.files.FileWriteChannel;
+import com.google.appengine.api.files.LockException;
 
 
 @PersistenceCapable
@@ -66,5 +89,56 @@ public class StaticFileItemStore {
 	 */
 	public BlobKey getBlobKey() {
 		return new BlobKey(blobKey);
+	}
+	
+	public static byte[] readBlob(BlobKey blobKey) throws IOException {
+		FileService fileService = FileServiceFactory.getFileService();
+		AppEngineFile file = fileService.getBlobFile(blobKey);
+		FileReadChannel readChannel = null;
+		try {
+			readChannel = fileService.openReadChannel(file, false);
+			InputStream input = Channels.newInputStream(readChannel);
+			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			long count = IOUtils.copyLarge(input, output, new byte[BlobstoreService.MAX_BLOB_FETCH_SIZE]);
+	        if (count > Integer.MAX_VALUE) {
+	            throw new IOException("Failed to read blobstore entry");
+	        }
+	        return output.toByteArray();
+		} catch (LockException | FileNotFoundException e) {
+			throw new IOException(e);
+		} finally {
+			if (readChannel != null) {
+				readChannel.close();
+			}
+		}
+	}
+	
+	public static BlobKey writeBlob(String fileName, byte[] data) throws IOException {
+		FileService fileService = FileServiceFactory.getFileService();
+		AppEngineFile file = fileService.createNewBlobFile("application/octet-stream", fileName);
+		FileWriteChannel writeChannel = fileService.openWriteChannel(file, true);
+		BufferedInputStream in = new BufferedInputStream(new ByteArrayInputStream(data));
+	    byte[] buffer = new byte[BlobstoreService.MAX_BLOB_FETCH_SIZE]; //fetch size apparently works for writing as well
+	    int read;
+	    while((read = in.read(buffer)) > 0){
+	        writeChannel.write(ByteBuffer.wrap(buffer, 0, read));
+	    }
+		writeChannel.closeFinally();
+	    return fileService.getBlobKey(file);
+	}
+	
+	public static void deleteBlob(BlobKey blobKey) {
+		BlobstoreServiceFactory.getBlobstoreService().delete(blobKey);
+	}
+	
+	public static Reader getStaticFileReader(PersistenceManager pm, String prefix, String name, Locale locale, String suffix) throws IOException {
+		return new StringReader(readStaticFile(pm, prefix, name, locale, suffix));
+	}
+	
+	public static String readStaticFile(PersistenceManager pm, String prefix, String name, Locale locale, String suffix) throws IOException {
+		String statStoreKey = prefix + "/" + name + "_" + locale.getLanguage() + "suffix";
+		StaticFileItemStore item = pm.getObjectById(StaticFileItemStore.class, statStoreKey);
+		pm.close();
+		return new String(readBlob(item.getBlobKey()), "UTF-8");
 	}
 }

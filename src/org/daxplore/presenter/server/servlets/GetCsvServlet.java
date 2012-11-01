@@ -28,13 +28,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.jdo.PersistenceManager;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.QuestionMetadataServerImpl;
-import org.daxplore.presenter.server.storage.StorageTools;
+import org.daxplore.presenter.server.storage.StatDataItemStore;
+import org.daxplore.presenter.server.storage.StaticFileItemStore;
 import org.daxplore.presenter.server.throwable.StatsException;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
@@ -70,6 +73,7 @@ public class GetCsvServlet extends HttpServlet {
 		PrintWriter respWriter = new PrintWriter(new OutputStreamWriter(resp.getOutputStream(), "UTF8"), true);
 		resp.setContentType("text/csv; charset=UTF-8");
 		CSVWriter csvWriter =  new CSVWriter(respWriter);
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 		
 		try {
 			String localeString = req.getParameter("l");
@@ -82,7 +86,7 @@ public class GetCsvServlet extends HttpServlet {
 			if(metadataMap.containsKey(locale.getLanguage())) {
 				questionMetadata = metadataMap.get(locale.getLanguage());
 			} else {
-				String questionText = StorageTools.readStaticFile(prefix, "definitions/questions", locale, ".json");
+				String questionText = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/questions", locale, ".json");
 				questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
 				metadataMap.put(locale.getLanguage(), questionMetadata);
 			}
@@ -97,8 +101,11 @@ public class GetCsvServlet extends HttpServlet {
 			
 			questionOptionTexts.add(0,  queryDefinition.getPerspectiveShortText() + " \\ " + queryDefinition.getQuestionShortText());
 			csvOutput.add(questionOptionTexts.toArray(new String[0]));
+			
 			LinkedList<String> datastoreJsons;
-			datastoreJsons = StorageTools.getStats(prefix, queryDefinition);
+			
+			datastoreJsons = StatDataItemStore.getStats(pm, prefix, queryDefinition);
+			
 			
 			ContainerFactory containerFactory = new ContainerFactory() {
 				@Override
@@ -171,6 +178,7 @@ public class GetCsvServlet extends HttpServlet {
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} finally {
 			csvWriter.close();
+			pm.close();
 		}
 	}
 }

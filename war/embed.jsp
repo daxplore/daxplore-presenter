@@ -1,6 +1,3 @@
-<%@page import="org.daxplore.presenter.server.throwable.StatsException"%>
-<%@page import="javax.jdo.Query"%>
-<%@page import="org.daxplore.presenter.server.storage.LocaleStore"%>
 <%
 /*
  *  Copyright 2012 Axel Winkler, Daniel Dunér
@@ -30,7 +27,6 @@
 <%@page import="java.util.Queue"%>
 <%@page import="java.io.IOException"%>
 <%@page import="org.daxplore.presenter.server.storage.QuestionMetadataServerImpl"%>
-<%@page import="org.daxplore.presenter.server.storage.StorageTools"%>
 <%@page import="java.io.Reader"%>
 <%@page import="org.daxplore.presenter.server.storage.PrefixStore"%>
 <%@page import="java.util.List"%>
@@ -41,6 +37,11 @@
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.logging.Level"%>
 <%@page import="java.util.logging.Logger"%>
+<%@page import="org.daxplore.presenter.server.throwable.StatsException"%>
+<%@page import="javax.jdo.Query"%>
+<%@page import="org.daxplore.presenter.server.storage.LocaleStore"%>
+<%@page import="org.daxplore.presenter.server.storage.StatDataItemStore"%>
+<%@page import="org.daxplore.presenter.server.storage.StaticFileItemStore"%>
 
 <%@ page 
 	language="java" 
@@ -60,12 +61,13 @@ public void jspInit(){
 		@SuppressWarnings("unchecked")
 		List<PrefixStore> prefixes = (List<PrefixStore>)pm.newQuery(PrefixStore.class).execute();
 		for(PrefixStore prefix : prefixes) {
-			Reader reader = StorageTools.getStaticFileReader(prefix.getPrefix(), "questions", locale , ".json");
+			Reader reader = StaticFileItemStore.getStaticFileReader(pm, prefix.getPrefix(), "questions", locale , ".json");
 			metadataMap.put(prefix.getPrefix(), new QuestionMetadataServerImpl(reader));
 			reader.close(); 
 		}
+		pm.close();
 	} catch (IOException e) {
-		logger.log(Level.SEVERE, "Failed to initialize metadata in embed.jsp", e); 
+		logger.log(Level.SEVERE, "Failed to initialize metadata in the embed servlet", e); 
 	}
 }
 %>
@@ -114,7 +116,7 @@ public void jspInit(){
 		
 		String queryString = request.getParameter("q");
 		QueryDefinition queryDefinition = new QueryDefinition(metadataMap.get(prefix), queryString);
-		LinkedList<String> jsonString = StorageTools.getStats(prefix, queryDefinition);
+		LinkedList<String> jsonString = StatDataItemStore.getStats(pm, prefix, queryDefinition);
 		LinkedList<String> questions = new LinkedList<String>();
 		questions.add(queryDefinition.getQuestionID());
 		questions.add(queryDefinition.getPerspectiveID());

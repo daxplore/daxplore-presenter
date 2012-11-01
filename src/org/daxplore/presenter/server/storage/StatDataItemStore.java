@@ -18,12 +18,21 @@
  */
 package org.daxplore.presenter.server.storage;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import org.daxplore.presenter.client.json.shared.StatDataItem;
+import org.daxplore.presenter.server.throwable.StatsException;
+import org.daxplore.presenter.shared.QueryDefinition;
+import org.daxplore.presenter.shared.SharedTools;
+import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
+
+import com.google.apphosting.api.ApiProxy.CapabilityDisabledException;
 
 /**
  * A representation of a {@link StatDataItem} and it's key that can be
@@ -75,5 +84,47 @@ public class StatDataItemStore {
 	 */
 	public String getJson() {
 		return json;
+	}
+	
+	public static LinkedList<String> getStats(PersistenceManager pm, String prefix, QueryDefinition queryDefinition) throws StatsException {
+		String perspectiveID = queryDefinition.getPerspectiveID();
+		String questionID = queryDefinition.getQuestionID();
+		boolean useTotal = queryDefinition.hasFlag(QueryFlag.TOTAL);
+		List<Integer> usedPerspectiveOptions = queryDefinition.getUsedPerspectiveOptions();
+		LinkedList<String> datastoreKeys = new LinkedList<String>();
+		if (questionID.equals("")) {
+			throw new StatsException("No legit query");
+		} else if (perspectiveID.equals("") || usedPerspectiveOptions.size() == 0) {
+			datastoreKeys.add(prefix + "/Q=" + questionID);
+		} else {
+			if (useTotal) {
+				datastoreKeys.add(prefix + "/Q=" + questionID);
+			}
+			for (int alt: usedPerspectiveOptions) {
+				datastoreKeys.add(prefix + "/" + perspectiveID + "=" + (alt+1) + "+Q=" + questionID);
+			}
+		}
+
+		LinkedList<String> datastoreJsons = new LinkedList<String>();
+		for (String key : datastoreKeys) {
+			try {
+				StatDataItemStore statStore = pm.getObjectById(StatDataItemStore.class, key.toUpperCase());
+				datastoreJsons.add(statStore.getJson());
+			} catch (CapabilityDisabledException e) {
+				SharedTools.println("CapabilityDisabledException");
+				// TODO Datastore down for maintenance: send error message or no feedback?
+				throw new StatsException(e);
+			} catch (javax.jdo.JDOObjectNotFoundException e) {
+				SharedTools.println("JDOObjectNotFoundException using key: " + key.toUpperCase());
+				throw new StatsException("Using key: " + key.toUpperCase(), e);
+				// TODO Key does not exist: send error message or no feedback?
+			} catch (UnsupportedOperationException e) {
+				SharedTools.println("UnsupportedOperationException. this should only happen on DevServer." + e);
+				SharedTools.println("Try restarting the web server or something.");
+				throw new StatsException("UnsupportedOperationException, this should only happen on DevServer.", e);
+				// TODO If google fixes this issue, remove catch.
+			}
+		}
+		return datastoreJsons;
 	}
 }
