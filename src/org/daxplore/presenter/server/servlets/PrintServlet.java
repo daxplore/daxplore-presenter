@@ -17,6 +17,8 @@
 package org.daxplore.presenter.server.servlets;
 
 import java.io.IOException;
+import java.io.Writer;
+import java.text.MessageFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -30,16 +32,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.daxplore.presenter.server.storage.LocaleStore;
 import org.daxplore.presenter.server.storage.LocalizedSettingItemStore;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.shared.EmbedDefinition;
 import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
-import org.daxplore.presenter.shared.SharedTools;
 
 @SuppressWarnings("serial")
 public class PrintServlet extends HttpServlet {
 	Logger logger = Logger.getLogger(PrintServlet.class.getName());
+	protected static String printHtmlTemplate = null;
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -89,17 +92,48 @@ public class PrintServlet extends HttpServlet {
 		
 		pm.close();
 		
-		List<String> argumentList = new LinkedList<String>();
-		argumentList.add("pageTitle=" 		+ pageTitle);
-		argumentList.add("queryString=" 	+ queryString);
-		argumentList.add("locale=" 			+ locale.toLanguageTag());
-		argumentList.add("prefix=" 			+ prefix);
-		argumentList.add("embedDefinition=" + embedDefinition);
+		String serverPath = request.getRequestURL().toString();
+		// remove last slash
+		if (serverPath.charAt(serverPath.length() - 1) == '/') {
+			serverPath = serverPath.substring(0, serverPath.length() - 1);
+		}
+		// remove module name
+		serverPath = serverPath.substring(0, serverPath.lastIndexOf("/"));
+		
+		if (printHtmlTemplate == null) {
+			try {
+				printHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/print.html"));
+			} catch (IOException e) {
+				logger.log(Level.WARNING, "Failed to load print html template", e);
+				try {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+					return;
+				} catch (IOException e1) {
+					return;
+				}
+			}
+		}
+		
+		String[] arguments = {
+			pageTitle,				// {0}
+			serverPath,				// {1}
+			queryString,			// {2}
+			locale.toLanguageTag(),	// {3}
+			prefix,					// {4}
+			embedDefinition			// {5}
+		};
 
 		try {
-			response.sendRedirect("/print.jsp?" + SharedTools.join(argumentList, "&"));
+			Writer writer = response.getWriter();
+			writer.write(MessageFormat.format(printHtmlTemplate, (Object[])arguments));
+			writer.close();
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "Failed to display print servlet", e);
-		} 
+			try {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			} catch (IOException e1) {
+				return;
+			}
+		}
 	}
 }

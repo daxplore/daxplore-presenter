@@ -37,7 +37,7 @@ import com.google.inject.Inject;
  * the users to select different questions.</p>
  * 
  * <p>The Groups class is populated with json-data found in the JavaScript
- * variable "groups", which is defined in presentation.jsp.</p>
+ * variable "groups", which is defined in presentation template.</p>
  * 
  * <p>The native methods act on the json data using JavaScript. The non-native
  * methods wrap this information in convenient Java-methods.</p>

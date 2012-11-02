@@ -18,6 +18,7 @@
  */
 package org.daxplore.presenter.server.servlets;
 
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringReader;
@@ -27,6 +28,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 import javax.servlet.ServletException;
@@ -64,6 +67,7 @@ import au.com.bytecode.opencsv.CSVWriter;
  */
 @SuppressWarnings("serial")
 public class GetCsvServlet extends HttpServlet {
+	Logger logger = Logger.getLogger(GetCsvServlet.class.getName());
 	protected static final Map<String, QuestionMetadata> metadataMap = new HashMap<String, QuestionMetadata>();
 	
 	@Override
@@ -102,10 +106,18 @@ public class GetCsvServlet extends HttpServlet {
 			questionOptionTexts.add(0,  queryDefinition.getPerspectiveShortText() + " \\ " + queryDefinition.getQuestionShortText());
 			csvOutput.add(questionOptionTexts.toArray(new String[0]));
 			
-			LinkedList<String> datastoreJsons;
-			
-			datastoreJsons = StatDataItemStore.getStats(pm, prefix, queryDefinition);
-			
+			LinkedList<String> statItems;
+			try {
+				statItems = StatDataItemStore.getStats(pm, prefix, queryDefinition);
+			} catch (StatsException e) {
+				logger.log(Level.WARNING, "Failed to load the statistical data items", e);
+				try {
+					resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+					return;
+				} catch (IOException e1) {
+					return;
+				}
+			}
 			
 			ContainerFactory containerFactory = new ContainerFactory() {
 				@Override
@@ -119,7 +131,7 @@ public class GetCsvServlet extends HttpServlet {
 			};
 			
 			JSONParser parser = new JSONParser();
-			for (String json : datastoreJsons) {
+			for (String json : statItems) {
 				Map jo = (Map)parser.parse(json, containerFactory);
 				Long perspectiveLong = (Long)jo.get("s");
 				if (perspectiveLong!=null) {
@@ -164,10 +176,6 @@ public class GetCsvServlet extends HttpServlet {
 			csvWriter.writeAll(csvOutput);
 			resp.setStatus(HttpServletResponse.SC_OK);
 			
-		} catch (StatsException e) {
-			e.printStackTrace();
-			resp.setContentType("text/html; charset=UTF-8");
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		} catch (ParseException e) {
 			e.printStackTrace();
 			resp.setContentType("text/html; charset=UTF-8");

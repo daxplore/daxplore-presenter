@@ -49,7 +49,7 @@ import com.google.gwt.user.client.ui.RootPanel;
  * by the URL. The section after the # is interpreted as a
  * {@link QueryDefinition} restore string.</p>
  * 
- * <p>Used together with Embed.gwt.xml and either embed.jsp or print.jsp</p>
+ * <p>Used together with Embed.gwt.xml and either embed or print templates.</p>
  */
 public class EmbedEntryPoint implements EntryPoint {
 	private final EmbedInjector injector = GWT.create(EmbedInjector.class);

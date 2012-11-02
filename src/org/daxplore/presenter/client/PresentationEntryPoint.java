@@ -36,7 +36,7 @@ import com.google.gwt.user.client.ui.RootPanel;
  * <p>This entry point creates a page that contains perspectives for questions
  * and perspective and the chart.</p>
  * 
- * <p>Used together with Presentation.gwt.xml and presentation.jsp.</p>
+ * <p>Used together with Presentation.gwt.xml and presentation template.</p>
  */
 public class PresentationEntryPoint implements EntryPoint {
 

@@ -9,7 +9,37 @@
 	</welcome-file-list>
 
 
-	<!-- Public servlets -->
+	<!-- Public display servlet -->
+
+	<servlet>
+		<servlet-name>presentation</servlet-name>
+		<servlet-class>org.daxplore.presenter.server.servlets.PresentationServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>presentation</servlet-name>
+		<url-pattern>/presentation</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>embed</servlet-name>
+		<servlet-class>org.daxplore.presenter.server.servlets.EmbedServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>embed</servlet-name>
+		<url-pattern>/embed</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>print</servlet-name>
+		<servlet-class>org.daxplore.presenter.server.servlets.PrintServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>print</servlet-name>
+		<url-pattern>/print</url-pattern>
+	</servlet-mapping>
+	
+
+	<!-- Public support servlets -->
 	
 	<servlet>
 		<servlet-name>getStats</servlet-name>
@@ -39,7 +69,7 @@
 	</servlet-mapping>
 	
 	
-	<!-- Admin servlets -->
+	<!-- Password protected admin servlets -->
 	
 	<servlet>
 		<servlet-name>upload</servlet-name>

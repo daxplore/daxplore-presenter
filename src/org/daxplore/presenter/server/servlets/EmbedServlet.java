@@ -16,8 +16,9 @@
  */
 package org.daxplore.presenter.server.servlets;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.Writer;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,13 +35,20 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.daxplore.presenter.server.storage.LocaleStore;
+import org.daxplore.presenter.server.storage.LocalizedSettingItemStore;
 import org.daxplore.presenter.server.storage.PMF;
+import org.daxplore.presenter.server.storage.StatDataItemStore;
+import org.daxplore.presenter.server.storage.StorageTools;
+import org.daxplore.presenter.server.throwable.StatsException;
+import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QuestionMetadata;
 import org.daxplore.presenter.shared.SharedTools;
+import org.json.simple.parser.ParseException;
 
 @SuppressWarnings("serial")
 public class EmbedServlet extends HttpServlet {
 	protected static Logger logger = Logger.getLogger(EmbedServlet.class.getName());
+	protected static String embedHtmlTemplate = null;
 	
 	protected HashMap<String, QuestionMetadata> metadataMap = new HashMap<String, QuestionMetadata>(); 
 
@@ -49,6 +57,7 @@ public class EmbedServlet extends HttpServlet {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
 		String prefix = request.getParameter("prefix");
+		String queryString = request.getParameter("q");
 		
 		//Set up supported locales:
 		Query query = pm.newQuery(LocaleStore.class);
@@ -82,23 +91,82 @@ public class EmbedServlet extends HttpServlet {
 			}
 		}
 		
-		List<String> argumentList = new LinkedList<String>();
-		argumentList.add("locale=" 			+ locale.toLanguageTag());
-		argumentList.add("prefix=" 			+ prefix);
-		argumentList.add("queryString=" 	+ request.getParameter("q"));
-		try {
-			IOUtils.copy(input, output)
-			PipeR
-			BufferedWriter writer = new BufferedWriter(response.getWriter());
-			writer.wt
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		String serverPath = request.getRequestURL().toString();
+		// remove last slash
+		if (serverPath.charAt(serverPath.length() - 1) == '/') {
+			serverPath = serverPath.substring(0, serverPath.length() - 1);
 		}
+		// remove module name
+		serverPath = serverPath.substring(0, serverPath.lastIndexOf("/"));
+		
+		QueryDefinition queryDefinition = new QueryDefinition(metadataMap.get(prefix), queryString);
+		LinkedList<String> statItems;
 		try {
-			response.sendRedirect("/embed.jsp?" + SharedTools.join(argumentList, "&"));
+			statItems = StatDataItemStore.getStats(pm, prefix, queryDefinition);
+		} catch (StatsException e) {
+			logger.log(Level.WARNING, "Failed to load the statistical data items", e);
+			try {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				return;
+			} catch (IOException e1) {
+				return;
+			}
+		}
+		LinkedList<String> questions = new LinkedList<String>();
+		questions.add(queryDefinition.getQuestionID());
+		questions.add(queryDefinition.getPerspectiveID());
+		
+		String pageTitle = LocalizedSettingItemStore.getLocalizedProperty(pm, prefix, locale, "pageTitle");
+		String jsondata = SharedTools.join(statItems, ",");
+		
+		String questionsString;
+		try {
+			questionsString = StorageTools.getQuestionDefinitions(pm, prefix, questions, locale);
+		} catch (IOException | ParseException e) {
+			logger.log(Level.WARNING, "Failed to load question metadata", e);
+			try {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				return;
+			} catch (IOException e1) {
+				return;
+			}
+		}
+	
+		if (embedHtmlTemplate == null) {
+			try {
+				embedHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/embed.html"));
+			} catch (IOException e) {
+				logger.log(Level.SEVERE, "Failed to load the html embed template", e);
+				try {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+					return;
+				} catch (IOException e1) {
+					return;
+				}
+			}
+		}
+		
+		String[] arguments = {
+				prefix, 				// {0}
+				locale.toLanguageTag(), // {1}
+				pageTitle,				// {2}
+				jsondata, 				// {3}
+				questionsString			// {4}
+				};
+		
+		Writer writer;
+		try {
+			writer = response.getWriter();
+			writer.write(MessageFormat.format(embedHtmlTemplate, (Object[])arguments));
+			writer.close();
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Failed to display embed servlet", e);
-		} 
+			logger.log(Level.SEVERE, "Failed to display the embed servlet", e);
+			try {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				return;
+			} catch (IOException e1) {
+				return;
+			}
+		}
 	}
 }

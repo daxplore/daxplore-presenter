@@ -206,7 +206,7 @@ public class EmbedPopup extends PopupPanel implements EmbedSizeHandler, QueryUpd
 			// remove module name
 			address = address.substring(0, address.lastIndexOf("/") + 1);
 			
-			address += "embed.jsp?q=" + queryDefinition.getAsString();
+			address += "embed?q=" + queryDefinition.getAsString();
 
 			address += "&l=" + LocaleInfo.getCurrentLocale().getLocaleName();
 

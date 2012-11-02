@@ -38,16 +38,6 @@ public class StorageTools {
 	 * <p>This is useful when answering an embed request, as the embed mode only
 	 * uses two of the defined questions: one for the question and one for
 	 * the perspective.</p>
-	 * 
-	 * @param questionIDs
-	 *            the IDs of the questions to return
-	 * @param locale
-	 *            the locale
-	 * @return the question metadata definitions
-	 * @throws IOException
-	 *             signals that the questions metadata file couldn't be read
-	 * @throws ParseException
-	 *             signals that the questions file couldn't be parsed
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static String getQuestionDefinitions(PersistenceManager pm, String prefix,
@@ -65,7 +55,8 @@ public class StorageTools {
 			}
 		};
 		
-		BufferedReader reader = new BufferedReader(StaticFileItemStore.getStaticFileReader(pm, prefix, "questions", locale, ".json"));
+		BufferedReader reader = new BufferedReader(
+				StaticFileItemStore.getStaticFileReader(pm, prefix, "definitions/questions", locale, ".json"));
 		
 		JSONParser parser = new JSONParser();
 		List<Map> questionList = (List<Map>)parser.parse(reader, containerFactory);

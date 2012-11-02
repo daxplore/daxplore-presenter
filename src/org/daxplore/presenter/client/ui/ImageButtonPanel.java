@@ -119,7 +119,7 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 			}
 			address = address.substring(0, address.lastIndexOf("/")+1); //remove module name
 			String locale = LocaleInfo.getCurrentLocale().getLocaleName();
-			address += "print.jsp?q=" + queryDefinition.getAsString() + "&l=" + locale;
+			address += "print?q=" + queryDefinition.getAsString() + "&l=" + locale;
 			String name = "_blank";
 			String features = "";
 			Window.open(address, name, features);

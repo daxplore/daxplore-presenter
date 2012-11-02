@@ -38,7 +38,7 @@ import com.google.inject.Inject;
  * <p>The native methods act on the json data using JavaScript. The non-native
  * methods wrap this information in convenient Java-methods. The data is loaded
  * from the JavaScript variable "perspectives" that is defined in
- * presentation.jsp.</p>
+ * presentation template.</p>
  */
 public class Perspectives {
 	private final List<String> questionIDList;
