@@ -1,4 +1,4 @@
-/*
+/**
  *  This file is part of Daxplore Presenter.
  *
  *  Daxplore Presenter is free software: you can redistribute it and/or modify
@@ -16,7 +16,9 @@
  */
 package org.daxplore.presenter.server.servlets;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -30,76 +32,73 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.daxplore.presenter.server.storage.LocaleStore;
-import org.daxplore.presenter.server.storage.LocalizedSettingItemStore;
 import org.daxplore.presenter.server.storage.PMF;
-import org.daxplore.presenter.shared.EmbedDefinition;
-import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
+import org.daxplore.presenter.shared.QuestionMetadata;
 import org.daxplore.presenter.shared.SharedTools;
 
 @SuppressWarnings("serial")
-public class PrintServlet extends HttpServlet {
-	Logger logger = Logger.getLogger(PrintServlet.class.getName());
+public class EmbedServlet extends HttpServlet {
+	protected static Logger logger = Logger.getLogger(EmbedServlet.class.getName());
+	
+	protected HashMap<String, QuestionMetadata> metadataMap = new HashMap<String, QuestionMetadata>(); 
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		String prefix = request.getParameter("prefix");
 
-		// Set up supported locales:
+		String prefix = request.getParameter("prefix");
+		
+		//Set up supported locales:
 		Query query = pm.newQuery(LocaleStore.class);
 		query.declareParameters("String specificPrefix");
 		query.setFilter("prefix.equals(specificPrefix)");
 		@SuppressWarnings("unchecked")
-		LocaleStore localeStore = ((List<LocaleStore>) query.execute(prefix)).get(0);
+		LocaleStore localeStore = ((List<LocaleStore>)query.execute(prefix)).get(0);
 		List<Locale> supportedLocales = localeStore.getSupportedLocales();
-
-		// Build a queue of desired locales, enqueue the most desired ones first
+		
+		//Build a queue of desired locales, enqueue the most desired ones first
 		Queue<Locale> desiredLocales = new LinkedList<Locale>();
-
+		
 		// 1. Add browser request string locale
 		String queryLocale = request.getParameter("l");
-		if (queryLocale != null) {
-			desiredLocales.add(new Locale(queryLocale));
+		if(queryLocale!=null){
+			desiredLocales.add(new Locale(queryLocale));	
 		}
-
+		
 		// 2. Add default locale
 		desiredLocales.add(localeStore.getDefaultLocale());
-
+		
 		Locale locale = null;
-		// Pick the first supported locale in the queue
-		FindLocale: for (Locale desired : desiredLocales) {
+		//Pick the first supported locale in the queue
+		FindLocale: for(Locale desired : desiredLocales){
 			String desiredLanguage = desired.getLanguage();
-			for (Locale supported : supportedLocales) {
-				if (supported.getLanguage().equalsIgnoreCase(desiredLanguage)) {
+			for(Locale supported : supportedLocales){
+				if(supported.getLanguage().equalsIgnoreCase(desiredLanguage)){
 					locale = supported;
 					break FindLocale;
 				}
 			}
 		}
-
-		String queryString = request.getParameter("q");
-		LinkedList<EmbedFlag> flags = new LinkedList<EmbedFlag>();
-		flags.add(EmbedFlag.LEGEND);
-		flags.add(EmbedFlag.TRANSPARENT);
-		flags.add(EmbedFlag.PRINT);
-		String embedDefinition = new EmbedDefinition(flags).getAsString();
-
-		String pageTitle = LocalizedSettingItemStore.getLocalizedProperty(pm, prefix, locale, "pageTitle");
-		
-		pm.close();
 		
 		List<String> argumentList = new LinkedList<String>();
-		argumentList.add("pageTitle=" 		+ pageTitle);
-		argumentList.add("queryString=" 	+ queryString);
 		argumentList.add("locale=" 			+ locale.toLanguageTag());
 		argumentList.add("prefix=" 			+ prefix);
-		argumentList.add("embedDefinition=" + embedDefinition);
-
+		argumentList.add("queryString=" 	+ request.getParameter("q"));
 		try {
-			response.sendRedirect("/print.jsp?" + SharedTools.join(argumentList, "&"));
+			IOUtils.copy(input, output)
+			PipeR
+			BufferedWriter writer = new BufferedWriter(response.getWriter());
+			writer.wt
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			response.sendRedirect("/embed.jsp?" + SharedTools.join(argumentList, "&"));
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Failed to display print servlet", e);
+			logger.log(Level.SEVERE, "Failed to display embed servlet", e);
 		} 
 	}
 }

@@ -19,9 +19,22 @@
  */
 %>
 
+<%@ page 
+	language="java" 
+	contentType="text/html; charset=utf-8"
+	pageEncoding="utf-8"
+%>
+
 <%
+	String serverPath = request.getRequestURL().toString();
+	// remove last slash
+	if (serverPath.charAt(serverPath.length() - 1) == '/') {
+		serverPath = serverPath.substring(0, serverPath.length() - 1);
+	}
+	// remove module name
+	serverPath = serverPath.substring(0, serverPath.lastIndexOf("/"));
+
 	String pageTitle = request.getParameter("pageTitle");
-	String serverPath = request.getParameter("serverPath");
 	String queryString = request.getParameter("queryString");
 	String locale = request.getParameter("locale");
 	String prefix = request.getParameter("prefix");

@@ -19,14 +19,10 @@
  */
 %>
 
-<%@page import="org.json.simple.parser.ParseException"%>
-<%@page import="org.daxplore.presenter.server.servlets.GetDefinitionsServlet"%>
-<%@page import="org.daxplore.presenter.shared.SharedTools"%>
-<%@page import="org.daxplore.presenter.shared.QueryDefinition"%>
-<%@page import="java.util.LinkedList"%>
-<%@page import="java.util.Queue"%>
+<%@page import="java.util.logging.Level"%>
 <%@page import="java.io.IOException"%>
 <%@page import="org.daxplore.presenter.server.storage.QuestionMetadataServerImpl"%>
+<%@page import="org.daxplore.presenter.server.storage.StaticFileItemStore"%>
 <%@page import="java.io.Reader"%>
 <%@page import="org.daxplore.presenter.server.storage.PrefixStore"%>
 <%@page import="java.util.List"%>
@@ -35,13 +31,14 @@
 <%@page import="java.util.Locale"%>
 <%@page import="org.daxplore.presenter.shared.QuestionMetadata"%>
 <%@page import="java.util.HashMap"%>
-<%@page import="java.util.logging.Level"%>
 <%@page import="java.util.logging.Logger"%>
-<%@page import="org.daxplore.presenter.server.throwable.StatsException"%>
-<%@page import="javax.jdo.Query"%>
-<%@page import="org.daxplore.presenter.server.storage.LocaleStore"%>
+<%@page import="org.daxplore.presenter.server.storage.LocalizedSettingItemStore"%>
+<%@page import="org.daxplore.presenter.server.storage.StorageTools"%>
 <%@page import="org.daxplore.presenter.server.storage.StatDataItemStore"%>
-<%@page import="org.daxplore.presenter.server.storage.StaticFileItemStore"%>
+<%@page import="org.daxplore.presenter.shared.SharedTools"%>
+<%@page import="java.util.LinkedList"%>
+<%@page import="org.daxplore.presenter.shared.QueryDefinition"%>
+<%@page import="org.json.simple.parser.ParseException"%>
 
 <%@ page 
 	language="java" 
@@ -73,80 +70,38 @@ public void jspInit(){
 %>
 
 <%
+	Locale locale		= new Locale(request.getParameter("locale"));
+	String prefix		= request.getParameter("prefix");
+	String queryString	= request.getParameter("queryString");
+	
 	PersistenceManager pm = PMF.get().getPersistenceManager();
-
-	String prefix = request.getParameter("prefix");
-	String jsondata = "";
-	String qdef = "";
-	String questionsString = "";
 	
-	Locale locale = null;
+	QueryDefinition queryDefinition = new QueryDefinition(metadataMap.get(prefix), queryString);
+	LinkedList<String> statItems = StatDataItemStore.getStats(pm, prefix, queryDefinition);
+	LinkedList<String> questions = new LinkedList<String>();
+	questions.add(queryDefinition.getQuestionID());
+	questions.add(queryDefinition.getPerspectiveID());
 	
-	try {
-		//Set up supported locales:
-		Query query = pm.newQuery(LocaleStore.class);
-		query.declareParameters("String specificPrefix");
-		query.setFilter("prefix.equals(specificPrefix)");
-		@SuppressWarnings("unchecked")
-		LocaleStore localeStore = ((List<LocaleStore>)query.execute(prefix)).get(0);
-		List<Locale> supportedLocales = localeStore.getSupportedLocales();
-		
-		//Build a queue of desired locales, enqueue the most desired ones first
-		Queue<Locale> desiredLocales = new LinkedList<Locale>();
-		
-		// 1. Add browser request string locale
-		String queryLocale = request.getParameter("l");
-		if(queryLocale!=null){
-			desiredLocales.add(new Locale(queryLocale));	
-		}
-		
-		// 2. Add default locale
-		desiredLocales.add(localeStore.getDefaultLocale());
-		
-		//Pick the first supported locale in the queue
-		FindLocale: for(Locale desired : desiredLocales){
-			String desiredLanguage = desired.getLanguage();
-			for(Locale supported : supportedLocales){
-				if(supported.getLanguage().equalsIgnoreCase(desiredLanguage)){
-					locale = supported;
-					break FindLocale;
-				}
-			}
-		}
-		
-		String queryString = request.getParameter("q");
-		QueryDefinition queryDefinition = new QueryDefinition(metadataMap.get(prefix), queryString);
-		LinkedList<String> jsonString = StatDataItemStore.getStats(pm, prefix, queryDefinition);
-		LinkedList<String> questions = new LinkedList<String>();
-		questions.add(queryDefinition.getQuestionID());
-		questions.add(queryDefinition.getPerspectiveID());
-		
-		jsondata = SharedTools.join(jsonString, ",");
-		questionsString = GetDefinitionsServlet.getDefinitions(questions, "_"+locale.getLanguage(), getServletContext());
-	} catch (IOException | ParseException | StatsException  | IllegalArgumentException e) {
-		logger.log(Level.INFO, "Bad request made to embed", e);
-		response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-	} catch (Exception e) {
-		logger.log(Level.SEVERE, "Something went horribly wrong in embed", e);
-		response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-	} finally {
-		pm.close();
-	}
+	String pageTitle = LocalizedSettingItemStore.getLocalizedProperty(pm, prefix, locale, "pageTitle");
+	String jsondata = SharedTools.join(statItems, ",");
+	String questionsString = StorageTools.getQuestionDefinitions(pm, prefix, questions, locale);
 %>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<!-- Set the locale for the gwt-parts of the site. -->
-   		<meta name="gwt:property" content="locale=<%=locale.getLanguage()%>">
-		<title>Daxplore embed</title>
+   		<meta name="gwt:property" content="locale=<%=locale%>">
+   		<meta name="gwt:property" content="prefix=<%=prefix%>">
+		<title><%=pageTitle%></title>
 		<link type="text/css" rel="stylesheet" href="css/embed.css">
 	    <link type="text/css" rel="stylesheet" href="css/daxplore-chart.css">
 	    <script type="text/javascript" src="gwtEmbed/gwtEmbed.nocache.js"></script>
 	</head>
 	<script type="text/javascript">
-		var jsondata = [ <%=jsondata %> ];
-		var questions = <%=questionsString %>;
+		var jsondata = [ <%=jsondata%> ];
+		var questions = <%=questionsString%>;
 	</script>
 	<body>
 		<div id="main"></div>

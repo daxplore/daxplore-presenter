@@ -14,42 +14,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.server.servlets.png;
+package org.daxplore.presenter.server.servlets;
 
-public class OnePixel implements PixelSource {
-	private int size = 1;
-	private int intcolor;
-	private int intalpha = 0x00;
-	boolean hasalpha = false;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-	public OnePixel(String color) {
-		intcolor = Integer.parseInt(color, 16);
-	}
-
-	public OnePixel(String color, String alpha) {
-		hasalpha = true;
-		intcolor = Integer.parseInt(color, 16);
-		intalpha = Integer.parseInt(alpha, 16);
-	}
-
+@SuppressWarnings("serial")
+public class PresenterServlet extends HttpServlet {
+	
 	@Override
-	public int getWidth() {
-		return size;
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+		
 	}
-
-	@Override
-	public int getHeight() {
-		return size;
-	}
-
-	@Override
-	public int getPixel(int x, int y) {
-		if (hasalpha) {
-			return (intcolor << 8) | (intalpha & 0xFF);
-		} else {
-			return intcolor;
-		}
-
-	}
-
 }
