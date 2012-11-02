@@ -80,15 +80,18 @@ public class MeanChartCompare extends MeanChart {
 			addStyleDependentName("compare-IE");
 		}
 
-		if (query.hasResult()) {
-			addData();
-		} else {
-			query.requestResult(new QueryCallback() {
-				@Override
-				public void callback() {
-					addData();
-				}
-			});
+		// Ugly hack: force subclasses to run this themselves so that they are properly initzialized first
+		if (this.getClass().equals(MeanChartCompare.class)) {
+			if (query.hasResult()) {
+				addData();
+			} else {
+				query.requestResult(new QueryCallback() {
+					@Override
+					public void callback() {
+						addData();
+					}
+				});
+			}
 		}
 	}
 

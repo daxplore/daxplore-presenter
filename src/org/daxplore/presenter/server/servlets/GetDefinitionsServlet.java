@@ -16,7 +16,7 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.server;
+package org.daxplore.presenter.server.servlets;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,13 +28,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.jdo.PersistenceManager;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.daxplore.presenter.server.throwable.ResourceReaderException;
+import org.daxplore.presenter.server.storage.PMF;
+import org.daxplore.presenter.server.storage.StaticFileItemStore;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.ContainerFactory;
 import org.json.simple.parser.JSONParser;
@@ -82,52 +84,25 @@ public class GetDefinitionsServlet extends HttpServlet {
 		
 		String definitionName = req.getParameter("def");
 		String asJavascript = req.getParameter("js");
+		String prefix = req.getParameter("prefix");
 		boolean asJS;
 		if (asJavascript != null && asJavascript.equals("true")) {
 			asJS = true;
 		} else {
 			asJS = false;
 		}
-		try {
-			if (definitionName.equalsIgnoreCase("perspectives")) {
-				BufferedReader reader = ServerTools.getResourceReader(getServletContext(), "perspectives", locale, ".json");
-				if (asJS) {
-					respWriter.write("var perspectives = ");
-				}
-				String line;
-				while ((line = reader.readLine()) != null) {
-					respWriter.write(line);
-				}
-				reader.close();
-			} else if (definitionName.equalsIgnoreCase("questions")) {
-				BufferedReader reader = ServerTools.getResourceReader(getServletContext(), "questions", locale, ".json");
-				if (asJS) {
-					respWriter.write("var questions = ");
-				}
-				String line;
-				while ((line = reader.readLine()) != null) {
-					respWriter.write(line);
-				}
-				reader.close();
-			} else if (definitionName.equalsIgnoreCase("groups")) {
-				BufferedReader reader = ServerTools.getResourceReader(getServletContext(), "groups", locale, ".json");
-				if (asJS) {
-					respWriter.write("var groups = ");
-				}
-				String line;
-				while ((line = reader.readLine()) != null) {
-					respWriter.write(line);
-				}
-				reader.close();
-			} else {
-				resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		
+		definitionName = definitionName.toLowerCase();
+		if (definitionName.equals("perspectives") || definitionName.equals("questions") || definitionName.equals("groups")) {
+			if (asJS) {
+				respWriter.write("var " + definitionName + " = ");
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} catch (ResourceReaderException e) {
-			e.printStackTrace();
-			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			PersistenceManager pm = PMF.get().getPersistenceManager();
+			String text = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/" + definitionName, locale, ".json");
+			pm.close();
+			respWriter.write(text);
+		} else {
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		}
 		respWriter.close();
 	}

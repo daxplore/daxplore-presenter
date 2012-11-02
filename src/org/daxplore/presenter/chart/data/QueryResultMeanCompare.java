@@ -167,10 +167,10 @@ public class QueryResultMeanCompare extends QueryResultMean {
 	 * @return The mean answer in the total data item group.
 	 */
 	public double getTotalMeanSecondary() {
-		if (averagesSecondary[0] != Double.NaN) {
-			return averagesSecondary[0];
+		if (Double.isNaN(averagesSecondary[0])) {
+			throw new Error("No total data exists");
 		}
-		throw new Error("No total data exists");
+		return averagesSecondary[0];
 	};
 
 	/**
@@ -180,10 +180,10 @@ public class QueryResultMeanCompare extends QueryResultMean {
 	 *         group.
 	 */
 	public double getTotalStandardDeviationSecondary() {
-		if (deviationsSecondary[0] != Double.NaN) {
-			return deviationsSecondary[0];
+		if (Double.isNaN(deviationsSecondary[0])) {
+			throw new Error("No total data exists");
 		}
-		throw new Error("No total data exists");
+		return deviationsSecondary[0];
 	};
 
 	/**

@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.xml.XMLConstants;
@@ -39,12 +40,12 @@ public class SharedResourceTools {
 		return schema;
 	}
 
-	public static List<String> findMissingUploadFiles(Set<String> keySet, List<String> languages) {
+	public static List<String> findMissingUploadFiles(Set<String> keySet, List<Locale> locales) {
 		// TODO Auto-generated method stub
 		return new LinkedList<String>();
 	}
 
-	public static List<String> findUnwantedUploadFiles(Set<String> keySet, List<String> languages) {
+	public static List<String> findUnwantedUploadFiles(Set<String> keySet, List<Locale> locales) {
 		// TODO Auto-generated method stub
 		return new LinkedList<String>();
 	}

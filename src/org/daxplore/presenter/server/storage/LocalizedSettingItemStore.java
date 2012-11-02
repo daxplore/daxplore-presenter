@@ -18,6 +18,8 @@
  */
 package org.daxplore.presenter.server.storage;
 
+import java.util.Locale;
+
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -34,7 +36,7 @@ import org.daxplore.presenter.client.json.shared.StatDataItem;
  * with a specific key.</p>
  */
 @PersistenceCapable
-public class SettingItemStore {
+public class LocalizedSettingItemStore {
 	@PrimaryKey
 	private String key;
 	@Persistent
@@ -44,16 +46,16 @@ public class SettingItemStore {
 	 * Creates a new settings item to hold a setting uploaded by an administrator
 	 * using the admin console.
 	 * 
-	 * <p>The key should be on the format "prefix/name_locale". The prefix defines
-	 * which presenter the setting belongs to, the name is the name of the
-	 * setting and locale is a Locale.toLanguageTag.</p>
+	 * <p>The key should be on the format "prefix/name". The prefix defines
+	 * which presenter the setting belongs to and the name is the name of the
+	 * setting.</p>
 	 * 
 	 * @param key
-	 *            a key on the format "prefix/name_locale"
+	 *            a key on the format "prefix/name"
 	 * @param value
 	 *            the value of the setting
 	 */
-	public SettingItemStore(String key, String value) {
+	public LocalizedSettingItemStore(String key, String value) {
 		this.key = key;
 		this.value = value;
 	}
@@ -76,11 +78,9 @@ public class SettingItemStore {
 		return value;
 	}
 	
-	public static String getProperty(String prefix, String propertyName) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		String statStoreKey = prefix + "/" + propertyName;
+	public static String getLocalizedProperty(PersistenceManager pm, String prefix, Locale locale, String propertyName) {
+		String statStoreKey = prefix + "/" + propertyName + "_" + locale.toLanguageTag();
 		SettingItemStore item = pm.getObjectById(SettingItemStore.class, statStoreKey);
-		pm.close();
 		return item.getValue();
 	}
 }

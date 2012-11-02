@@ -18,23 +18,30 @@
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
 %>
-<%@page import="org.daxplore.presenter.server.GetStatsServlet"%>
-<%@page import="java.io.BufferedReader"%>
-<%@page import="java.io.IOException"%>
-<%@page import="org.daxplore.presenter.server.GetDefinitionsServlet"%>
+
+<%@page import="org.json.simple.parser.ParseException"%>
+<%@page import="org.daxplore.presenter.server.servlets.GetDefinitionsServlet"%>
+<%@page import="org.daxplore.presenter.shared.SharedTools"%>
 <%@page import="org.daxplore.presenter.shared.QueryDefinition"%>
 <%@page import="java.util.LinkedList"%>
-<%@page import="org.daxplore.presenter.shared.SharedTools"%>
-<%@page import="org.daxplore.presenter.server.QuestionMetadataServerImpl"%>
-<%@page import="org.daxplore.presenter.shared.QuestionMetadata"%>
-<%@page import="org.daxplore.presenter.server.resources.JspLocales"%>
-<%@page import="java.util.List"%>
 <%@page import="java.util.Queue"%>
-<%@page import="org.daxplore.presenter.server.throwable.StatsException"%>
-<%@page import="org.json.simple.parser.ParseException"%>
-<%@page import="org.daxplore.presenter.server.throwable.ResourceReaderException"%>
-<%@page import="org.daxplore.presenter.server.ServerTools"%>
+<%@page import="java.io.IOException"%>
+<%@page import="org.daxplore.presenter.server.storage.QuestionMetadataServerImpl"%>
+<%@page import="java.io.Reader"%>
+<%@page import="org.daxplore.presenter.server.storage.PrefixStore"%>
+<%@page import="java.util.List"%>
+<%@page import="org.daxplore.presenter.server.storage.PMF"%>
+<%@page import="javax.jdo.PersistenceManager"%>
 <%@page import="java.util.Locale"%>
+<%@page import="org.daxplore.presenter.shared.QuestionMetadata"%>
+<%@page import="java.util.HashMap"%>
+<%@page import="java.util.logging.Level"%>
+<%@page import="java.util.logging.Logger"%>
+<%@page import="org.daxplore.presenter.server.throwable.StatsException"%>
+<%@page import="javax.jdo.Query"%>
+<%@page import="org.daxplore.presenter.server.storage.LocaleStore"%>
+<%@page import="org.daxplore.presenter.server.storage.StatDataItemStore"%>
+<%@page import="org.daxplore.presenter.server.storage.StaticFileItemStore"%>
 
 <%@ page 
 	language="java" 
@@ -43,24 +50,32 @@
 %>
 
 <%!// Setup
-protected QuestionMetadata questionMetadata = null;
+protected static Logger logger = Logger.getLogger("embed.jsp");
+protected HashMap<String, QuestionMetadata> metadataMap = new HashMap<String, QuestionMetadata>(); 
 		
 public void jspInit(){
 	try {
 		//it should not matter what locale we use here, as long as it is one of the supported locales:
 		Locale locale = new Locale("en"); //TODO figure this out in a smarter way
-		BufferedReader reader = ServerTools.getResourceReader(getServletContext(), "questions", locale , ".json");
-		questionMetadata = new QuestionMetadataServerImpl(reader);
-		reader.close(); 
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		@SuppressWarnings("unchecked")
+		List<PrefixStore> prefixes = (List<PrefixStore>)pm.newQuery(PrefixStore.class).execute();
+		for(PrefixStore prefix : prefixes) {
+			Reader reader = StaticFileItemStore.getStaticFileReader(pm, prefix.getPrefix(), "questions", locale , ".json");
+			metadataMap.put(prefix.getPrefix(), new QuestionMetadataServerImpl(reader));
+			reader.close(); 
+		}
+		pm.close();
 	} catch (IOException e) {
-		System.out.println("Couldn't read file in jspInit: " + e.toString());
-	} catch (ResourceReaderException e) {
-		e.printStackTrace();
+		logger.log(Level.SEVERE, "Failed to initialize metadata in the embed servlet", e); 
 	}
 }
 %>
 
 <%
+	PersistenceManager pm = PMF.get().getPersistenceManager();
+
+	String prefix = request.getParameter("prefix");
 	String jsondata = "";
 	String qdef = "";
 	String questionsString = "";
@@ -69,7 +84,12 @@ public void jspInit(){
 	
 	try {
 		//Set up supported locales:
-		List<Locale> supportedLocales = JspLocales.getSupportedLocales();
+		Query query = pm.newQuery(LocaleStore.class);
+		query.declareParameters("String specificPrefix");
+		query.setFilter("prefix.equals(specificPrefix)");
+		@SuppressWarnings("unchecked")
+		LocaleStore localeStore = ((List<LocaleStore>)query.execute(prefix)).get(0);
+		List<Locale> supportedLocales = localeStore.getSupportedLocales();
 		
 		//Build a queue of desired locales, enqueue the most desired ones first
 		Queue<Locale> desiredLocales = new LinkedList<Locale>();
@@ -81,7 +101,7 @@ public void jspInit(){
 		}
 		
 		// 2. Add default locale
-		desiredLocales.add(JspLocales.getDefaultLocale());
+		desiredLocales.add(localeStore.getDefaultLocale());
 		
 		//Pick the first supported locale in the queue
 		FindLocale: for(Locale desired : desiredLocales){
@@ -95,29 +115,22 @@ public void jspInit(){
 		}
 		
 		String queryString = request.getParameter("q");
-		QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, queryString);
-		LinkedList<String> jsonString = GetStatsServlet.getStats(queryDefinition);
+		QueryDefinition queryDefinition = new QueryDefinition(metadataMap.get(prefix), queryString);
+		LinkedList<String> jsonString = StatDataItemStore.getStats(pm, prefix, queryDefinition);
 		LinkedList<String> questions = new LinkedList<String>();
 		questions.add(queryDefinition.getQuestionID());
 		questions.add(queryDefinition.getPerspectiveID());
 		
 		jsondata = SharedTools.join(jsonString, ",");
 		questionsString = GetDefinitionsServlet.getDefinitions(questions, "_"+locale.getLanguage(), getServletContext());
-	} catch (IOException e) {
-		e.printStackTrace();
-		response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-	} catch (ParseException e) {
-		e.printStackTrace();
-		response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-	} catch (StatsException e) {
-		e.printStackTrace();
-		response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-	} catch (IllegalArgumentException e) {
-		e.printStackTrace();
+	} catch (IOException | ParseException | StatsException  | IllegalArgumentException e) {
+		logger.log(Level.INFO, "Bad request made to embed", e);
 		response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 	} catch (Exception e) {
-		e.printStackTrace();
+		logger.log(Level.SEVERE, "Something went horribly wrong in embed", e);
 		response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	} finally {
+		pm.close();
 	}
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">

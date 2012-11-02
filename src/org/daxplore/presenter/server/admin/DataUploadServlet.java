@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.server.upload;
+package org.daxplore.presenter.server.admin;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -29,8 +29,8 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
-import org.daxplore.presenter.server.storage.BlobManager;
-import org.daxplore.presenter.server.upload.DataUnpackServlet.UnpackType;
+import org.daxplore.presenter.server.admin.DataUnpackServlet.UnpackType;
+import org.daxplore.presenter.server.storage.StaticFileItemStore;
 import org.daxplore.presenter.shared.ClientServerMessage.MESSAGE_TYPE;
 
 import com.google.api.server.spi.response.BadRequestException;
@@ -79,7 +79,7 @@ public class DataUploadServlet extends HttpServlet {
 			if (fileIterator.hasNext()) {
 				throw new BadRequestException("More than one file uploaded in a single request");
 			}
-			BlobKey blobKey = BlobManager.writeFile(file.getFieldName(), fileData);
+			BlobKey blobKey = StaticFileItemStore.writeBlob(file.getFieldName(), fileData);
 			UnpackQueue unpackQueue = new UnpackQueue("", channelToken);
 			unpackQueue.addTask(UnpackType.UNZIP_ALL, blobKey.getKeyString());
 			messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "User is uploading a new file with presenter data");
@@ -87,15 +87,7 @@ public class DataUploadServlet extends HttpServlet {
 			logger.log(Level.WARNING, e.getMessage(), e);
 			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			//TODO communicate error to user
-		} catch (FileUploadException e) {
-			logger.log(Level.INFO, e.getMessage(), e);
-			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			// TODO give user feedback on invalid file
-		} catch (IOException e) {
-			logger.log(Level.INFO, e.getMessage(), e);
-			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			// TODO give user feedback on invalid file
-		} catch (BadRequestException e) {
+		} catch (FileUploadException | IOException | BadRequestException e) {
 			logger.log(Level.INFO, e.getMessage(), e);
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			// TODO give user feedback on invalid file

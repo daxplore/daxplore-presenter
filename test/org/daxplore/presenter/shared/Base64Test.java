@@ -108,8 +108,6 @@ public class Base64Test {
 			
 			assertEquals(e2, e1);
 			byte[] b1 = Base64.decodeLines(e1);
-			
-			e2.replace("\n", "");
 			byte[] b2 = apacheCoder.decode(e2.replace("\n", "").getBytes());
 			
 			assertArrayEquals(b0, b1);

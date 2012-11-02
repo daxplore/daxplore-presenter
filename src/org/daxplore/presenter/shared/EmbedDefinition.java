@@ -142,7 +142,7 @@ public class EmbedDefinition {
 	 *             thrown if the definition is invalid
 	 */
 	public EmbedDefinition(String embedDefinitionString) throws IllegalArgumentException {
-		if(embedDefinitionString == null || embedDefinitionString == "") {
+		if(embedDefinitionString == null || embedDefinitionString.equals("")) {
 			throw new IllegalArgumentException("No string to restore from");
 		}
 		flags = new EmbedFlag[0];

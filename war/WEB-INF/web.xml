@@ -13,7 +13,7 @@
 	
 	<servlet>
 		<servlet-name>getStats</servlet-name>
-		<servlet-class>org.daxplore.presenter.server.GetStatsServlet</servlet-class>
+		<servlet-class>org.daxplore.presenter.server.servlets.GetStatsServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>getStats</servlet-name>
@@ -22,20 +22,11 @@
 	
 	<servlet>
 		<servlet-name>getCsv</servlet-name>
-		<servlet-class>org.daxplore.presenter.server.GetCsvServlet</servlet-class>
+		<servlet-class>org.daxplore.presenter.server.servlets.GetCsvServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>getCsv</servlet-name>
 		<url-pattern>/getCsv/*</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>getDefinitions</servlet-name>
-		<servlet-class>org.daxplore.presenter.server.GetDefinitionsServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>getDefinitions</servlet-name>
-		<url-pattern>/getDefinitions</url-pattern>
 	</servlet-mapping>
 
 	<servlet>

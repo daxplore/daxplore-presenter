@@ -14,9 +14,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.server.upload;
+package org.daxplore.presenter.server.admin;
 
-import org.daxplore.presenter.server.upload.DataUnpackServlet.UnpackType;
+import org.daxplore.presenter.server.admin.DataUnpackServlet.UnpackType;
 
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;

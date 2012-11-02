@@ -18,12 +18,8 @@
  */
 package org.daxplore.presenter.server.throwable;
 
-import org.daxplore.presenter.server.GetStatsServlet;
-import org.daxplore.presenter.shared.QueryDefinition;
-
 /**
- * An Exception thrown by {@link GetStatsServlet#getStats(QueryDefinition)} when
- * unable to return a statistic.
+ * An Exception thrown when failing to read a statistical data item.
  */
 @SuppressWarnings("serial")
 public class StatsException extends Exception {

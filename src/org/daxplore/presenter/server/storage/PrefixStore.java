@@ -16,28 +16,21 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.server;
+package org.daxplore.presenter.server.storage;
 
-import javax.jdo.JDOHelper;
-import javax.jdo.PersistenceManagerFactory;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.PrimaryKey;
 
-/**
- * Gives access to a {@link PersistenceManagerFactory} instance.
- * 
- * <p>The instance is kept unique for each server instance.</p>
- */
-public final class PMF {
-	private static final PersistenceManagerFactory pmfInstance = JDOHelper.getPersistenceManagerFactory("transactions-optional");
+@PersistenceCapable
+public class PrefixStore {
+	@PrimaryKey
+	private String prefix;
 
-	private PMF() {
+	public PrefixStore(String prefix) {
+		this.prefix = prefix;
 	}
 
-	/**
-	 * Gets the server-instance's {@link PersistenceManagerFactory}.
-	 * 
-	 * @return the persistence manager factory
-	 */
-	public static PersistenceManagerFactory get() {
-		return pmfInstance;
+	public String getPrefix() {
+		return prefix;
 	}
 }

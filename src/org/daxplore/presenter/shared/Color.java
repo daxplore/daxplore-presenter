@@ -97,7 +97,6 @@ public class Color {
 			hprim = h / 60;
 			X = C * (1 - Math.abs(hprim % 2 - 1));
 			m = lightnessOrValue - 0.5 * C;
-			
 			break;
 		case HSV:
 			hsvh = h;
@@ -109,8 +108,9 @@ public class Color {
 			hprim = h / 60;
 			X = C * (1 - Math.abs(hprim % 2 - 1));
 			m = lightnessOrValue - C;
-			
 			break;
+		case RGB:
+			throw new Error("RGB model used in the HSL/HSV constructor");
 		}
 		
 		if (hprim < 1) {
@@ -150,6 +150,7 @@ public class Color {
 		switch (model) {
 		case HSL: calcHSV(); break;
 		case HSV: calcHSL(); break;
+		case RGB: throw new AssertionError();
 		}
 	}
 

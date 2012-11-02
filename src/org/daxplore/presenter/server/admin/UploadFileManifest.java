@@ -14,12 +14,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.server.upload;
+package org.daxplore.presenter.server.admin;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -39,10 +41,11 @@ import com.google.api.server.spi.response.InternalServerErrorException;
  * 
  */
 public class UploadFileManifest {
+	protected static Logger logger = Logger.getLogger(UploadFileManifest.class.getName());
+	
 	protected int versionMajor, versionMinor;
-
-	protected String prefix;
-	protected List<String> languages = new LinkedList<String>();
+	protected List<Locale> locales = new LinkedList<Locale>();
+	protected Locale defaultLocale; 
 	
 	public UploadFileManifest(InputStream manifestInputStream) throws InternalServerErrorException, BadRequestException {
 		DocumentBuilder documentBuilder = null;
@@ -55,39 +58,49 @@ public class UploadFileManifest {
 			if (documentBuilder==null) {
 				throw new ParserConfigurationException();
 			}
-		} catch (IOException e) {
+		} catch (IOException | SAXException e) {
 			e.printStackTrace();
 			throw new InternalServerErrorException("Could not read UploadFileManifest Schema");
-		} catch (SAXException e) {
-			e.printStackTrace();
-			throw new InternalServerErrorException("Could not create UploadFileManifest Schema");
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 			throw new InternalServerErrorException("Could not create document builder from UploadFileManifest Schema");
 		}
 		
 		try {
+			//TODO replace xml parser
 			Document document = documentBuilder.parse(manifestInputStream);
 		
 			Node node = document.getElementsByTagName("major").item(0);
 			versionMajor = Integer.parseInt(node.getTextContent());
 			
-			node = document.getElementsByTagName("major").item(0);
+			node = document.getElementsByTagName("minor").item(0);
 			versionMinor = Integer.parseInt(node.getTextContent());
-			
-			node = document.getElementsByTagName("prefix").item(0);
-			prefix = node.getTextContent(); 
-			
-			NodeList languageNodes = document.getElementsByTagName("language-BCP47");
+
+			node = document.getElementsByTagName("supportedLocales").item(0);
+			NodeList languageNodes = node.getChildNodes();
 			for (int i=0; i<languageNodes.getLength(); i++) {
-				languages.add(languageNodes.item(i).getTextContent());
+				String text = languageNodes.item(i).getTextContent().trim();
+				if (text!=null && !text.equals("")) { // buggy parsing requires this test
+					locales.add(new Locale(text));
+				}
+			}
+			
+			node = document.getElementsByTagName("defaultLocale").item(0);
+			languageNodes = node.getChildNodes();
+			// strange parsing requires this work-around
+			for (int i=0; i<languageNodes.getLength(); i++) {
+				String text = languageNodes.item(i).getTextContent().trim();
+				if (text!=null && !text.equals("")) { 
+					defaultLocale = new Locale(text);
+					break;
+				}
 			}
 		} catch (SAXException e) {
 			e.printStackTrace();
 			throw new BadRequestException("Manifest doesn't comply to the upload file schema");
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new BadRequestException("Failed to read the manifest data stream");
+			throw new BadRequestException("Failed to read the uploaded file's manifest");
 		}
 	}
 	
@@ -99,11 +112,11 @@ public class UploadFileManifest {
 		return versionMinor;
 	}
 
-	public String getPrefix() {
-		return prefix;
+	public List<Locale> getSupportedLocales() {
+		return locales;
 	}
-
-	public List<String> getLanguages() {
-		return languages;
+	
+	public Locale getDefaultLocale() {
+		return defaultLocale;
 	}
 }

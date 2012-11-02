@@ -12,26 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-package org.daxplore.presenter.server.png;
+package org.daxplore.presenter.server.servlets.png;
+
+import java.io.IOException;
 
 /**
- * {@code PixelSource} represents a physical image of a specific resolution.
+ * An {@code ImageWriter} is capable of converting a {@link} PixelSource} to a
+ * specific stream of bytes in some specific image format.
  * 
  * @author schwardo@google.com (Don Schwarz)
  */
-public interface PixelSource {
+public interface ImageWriter {
 	/**
-	 * Returns the width of the image, in pixels.
+	 * Returns the content type for the image format that is used.
 	 */
-	int getWidth();
+	String getContentType();
 
 	/**
-	 * Returns the height of the image, in pixels.
+	 * Generate the image produced by {@code source}.
 	 */
-	int getHeight();
-
-	/**
-	 * Returns a color for the specified pixel, as produced by {@link ColorUtil}.
-	 */
-	int getPixel(int x, int y);
+	byte[] generateImage(PixelSource source) throws IOException;
 }

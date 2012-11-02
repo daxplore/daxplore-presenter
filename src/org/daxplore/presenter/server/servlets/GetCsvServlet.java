@@ -16,11 +16,11 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.server;
+package org.daxplore.presenter.server.servlets;
 
-import java.io.BufferedReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -28,12 +28,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.jdo.PersistenceManager;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.daxplore.presenter.server.throwable.ResourceReaderException;
+import org.daxplore.presenter.server.storage.PMF;
+import org.daxplore.presenter.server.storage.QuestionMetadataServerImpl;
+import org.daxplore.presenter.server.storage.StatDataItemStore;
+import org.daxplore.presenter.server.storage.StaticFileItemStore;
 import org.daxplore.presenter.server.throwable.StatsException;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
@@ -55,6 +59,7 @@ import au.com.bytecode.opencsv.CSVWriter;
  * <ul>
  * <li>q, which is a queryString that defines the query</li>
  * <li>l, which defines the locale</li>
+ * <li>prefix, which defines which prefix to read the data from</li>
  * </ul>
  */
 @SuppressWarnings("serial")
@@ -68,9 +73,11 @@ public class GetCsvServlet extends HttpServlet {
 		PrintWriter respWriter = new PrintWriter(new OutputStreamWriter(resp.getOutputStream(), "UTF8"), true);
 		resp.setContentType("text/csv; charset=UTF-8");
 		CSVWriter csvWriter =  new CSVWriter(respWriter);
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 		
 		try {
 			String localeString = req.getParameter("l");
+			String prefix = req.getParameter("prefix");
 			if (localeString==null) {
 				localeString = "";
 			}
@@ -79,9 +86,8 @@ public class GetCsvServlet extends HttpServlet {
 			if(metadataMap.containsKey(locale.getLanguage())) {
 				questionMetadata = metadataMap.get(locale.getLanguage());
 			} else {
-				BufferedReader reader = ServerTools.getResourceReader(getServletContext(), "questions", locale, ".json");
-				questionMetadata = new QuestionMetadataServerImpl(reader);
-				reader.close();
+				String questionText = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/questions", locale, ".json");
+				questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
 				metadataMap.put(locale.getLanguage(), questionMetadata);
 			}
 			QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, req.getParameter("q"));
@@ -95,8 +101,11 @@ public class GetCsvServlet extends HttpServlet {
 			
 			questionOptionTexts.add(0,  queryDefinition.getPerspectiveShortText() + " \\ " + queryDefinition.getQuestionShortText());
 			csvOutput.add(questionOptionTexts.toArray(new String[0]));
+			
 			LinkedList<String> datastoreJsons;
-			datastoreJsons = GetStatsServlet.getStats(queryDefinition);
+			
+			datastoreJsons = StatDataItemStore.getStats(pm, prefix, queryDefinition);
+			
 			
 			ContainerFactory containerFactory = new ContainerFactory() {
 				@Override
@@ -155,10 +164,6 @@ public class GetCsvServlet extends HttpServlet {
 			csvWriter.writeAll(csvOutput);
 			resp.setStatus(HttpServletResponse.SC_OK);
 			
-		} catch (ResourceReaderException e) {
-			e.printStackTrace();
-			resp.setContentType("text/html; charset=UTF-8");
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		} catch (StatsException e) {
 			e.printStackTrace();
 			resp.setContentType("text/html; charset=UTF-8");
@@ -173,6 +178,7 @@ public class GetCsvServlet extends HttpServlet {
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} finally {
 			csvWriter.close();
+			pm.close();
 		}
 	}
 }

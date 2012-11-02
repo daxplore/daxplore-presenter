@@ -20,17 +20,22 @@
 %>
 <!DOCTYPE html>
 
-<%@page import="org.daxplore.presenter.server.resources.JspLocales"%>
 <%@page import="java.util.List"%>
 <%@page import="java.io.UnsupportedEncodingException"%>
 <%@page import="org.daxplore.presenter.server.ServerTools"%>
-<%@page import="org.daxplore.presenter.server.resources.JspBundles"%>
 <%@page import="org.daxplore.presenter.shared.SharedTools"%>
 <%@page import="java.util.Arrays"%>
 <%@page import="java.util.LinkedList"%>
 <%@page import="java.util.Queue"%>
 <%@page import="java.util.ResourceBundle"%>
 <%@page import="java.util.Locale"%>
+<%@page import="org.daxplore.presenter.server.storage.PMF"%>
+<%@page import="javax.jdo.PersistenceManager"%>
+<%@page import="javax.jdo.Query"%>
+<%@page import="org.daxplore.presenter.server.storage.LocaleStore"%>
+<%@page import="java.io.IOException"%>
+<%@page import="org.daxplore.presenter.server.storage.LocalizedSettingItemStore"%>
+<%@page import="org.daxplore.presenter.server.storage.StaticFileItemStore"%>
 
 <%@ page
 language="java"
@@ -40,19 +45,26 @@ contentType="text/html;charset=utf-8"
 %>
 
 <%
+	PersistenceManager pm = PMF.get().getPersistenceManager();
 	Locale locale = null;
 	String pageTitle = "";
 	boolean browserSupported = true;
 	ResourceBundle filenameBundle = null;
+	String perspectives = "", groups = "", questions = "";
 	
 	try {
 		request.setCharacterEncoding("UTF-8");
 		response.setContentType("text/html; charset=UTF-8");
-
+		
+		String prefix = request.getParameter("prefix");
+		
+		// TODO Add caching for loaded files
+		perspectives = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/perspectives", locale, ".json");
+		questions = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/questions", locale, ".json");
+		groups = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/groups", locale, ".json");
+		
 		String useragent = request.getHeader("user-agent");
 		double ieversion = ServerTools.getInternetExplorerVersion(useragent);
-		SharedTools.println(useragent);
-		SharedTools.println("IE version = "+ ieversion);
 		if(useragent == null || (ieversion > 0.0 && ieversion < 8.0)){
 			browserSupported = false;
 		}
@@ -64,7 +76,12 @@ contentType="text/html;charset=utf-8"
 		browserSupported = browserSupported || ignoreBadBrowser;
 	
 		//Set up supported locales:
-		List<Locale> supportedLocales = JspLocales.getSupportedLocales();
+		Query query = pm.newQuery(LocaleStore.class);
+		query.declareParameters("String specificPrefix");
+		query.setFilter("prefix.equals(specificPrefix)");
+		@SuppressWarnings("unchecked")
+		LocaleStore localeStore = ((List<LocaleStore>)query.execute(prefix)).get(0);
+		List<Locale> supportedLocales = localeStore.getSupportedLocales();
 		
 		//Build a queue of desired locales, enqueue the most desired ones first
 		Queue<Locale> desiredLocales = new LinkedList<Locale>();
@@ -92,7 +109,7 @@ contentType="text/html;charset=utf-8"
 		}
 		
 		// 4. Add default locale
-		desiredLocales.add(JspLocales.getDefaultLocale());
+		desiredLocales.add(localeStore.getDefaultLocale());
 		
 		//Pick the first supported locale in the queue
 		FindLocale: for(Locale desired : desiredLocales){
@@ -105,16 +122,13 @@ contentType="text/html;charset=utf-8"
 			}
 		}
 		
-		filenameBundle = JspBundles.getFilenameBundle(locale);
-		if (filenameBundle == null) {
-			throw new NullPointerException("Could not load filename bundle");
-		}
-
-		ResourceBundle htmlTextsBundle = JspBundles.getHTMLTextsBundle(locale);
-		pageTitle = htmlTextsBundle.getString("pageTitle");
+		pageTitle = LocalizedSettingItemStore.getLocalizedProperty(pm, prefix, locale, "pageTitle");
+		
 	} catch (Exception e) {
 		e.printStackTrace();
 		response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	} finally {
+		pm.close();
 	}
 %>
 <html>
@@ -131,117 +145,28 @@ contentType="text/html;charset=utf-8"
 
     <title><%=pageTitle%></title>
     
-    <script type="text/javascript">
-		function setCookie(c_name, value, exdays){
-			var exdate=new Date();
-			exdate.setDate(exdate.getDate() + exdays);
-			var c_value=escape(value) + ((exdays==null) ? "" : "; expires="+exdate.toUTCString());
-			document.cookie=c_name + "=" + c_value;
-		}
-
-		/** http://www.quirksmode.org/js/cookies.html **/
-		function readCookie(name) {
-			var nameEQ = name + "=";
-			var ca = document.cookie.split(';');
-			for(var i=0;i < ca.length;i++) {
-				var c = ca[i];
-				while (c.charAt(0)==' ') c = c.substring(1,c.length);
-				if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-			}
-			return null;
-		}
-
-		function cookiesSupported(){
-			setCookie("cookies-supported", true);
-			if(readCookie("cookies-supported")){
-				return true;
-			}else{
-				return false;
-			}
-		}
+    <script type="text/javascript" src="js/cookie-locale-handling"></script>
 		
-		function badBrowserReload(){
-			setCookie("bad-browser", "ignore", 7);
-			window.location.reload();
-		}
-
-		function getQueryParameters(){
-			var query = location.search.substring(1);
-			var parameters = query.split('&');
-			var result = new Object();
-			for (var i=0; i<parameters.length; i++) {
-				var pos = parameters[i].indexOf('=');
-				if (pos > 0) {
-					var key = parameters[i].substring(0,pos);
-					var val = parameters[i].substring(pos+1);
-					result[key] = val;
-				}
-			}
-			return result;
-		}
-		
-		function queryStringWithNewLocale(locale) {
-			var queryPairs = new Array();
-			var parameters = getQueryParameters();
-			parameters.locale = locale;
-			var index = 0;
-			for(var key in parameters){
-				queryPairs[index] = key+"="+parameters[key];
-				index++;
-			}
-			return queryPairs.join('&');
-		}
-
-		function queryStringWithoutLocale() {
-			var queryPairs = new Array();
-			var parameters = getQueryParameters();
-			delete parameters.locale;
-			var index = 0;
-			for(var key in parameters){
-				queryPairs[index] = key+"="+parameters[key];
-				index++;
-			}
-			return queryPairs.join('&');
-		}
-
-		function setQueryStringLocale(locale){
-			var search = "?"+queryStringWithNewLocale(locale);
-			location.replace(location.protocol + "//" + location.host + search + location.hash);
-		}
-
-		function changeLocaleReload(locale){
-			setCookie("locale", locale, 30);
-			var parameters = getQueryParameters();
-			if(parameters.hasOwnProperty("locale")){
-				var search = "?"+queryStringWithoutLocale();
-				location.replace(location.protocol + "//" + location.host + search + location.hash);
-			}else{
-				location.reload();
-			}
-		}
-	</script>
-		
-	<%if(browserSupported){ %>
-	    <script type="text/javascript" src="/getDefinitions?def=perspectives&amp;js=true&amp;l=<%=locale.getLanguage()%>" charset="UTF-8"></script>
-	  	<script type="text/javascript" src="/getDefinitions?def=questions&amp;js=true&amp;l=<%=locale.getLanguage()%>" charset="UTF-8"></script>
-	  	<script type="text/javascript" src="/getDefinitions?def=groups&amp;js=true&amp;l=<%=locale.getLanguage()%>" charset="UTF-8"></script>
-	    <script type="text/javascript" src="gwtPresentation/gwtPresentation.nocache.js"></script>
-	<% } 
-	if(!browserSupported) { %>
+	<% if (browserSupported) { %>
+		<script type="text/javascript" charset="UFT-8">
+			var perspectives = <%=perspectives%>;
+			var questions = <%=questions%>;
+			var groups = <%=groups%>;
+		</script>
+		<script type="text/javascript" src="gwtPresentation/gwtPresentation.nocache.js"></script>
+	<% } else { %>
 		<link rel="stylesheet" type="text/css" href="css/browser-suggestions.css">
-	<% } %>
+ 	<% } %>
   	
   </head>
 
   <body>
 	<% if(browserSupported){ %>
-    <!-- OPTIONAL: include this if you want history support -->
-    <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
-    <% } %>
-    <% if(!browserSupported){ %>
+	    <!-- OPTIONAL: include this if you want history support -->
+	    <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
+	    <jsp:include page="<%=filenameBundle.getString(\"presentation-content\")%>" />
+    <% } else {%>
 		<jsp:include page="<%=filenameBundle.getString(\"browser-suggestions\")%>" />
-    <% }else{ //Here comes the design code. %>
-		<jsp:include page="<%=filenameBundle.getString(\"presentation-content\")%>" />
-	<%} %>
+    <% }%>
   </body>
 </html>

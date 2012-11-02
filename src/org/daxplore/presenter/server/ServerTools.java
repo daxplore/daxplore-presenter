@@ -20,7 +20,6 @@ package org.daxplore.presenter.server;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
@@ -28,10 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipInputStream;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
-
-import org.daxplore.presenter.server.throwable.ResourceReaderException;
 
 /**
  * Static helper methods used on the server.
@@ -76,46 +72,12 @@ public class ServerTools {
 		return false;
 	}
 	
-	/**
-	 * Get the resource reader.
-	 * 
-	 * @param servletContext
-	 *            the servlet context
-	 * @param baseName
-	 *            the base name
-	 * @param locale
-	 *            the locale
-	 * @param suffix
-	 *            the suffix
-	 * @return the resource reader
-	 * @throws ResourceReaderException
-	 *             the resource reader exception
-	 */
-	public static BufferedReader getResourceReader(ServletContext servletContext, String baseName, Locale locale, String suffix)
-			throws ResourceReaderException {
-		String location = "/definitions/";
-		String localeString = "";
-		if (locale!=null && !locale.equals(Locale.ROOT) && locale.getLanguage()!="") {
-			localeString = "_" + locale.getLanguage();
-		}
-		String resource = location + baseName + localeString + suffix;
-		InputStream stream = servletContext.getResourceAsStream(resource);
-		if (stream==null) {
-			throw new ResourceReaderException("Unable to locate resource: " + resource);
-		}
-		try {
-			return new BufferedReader(new InputStreamReader(stream, "UTF8"));
-		} catch (UnsupportedEncodingException e) {
-			throw new ResourceReaderException(e);
-		}
-	}
-
 	public static boolean isSupportedUploadFileVersion(int major, int minor) {
 		//TODO test if file version is supported
 		return true;
 	}
 
-	public static boolean isSupportedLanguage(String language) {
+	public static boolean isSupportedLocale(Locale locale) {
 		// TODO Auto-generated method stub
 		return true;
 	}

@@ -16,23 +16,28 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.server.resources;
+package org.daxplore.presenter.server.storage;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManagerFactory;
 
+/**
+ * Gives access to a {@link PersistenceManagerFactory} instance.
+ * 
+ * <p>The instance is kept unique for each server instance.</p>
+ */
+public final class PMF {
+	private static final PersistenceManagerFactory pmfInstance = JDOHelper.getPersistenceManagerFactory("transactions-optional");
 
-public class JspLocales {
-	public static List<Locale> getSupportedLocales() {
-		List<Locale> locales = new LinkedList<Locale>();
-		for (String l : JspBundles.getLocalesBundle().getString("supportedLocales").split("\\\\,")) {
-			locales.add(new Locale(l.trim()));
-		}
-		return locales;
+	private PMF() {
 	}
-	
-	public static Locale getDefaultLocale() {
-		return new Locale(JspBundles.getLocalesBundle().getString("defaultLocale"));
+
+	/**
+	 * Gets the server-instance's {@link PersistenceManagerFactory}.
+	 * 
+	 * @return the persistence manager factory
+	 */
+	public static PersistenceManagerFactory get() {
+		return pmfInstance;
 	}
 }
