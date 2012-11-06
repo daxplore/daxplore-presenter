@@ -18,12 +18,14 @@
  */
 package org.daxplore.presenter.server.servlets;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,12 +43,13 @@ import org.daxplore.presenter.server.servlets.png.PngWriter;
  */
 @SuppressWarnings("serial")
 public class GetPixelServlet extends HttpServlet {
-
+	protected static Logger logger = Logger.getLogger(GetPixelServlet.class.getName());
+	
 	private final int CACHE_DURATION_IN_SECOND = 60 * 60 * 24 * 14; // 14 days
 	private final long CACHE_DURATION_IN_MS = CACHE_DURATION_IN_SECOND * 1000;
 
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, java.io.IOException {
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
 
 		boolean hasalpha = false;
 
@@ -67,6 +70,12 @@ public class GetPixelServlet extends HttpServlet {
 				// System.out.println("alpha: " + m.group(2));
 			}
 			// System.out.println("filetype: " + m.group(3));
+		} else {
+			logger.log(Level.WARNING, "Bad pixel request");
+			try {
+				resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			} catch (IOException e1) {}
+			return;
 		}
 
 		resp.setContentType("image/png");
@@ -83,9 +92,17 @@ public class GetPixelServlet extends HttpServlet {
 			pixel = new OnePixel(color);
 		}
 		PngWriter pngw = new PngWriter(hasalpha);
-		byte[] bytes = pngw.generateImage(pixel);
-
-		OutputStream respWriter = resp.getOutputStream();
-		respWriter.write(bytes);
+		
+		try {
+			byte[] bytes = pngw.generateImage(pixel);
+			OutputStream respWriter = resp.getOutputStream();
+			respWriter.write(bytes);
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Failed to generate a pixel", e);
+			try {
+				resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			} catch (IOException e1) {}
+			return;
+		}
 	}
 }

@@ -21,28 +21,27 @@ import java.io.Writer;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
-import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.daxplore.presenter.server.storage.LocaleStore;
+import org.daxplore.presenter.server.ServerTools;
 import org.daxplore.presenter.server.storage.LocalizedSettingItemStore;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.StatDataItemStore;
 import org.daxplore.presenter.server.storage.StorageTools;
+import org.daxplore.presenter.server.throwable.LocaleSelectionException;
 import org.daxplore.presenter.server.throwable.StatsException;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QuestionMetadata;
 import org.daxplore.presenter.shared.SharedTools;
+import org.daxplore.shared.SharedResourceTools;
 import org.json.simple.parser.ParseException;
 
 @SuppressWarnings("serial")
@@ -59,36 +58,24 @@ public class EmbedServlet extends HttpServlet {
 		String prefix = request.getParameter("prefix");
 		String queryString = request.getParameter("q");
 		
-		//Set up supported locales:
-		Query query = pm.newQuery(LocaleStore.class);
-		query.declareParameters("String specificPrefix");
-		query.setFilter("prefix.equals(specificPrefix)");
-		@SuppressWarnings("unchecked")
-		LocaleStore localeStore = ((List<LocaleStore>)query.execute(prefix)).get(0);
-		List<Locale> supportedLocales = localeStore.getSupportedLocales();
-		
-		//Build a queue of desired locales, enqueue the most desired ones first
-		Queue<Locale> desiredLocales = new LinkedList<Locale>();
-		
-		// 1. Add browser request string locale
-		String queryLocale = request.getParameter("l");
-		if(queryLocale!=null){
-			desiredLocales.add(new Locale(queryLocale));	
+		// Clean user input
+		if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
+			logger.log(Level.WARNING, "Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
+			try {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			} catch (IOException e1) {}
+			return;
 		}
-		
-		// 2. Add default locale
-		desiredLocales.add(localeStore.getDefaultLocale());
-		
+				
 		Locale locale = null;
-		//Pick the first supported locale in the queue
-		FindLocale: for(Locale desired : desiredLocales){
-			String desiredLanguage = desired.getLanguage();
-			for(Locale supported : supportedLocales){
-				if(supported.getLanguage().equalsIgnoreCase(desiredLanguage)){
-					locale = supported;
-					break FindLocale;
-				}
-			}
+		try {
+			locale = ServerTools.selectLocale(request, prefix);
+		} catch (LocaleSelectionException e) {
+			logger.log(Level.SEVERE,  "Default locale is not a supported locale for prefix '" + prefix + "'");
+			try {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			} catch (IOException e1) {}
+			return;
 		}
 		
 		String serverPath = request.getRequestURL().toString();
@@ -107,10 +94,8 @@ public class EmbedServlet extends HttpServlet {
 			logger.log(Level.WARNING, "Failed to load the statistical data items", e);
 			try {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				return;
-			} catch (IOException e1) {
-				return;
-			}
+			} catch (IOException e1) {}
+			return;
 		}
 		LinkedList<String> questions = new LinkedList<String>();
 		questions.add(queryDefinition.getQuestionID());
@@ -126,10 +111,8 @@ public class EmbedServlet extends HttpServlet {
 			logger.log(Level.WARNING, "Failed to load question metadata", e);
 			try {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				return;
-			} catch (IOException e1) {
-				return;
-			}
+			} catch (IOException e1) {}
+			return;
 		}
 	
 		if (embedHtmlTemplate == null) {
@@ -139,10 +122,8 @@ public class EmbedServlet extends HttpServlet {
 				logger.log(Level.SEVERE, "Failed to load the html embed template", e);
 				try {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-					return;
-				} catch (IOException e1) {
-					return;
-				}
+				} catch (IOException e1) {}
+				return;
 			}
 		}
 		
@@ -163,10 +144,8 @@ public class EmbedServlet extends HttpServlet {
 			logger.log(Level.SEVERE, "Failed to display the embed servlet", e);
 			try {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				return;
-			} catch (IOException e1) {
-				return;
-			}
+			} catch (IOException e1) {}
+			return;
 		}
 	}
 }

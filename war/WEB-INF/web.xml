@@ -5,7 +5,7 @@
 	<!-- Default page to serve -->
 	
 	<welcome-file-list>
-		<welcome-file>presentation.jsp</welcome-file>
+		<welcome-file>presentation</welcome-file>
 	</welcome-file-list>
 
 

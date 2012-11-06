@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
@@ -48,6 +49,11 @@ public class SharedResourceTools {
 	public static List<String> findUnwantedUploadFiles(Set<String> keySet, List<Locale> locales) {
 		// TODO Auto-generated method stub
 		return new LinkedList<String>();
+	}
+	
+	protected static Pattern prefixPattern = Pattern.compile("[a-zA-Z]+");
+	public static boolean isSyntacticallyValidPrefix(String prefix) {
+		return prefixPattern.matcher(prefix).matches();
 	}
 	
 }

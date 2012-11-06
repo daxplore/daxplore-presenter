@@ -107,10 +107,8 @@ public class PrintServlet extends HttpServlet {
 				logger.log(Level.WARNING, "Failed to load print html template", e);
 				try {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-					return;
-				} catch (IOException e1) {
-					return;
-				}
+				} catch (IOException e1) {}
+				return;
 			}
 		}
 		
@@ -131,9 +129,8 @@ public class PrintServlet extends HttpServlet {
 			logger.log(Level.SEVERE, "Failed to display print servlet", e);
 			try {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {
-				return;
-			}
+			} catch (IOException e1) {}
+			return;
 		}
 	}
 }
