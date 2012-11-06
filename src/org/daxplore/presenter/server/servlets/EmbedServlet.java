@@ -66,6 +66,14 @@ public class EmbedServlet extends HttpServlet {
 			} catch (IOException e1) {}
 			return;
 		}
+		
+		if(!ServerTools.isSyntacticallyValidQueryString(queryString)) {
+			logger.log(Level.WARNING, "Someone tried to use a syntactically invalid query string: '" + queryString+ "'");
+			try {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			} catch (IOException e1) {}
+			return;
+		}
 				
 		Locale locale = null;
 		try {

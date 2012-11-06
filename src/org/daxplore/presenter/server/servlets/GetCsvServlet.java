@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.daxplore.presenter.server.ServerTools;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.QuestionMetadataServerImpl;
 import org.daxplore.presenter.server.storage.StatDataItemStore;
@@ -82,6 +83,14 @@ public class GetCsvServlet extends HttpServlet {
 		// Clean user input
 		if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
 			logger.log(Level.WARNING, "Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
+			try {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			} catch (IOException e1) {}
+			return;
+		}
+		
+		if(!ServerTools.isSyntacticallyValidQueryString(queryDefinitionString)) {
+			logger.log(Level.WARNING, "Someone tried to use a syntactically invalid query string: '" + queryDefinitionString+ "'");
 			try {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			} catch (IOException e1) {}

@@ -174,4 +174,9 @@ public class ServerTools {
 		
 		throw new LocaleSelectionException("Default locale is not a supported locale for prefix '" + prefix + "'");
 	}
+
+	public static boolean isSyntacticallyValidQueryString(String queryString) {
+		// TODO Write validation of query string
+		return true;
+	}
 }
