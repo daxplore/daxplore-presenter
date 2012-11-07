@@ -16,56 +16,38 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.chart;
+package org.daxplore.presenter.server;
 
-import org.daxplore.presenter.chart.ChartTools;
-import org.daxplore.presenter.BrowserUserStringTestData;
+import static org.junit.Assert.*;
+
 import org.junit.Test;
+import org.daxplore.presenter.BrowserUserStringTestData;
 
-import com.google.gwt.junit.client.GWTTestCase;
+public class ServerToolsTest {
 
-public class ChartToolsTest extends GWTTestCase {
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getModuleName() {
-		return "org.daxplore.presenter.gwtPresentation";
-	}
-
-	@Test
-	public void testFormatAsTwoDigits() {
-		fail();
-	}
-
-	@Test
-	public void testFormatAsTwoDigitsPercentage() {
-		fail();
-	}
-	
 	@Test
 	public void testGetInternetExplorerVersion() {
 		for (String useragent : BrowserUserStringTestData.nonIe) {
-			assertEquals(-1, (int)ChartTools.getInternetExplorerVersion(useragent));
+			assertEquals(-1, (int)ServerTools.getInternetExplorerVersion(useragent));
 		}
 		for (String useragent : BrowserUserStringTestData.ie5) {
-			assertEquals(5, (int)ChartTools.getInternetExplorerVersion(useragent));
+			assertEquals(5, (int)ServerTools.getInternetExplorerVersion(useragent));
 		}
 		for (String useragent : BrowserUserStringTestData.ie6) {
-			assertEquals(6, (int)ChartTools.getInternetExplorerVersion(useragent));
+			assertEquals(6, (int)ServerTools.getInternetExplorerVersion(useragent));
 		}
 		for (String useragent : BrowserUserStringTestData.ie7) {
-			assertEquals(7, (int)ChartTools.getInternetExplorerVersion(useragent));
+			assertEquals(7, (int)ServerTools.getInternetExplorerVersion(useragent));
 		}
 		for (String useragent : BrowserUserStringTestData.ie8) {
-			assertEquals(8, (int)ChartTools.getInternetExplorerVersion(useragent));
+			assertEquals(8, (int)ServerTools.getInternetExplorerVersion(useragent));
 		}
 		for (String useragent : BrowserUserStringTestData.ie9) {
-			assertEquals(9, (int)ChartTools.getInternetExplorerVersion(useragent));
+			assertEquals(9, (int)ServerTools.getInternetExplorerVersion(useragent));
 		}
 		for (String useragent : BrowserUserStringTestData.ie10) {
-			assertEquals(10, (int)ChartTools.getInternetExplorerVersion(useragent));
+			assertEquals(10, (int)ServerTools.getInternetExplorerVersion(useragent));
 		}
 	}
+
 }
