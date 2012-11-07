@@ -111,8 +111,10 @@ public class ServerTools {
 	 * @return true, if the locale is supported
 	 */
 	public static boolean isSupportedLocale(Locale locale) {
-		// TODO Auto-generated method stub
-		return true;
+		String languageTag = locale.toLanguageTag();
+		Locale en = new Locale("en");
+		Locale sv = new Locale("sv");
+		return languageTag.equals(en.toLanguageTag()) || languageTag.equals(sv.toLanguageTag());
 	}
 	
 	/**
@@ -139,7 +141,7 @@ public class ServerTools {
 		try {
 			return new BufferedReader(new InputStreamReader(new ByteArrayInputStream(data), "UTF-8"));
 		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e); //UTF-8 should never be unsupported
+			throw new AssertionError(e); //UTF-8 should never be unsupported
 		}
 	}
 	
