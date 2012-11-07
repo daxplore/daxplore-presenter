@@ -84,11 +84,32 @@ public class ServerTools {
 		return false;
 	}
 	
+	/**
+	 * Check if an upload file is of a version that is supported by the 
+	 * underlying Daxplore system.
+	 * 
+	 * <p>This is used to verify that the upload file, that has been uploaded
+	 * by an administrator, is of a supported version.</p>
+	 * 
+	 * @param major	The upload file major version
+	 * @param minor The upload file minor version
+	 * @return true, if the file version is supported
+	 */
 	public static boolean isSupportedUploadFileVersion(int major, int minor) {
 		//TODO test if file version is supported
 		return true;
 	}
 
+	/**
+	 * Check if a locale is supported by the underlying Daxplore system.
+	 * 
+	 * <p>This is <i>not</i> the same as a prefix being supported for a specific
+	 * prefix. This method should only be used to verify that an upload-file
+	 * uploaded by an administrator uses supported locales.</p>
+	 * 
+	 * @param locale the locale to check if it is supported
+	 * @return true, if the locale is supported
+	 */
 	public static boolean isSupportedLocale(Locale locale) {
 		// TODO Auto-generated method stub
 		return true;
@@ -175,6 +196,15 @@ public class ServerTools {
 		throw new LocaleSelectionException("Default locale is not a supported locale for prefix '" + prefix + "'");
 	}
 
+	/**
+	 * Check if a query string is syntactically valid.
+	 * 
+	 * <p>This can be used to make sure that the input from the users aren't
+	 * evil.</p>
+	 * 
+	 * @param queryString the query definition string to check
+	 * @return true, if the format is correct
+	 */
 	public static boolean isSyntacticallyValidQueryString(String queryString) {
 		// TODO Write validation of query string
 		return true;
