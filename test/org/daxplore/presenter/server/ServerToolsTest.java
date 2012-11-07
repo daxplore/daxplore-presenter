@@ -20,8 +20,11 @@ package org.daxplore.presenter.server;
 
 import static org.junit.Assert.*;
 
+import java.util.Locale;
+
 import org.junit.Test;
 import org.daxplore.presenter.BrowserUserStringTestData;
+import javax.servlet.http.Cookie;
 
 public class ServerToolsTest {
 
@@ -50,4 +53,70 @@ public class ServerToolsTest {
 		}
 	}
 
+	@Test
+	public void testIgnoreBadBrowser() {
+		Cookie[] cookies1 = {
+			new Cookie("foo", "bar"),
+			new Cookie("ax-dax-max", "bax-hax-lax"),
+			new Cookie("bad-browser", "ignore"),
+			new Cookie("lump", "lump")
+		};
+		assertTrue(ServerTools.ignoreBadBrowser(cookies1));
+
+		Cookie[] cookies2 = {
+				new Cookie("foo", "bar"),
+				new Cookie("ax-dax-max", "bax-hax-lax"),
+				new Cookie("bad-browser-2", "lump")
+		};
+		assertFalse(ServerTools.ignoreBadBrowser(cookies2));
+
+		Cookie[] cookies3 = {
+				new Cookie("foo", "bar"),
+				new Cookie("ax-dax-max", "bax-hax-lax"),
+				new Cookie("bad-browser", "something"),
+				new Cookie("lump", "lump")
+		};
+		assertFalse(ServerTools.ignoreBadBrowser(cookies3));
+	}
+	
+	@Test
+	public void testIsSupportedUploadFileVersion() {
+		fail();
+	}
+	
+	@Test
+	public void testIsSupportedLocale() {
+		// List supported locales
+		assertTrue(ServerTools.isSupportedLocale(new Locale("en")));
+		assertTrue(ServerTools.isSupportedLocale(new Locale("sv")));
+
+		// Don't support sub-locales (in the case of administrators uploading new data)
+		assertFalse(ServerTools.isSupportedLocale(new Locale("en", "uk")));
+		assertFalse(ServerTools.isSupportedLocale(new Locale("sv", "fi")));
+		
+		// Don't support other locales
+		assertFalse(ServerTools.isSupportedLocale(new Locale("de")));
+		assertFalse(ServerTools.isSupportedLocale(new Locale("ms")));
+		assertFalse(ServerTools.isSupportedLocale(new Locale("tr")));
+	}
+	
+	@Test
+	public void testGetAsZipInputStream() {
+		fail();
+	}
+	
+	@Test
+	public void testGetAsBufferedReader() {
+		fail();
+	}
+	
+	@Test
+	public void testSelectLocale() {
+		fail();
+	}
+	
+	@Test
+	public void testIsSyntacticallyValidQueryString() {
+		fail();
+	}
 }
