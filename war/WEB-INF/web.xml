@@ -13,7 +13,7 @@
 
 	<servlet>
 		<servlet-name>presentation</servlet-name>
-		<servlet-class>org.daxplore.presenter.server.servlets.PresentationServlet</servlet-class>
+		<servlet-class>org.daxplore.presenter.server.servlets.PresenterServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>presentation</servlet-name>
@@ -42,15 +42,6 @@
 	<!-- Public support servlets -->
 	
 	<servlet>
-		<servlet-name>getStats</servlet-name>
-		<servlet-class>org.daxplore.presenter.server.servlets.GetStatsServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>getStats</servlet-name>
-		<url-pattern>/getStats</url-pattern>
-	</servlet-mapping>
-	
-	<servlet>
 		<servlet-name>getCsv</servlet-name>
 		<servlet-class>org.daxplore.presenter.server.servlets.GetCsvServlet</servlet-class>
 	</servlet>
@@ -61,7 +52,7 @@
 
 	<servlet>
 		<servlet-name>getPixel</servlet-name>
-		<servlet-class>org.daxplore.presenter.server.png.GetPixelServlet</servlet-class>
+		<servlet-class>org.daxplore.presenter.server.servlets.GetPixelServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>getPixel</servlet-name>
@@ -72,8 +63,17 @@
 	<!-- Password protected admin servlets -->
 	
 	<servlet>
+		<servlet-name>admin</servlet-name>
+		<servlet-class>org.daxplore.presenter.server.servlets.AdminServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>admin</servlet-name>
+		<url-pattern>/admin</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>upload</servlet-name>
-		<servlet-class>org.daxplore.presenter.server.upload.DataUploadServlet</servlet-class>
+		<servlet-class>org.daxplore.presenter.server.servlets.DataUploadServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>upload</servlet-name>
@@ -82,7 +82,7 @@
 
 	<servlet>
 		<servlet-name>uploadUnpack</servlet-name>
-		<servlet-class>org.daxplore.presenter.server.upload.DataUnpackServlet</servlet-class>
+		<servlet-class>org.daxplore.presenter.server.servlets.DataUnpackServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>uploadUnpack</servlet-name>
@@ -91,7 +91,7 @@
 
 	<security-constraint>
 		<web-resource-collection>
-			<url-pattern>/admin/*</url-pattern>
+			<url-pattern>/admin*</url-pattern>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>admin</role-name>

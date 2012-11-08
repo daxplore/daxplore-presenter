@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.server.admin;
+package org.daxplore.presenter.server.servlets;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -37,6 +37,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.daxplore.presenter.server.ServerTools;
+import org.daxplore.presenter.server.admin.ClientMessageSender;
+import org.daxplore.presenter.server.admin.UnpackQueue;
+import org.daxplore.presenter.server.admin.UploadFileManifest;
 import org.daxplore.presenter.server.storage.LocaleStore;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.PrefixStore;

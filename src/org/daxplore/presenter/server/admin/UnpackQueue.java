@@ -16,7 +16,7 @@
  */
 package org.daxplore.presenter.server.admin;
 
-import org.daxplore.presenter.server.admin.DataUnpackServlet.UnpackType;
+import org.daxplore.presenter.server.servlets.DataUnpackServlet.UnpackType;
 
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
