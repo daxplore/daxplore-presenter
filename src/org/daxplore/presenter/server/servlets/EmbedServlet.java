@@ -67,7 +67,7 @@ public class EmbedServlet extends HttpServlet {
 			return;
 		}
 		
-		if(!ServerTools.isSyntacticallyValidQueryString(queryString)) {
+		if(queryString==null || !ServerTools.isSyntacticallyValidQueryString(queryString)) {
 			logger.log(Level.WARNING, "Someone tried to use a syntactically invalid query string: '" + queryString+ "'");
 			try {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

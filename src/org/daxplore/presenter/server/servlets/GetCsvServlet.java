@@ -77,11 +77,11 @@ public class GetCsvServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 		// Get input from URL
 		String prefix = request.getParameter("prefix");
+		String queryString = request.getParameter("q");
 		String localeString = request.getParameter("l");
-		String queryDefinitionString = request.getParameter("q");
 		
 		// Clean user input
-		if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
+		if(prefix==null || !SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
 			logger.log(Level.WARNING, "Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
 			try {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -89,12 +89,16 @@ public class GetCsvServlet extends HttpServlet {
 			return;
 		}
 		
-		if(!ServerTools.isSyntacticallyValidQueryString(queryDefinitionString)) {
-			logger.log(Level.WARNING, "Someone tried to use a syntactically invalid query string: '" + queryDefinitionString+ "'");
+		if(queryString==null || !ServerTools.isSyntacticallyValidQueryString(queryString)) {
+			logger.log(Level.WARNING, "Someone tried to use a syntactically invalid query string: '" + queryString+ "'");
 			try {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			} catch (IOException e1) {}
 			return;
+		}
+		
+		if (localeString==null) {
+			localeString = "";
 		}
 		
 		CSVWriter csvWriter;
@@ -118,9 +122,7 @@ public class GetCsvServlet extends HttpServlet {
 
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		
-		if (localeString==null) {
-			localeString = "";
-		}
+		
 		Locale locale = new Locale(localeString);
 		QuestionMetadata questionMetadata;
 		if(metadataMap.containsKey(locale.getLanguage())) {
@@ -142,7 +144,7 @@ public class GetCsvServlet extends HttpServlet {
 			questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
 			metadataMap.put(locale.getLanguage(), questionMetadata);
 		}
-		QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, queryDefinitionString);
+		QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, queryString);
 		List<String[]> csvOutput = new LinkedList<String[]>();
 		
 		response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

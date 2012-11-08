@@ -50,7 +50,7 @@ public class AdminServlet extends HttpServlet {
 		String prefix = request.getParameter("prefix");
 		
 		// Clean user input
-		if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
+		if(prefix==null || !SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
 			logger.log(Level.WARNING, "Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
 			try {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

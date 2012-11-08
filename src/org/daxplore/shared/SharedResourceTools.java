@@ -51,9 +51,9 @@ public class SharedResourceTools {
 		return new LinkedList<String>();
 	}
 	
-	protected static Pattern prefixPattern = Pattern.compile("[a-zA-Z]+");
+	
 	public static boolean isSyntacticallyValidPrefix(String prefix) {
-		return prefixPattern.matcher(prefix).matches();
+		return Pattern.matches("[a-zA-Z]+", prefix);
 	}
 	
 }

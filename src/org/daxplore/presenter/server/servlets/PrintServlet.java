@@ -33,11 +33,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.daxplore.presenter.server.ServerTools;
 import org.daxplore.presenter.server.storage.LocaleStore;
 import org.daxplore.presenter.server.storage.LocalizedSettingItemStore;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.shared.EmbedDefinition;
 import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
+import org.daxplore.shared.SharedResourceTools;
 
 @SuppressWarnings("serial")
 public class PrintServlet extends HttpServlet {
@@ -46,8 +48,29 @@ public class PrintServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
+		// Get input from URL
 		String prefix = request.getParameter("prefix");
+		String queryLocale = request.getParameter("l");
+		String queryString = request.getParameter("q");
+		
+		// Clean user input
+		if(prefix==null || !SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
+			logger.log(Level.WARNING, "Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
+			try {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			} catch (IOException e1) {}
+			return;
+		}
+		
+		if(queryString==null || !ServerTools.isSyntacticallyValidQueryString(queryString)) {
+			logger.log(Level.WARNING, "Someone tried to use a syntactically invalid query string: '" + queryString+ "'");
+			try {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			} catch (IOException e1) {}
+			return;
+		}
+		
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 
 		// Set up supported locales:
 		Query query = pm.newQuery(LocaleStore.class);
@@ -61,7 +84,7 @@ public class PrintServlet extends HttpServlet {
 		Queue<Locale> desiredLocales = new LinkedList<Locale>();
 
 		// 1. Add browser request string locale
-		String queryLocale = request.getParameter("l");
+		
 		if (queryLocale != null) {
 			desiredLocales.add(new Locale(queryLocale));
 		}
@@ -81,7 +104,7 @@ public class PrintServlet extends HttpServlet {
 			}
 		}
 
-		String queryString = request.getParameter("q");
+		
 		LinkedList<EmbedFlag> flags = new LinkedList<EmbedFlag>();
 		flags.add(EmbedFlag.LEGEND);
 		flags.add(EmbedFlag.TRANSPARENT);
