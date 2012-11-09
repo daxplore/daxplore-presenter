@@ -16,10 +16,10 @@
  */
 package org.daxplore.presenter.server.admin;
 
+import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.ClientMessage;
 import org.daxplore.presenter.shared.ClientServerMessage.MESSAGE_TYPE;
 
-import com.google.api.server.spi.response.InternalServerErrorException;
 import com.google.appengine.api.channel.ChannelMessage;
 import com.google.appengine.api.channel.ChannelService;
 import com.google.appengine.api.channel.ChannelServiceFactory;
@@ -32,18 +32,18 @@ public class ClientMessageSender {
 		this.channelToken = channelToken;
 	}
 	
-	public void send(ClientMessage message) throws InternalServerErrorException {
+	public void send(ClientMessage message) throws InternalServerException {
 		ChannelService channelService = ChannelServiceFactory.getChannelService();
 		try {
 			channelService.sendMessage(new ChannelMessage(channelToken, message.toJsonString()));
 			System.out.println(message.toJsonString());
 		} catch (IllegalArgumentException e) {
-			throw new InternalServerErrorException("Error when sending client message: " + e.getMessage());
+			throw new InternalServerException("Error when sending client message: " + message, e);
 		}
 			
 	}
 	
-	public void send(MESSAGE_TYPE messageType, String message) throws InternalServerErrorException {
+	public void send(MESSAGE_TYPE messageType, String message) throws InternalServerException {
 		send(new ClientMessage(messageType, message));
 	}
 	

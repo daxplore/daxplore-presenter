@@ -36,13 +36,12 @@ import org.daxplore.presenter.server.storage.LocalizedSettingItemStore;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.StatDataItemStore;
 import org.daxplore.presenter.server.storage.StorageTools;
-import org.daxplore.presenter.server.throwable.LocaleSelectionException;
-import org.daxplore.presenter.server.throwable.StatsException;
+import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QuestionMetadata;
 import org.daxplore.presenter.shared.SharedTools;
 import org.daxplore.shared.SharedResourceTools;
-import org.json.simple.parser.ParseException;
 
 @SuppressWarnings("serial")
 public class EmbedServlet extends HttpServlet {
@@ -53,107 +52,87 @@ public class EmbedServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-
-		String prefix = request.getParameter("prefix");
-		String queryString = request.getParameter("q");
-		
-		// Clean user input
-		if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
-			logger.log(Level.WARNING, "Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
-			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {}
-			return;
-		}
-		
-		if(queryString==null || !ServerTools.isSyntacticallyValidQueryString(queryString)) {
-			logger.log(Level.WARNING, "Someone tried to use a syntactically invalid query string: '" + queryString+ "'");
-			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {}
-			return;
-		}
-				
-		Locale locale = null;
 		try {
-			locale = ServerTools.selectLocale(request, prefix);
-		} catch (LocaleSelectionException e) {
-			logger.log(Level.SEVERE,  "Default locale is not a supported locale for prefix '" + prefix + "'");
-			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {}
-			return;
-		}
-		
-		String serverPath = request.getRequestURL().toString();
-		// remove last slash
-		if (serverPath.charAt(serverPath.length() - 1) == '/') {
-			serverPath = serverPath.substring(0, serverPath.length() - 1);
-		}
-		// remove module name
-		serverPath = serverPath.substring(0, serverPath.lastIndexOf("/"));
-		
-		QueryDefinition queryDefinition = new QueryDefinition(metadataMap.get(prefix), queryString);
-		LinkedList<String> statItems;
-		try {
-			statItems = StatDataItemStore.getStats(pm, prefix, queryDefinition);
-		} catch (StatsException e) {
-			logger.log(Level.WARNING, "Failed to load the statistical data items", e);
-			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {}
-			return;
-		}
-		LinkedList<String> questions = new LinkedList<String>();
-		questions.add(queryDefinition.getQuestionID());
-		questions.add(queryDefinition.getPerspectiveID());
-		
-		String pageTitle = LocalizedSettingItemStore.getLocalizedProperty(pm, prefix, locale, "pageTitle");
-		String jsondata = SharedTools.join(statItems, ",");
-		
-		String questionsString;
-		try {
-			questionsString = StorageTools.getQuestionDefinitions(pm, prefix, questions, locale);
-		} catch (IOException | ParseException e) {
-			logger.log(Level.WARNING, "Failed to load question metadata", e);
-			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {}
-			return;
-		}
+			PersistenceManager pm = PMF.get().getPersistenceManager();
 	
-		if (embedHtmlTemplate == null) {
-			try {
-				embedHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/embed.html"));
-			} catch (IOException e) {
-				logger.log(Level.SEVERE, "Failed to load the html embed template", e);
+			String prefix = request.getParameter("prefix");
+			String queryString = request.getParameter("q");
+			
+			// Clean user input
+			if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
+				logger.log(Level.WARNING, "Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
 				try {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				} catch (IOException e1) {}
 				return;
 			}
-		}
+			
+			if(queryString==null || !ServerTools.isSyntacticallyValidQueryString(queryString)) {
+				logger.log(Level.WARNING, "Someone tried to use a syntactically invalid query string: '" + queryString+ "'");
+				try {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				} catch (IOException e1) {}
+				return;
+			}
+					
+			Locale locale = ServerTools.selectLocale(request, prefix);
+			
+			String serverPath = request.getRequestURL().toString();
+			// remove last slash
+			if (serverPath.charAt(serverPath.length() - 1) == '/') {
+				serverPath = serverPath.substring(0, serverPath.length() - 1);
+			}
+			// remove module name
+			serverPath = serverPath.substring(0, serverPath.lastIndexOf("/"));
+			
+			QueryDefinition queryDefinition = new QueryDefinition(metadataMap.get(prefix), queryString);
+			LinkedList<String> statItems = StatDataItemStore.getStats(pm, prefix, queryDefinition);
+
+			LinkedList<String> questions = new LinkedList<String>();
+			questions.add(queryDefinition.getQuestionID());
+			questions.add(queryDefinition.getPerspectiveID());
+			
+			String pageTitle = LocalizedSettingItemStore.getLocalizedProperty(pm, prefix, locale, "pageTitle");
+			
+			String jsondata = SharedTools.join(statItems, ",");
+			
+			String questionsString = StorageTools.getQuestionDefinitions(pm, prefix, questions, locale);
+
 		
-		String[] arguments = {
-				prefix, 				// {0}
-				locale.toLanguageTag(), // {1}
-				pageTitle,				// {2}
-				jsondata, 				// {3}
-				questionsString			// {4}
-				};
-		
-		Writer writer;
-		try {
-			writer = response.getWriter();
-			writer.write(MessageFormat.format(embedHtmlTemplate, (Object[])arguments));
-			writer.close();
-		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Failed to display the embed servlet", e);
+			if (embedHtmlTemplate == null) {
+				try {
+					embedHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/embed.html"));
+				} catch (IOException e) {
+					logger.log(Level.SEVERE, "Failed to load the html embed template", e);
+					try {
+						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+					} catch (IOException e1) {}
+					return;
+				}
+			}
+			
+			String[] arguments = {
+					prefix, 				// {0}
+					locale.toLanguageTag(), // {1}
+					pageTitle,				// {2}
+					jsondata, 				// {3}
+					questionsString			// {4}
+					};
+			
+			Writer writer;
 			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {}
-			return;
+				writer = response.getWriter();
+				writer.write(MessageFormat.format(embedHtmlTemplate, (Object[])arguments));
+				writer.close();
+			} catch (IOException e) {
+				throw new InternalServerException("Failed to display the embed servlet", e);
+			}
+		} catch (BadReqException e) {
+			logger.log(Level.WARNING, e.getMessage(), e);
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		} catch (InternalServerException e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 	}
 }

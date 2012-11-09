@@ -35,7 +35,8 @@ import org.daxplore.presenter.server.ServerTools;
 import org.daxplore.presenter.server.storage.LocalizedSettingItemStore;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.StaticFileItemStore;
-import org.daxplore.presenter.server.throwable.LocaleSelectionException;
+import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.shared.SharedResourceTools;
 
 @SuppressWarnings("serial")
@@ -48,84 +49,76 @@ public class PresenterServlet extends HttpServlet {
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-		// Get input from URL
-		String prefix = request.getParameter("prefix");
-		String useragent = request.getHeader("user-agent");
-		Cookie[] cookies = request.getCookies();
-		
-		// Clean user input
-		if(prefix==null || !SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
-			logger.log(Level.WARNING, "Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
-			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {}
-			return;
-		}
-		
-		boolean browserSupported = true;
-		double ieversion = ServerTools.getInternetExplorerVersion(useragent);
-		if(useragent == null | (ieversion > 0.0 & ieversion < 8.0)) {
-			browserSupported = false;
-		}
-		
-		boolean ignoreBadBrowser = false;
-		if(cookies != null) {
-			ignoreBadBrowser = ServerTools.ignoreBadBrowser(cookies);
-		}
-		browserSupported = browserSupported | ignoreBadBrowser;
-		
-		if (!browserSupported) {
-			displayUnsupportedBrowserPage(response);
-			return;
-		}
-		
-		Locale locale = null;
+		PersistenceManager pm = null;
 		try {
-			locale = ServerTools.selectLocale(request, prefix);
-		} catch (LocaleSelectionException e) {
-			logger.log(Level.SEVERE,  "Default locale is not a supported locale for prefix '" + prefix + "'");
-			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {}
-			return;
-		}
-		
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		// TODO Add caching for loaded files
-		String perspectives = "", groups = "", questions = "";
-		try {
+			// Get input from URL
+			String prefix = request.getParameter("prefix");
+			String useragent = request.getHeader("user-agent");
+			Cookie[] cookies = request.getCookies();
+			
+			// Clean user input
+			if(prefix==null || !SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
+				logger.log(Level.WARNING, "Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
+				try {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				} catch (IOException e1) {}
+				return;
+			}
+			
+			boolean browserSupported = true;
+			double ieversion = ServerTools.getInternetExplorerVersion(useragent);
+			if(useragent == null | (ieversion > 0.0 & ieversion < 8.0)) {
+				browserSupported = false;
+			}
+			
+			boolean ignoreBadBrowser = false;
+			if(cookies != null) {
+				ignoreBadBrowser = ServerTools.ignoreBadBrowser(cookies);
+			}
+			browserSupported = browserSupported | ignoreBadBrowser;
+			
+			if (!browserSupported) {
+				displayUnsupportedBrowserPage(response);
+				return;
+			}
+			
+			Locale locale = ServerTools.selectLocale(request, prefix);
+			
+			pm = PMF.get().getPersistenceManager();
+			// TODO Add caching for loaded files
+			String perspectives = "", groups = "", questions = "";
 			perspectives = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/perspectives", locale, ".json");
 			questions = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/questions", locale, ".json");
 			groups = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/groups", locale, ".json");
-		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Failed to load definition files", e);
-			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {}
-			return;
-		}
-		String pageTitle = LocalizedSettingItemStore.getLocalizedProperty(pm, prefix, locale, "pageTitle");
-		pm.close();
+			
+			String pageTitle = LocalizedSettingItemStore.getLocalizedProperty(pm, prefix, locale, "pageTitle");
 		
-		String[] arguments = {
-			locale.toLanguageTag(), // {0}
-			pageTitle,				// {1}
-			perspectives,			// {2}
-			questions,				// {3}
-			groups					// {4}
-		};
-		
-		response.setContentType("text/html; charset=UTF-8");
-		try {
-			Writer writer = response.getWriter();
-			writer.write(MessageFormat.format(presenterHtmlTemplate, (Object[])arguments));
-			writer.close();
-		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Failed to display presenter servlet", e);
+			String[] arguments = {
+				locale.toLanguageTag(), // {0}
+				pageTitle,				// {1}
+				perspectives,			// {2}
+				questions,				// {3}
+				groups					// {4}
+			};
+			
+			response.setContentType("text/html; charset=UTF-8");
 			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {}
-			return;
+				Writer writer = response.getWriter();
+				writer.write(MessageFormat.format(presenterHtmlTemplate, (Object[])arguments));
+				writer.close();
+			} catch (IOException e) {
+				throw new InternalServerException("Failed to display presenter servlet", e);
+			}
+		} catch (BadReqException e) {
+			logger.log(Level.WARNING, e.getMessage(), e);
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		} catch (InternalServerException e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} finally {
+			if (pm != null) {
+				pm.close();
+			}
 		}
 	}
 	

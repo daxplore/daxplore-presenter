@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.daxplore.presenter.server.storage.LocalizedSettingItemStore;
 import org.daxplore.presenter.server.storage.PMF;
+import org.daxplore.presenter.server.throwable.BadReqException;
 import org.daxplore.shared.SharedResourceTools;
 
 import com.google.appengine.api.channel.ChannelService;
@@ -46,57 +47,56 @@ public class AdminServlet extends HttpServlet {
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-		// Get input from URL
-		String prefix = request.getParameter("prefix");
-		
-		// Clean user input
-		if(prefix==null || !SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
-			logger.log(Level.WARNING, "Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
-			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {}
-			return;
-		}
-		
-		Locale locale = new Locale("en");
-		UserService userService = UserServiceFactory.getUserService();
-		User user = userService.getCurrentUser();
-		ChannelService channelService = ChannelServiceFactory.getChannelService();
-		String channelToken = channelService.createChannel(user.getUserId());
-		
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		String pageTitle = LocalizedSettingItemStore.getLocalizedProperty(pm, prefix, locale, "pageTitle");
-		pageTitle += " - Admin";
-		
-		if (adminHtmlTemplate == null) {
-			try {
-				adminHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/admin.html"));
-			} catch (IOException e) {
-				logger.log(Level.SEVERE, "Failed to load the html embed template", e);
+		try {
+			// Get input from URL
+			String prefix = request.getParameter("prefix");
+			
+			// Clean user input
+			if(prefix==null || !SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
+				logger.log(Level.WARNING, "Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
 				try {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				} catch (IOException e1) {}
 				return;
 			}
-		}
-		
-		String[] arguments = {
-				locale.toLanguageTag(), // {0}
-				channelToken, 			// {1}
-				pageTitle,				// {2}
-				};
-		
-		Writer writer;
-		try {
-			writer = response.getWriter();
+			
+			Locale locale = new Locale("en");
+			UserService userService = UserServiceFactory.getUserService();
+			User user = userService.getCurrentUser();
+			ChannelService channelService = ChannelServiceFactory.getChannelService();
+			String channelToken = channelService.createChannel(user.getUserId());
+			
+			PersistenceManager pm = PMF.get().getPersistenceManager();
+			String pageTitle = LocalizedSettingItemStore.getLocalizedProperty(pm, prefix, locale, "pageTitle");
+			pageTitle += " - Admin";
+			
+			if (adminHtmlTemplate == null) {
+				try {
+					adminHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/admin.html"));
+				} catch (IOException e) {
+					logger.log(Level.SEVERE, "Failed to load the html embed template", e);
+					try {
+						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+					} catch (IOException e1) {}
+					return;
+				}
+			}
+			
+			String[] arguments = {
+					locale.toLanguageTag(), // {0}
+					channelToken, 			// {1}
+					pageTitle,				// {2}
+					};
+			
+			Writer writer = response.getWriter();
 			writer.write(MessageFormat.format(adminHtmlTemplate, (Object[])arguments));
 			writer.close();
-		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Failed to display the admin servlet", e);
-			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {}
-			return;
+		} catch (BadReqException e) {
+			logger.log(Level.WARNING, e.getMessage(), e);
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 	}
 }

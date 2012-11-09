@@ -28,18 +28,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
 
+import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.shared.SharedResourceTools;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.google.api.server.spi.response.BadRequestException;
-import com.google.api.server.spi.response.InternalServerErrorException;
-
-/**
- * 
- */
 public class UploadFileManifest {
 	protected static Logger logger = Logger.getLogger(UploadFileManifest.class.getName());
 	
@@ -47,7 +43,7 @@ public class UploadFileManifest {
 	protected List<Locale> locales = new LinkedList<Locale>();
 	protected Locale defaultLocale; 
 	
-	public UploadFileManifest(InputStream manifestInputStream) throws InternalServerErrorException, BadRequestException {
+	public UploadFileManifest(InputStream manifestInputStream) throws InternalServerException, BadReqException {
 		DocumentBuilder documentBuilder = null;
 		try {
 			Schema schema = SharedResourceTools.getUploadFileManifestSchema();
@@ -59,11 +55,9 @@ public class UploadFileManifest {
 				throw new ParserConfigurationException();
 			}
 		} catch (IOException | SAXException e) {
-			e.printStackTrace();
-			throw new InternalServerErrorException("Could not read UploadFileManifest Schema");
+			throw new InternalServerException("Could not read UploadFileManifest Schema", e);
 		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-			throw new InternalServerErrorException("Could not create document builder from UploadFileManifest Schema");
+			throw new InternalServerException("Could not create document builder from UploadFileManifest Schema", e);
 		}
 		
 		try {
@@ -96,11 +90,9 @@ public class UploadFileManifest {
 				}
 			}
 		} catch (SAXException e) {
-			e.printStackTrace();
-			throw new BadRequestException("Manifest doesn't comply to the upload file schema");
+			throw new BadReqException("Manifest doesn't comply to the upload file schema", e);
 		} catch (IOException e) {
-			e.printStackTrace();
-			throw new BadRequestException("Failed to read the uploaded file's manifest");
+			throw new BadReqException("Failed to read the uploaded file's manifest", e);
 		}
 	}
 	

@@ -38,7 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.daxplore.presenter.server.storage.LocaleStore;
 import org.daxplore.presenter.server.storage.PMF;
-import org.daxplore.presenter.server.throwable.LocaleSelectionException;
+import org.daxplore.presenter.server.throwable.InternalServerException;
 
 /**
  * Static helper methods used on the server.
@@ -145,7 +145,7 @@ public class ServerTools {
 		}
 	}
 	
-	public static Locale selectLocale(HttpServletRequest request, String prefix) throws LocaleSelectionException {
+	public static Locale selectLocale(HttpServletRequest request, String prefix) throws InternalServerException {
 		// Get locale data from request
 		Cookie[] cookies = request.getCookies();
 		String queryLocale = request.getParameter("locale");
@@ -195,7 +195,7 @@ public class ServerTools {
 			}
 		}
 		
-		throw new LocaleSelectionException("Default locale is not a supported locale for prefix '" + prefix + "'");
+		throw new InternalServerException("Default locale is not a supported locale for prefix '" + prefix + "'");
 	}
 
 	/**

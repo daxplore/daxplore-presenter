@@ -22,16 +22,15 @@ import java.io.InputStream;
 import java.util.Locale;
 
 import org.daxplore.presenter.server.admin.UploadFileManifest;
+import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.junit.Test;
-
-import com.google.api.server.spi.response.BadRequestException;
-import com.google.api.server.spi.response.InternalServerErrorException;
 
 
 public class UploadFileManifestTest {
 
 	@Test
-	public void testUploadFileManifestParsing() throws InternalServerErrorException, BadRequestException {
+	public void testUploadFileManifestParsing() throws InternalServerException, BadReqException {
 		InputStream manifestInputStream = getClass().getResourceAsStream("manifest.xml");
 		UploadFileManifest manifest = new UploadFileManifest(manifestInputStream);
 		

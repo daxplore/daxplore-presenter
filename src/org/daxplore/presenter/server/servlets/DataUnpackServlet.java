@@ -46,13 +46,14 @@ import org.daxplore.presenter.server.storage.PrefixStore;
 import org.daxplore.presenter.server.storage.SettingItemStore;
 import org.daxplore.presenter.server.storage.StatDataItemStore;
 import org.daxplore.presenter.server.storage.StaticFileItemStore;
+import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.ClientMessage;
 import org.daxplore.presenter.shared.ClientServerMessage.MESSAGE_TYPE;
 import org.daxplore.presenter.shared.SharedTools;
 import org.daxplore.shared.SharedResourceTools;
 
 import com.google.api.server.spi.response.BadRequestException;
-import com.google.api.server.spi.response.InternalServerErrorException;
 import com.google.appengine.api.blobstore.BlobInfoFactory;
 import com.google.appengine.api.blobstore.BlobKey;
 
@@ -96,9 +97,9 @@ public class DataUnpackServlet extends HttpServlet {
 			}
 		
 		} catch (BadRequestException e) {
-			logger.log(Level.INFO, e.getMessage(), e);
+			logger.log(Level.WARNING, e.getMessage(), e);
 			//TODO communicate error to user
-		} catch (InternalServerErrorException e) {
+		} catch (InternalServerException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 			//TODO communicate error to user
 		} catch (Exception e) {
@@ -117,7 +118,7 @@ public class DataUnpackServlet extends HttpServlet {
 		}
 	}
 	
-	protected void purgeExistingData(String prefix, ClientMessageSender messageSender) throws InternalServerErrorException {
+	protected void purgeExistingData(String prefix, ClientMessageSender messageSender) throws InternalServerException {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		long time = System.currentTimeMillis();
 		
@@ -184,7 +185,7 @@ public class DataUnpackServlet extends HttpServlet {
 	}
 	
 	protected void unzipAll(String prefix, byte[] fileData, ClientMessageSender messageSender)
-					throws BadRequestException, InternalServerErrorException {
+					throws BadReqException, InternalServerException {
 		LinkedHashMap<String, byte[]> fileMap = new LinkedHashMap<String, byte[]>();
 		
 		ZipInputStream zipIn = ServerTools.getAsZipInputStream(fileData); 
@@ -203,12 +204,12 @@ public class DataUnpackServlet extends HttpServlet {
 				}
 			}
 		} catch (IOException e) {
-			throw new BadRequestException("Error when reading uploaded file (invalid file?)");
+			throw new BadReqException("Error when reading uploaded file (invalid file?)");
 		}
 		
 		// Read the file manifest to get metadata about the file
 		if (!fileMap.containsKey("manifest.xml")) {
-			throw new BadRequestException("No manifest.xml found in uploaded file");
+			throw new BadReqException("No manifest.xml found in uploaded file");
 		}
 		InputStream manifestStream = new ByteArrayInputStream(fileMap.get("manifest.xml"));
 		UploadFileManifest manifest = new UploadFileManifest(manifestStream);
@@ -217,23 +218,23 @@ public class DataUnpackServlet extends HttpServlet {
 		// Check manifest content and make sure that the file is in proper order
 		
 		if (!ServerTools.isSupportedUploadFileVersion(manifest.getVersionMajor(), manifest.getVersionMinor())) {
-			throw new BadRequestException("Unsupported file version");
+			throw new BadReqException("Unsupported file version");
 		}
 		
 		for (Locale locale : manifest.getSupportedLocales()) {
 			if (!ServerTools.isSupportedLocale(locale)) {
-				throw new BadRequestException("Unsupported language: " + locale.toLanguageTag());
+				throw new BadReqException("Unsupported language: " + locale.toLanguageTag());
 			}
 		}
 		
 		List<String> missingUploadFiles = SharedResourceTools.findMissingUploadFiles(fileMap.keySet(), manifest.getSupportedLocales());
 		if (!missingUploadFiles.isEmpty()) {
-			throw new BadRequestException("Uploaded doesn't contain required files: " + SharedTools.join(missingUploadFiles, ", "));
+			throw new BadReqException("Uploaded doesn't contain required files: " + SharedTools.join(missingUploadFiles, ", "));
 		}
 		
 		List<String> unwantedUploadFiles = SharedResourceTools.findUnwantedUploadFiles(fileMap.keySet(), manifest.getSupportedLocales());
 		if (!unwantedUploadFiles.isEmpty()) {
-			throw new BadRequestException("Uploaded file contains extra files: " + SharedTools.join(unwantedUploadFiles, ", "));
+			throw new BadReqException("Uploaded file contains extra files: " + SharedTools.join(unwantedUploadFiles, ", "));
 		}
 		
 		// Purge all existing data that uses this prefix
@@ -250,18 +251,14 @@ public class DataUnpackServlet extends HttpServlet {
 		pm.close();
 		UnpackQueue unpackQueue = new UnpackQueue(prefix, messageSender.getChannelToken());
 		for (String fileName : fileMap.keySet()) {
-			try {
-				BlobKey blobKey = StaticFileItemStore.writeBlob(prefix + "/" + fileName, fileMap.get(fileName));
-				enqueueForUnpacking(unpackQueue, fileName, blobKey);
-			} catch (IOException e) {
-				throw new InternalServerErrorException(e);
-			}
+			BlobKey blobKey = StaticFileItemStore.writeBlob(prefix + "/" + fileName, fileMap.get(fileName));
+			enqueueForUnpacking(unpackQueue, fileName, blobKey);
 		}
 	}
 	
 	
 	protected void unpackPropertyFile(String prefix, String fileName, byte[] fileData, ClientMessageSender messageSender)
-			throws BadRequestException, InternalServerErrorException {
+			throws BadRequestException, InternalServerException {
 		BufferedReader reader = ServerTools.getAsBufferedReader(fileData);
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
@@ -278,27 +275,25 @@ public class DataUnpackServlet extends HttpServlet {
 				pm.makePersistent(new SettingItemStore(key, value));
 				count++;
 			}
-			messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE,
-					"Unpacked " + count + " properties!");
+			messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Unpacked " + count + " properties!");
 		} catch (IOException e) {
-			throw new InternalServerErrorException(e);
+			throw new InternalServerException("Failed to unpack property file", e);
 		} finally {
 			pm.close();
 		}
 	}
 
 	protected void unpackStaticFile(String prefix, String fileName, BlobKey blobKey, ClientMessageSender messageSender)
-			throws BadRequestException, InternalServerErrorException {
+			throws BadRequestException, InternalServerException {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		String datstoreKey = prefix + "/" + fileName;
 		pm.makePersistent(new StaticFileItemStore(datstoreKey, blobKey));
 		pm.close();
-		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE,
-				"Stored the static file " + fileName);
+		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Stored the static file " + fileName);
 	}
 	
 	protected void unpackStatisticalDataFile(String prefix, byte[] fileData, ClientMessageSender messageSender)
-			throws BadRequestException, InternalServerErrorException {
+			throws BadRequestException, InternalServerException {
 		long time = System.currentTimeMillis();
 		BufferedReader reader = ServerTools.getAsBufferedReader(fileData);
 		PersistenceManager pm = PMF.get().getPersistenceManager();
@@ -322,7 +317,7 @@ public class DataUnpackServlet extends HttpServlet {
 			logger.log(Level.INFO, message);
 			messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, message);
 		} catch (IOException e) {
-			throw new InternalServerErrorException(e);
+			throw new InternalServerException("Failed to unpack statistical data file", e);
 		} finally {
 			pm.close();
 		}

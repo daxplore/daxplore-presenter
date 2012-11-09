@@ -33,10 +33,10 @@ import org.daxplore.presenter.server.admin.ClientMessageSender;
 import org.daxplore.presenter.server.admin.UnpackQueue;
 import org.daxplore.presenter.server.servlets.DataUnpackServlet.UnpackType;
 import org.daxplore.presenter.server.storage.StaticFileItemStore;
+import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.ClientServerMessage.MESSAGE_TYPE;
 
-import com.google.api.server.spi.response.BadRequestException;
-import com.google.api.server.spi.response.InternalServerErrorException;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
@@ -67,32 +67,32 @@ public class DataUploadServlet extends HttpServlet {
 	    	UserService userService = UserServiceFactory.getUserService();
 			User user = userService.getCurrentUser();
 			if(user==null) {
-				throw new BadRequestException("User not logged in");
+				throw new BadReqException("User not logged in");
 			}
 			String channelToken = user.getUserId(); //TODO something better
 			ClientMessageSender messageSender = new ClientMessageSender(channelToken);
 			
 			FileItemIterator fileIterator = upload.getItemIterator(req);
 			if (!fileIterator.hasNext()) {
-				throw new BadRequestException("No file uploaded");
+				throw new BadReqException("No file uploaded");
 			}
 			FileItemStream file = fileIterator.next();
 			byte[] fileData = IOUtils.toByteArray(file.openStream());
 			if (fileIterator.hasNext()) {
-				throw new BadRequestException("More than one file uploaded in a single request");
+				throw new BadReqException("More than one file uploaded in a single request");
 			}
 			BlobKey blobKey = StaticFileItemStore.writeBlob(file.getFieldName(), fileData);
 			UnpackQueue unpackQueue = new UnpackQueue("", channelToken);
 			unpackQueue.addTask(UnpackType.UNZIP_ALL, blobKey.getKeyString());
 			messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "User is uploading a new file with presenter data");
-		} catch (InternalServerErrorException e) {
+		} catch (FileUploadException | IOException | BadReqException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
-			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			//TODO communicate error to user
-		} catch (FileUploadException | IOException | BadRequestException e) {
-			logger.log(Level.INFO, e.getMessage(), e);
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			// TODO give user feedback on invalid file
+		} catch (InternalServerException e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			//TODO communicate error to user
 		}
 	}
 }

@@ -26,6 +26,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import org.daxplore.presenter.client.json.shared.StatDataItem;
+import org.daxplore.presenter.server.throwable.BadReqException;
 
 /**
  * A representation of a {@link StatDataItem} and it's key that can be
@@ -78,9 +79,13 @@ public class LocalizedSettingItemStore {
 		return value;
 	}
 	
-	public static String getLocalizedProperty(PersistenceManager pm, String prefix, Locale locale, String propertyName) {
+	public static String getLocalizedProperty(PersistenceManager pm, String prefix,
+			Locale locale, String propertyName) throws BadReqException {
 		String statStoreKey = prefix + "/" + propertyName + "_" + locale.toLanguageTag();
-		SettingItemStore item = pm.getObjectById(SettingItemStore.class, statStoreKey);
-		return item.getValue();
+		try {
+			return pm.getObjectById(SettingItemStore.class, statStoreKey).getValue();
+		} catch (Exception e) {
+			throw new BadReqException("Could not read localized property '" + statStoreKey + "'", e);
+		}
 	}
 }

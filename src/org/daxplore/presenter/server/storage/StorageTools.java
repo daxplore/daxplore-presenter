@@ -17,7 +17,6 @@
 package org.daxplore.presenter.server.storage;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,10 +25,10 @@ import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 
+import org.daxplore.presenter.server.throwable.BadReqException;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.ContainerFactory;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 public class StorageTools {
 	/**
@@ -41,34 +40,37 @@ public class StorageTools {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static String getQuestionDefinitions(PersistenceManager pm, String prefix,
-			List<String> questionIDs, Locale locale) throws IOException, ParseException {
-		
-		JSONArray definitions = new JSONArray();
-		ContainerFactory containerFactory = new ContainerFactory() {
-			@Override
-			public Map createObjectContainer() {
-				return new LinkedHashMap();
+			List<String> questionIDs, Locale locale) throws BadReqException {
+		try {
+			JSONArray definitions = new JSONArray();
+			ContainerFactory containerFactory = new ContainerFactory() {
+				@Override
+				public Map createObjectContainer() {
+					return new LinkedHashMap();
+				}
+				@Override
+				public List creatArrayContainer() {
+					return new LinkedList();
+				}
+			};
+			
+			BufferedReader reader = new BufferedReader(
+					StaticFileItemStore.getStaticFileReader(pm, prefix, "definitions/questions", locale, ".json"));
+			
+			JSONParser parser = new JSONParser();
+			List<Map> questionList = (List<Map>)parser.parse(reader, containerFactory);
+			
+			for(Map map: questionList){
+				Object o = map.get("column");
+				String column = (String)o;
+				if(questionIDs.contains(column)){
+					definitions.add(map);
+				}
 			}
-			@Override
-			public List creatArrayContainer() {
-				return new LinkedList();
-			}
-		};
-		
-		BufferedReader reader = new BufferedReader(
-				StaticFileItemStore.getStaticFileReader(pm, prefix, "definitions/questions", locale, ".json"));
-		
-		JSONParser parser = new JSONParser();
-		List<Map> questionList = (List<Map>)parser.parse(reader, containerFactory);
-		
-		for(Map map: questionList){
-			Object o = map.get("column");
-			String column = (String)o;
-			if(questionIDs.contains(column)){
-				definitions.add(map);
-			}
+			
+			return definitions.toJSONString();
+		} catch (Exception e) {
+			throw new BadReqException("Failed to read question definitions", e);
 		}
-		
-		return definitions.toJSONString();
 	}
 }

@@ -20,17 +20,14 @@ package org.daxplore.presenter.server.storage;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import org.daxplore.presenter.client.json.shared.StatDataItem;
-import org.daxplore.presenter.server.throwable.StatsException;
+import org.daxplore.presenter.server.throwable.BadReqException;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
@@ -44,8 +41,6 @@ import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
  */
 @PersistenceCapable
 public class StatDataItemStore {
-	protected static Logger logger = Logger.getLogger(StatDataItemStore.class.getName());
-	
 	@PrimaryKey
 	private String key;
 	@Persistent
@@ -88,7 +83,7 @@ public class StatDataItemStore {
 		return json;
 	}
 	
-	public static LinkedList<String> getStats(PersistenceManager pm, String prefix, QueryDefinition queryDefinition) throws StatsException {
+	public static LinkedList<String> getStats(PersistenceManager pm, String prefix, QueryDefinition queryDefinition) throws BadReqException {
 		String perspectiveID = queryDefinition.getPerspectiveID();
 		String questionID = queryDefinition.getQuestionID();
 		boolean useTotal = queryDefinition.hasFlag(QueryFlag.TOTAL);
@@ -96,8 +91,7 @@ public class StatDataItemStore {
 		
 		LinkedList<String> datastoreKeys = new LinkedList<String>();
 		if (questionID.equals("")) {
-			logger.log(Level.WARNING, "Empty questionID used in request");
-			throw new StatsException("Empty questionID used in request");
+			throw new BadReqException("Empty questionID used in request");
 		} else if (perspectiveID.equals("") || usedPerspectiveOptions.size() == 0) {
 			datastoreKeys.add(prefix + "/Q=" + questionID);
 		} else {
@@ -114,9 +108,8 @@ public class StatDataItemStore {
 			try {
 				StatDataItemStore statStore = pm.getObjectById(StatDataItemStore.class, key.toUpperCase());
 				datastoreJsons.add(statStore.getJson());
-			} catch (JDOObjectNotFoundException e) {
-				logger.log(Level.WARNING, "JDOObjectNotFoundException using key: " + key.toUpperCase(), e);
-				throw new StatsException("JDOObjectNotFoundException using key: " + key.toUpperCase(), e);
+			} catch (Exception e) {
+				throw new BadReqException("Could not read data item '" + key + "'", e);
 			}
 		}
 		

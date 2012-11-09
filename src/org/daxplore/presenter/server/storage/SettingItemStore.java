@@ -24,6 +24,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import org.daxplore.presenter.client.json.shared.StatDataItem;
+import org.daxplore.presenter.server.throwable.BadReqException;
 
 /**
  * A representation of a {@link StatDataItem} and it's key that can be
@@ -76,11 +77,12 @@ public class SettingItemStore {
 		return value;
 	}
 	
-	public static String getProperty(String prefix, String propertyName) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
+	public static String getProperty(PersistenceManager pm, String prefix, String propertyName) throws BadReqException {
 		String statStoreKey = prefix + "/" + propertyName;
-		SettingItemStore item = pm.getObjectById(SettingItemStore.class, statStoreKey);
-		pm.close();
-		return item.getValue();
+		try {
+			return pm.getObjectById(SettingItemStore.class, statStoreKey).getValue();
+		} catch (Exception e) {
+			throw new BadReqException("Could not read property '" + statStoreKey + "'", e);
+		}
 	}
 }

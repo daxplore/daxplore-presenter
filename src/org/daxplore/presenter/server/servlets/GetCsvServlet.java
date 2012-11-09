@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -42,7 +41,8 @@ import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.QuestionMetadataServerImpl;
 import org.daxplore.presenter.server.storage.StatDataItemStore;
 import org.daxplore.presenter.server.storage.StaticFileItemStore;
-import org.daxplore.presenter.server.throwable.StatsException;
+import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 import org.daxplore.presenter.shared.QuestionMetadata;
@@ -75,151 +75,104 @@ public class GetCsvServlet extends HttpServlet {
 	@Override
 	@SuppressWarnings({ "rawtypes" })
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-		// Get input from URL
-		String prefix = request.getParameter("prefix");
-		String queryString = request.getParameter("q");
-		String localeString = request.getParameter("l");
-		
-		// Clean user input
-		if(prefix==null || !SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
-			logger.log(Level.WARNING, "Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
-			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {}
-			return;
-		}
-		
-		if(queryString==null || !ServerTools.isSyntacticallyValidQueryString(queryString)) {
-			logger.log(Level.WARNING, "Someone tried to use a syntactically invalid query string: '" + queryString+ "'");
-			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {}
-			return;
-		}
-		
-		if (localeString==null) {
-			localeString = "";
-		}
-		
-		CSVWriter csvWriter;
+		PersistenceManager pm = null;
+		CSVWriter csvWriter = null;
 		try {
-			PrintWriter respWriter = new PrintWriter(new OutputStreamWriter(response.getOutputStream(), "UTF8"), true);
-			response.setContentType("text/csv; charset=UTF-8");
-			csvWriter =  new CSVWriter(respWriter);
-		} catch (UnsupportedEncodingException e) {
-			logger.log(Level.SEVERE, "UTF-8 is not supported in Java implementation", e);
+			// Get input from URL
+			String prefix = request.getParameter("prefix");
+			String queryString = request.getParameter("q");
+			String localeString = request.getParameter("l");
+			
+			// Clean user input
+			if(prefix==null || !SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
+				logger.log(Level.WARNING, "Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
+				try {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				} catch (IOException e1) {}
+				return;
+			}
+			
+			if(queryString==null || !ServerTools.isSyntacticallyValidQueryString(queryString)) {
+				logger.log(Level.WARNING, "Someone tried to use a syntactically invalid query string: '" + queryString+ "'");
+				try {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				} catch (IOException e1) {}
+				return;
+			}
+			
+			if (localeString==null) {
+				localeString = "";
+			}
+			
+			
+			
 			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {}
-			return;
-		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Could not open a csv writer", e);
-			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {}
-			return;
-		}
-
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		
-		
-		Locale locale = new Locale(localeString);
-		QuestionMetadata questionMetadata;
-		if(metadataMap.containsKey(locale.getLanguage())) {
-			questionMetadata = metadataMap.get(locale.getLanguage());
-		} else {
-			String questionText;
-			try {
-				questionText = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/questions", locale, ".json");
+				PrintWriter respWriter = new PrintWriter(new OutputStreamWriter(response.getOutputStream(), "UTF8"), true);
+				response.setContentType("text/csv; charset=UTF-8");
+				csvWriter =  new CSVWriter(respWriter);
 			} catch (IOException e) {
-				logger.log(Level.WARNING, "Failed to read questions metadata file", e);
-				try {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				} catch (IOException e1) {}
-				try {
-					csvWriter.close();
-				} catch (IOException e1) {}
-				return;
+				throw new InternalServerException("Failed to write csv response", e);
 			}
-			questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
-			metadataMap.put(locale.getLanguage(), questionMetadata);
-		}
-		QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, queryString);
-		List<String[]> csvOutput = new LinkedList<String[]>();
-		
-		response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		
-		List<String> questionOptionTexts = queryDefinition.getQuestionOptionTexts();
-		List<String> perspectiveOptionTexts = queryDefinition.getPerspectiveOptionTexts();
-		List<Integer> usedPerspectiveOptions = queryDefinition.getUsedPerspectiveOptions();
-		
-		questionOptionTexts.add(0,  queryDefinition.getPerspectiveShortText() + " \\ " + queryDefinition.getQuestionShortText());
-		csvOutput.add(questionOptionTexts.toArray(new String[0]));
-		
-		LinkedList<String> statItems;
-		try {
-			statItems = StatDataItemStore.getStats(pm, prefix, queryDefinition);
-		} catch (StatsException e) {
-			logger.log(Level.WARNING, "Failed to load the statistical data items", e);
-			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {}
-			try {
-				csvWriter.close();
-			} catch (IOException e1) {}
-			return;
-		}
-		
-		ContainerFactory containerFactory = new ContainerFactory() {
-			@Override
-			public Map createObjectContainer() {
-				return new LinkedHashMap();
+			
+	
+			pm = PMF.get().getPersistenceManager();
+			
+			
+			Locale locale = new Locale(localeString);
+			QuestionMetadata questionMetadata;
+			if(metadataMap.containsKey(locale.getLanguage())) {
+				questionMetadata = metadataMap.get(locale.getLanguage());
+			} else {
+				String questionText = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/questions", locale, ".json");
+				questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
+				metadataMap.put(locale.getLanguage(), questionMetadata);
 			}
-			@Override
-			public List creatArrayContainer() {
-				return new LinkedList();
-			}
-		};
-		
-		JSONParser parser = new JSONParser();
-		for (String json : statItems) {
-			Map jo;
-			try {
-				jo = (Map)parser.parse(json, containerFactory);
-			} catch (ParseException e) {
-				logger.log(Level.WARNING, "Failed to load the statistical data items", e);
+			QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, queryString);
+			List<String[]> csvOutput = new LinkedList<String[]>();
+			
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			
+			List<String> questionOptionTexts = queryDefinition.getQuestionOptionTexts();
+			List<String> perspectiveOptionTexts = queryDefinition.getPerspectiveOptionTexts();
+			List<Integer> usedPerspectiveOptions = queryDefinition.getUsedPerspectiveOptions();
+			
+			questionOptionTexts.add(0,  queryDefinition.getPerspectiveShortText() + " \\ " + queryDefinition.getQuestionShortText());
+			csvOutput.add(questionOptionTexts.toArray(new String[0]));
+			
+			LinkedList<String> statItems = StatDataItemStore.getStats(pm, prefix, queryDefinition);
+	
+			
+			ContainerFactory containerFactory = new ContainerFactory() {
+				@Override
+				public Map createObjectContainer() {
+					return new LinkedHashMap();
+				}
+				@Override
+				public List creatArrayContainer() {
+					return new LinkedList();
+				}
+			};
+			
+			JSONParser parser = new JSONParser();
+			for (String json : statItems) {
+				Map jo;
 				try {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				} catch (IOException e1) {}
-				try {
-					csvWriter.close();
-				} catch (IOException e1) {}
-				return;
-			}
-			Long perspectiveLong = (Long)jo.get("s");
-			if (perspectiveLong!=null) {
-				int index = perspectiveLong.intValue()-1;
-				if (usedPerspectiveOptions.contains(index)) {
-					String[] row = new String[1 + queryDefinition.getQuestionOptionCount()];
-					List respondents = (List)jo.get("d");
-					if (queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
-						row[0] = perspectiveOptionTexts.get(index) + " (1)"; //TODO mark primary (1) in some better way?
-					} else {
-						row[0] = perspectiveOptionTexts.get(index);
-					}
-					for (int i=1; i<row.length; i++) {
-						if (i-1<respondents.size()) {
-							row[i] = ((Long)respondents.get(i-1)).toString();
+					jo = (Map)parser.parse(json, containerFactory);
+				} catch (ParseException e) {
+					throw new BadReqException("Failed to parse json data", e);
+				}
+	
+				Long perspectiveLong = (Long)jo.get("s");
+				if (perspectiveLong!=null) {
+					int index = perspectiveLong.intValue()-1;
+					if (usedPerspectiveOptions.contains(index)) {
+						String[] row = new String[1 + queryDefinition.getQuestionOptionCount()];
+						List respondents = (List)jo.get("d");
+						if (queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
+							row[0] = perspectiveOptionTexts.get(index) + " (1)"; //TODO mark primary (1) in some better way?
 						} else {
-							row[i] = "0";
+							row[0] = perspectiveOptionTexts.get(index);
 						}
-					}
-					csvOutput.add(row);
-					
-					if (queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
-						row = new String[1 + queryDefinition.getQuestionOptionCount()];
-						respondents = (List)jo.get("o");
-						row[0] = perspectiveOptionTexts.get(index) + " (2)"; //TODO mark secondary (2) in some better way?
 						for (int i=1; i<row.length; i++) {
 							if (i-1<respondents.size()) {
 								row[i] = ((Long)respondents.get(i-1)).toString();
@@ -228,19 +181,45 @@ public class GetCsvServlet extends HttpServlet {
 							}
 						}
 						csvOutput.add(row);
+						
+						if (queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
+							row = new String[1 + queryDefinition.getQuestionOptionCount()];
+							respondents = (List)jo.get("o");
+							row[0] = perspectiveOptionTexts.get(index) + " (2)"; //TODO mark secondary (2) in some better way?
+							for (int i=1; i<row.length; i++) {
+								if (i-1<respondents.size()) {
+									row[i] = ((Long)respondents.get(i-1)).toString();
+								} else {
+									row[i] = "0";
+								}
+							}
+							csvOutput.add(row);
+						}
 					}
+				} else {
+					//TODO All respondents, ignore or add?
 				}
-			} else {
-				//TODO All respondents, ignore or add?
+			}
+			
+			// write response
+			csvWriter.writeAll(csvOutput);
+			response.setStatus(HttpServletResponse.SC_OK);
+			
+		} catch (BadReqException e) {
+			logger.log(Level.WARNING, e.getMessage(), e);
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} finally {
+			if (csvWriter != null) {
+				try {
+					csvWriter.close();
+				} catch (IOException e1) {}
+			}
+			if (pm!=null) {
+				pm.close();
 			}
 		}
-		
-		// write response
-		csvWriter.writeAll(csvOutput);
-		response.setStatus(HttpServletResponse.SC_OK);
-		try {
-			csvWriter.close();
-		} catch (IOException e1) {}
-		pm.close();
 	}
 }

@@ -37,6 +37,8 @@ import org.daxplore.presenter.server.ServerTools;
 import org.daxplore.presenter.server.storage.LocaleStore;
 import org.daxplore.presenter.server.storage.LocalizedSettingItemStore;
 import org.daxplore.presenter.server.storage.PMF;
+import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.EmbedDefinition;
 import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
 import org.daxplore.shared.SharedResourceTools;
@@ -48,112 +50,115 @@ public class PrintServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-		// Get input from URL
-		String prefix = request.getParameter("prefix");
-		String queryLocale = request.getParameter("l");
-		String queryString = request.getParameter("q");
-		
-		// Clean user input
-		if(prefix==null || !SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
-			logger.log(Level.WARNING, "Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
-			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {}
-			return;
-		}
-		
-		if(queryString==null || !ServerTools.isSyntacticallyValidQueryString(queryString)) {
-			logger.log(Level.WARNING, "Someone tried to use a syntactically invalid query string: '" + queryString+ "'");
-			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {}
-			return;
-		}
-		
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-
-		// Set up supported locales:
-		Query query = pm.newQuery(LocaleStore.class);
-		query.declareParameters("String specificPrefix");
-		query.setFilter("prefix.equals(specificPrefix)");
-		@SuppressWarnings("unchecked")
-		LocaleStore localeStore = ((List<LocaleStore>) query.execute(prefix)).get(0);
-		List<Locale> supportedLocales = localeStore.getSupportedLocales();
-
-		// Build a queue of desired locales, enqueue the most desired ones first
-		Queue<Locale> desiredLocales = new LinkedList<Locale>();
-
-		// 1. Add browser request string locale
-		
-		if (queryLocale != null) {
-			desiredLocales.add(new Locale(queryLocale));
-		}
-
-		// 2. Add default locale
-		desiredLocales.add(localeStore.getDefaultLocale());
-
-		Locale locale = null;
-		// Pick the first supported locale in the queue
-		FindLocale: for (Locale desired : desiredLocales) {
-			String desiredLanguage = desired.getLanguage();
-			for (Locale supported : supportedLocales) {
-				if (supported.getLanguage().equalsIgnoreCase(desiredLanguage)) {
-					locale = supported;
-					break FindLocale;
-				}
-			}
-		}
-
-		
-		LinkedList<EmbedFlag> flags = new LinkedList<EmbedFlag>();
-		flags.add(EmbedFlag.LEGEND);
-		flags.add(EmbedFlag.TRANSPARENT);
-		flags.add(EmbedFlag.PRINT);
-		String embedDefinition = new EmbedDefinition(flags).getAsString();
-
-		String pageTitle = LocalizedSettingItemStore.getLocalizedProperty(pm, prefix, locale, "pageTitle");
-		
-		pm.close();
-		
-		String serverPath = request.getRequestURL().toString();
-		// remove last slash
-		if (serverPath.charAt(serverPath.length() - 1) == '/') {
-			serverPath = serverPath.substring(0, serverPath.length() - 1);
-		}
-		// remove module name
-		serverPath = serverPath.substring(0, serverPath.lastIndexOf("/"));
-		
-		if (printHtmlTemplate == null) {
-			try {
-				printHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/print.html"));
-			} catch (IOException e) {
-				logger.log(Level.WARNING, "Failed to load print html template", e);
+		PersistenceManager pm = null;
+		try {
+			// Get input from URL
+			String prefix = request.getParameter("prefix");
+			String queryLocale = request.getParameter("l");
+			String queryString = request.getParameter("q");
+			
+			// Clean user input
+			if(prefix==null || !SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
+				logger.log(Level.WARNING, "Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
 				try {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				} catch (IOException e1) {}
 				return;
 			}
-		}
-		
-		String[] arguments = {
-			pageTitle,				// {0}
-			serverPath,				// {1}
-			queryString,			// {2}
-			locale.toLanguageTag(),	// {3}
-			prefix,					// {4}
-			embedDefinition			// {5}
-		};
-
-		try {
-			Writer writer = response.getWriter();
-			writer.write(MessageFormat.format(printHtmlTemplate, (Object[])arguments));
-			writer.close();
-		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Failed to display print servlet", e);
+			
+			if(queryString==null || !ServerTools.isSyntacticallyValidQueryString(queryString)) {
+				logger.log(Level.WARNING, "Someone tried to use a syntactically invalid query string: '" + queryString+ "'");
+				try {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				} catch (IOException e1) {}
+				return;
+			}
+			
+			pm = PMF.get().getPersistenceManager();
+	
+			// Set up supported locales:
+			Query query = pm.newQuery(LocaleStore.class);
+			query.declareParameters("String specificPrefix");
+			query.setFilter("prefix.equals(specificPrefix)");
+			@SuppressWarnings("unchecked")
+			LocaleStore localeStore = ((List<LocaleStore>) query.execute(prefix)).get(0);
+			List<Locale> supportedLocales = localeStore.getSupportedLocales();
+	
+			// Build a queue of desired locales, enqueue the most desired ones first
+			Queue<Locale> desiredLocales = new LinkedList<Locale>();
+	
+			// 1. Add browser request string locale
+			
+			if (queryLocale != null) {
+				desiredLocales.add(new Locale(queryLocale));
+			}
+	
+			// 2. Add default locale
+			desiredLocales.add(localeStore.getDefaultLocale());
+	
+			Locale locale = null;
+			// Pick the first supported locale in the queue
+			FindLocale: for (Locale desired : desiredLocales) {
+				String desiredLanguage = desired.getLanguage();
+				for (Locale supported : supportedLocales) {
+					if (supported.getLanguage().equalsIgnoreCase(desiredLanguage)) {
+						locale = supported;
+						break FindLocale;
+					}
+				}
+			}
+	
+			
+			LinkedList<EmbedFlag> flags = new LinkedList<EmbedFlag>();
+			flags.add(EmbedFlag.LEGEND);
+			flags.add(EmbedFlag.TRANSPARENT);
+			flags.add(EmbedFlag.PRINT);
+			String embedDefinition = new EmbedDefinition(flags).getAsString();
+	
+			String pageTitle = LocalizedSettingItemStore.getLocalizedProperty(pm, prefix, locale, "pageTitle");
+			
+			String serverPath = request.getRequestURL().toString();
+			// remove last slash
+			if (serverPath.charAt(serverPath.length() - 1) == '/') {
+				serverPath = serverPath.substring(0, serverPath.length() - 1);
+			}
+			// remove module name
+			serverPath = serverPath.substring(0, serverPath.lastIndexOf("/"));
+			
+			if (printHtmlTemplate == null) {
+				try {
+					printHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/print.html"));
+				} catch (IOException e) {
+					throw new InternalServerException("Failed to load print html template", e);
+				}
+			}
+			
+			String[] arguments = {
+				pageTitle,				// {0}
+				serverPath,				// {1}
+				queryString,			// {2}
+				locale.toLanguageTag(),	// {3}
+				prefix,					// {4}
+				embedDefinition			// {5}
+			};
+	
 			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {}
-			return;
+				Writer writer = response.getWriter();
+				writer.write(MessageFormat.format(printHtmlTemplate, (Object[])arguments));
+				writer.close();
+			} catch (IOException e) {
+				throw new InternalServerException("Failed to display print servlet", e);
+			}
+		} catch (BadReqException e) {
+			logger.log(Level.WARNING, e.getMessage(), e);
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		} catch (InternalServerException e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} finally {
+			if (pm != null) {
+				pm.close();
+			}
 		}
 	}
 }

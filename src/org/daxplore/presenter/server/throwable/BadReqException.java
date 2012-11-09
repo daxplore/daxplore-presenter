@@ -1,4 +1,4 @@
-/*
+/**
  *  This file is part of Daxplore Presenter.
  *
  *  Daxplore Presenter is free software: you can redistribute it and/or modify
@@ -16,9 +16,26 @@
  */
 package org.daxplore.presenter.server.throwable;
 
+/**
+ * A replacement for BadRequestException, needed because the standard AppEngine
+ * BadRequestException was missing two constructors.
+ */
 @SuppressWarnings("serial")
-public class LocaleSelectionException extends Exception {
-	public LocaleSelectionException(String string) {
-		super(string);
+public class BadReqException extends Exception {
+	
+	public BadReqException() {
+		super();
+	}
+
+	public BadReqException(String message) {
+		super(message);
+	}
+
+	public BadReqException(Throwable cause) {
+		super(cause);
+	}
+	
+	public BadReqException(String message, Throwable cause) {
+		super(message, cause);
 	}
 }
