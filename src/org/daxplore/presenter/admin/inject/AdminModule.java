@@ -20,9 +20,10 @@ package org.daxplore.presenter.admin.inject;
 
 
 
+import org.daxplore.presenter.admin.AdminEntryPoint;
 import org.daxplore.presenter.admin.presenter.AdminPresenter;
-import org.daxplore.presenter.admin.view.AdminViewImpl;
 import org.daxplore.presenter.admin.view.AdminView;
+import org.daxplore.presenter.admin.view.AdminViewImpl;
 
 import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.inject.Singleton;

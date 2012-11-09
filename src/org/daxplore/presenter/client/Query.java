@@ -28,9 +28,9 @@ import org.daxplore.presenter.chart.data.QueryResultCountCompare;
 import org.daxplore.presenter.chart.data.QueryResultMean;
 import org.daxplore.presenter.chart.data.QueryResultMeanCompare;
 import org.daxplore.presenter.client.json.shared.StatDataItem;
-import org.daxplore.presenter.shared.SharedTools;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QuestionMetadata;
+import org.daxplore.presenter.shared.SharedTools;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
