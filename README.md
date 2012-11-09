@@ -8,7 +8,7 @@ The project is primarily financed by [AFA Försäkring](http://www.afaforsakring
 
 Getting the project to build and run locally.
 ----------------------------
-1. Install Eclipse and the Google Plugin for Eclipse  
+1. Install Eclipse, Java 7 (OpenJDK7) and the Google Plugin for Eclipse  
 http://code.google.com/eclipse/
 
 2. Clone the project into workspace  
@@ -32,5 +32,13 @@ Right click project -> Debug as -> Web Application -> presentation.jsp
 
 7. Use the project Daxplore Producer to generate and upload data and metadata to the local database.
 
-8. Open up and run the local web server (link provided by the Development Mode view in Eclipse)  
+8. Open up and run the local web server (link provided by the Development Mode view in Eclipse)
+
+
+Trouble shooting
+---------------
+If you get a VerifyError:
+```java.lang.VerifyError: Expecting a stackmap frame at branch target ...```
+Then add ```-XX:-UseSplitVerifier``` as a default VM argument. See this thread for more information:
+http://stackoverflow.com/questions/7936006/why-am-i-getting-the-following-error-when-running-google-app-from-eclipse
 
