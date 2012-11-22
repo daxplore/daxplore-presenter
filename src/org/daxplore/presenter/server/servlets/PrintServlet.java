@@ -35,8 +35,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.daxplore.presenter.server.ServerTools;
 import org.daxplore.presenter.server.storage.LocaleStore;
-import org.daxplore.presenter.server.storage.LocalizedSettingItemStore;
 import org.daxplore.presenter.server.storage.PMF;
+import org.daxplore.presenter.server.storage.SettingItemStore;
 import org.daxplore.presenter.server.throwable.BadReqException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.EmbedDefinition;
@@ -115,7 +115,7 @@ public class PrintServlet extends HttpServlet {
 			flags.add(EmbedFlag.PRINT);
 			String embedDefinition = new EmbedDefinition(flags).getAsString();
 	
-			String pageTitle = LocalizedSettingItemStore.getLocalizedProperty(pm, prefix, locale, "pageTitle");
+			String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
 			
 			String serverPath = request.getRequestURL().toString();
 			// remove last slash

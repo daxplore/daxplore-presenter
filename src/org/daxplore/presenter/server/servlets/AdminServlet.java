@@ -29,8 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.daxplore.presenter.server.storage.LocalizedSettingItemStore;
 import org.daxplore.presenter.server.storage.PMF;
+import org.daxplore.presenter.server.storage.SettingItemStore;
 import org.daxplore.presenter.server.throwable.BadReqException;
 import org.daxplore.shared.SharedResourceTools;
 
@@ -67,7 +67,7 @@ public class AdminServlet extends HttpServlet {
 			String channelToken = channelService.createChannel(user.getUserId());
 			
 			PersistenceManager pm = PMF.get().getPersistenceManager();
-			String pageTitle = LocalizedSettingItemStore.getLocalizedProperty(pm, prefix, locale, "pageTitle");
+			String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
 			pageTitle += " - Admin";
 			
 			if (adminHtmlTemplate == null) {

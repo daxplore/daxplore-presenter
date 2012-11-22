@@ -179,7 +179,8 @@ public class DataUnpackServlet extends HttpServlet {
 			unpackQueue.addTask(UnpackType.PROPERTIES, blobKey.getKeyString());
 		} else if(fileName.startsWith("data/")) {
 			unpackQueue.addTask(UnpackType.STATISTICAL_DATA, blobKey.getKeyString());
-		} else if(fileName.startsWith("definitions/") || fileName.startsWith("texts/")) {
+		} else if(fileName.startsWith("definitions/")
+				|| fileName.startsWith("texts/")) {
 			unpackQueue.addTask(UnpackType.STATIC_FILE, blobKey.getKeyString());
 		}
 	}
@@ -269,7 +270,7 @@ public class DataUnpackServlet extends HttpServlet {
 				// Assumes that the data is in a "key = value\n" format
 				int splitPoint = line.indexOf('=');
 				String key = line.substring(0, splitPoint).trim();
-				key = prefix + "/" + fileName + "/" + key;
+				key = prefix + "/" + fileName.substring(0, fileName.lastIndexOf('.')) + "/" + key;
 				String value = line.substring(splitPoint+1).trim();
 				
 				pm.makePersistent(new SettingItemStore(key, value));

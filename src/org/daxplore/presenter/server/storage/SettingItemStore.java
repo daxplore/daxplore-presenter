@@ -18,6 +18,8 @@
  */
 package org.daxplore.presenter.server.storage;
 
+import java.util.Locale;
+
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -50,7 +52,7 @@ public class SettingItemStore {
 	 * setting and locale is a Locale.toLanguageTag.</p>
 	 * 
 	 * @param key
-	 *            a key on the format "prefix/name_locale"
+	 *            a key on the format "prefix/filename[_locale]/propertyname"
 	 * @param value
 	 *            the value of the setting
 	 */
@@ -77,12 +79,22 @@ public class SettingItemStore {
 		return value;
 	}
 	
-	public static String getProperty(PersistenceManager pm, String prefix, String propertyName) throws BadReqException {
-		String statStoreKey = prefix + "/" + propertyName;
+	public static String getProperty(PersistenceManager pm, String prefix, String fileName, String propertyName) throws BadReqException {
+		String statStoreKey = prefix + "/" + fileName + "/" + propertyName;
 		try {
 			return pm.getObjectById(SettingItemStore.class, statStoreKey).getValue();
 		} catch (Exception e) {
 			throw new BadReqException("Could not read property '" + statStoreKey + "'", e);
+		}
+	}
+	
+	public static String getLocalizedProperty(PersistenceManager pm, String prefix,
+			String fileName, Locale locale, String propertyName) throws BadReqException {
+		String statStoreKey = prefix + "/" + fileName + "_" + locale.toLanguageTag() + "/" + propertyName;
+		try {
+			return pm.getObjectById(SettingItemStore.class, statStoreKey).getValue();
+		} catch (Exception e) {
+			throw new BadReqException("Could not read localized property '" + statStoreKey + "'", e);
 		}
 	}
 }

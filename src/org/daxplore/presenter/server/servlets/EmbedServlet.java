@@ -32,8 +32,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.daxplore.presenter.server.ServerTools;
-import org.daxplore.presenter.server.storage.LocalizedSettingItemStore;
 import org.daxplore.presenter.server.storage.PMF;
+import org.daxplore.presenter.server.storage.SettingItemStore;
 import org.daxplore.presenter.server.storage.StatDataItemStore;
 import org.daxplore.presenter.server.storage.StorageTools;
 import org.daxplore.presenter.server.throwable.BadReqException;
@@ -92,7 +92,7 @@ public class EmbedServlet extends HttpServlet {
 			questions.add(queryDefinition.getQuestionID());
 			questions.add(queryDefinition.getPerspectiveID());
 			
-			String pageTitle = LocalizedSettingItemStore.getLocalizedProperty(pm, prefix, locale, "pageTitle");
+			String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
 			
 			String jsondata = SharedTools.join(statItems, ",");
 			

@@ -32,8 +32,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.daxplore.presenter.server.ServerTools;
-import org.daxplore.presenter.server.storage.LocalizedSettingItemStore;
 import org.daxplore.presenter.server.storage.PMF;
+import org.daxplore.presenter.server.storage.SettingItemStore;
 import org.daxplore.presenter.server.storage.StaticFileItemStore;
 import org.daxplore.presenter.server.throwable.BadReqException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
@@ -91,7 +91,7 @@ public class PresenterServlet extends HttpServlet {
 			questions = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/questions", locale, ".json");
 			groups = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/groups", locale, ".json");
 			
-			String pageTitle = LocalizedSettingItemStore.getLocalizedProperty(pm, prefix, locale, "pageTitle");
+			String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
 		
 			String[] arguments = {
 				locale.toLanguageTag(), // {0}
