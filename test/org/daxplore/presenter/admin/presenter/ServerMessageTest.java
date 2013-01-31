@@ -16,7 +16,7 @@
  */
 package org.daxplore.presenter.admin.presenter;
 
-import org.daxplore.presenter.shared.ClientServerMessage.MESSAGE_TYPE;
+import org.daxplore.presenter.shared.ClientServerMessage.MessageType;
 import org.junit.Test;
 
 import com.google.gwt.junit.client.GWTTestCase;
@@ -31,7 +31,7 @@ public class ServerMessageTest extends GWTTestCase {
 	@Test
 	public void testServerMessage() {
 		ServerMessage message = new ServerMessage("{\"message\":\"Some text!\",\"type\":\"SERVER_ERROR\"}");
-		assertEquals(MESSAGE_TYPE.SERVER_ERROR, message.getMessageType());
+		assertEquals(MessageType.SERVER_ERROR, message.getMessageType());
 		assertEquals("Some text!", message.getMessage());
 	}
 

@@ -35,7 +35,7 @@ import org.daxplore.presenter.server.servlets.DataUnpackServlet.UnpackType;
 import org.daxplore.presenter.server.storage.StaticFileItemStore;
 import org.daxplore.presenter.server.throwable.BadReqException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
-import org.daxplore.presenter.shared.ClientServerMessage.MESSAGE_TYPE;
+import org.daxplore.presenter.shared.ClientServerMessage.MessageType;
 
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.users.User;
@@ -84,7 +84,7 @@ public class DataUploadServlet extends HttpServlet {
 			BlobKey blobKey = StaticFileItemStore.writeBlob(file.getFieldName(), fileData);
 			UnpackQueue unpackQueue = new UnpackQueue("", channelToken);
 			unpackQueue.addTask(UnpackType.UNZIP_ALL, blobKey.getKeyString());
-			messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "User is uploading a new file with presenter data");
+			messageSender.send(MessageType.PROGRESS_UPDATE, "User is uploading a new file with presenter data");
 		} catch (FileUploadException | IOException | BadReqException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);

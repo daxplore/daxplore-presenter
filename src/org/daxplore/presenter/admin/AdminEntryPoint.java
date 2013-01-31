@@ -17,7 +17,6 @@
 package org.daxplore.presenter.admin;
 
 import org.daxplore.presenter.admin.inject.AdminInjector;
-import org.daxplore.presenter.admin.presenter.AdminPresenter;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -31,7 +30,7 @@ public class AdminEntryPoint implements EntryPoint {
 	@Override
 	public void onModuleLoad() {
 		AdminInjector injector = GWT.create(AdminInjector.class);
-		AdminPresenter adminPresenter = injector.getAdminPresenter();
-		RootPanel.get().add(adminPresenter.getDisplay().asWidget());
+		AdminController adminController = injector.getAdminController();
+		adminController.go(RootPanel.get());
 	}
 }

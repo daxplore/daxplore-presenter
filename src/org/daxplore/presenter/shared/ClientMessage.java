@@ -20,10 +20,10 @@ import org.json.simple.JSONObject;
 
 public class ClientMessage implements ClientServerMessage {
 
-	protected MESSAGE_TYPE messageType;
+	protected MessageType messageType;
 	protected String message; 
 	
-	public ClientMessage(MESSAGE_TYPE messageType, String message) {
+	public ClientMessage(MessageType messageType, String message) {
 		this.messageType = messageType;
 		this.message = message;
 	}
@@ -40,7 +40,7 @@ public class ClientMessage implements ClientServerMessage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public MESSAGE_TYPE getMessageType() {
+	public MessageType getMessageType() {
 		return messageType;
 	}
 

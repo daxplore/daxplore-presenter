@@ -19,7 +19,7 @@ package org.daxplore.presenter.server.upload;
 import static org.junit.Assert.*;
 
 import org.daxplore.presenter.shared.ClientMessage;
-import org.daxplore.presenter.shared.ClientServerMessage.MESSAGE_TYPE;
+import org.daxplore.presenter.shared.ClientServerMessage.MessageType;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.junit.Test;
@@ -28,11 +28,11 @@ public class ClientMessageTest {
 
 	@Test
 	public void testClientMessage() {
-		ClientMessage message = new ClientMessage(MESSAGE_TYPE.PROGRESS_UPDATE, "Some message!");
+		ClientMessage message = new ClientMessage(MessageType.PROGRESS_UPDATE, "Some message!");
 		String json = message.toJsonString();
 		
 		JSONObject jsonObject = (JSONObject)JSONValue.parse(json);
-		assertEquals(MESSAGE_TYPE.PROGRESS_UPDATE, MESSAGE_TYPE.valueOf((String)jsonObject.get("type")));
+		assertEquals(MessageType.PROGRESS_UPDATE, MessageType.valueOf((String)jsonObject.get("type")));
 		assertEquals("Some message!", jsonObject.get("message"));
 	}
 }

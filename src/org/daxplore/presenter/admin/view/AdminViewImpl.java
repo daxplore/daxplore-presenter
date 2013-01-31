@@ -21,6 +21,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FileUpload;
@@ -33,26 +34,33 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
 /**
- * The StagePanel is the base widget for the admin page.
+ * The base widget for the admin page.
  * 
  * <p>It contains all the UI-elements in the page. It handles resizing of all
  * it's sub-widgets if the window is resized.</p>
  */
 public class AdminViewImpl extends Composite implements AdminView {
+	@UiTemplate("AdminViewImpl.ui.xml")
 	interface AdminViewPanel extends UiBinder<Widget, AdminViewImpl> {}
 	private static AdminViewPanel uiBinder = GWT.create(AdminViewPanel.class);
 	
 	protected EventBus eventBus;
-
+	
+	@UiField(provided=true)
+	protected PrefixListViewImpl prefixListView;
+	
 	@UiField protected FormPanel uploadForm;
 	@UiField protected FileUpload uploadWidget;
 	@UiField protected Button uploadButton;
 	@UiField protected TextArea serverMessageArea;
-	
+		  
 	@Inject
-	protected AdminViewImpl(EventBus eventBus) {
+	protected AdminViewImpl(EventBus eventBus, PrefixListViewImpl prefixListView) {
 		this.eventBus = eventBus;
+	    this.prefixListView = prefixListView;
+	    
 		initWidget(uiBinder.createAndBindUi(this));
+		
 		uploadForm.setAction("/admin/upload");
 		uploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
 		uploadForm.setMethod(FormPanel.METHOD_POST);

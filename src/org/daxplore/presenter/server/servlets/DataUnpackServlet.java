@@ -49,7 +49,7 @@ import org.daxplore.presenter.server.storage.StaticFileItemStore;
 import org.daxplore.presenter.server.throwable.BadReqException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.ClientMessage;
-import org.daxplore.presenter.shared.ClientServerMessage.MESSAGE_TYPE;
+import org.daxplore.presenter.shared.ClientServerMessage.MessageType;
 import org.daxplore.presenter.shared.SharedTools;
 import org.daxplore.shared.SharedResourceTools;
 
@@ -79,7 +79,7 @@ public class DataUnpackServlet extends HttpServlet {
 			
 			String fileName = new BlobInfoFactory().loadBlobInfo(blobKey).getFilename();
 			byte[] fileData = StaticFileItemStore.readBlob(blobKey);
-			messageSender.send(new ClientMessage(MESSAGE_TYPE.PROGRESS_UPDATE, "Unpacking: " + fileName));
+			messageSender.send(new ClientMessage(MessageType.PROGRESS_UPDATE, "Unpacking: " + fileName));
 
 			switch(type) {
 			case UNZIP_ALL:
@@ -129,28 +129,28 @@ public class DataUnpackServlet extends HttpServlet {
 		query.declareParameters("String specificPrefix");
 		query.setFilter("prefix.equals(specificPrefix)");
 		long deletedPrefixItems = query.deletePersistentAll(prefix); // should always be 1
-		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Removed the stored prefix '" + prefix + '"');
+		messageSender.send(MessageType.PROGRESS_UPDATE, "Removed the stored prefix '" + prefix + '"');
 		
 		// Delete the single locale entry for the prefix
 		query = pm.newQuery(LocaleStore.class);
 		query.declareParameters("String specificPrefix");
 		query.setFilter("prefix.equals(specificPrefix)");
 		long deletedLocaleItems = query.deletePersistentAll(prefix); // should always be 1
-		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Removed the locale item for prefix '" + prefix + '"');
+		messageSender.send(MessageType.PROGRESS_UPDATE, "Removed the locale item for prefix '" + prefix + '"');
 		
 		// Delete all statistical data items related to the prefix
 		query = pm.newQuery(StatDataItemStore.class);
 		query.declareParameters("String prefix");
 		query.setFilter("key.startsWith(prefix)");
 		long deletedStatDataItems = query.deletePersistentAll(prefix + "/");
-		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Removed " + deletedStatDataItems + " old statistical data items");
+		messageSender.send(MessageType.PROGRESS_UPDATE, "Removed " + deletedStatDataItems + " old statistical data items");
 		
 		// Delete all setting items related to the prefix
 		query = pm.newQuery(SettingItemStore.class);
 		query.declareParameters("String prefix");
 		query.setFilter("key.startsWith(prefix)");
 		long deletedSettingItems = query.deletePersistentAll(prefix + "/");
-		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Removed " + deletedSettingItems + " old settings");
+		messageSender.send(MessageType.PROGRESS_UPDATE, "Removed " + deletedSettingItems + " old settings");
 
 		// Delete all the blobstore-stored files
 		query = pm.newQuery(StaticFileItemStore.class);
@@ -167,7 +167,7 @@ public class DataUnpackServlet extends HttpServlet {
 		query.declareParameters("String prefix");
 		query.setFilter("key.startsWith(prefix)");
 		long deletedStaticFileItems = query.deletePersistentAll(prefix + "/");
-		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Removed " + deletedStaticFileItems + " old static files");
+		messageSender.send(MessageType.PROGRESS_UPDATE, "Removed " + deletedStaticFileItems + " old static files");
 		
 		long totalDeleted = deletedPrefixItems + deletedLocaleItems + deletedStatDataItems + deletedSettingItems + deletedStaticFileItems;
 		double timeSeconds = ((System.currentTimeMillis()-time)/Math.pow(10, 6));
@@ -244,7 +244,7 @@ public class DataUnpackServlet extends HttpServlet {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		pm.makePersistent(new PrefixStore(prefix));
 		logger.log(Level.INFO, "Added prefix to system: " + prefix);
-		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Added prefix to system: " + prefix);
+		messageSender.send(MessageType.PROGRESS_UPDATE, "Added prefix to system: " + prefix);
 		
 		LocaleStore localeStore = new LocaleStore(prefix, manifest.getSupportedLocales(), manifest.getDefaultLocale());
 		pm.makePersistent(localeStore);
@@ -276,7 +276,7 @@ public class DataUnpackServlet extends HttpServlet {
 				pm.makePersistent(new SettingItemStore(key, value));
 				count++;
 			}
-			messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Unpacked " + count + " properties!");
+			messageSender.send(MessageType.PROGRESS_UPDATE, "Unpacked " + count + " properties!");
 		} catch (IOException e) {
 			throw new InternalServerException("Failed to unpack property file", e);
 		} finally {
@@ -290,7 +290,7 @@ public class DataUnpackServlet extends HttpServlet {
 		String datstoreKey = prefix + "/" + fileName;
 		pm.makePersistent(new StaticFileItemStore(datstoreKey, blobKey));
 		pm.close();
-		messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, "Stored the static file " + fileName);
+		messageSender.send(MessageType.PROGRESS_UPDATE, "Stored the static file " + fileName);
 	}
 	
 	protected void unpackStatisticalDataFile(String prefix, byte[] fileData, ClientMessageSender messageSender)
@@ -316,7 +316,7 @@ public class DataUnpackServlet extends HttpServlet {
 			time = System.currentTimeMillis()-time;
 			String message = "Unpacked " + count + " statistical data items in " + (time/Math.pow(10, 6)) + " seconds";
 			logger.log(Level.INFO, message);
-			messageSender.send(MESSAGE_TYPE.PROGRESS_UPDATE, message);
+			messageSender.send(MessageType.PROGRESS_UPDATE, message);
 		} catch (IOException e) {
 			throw new InternalServerException("Failed to unpack statistical data file", e);
 		} finally {

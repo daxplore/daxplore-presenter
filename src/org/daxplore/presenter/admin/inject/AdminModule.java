@@ -18,12 +18,14 @@
  */
 package org.daxplore.presenter.admin.inject;
 
-
-
+import org.daxplore.presenter.admin.AdminController;
 import org.daxplore.presenter.admin.AdminEntryPoint;
 import org.daxplore.presenter.admin.presenter.AdminPresenter;
+import org.daxplore.presenter.admin.presenter.PrefixListPresenter;
 import org.daxplore.presenter.admin.view.AdminView;
 import org.daxplore.presenter.admin.view.AdminViewImpl;
+import org.daxplore.presenter.admin.view.PrefixListView;
+import org.daxplore.presenter.admin.view.PrefixListViewImpl;
 
 import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.inject.Singleton;
@@ -47,9 +49,14 @@ public class AdminModule extends AbstractGinModule {
 
 	@Override
 	protected void configure() {
-
+		/* org.daxplore.presenter.admin.AdminController */
+		bind(AdminController.class).in(Singleton.class);
+		
 		/* org.daxplore.presenter.admin.presenter */
 		bind(AdminPresenter.class).in(Singleton.class);
+		
+		bind(PrefixListPresenter.class).in(Singleton.class);
+		bind(PrefixListView.class).to(PrefixListViewImpl.class).in(Singleton.class);
 
 		/* org.daxplore.presenter.admin.view */
 		bind(AdminView.class).to(AdminViewImpl.class).in(Singleton.class);

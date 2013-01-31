@@ -23,16 +23,11 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.daxplore.presenter.server.storage.PMF;
-import org.daxplore.presenter.server.storage.SettingItemStore;
-import org.daxplore.presenter.server.throwable.BadReqException;
-import org.daxplore.shared.SharedResourceTools;
 
 import com.google.appengine.api.channel.ChannelService;
 import com.google.appengine.api.channel.ChannelServiceFactory;
@@ -47,18 +42,7 @@ public class AdminServlet extends HttpServlet {
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-		try {
 			// Get input from URL
-			String prefix = request.getParameter("prefix");
-			
-			// Clean user input
-			if(prefix==null || !SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
-				logger.log(Level.WARNING, "Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
-				try {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				} catch (IOException e1) {}
-				return;
-			}
 			
 			Locale locale = new Locale("en");
 			UserService userService = UserServiceFactory.getUserService();
@@ -66,9 +50,7 @@ public class AdminServlet extends HttpServlet {
 			ChannelService channelService = ChannelServiceFactory.getChannelService();
 			String channelToken = channelService.createChannel(user.getUserId());
 			
-			PersistenceManager pm = PMF.get().getPersistenceManager();
-			String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
-			pageTitle += " - Admin";
+			String pageTitle = "Daxplore Admin";
 			
 			if (adminHtmlTemplate == null) {
 				try {
@@ -88,13 +70,11 @@ public class AdminServlet extends HttpServlet {
 					pageTitle,				// {2}
 					};
 			
+		try {
 			Writer writer = response.getWriter();
 			writer.write(MessageFormat.format(adminHtmlTemplate, (Object[])arguments));
 			writer.close();
-		} catch (BadReqException e) {
-			logger.log(Level.WARNING, e.getMessage(), e);
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-		} catch (Exception e) {
+		} catch (IOException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}

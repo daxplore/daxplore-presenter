@@ -23,13 +23,13 @@ import com.google.gwt.json.client.JSONParser;
 
 public class ServerMessage implements ClientServerMessage {
 
-	protected MESSAGE_TYPE messageType;
+	protected MessageType messageType;
 	protected String json, message;
 	
 	public ServerMessage(String json) {
 		this.json = json;
 		JSONObject jsonObject = JSONParser.parseStrict(json).isObject();
-		messageType = MESSAGE_TYPE.valueOf(jsonObject.get("type").isString().stringValue());
+		messageType = MessageType.valueOf(jsonObject.get("type").isString().stringValue());
 		message = jsonObject.get("message").isString().stringValue();
 	}
 
@@ -37,7 +37,7 @@ public class ServerMessage implements ClientServerMessage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public MESSAGE_TYPE getMessageType() {
+	public MessageType getMessageType() {
 		return messageType;
 	}
 

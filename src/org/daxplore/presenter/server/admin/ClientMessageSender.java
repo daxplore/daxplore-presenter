@@ -18,7 +18,7 @@ package org.daxplore.presenter.server.admin;
 
 import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.ClientMessage;
-import org.daxplore.presenter.shared.ClientServerMessage.MESSAGE_TYPE;
+import org.daxplore.presenter.shared.ClientServerMessage.MessageType;
 
 import com.google.appengine.api.channel.ChannelMessage;
 import com.google.appengine.api.channel.ChannelService;
@@ -43,7 +43,7 @@ public class ClientMessageSender {
 			
 	}
 	
-	public void send(MESSAGE_TYPE messageType, String message) throws InternalServerException {
+	public void send(MessageType messageType, String message) throws InternalServerException {
 		send(new ClientMessage(messageType, message));
 	}
 	

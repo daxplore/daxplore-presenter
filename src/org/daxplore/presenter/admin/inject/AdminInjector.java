@@ -18,8 +18,8 @@
  */
 package org.daxplore.presenter.admin.inject;
 
+import org.daxplore.presenter.admin.AdminController;
 import org.daxplore.presenter.admin.AdminEntryPoint;
-import org.daxplore.presenter.admin.presenter.AdminPresenter;
 
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
@@ -40,5 +40,5 @@ import com.google.gwt.inject.client.Ginjector;
  */
 @GinModules(AdminModule.class)
 public interface AdminInjector extends Ginjector {
-	public AdminPresenter getAdminPresenter();
+	public AdminController getAdminController();
 }

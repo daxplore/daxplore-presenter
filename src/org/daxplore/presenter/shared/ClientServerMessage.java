@@ -17,11 +17,11 @@
 package org.daxplore.presenter.shared;
 
 public interface ClientServerMessage {
-	public enum MESSAGE_TYPE {
+	public enum MessageType {
 		PROGRESS_UPDATE, SERVER_ERROR, USER_ERROR
 	}
 	
-	public MESSAGE_TYPE getMessageType();
+	public MessageType getMessageType();
 	
 	public String getMessage();
 	
