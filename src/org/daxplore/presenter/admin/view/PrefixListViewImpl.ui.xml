@@ -4,8 +4,11 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:w="urn:import:com.google.gwt.user.cellview.client">
 	
-	<g:VerticalPanel>
-		<w:CellList ui:field='prefixCellList'/>
-		<g:Button ui:field='addPrefixButton'>Add new prefix</g:Button>
-	</g:VerticalPanel>
+	<g:DecoratorPanel>
+		<g:VerticalPanel>
+			<g:Label>Select a prefix</g:Label>
+			<w:CellList ui:field='prefixCellList'/>
+			<g:Button ui:field='addPrefixButton'>Add new prefix</g:Button>
+		</g:VerticalPanel>
+	</g:DecoratorPanel>
 </ui:UiBinder> 
