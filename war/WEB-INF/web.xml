@@ -40,6 +40,15 @@
 	
 
 	<!-- Public support servlets -->
+
+	<servlet>
+		<servlet-name>getStats</servlet-name>
+		<servlet-class>org.daxplore.presenter.server.servlets.GetStatsServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>getStats</servlet-name>
+		<url-pattern>/getStats</url-pattern>
+	</servlet-mapping>
 	
 	<servlet>
 		<servlet-name>getCsv</servlet-name>
