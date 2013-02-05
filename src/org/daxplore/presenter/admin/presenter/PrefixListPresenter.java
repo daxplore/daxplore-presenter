@@ -23,7 +23,6 @@ import java.util.List;
 import org.daxplore.presenter.admin.event.SelectPrefixEvent;
 import org.daxplore.presenter.admin.model.PrefixListModel;
 import org.daxplore.presenter.admin.view.PrefixListView;
-import org.daxplore.shared.SharedResourceTools;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -72,7 +71,7 @@ public class PrefixListPresenter implements Presenter {
 			return;
 		}
 		prefix = prefix.trim();
-		if (!SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
+		if (!prefix.matches("[a-zA-Z]+")) { // TODO Used shared resources regexp for this
 			display.alertInvalidPrefix(prefix);
 			return;
 		}

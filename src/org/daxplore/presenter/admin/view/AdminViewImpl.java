@@ -17,18 +17,12 @@
 package org.daxplore.presenter.admin.view;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FileUpload;
-import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
-import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
-import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.HasWidgets;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -46,45 +40,59 @@ public class AdminViewImpl extends Composite implements AdminView {
 	
 	protected EventBus eventBus;
 	
-	@UiField(provided=true)
-	protected PrefixListViewImpl prefixListView;
-	
-	@UiField protected FormPanel uploadForm;
-	@UiField protected FileUpload uploadWidget;
-	@UiField protected Button uploadButton;
-	@UiField protected TextArea serverMessageArea;
+	@UiField protected SimplePanel mainContentSlot;
+	@UiField protected SimplePanel sidebarContentSlot;
+//	@UiField protected FormPanel uploadForm;
+//	@UiField protected FileUpload uploadWidget;
+//	@UiField protected Button uploadButton;
+//	@UiField protected TextArea serverMessageArea;
 		  
 	@Inject
-	protected AdminViewImpl(EventBus eventBus, PrefixListViewImpl prefixListView) {
+	public AdminViewImpl(EventBus eventBus) {
 		this.eventBus = eventBus;
-	    this.prefixListView = prefixListView;
 	    
 		initWidget(uiBinder.createAndBindUi(this));
 		
-		uploadForm.setAction("/admin/upload");
-		uploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
-		uploadForm.setMethod(FormPanel.METHOD_POST);
+//		uploadForm.setAction("/admin/upload");
+//		uploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
+//		uploadForm.setMethod(FormPanel.METHOD_POST);
 	}
 
-	@UiHandler("uploadButton")
-	protected void handleClick(ClickEvent e) {
-		uploadForm.submit();
-	}
-
-	@UiHandler("uploadForm")
-	protected void handleSubmit(SubmitEvent event) {
-	}
-
-	@UiHandler("uploadForm")
-	protected void handleSubmitComplete(SubmitCompleteEvent event) {
-	}
+//	@UiHandler("uploadButton")
+//	protected void handleClick(ClickEvent e) {
+//		uploadForm.submit();
+//	}
+//
+//	@UiHandler("uploadForm")
+//	protected void handleSubmit(SubmitEvent event) {
+//	}
+//
+//	@UiHandler("uploadForm")
+//	protected void handleSubmitComplete(SubmitCompleteEvent event) {
+//	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void addServerMessage(String message) {
-		String text = serverMessageArea.getText() + "\n" + message;
-		serverMessageArea.setText(text);
+//		String text = serverMessageArea.getText() + "\n" + message;
+//		serverMessageArea.setText(text);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public HasWidgets getMainContentSlot() {
+		return mainContentSlot;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public HasWidgets getSidebarContentSlot() {
+		return sidebarContentSlot;
 	}
 }

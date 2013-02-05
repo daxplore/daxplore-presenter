@@ -21,8 +21,10 @@ package org.daxplore.presenter.admin;
 import org.daxplore.presenter.admin.event.SelectPrefixEvent;
 import org.daxplore.presenter.admin.event.SelectPrefixHandler;
 import org.daxplore.presenter.admin.event.ServerChannelEvent;
-import org.daxplore.presenter.admin.event.ServerMessageEvent;
 import org.daxplore.presenter.admin.event.ServerChannelEvent.ServerStatus;
+import org.daxplore.presenter.admin.event.ServerMessageEvent;
+import org.daxplore.presenter.admin.presenter.AdminPresenter;
+import org.daxplore.presenter.admin.presenter.PrefixListPresenter;
 import org.daxplore.presenter.admin.presenter.Presenter;
 import org.daxplore.presenter.admin.presenter.ServerMessage;
 
@@ -45,11 +47,15 @@ import com.google.web.bindery.event.shared.EventBus;
 public class AdminController implements Presenter, ValueChangeHandler<String> {
 
 	private final EventBus eventBus;
+	private final AdminPresenter adminPresenter;
+	private final PrefixListPresenter prefixListPresenter;
 	private HasWidgets container;
 
 	@Inject
-	protected AdminController(EventBus eventBus) {
+	protected AdminController(EventBus eventBus, AdminPresenter adminPresenter, PrefixListPresenter prefixListPresenter) {
 		this.eventBus = eventBus;
+		this.adminPresenter = adminPresenter;
+		this.prefixListPresenter = prefixListPresenter;
 		setupServerCommunication();
 		bind();
 	}
@@ -111,7 +117,8 @@ public class AdminController implements Presenter, ValueChangeHandler<String> {
 	@Override
 	public void go(final HasWidgets container) {
 		this.container = container;
-
+		adminPresenter.go(container);
+		prefixListPresenter.go(adminPresenter.getSidebarContentSlot());
 		if (History.getToken().isEmpty()) {
 			History.newItem("");
 		} else {
@@ -140,7 +147,8 @@ public class AdminController implements Presenter, ValueChangeHandler<String> {
 			}
 
 			if (presenter != null) {
-				presenter.go(container);
+				// Let the presenter display itself inside the adminPresenter's main slot
+				presenter.go(adminPresenter.getMainContentSlot());
 			}
 		}
 	}

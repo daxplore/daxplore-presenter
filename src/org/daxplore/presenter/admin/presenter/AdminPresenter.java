@@ -20,20 +20,12 @@ package org.daxplore.presenter.admin.presenter;
 
 import org.daxplore.presenter.admin.view.AdminView;
 
-import com.google.gwt.appengine.channel.client.Channel;
-import com.google.gwt.appengine.channel.client.ChannelFactory;
-import com.google.gwt.appengine.channel.client.ChannelFactory.ChannelCreatedCallback;
-import com.google.gwt.appengine.channel.client.SocketError;
-import com.google.gwt.appengine.channel.client.SocketListener;
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.MetaElement;
-import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-public class AdminPresenter implements SocketListener {
+public class AdminPresenter implements Presenter {
 	protected EventBus eventBus;
 	protected AdminView adminView;
 	
@@ -41,72 +33,37 @@ public class AdminPresenter implements SocketListener {
 	protected AdminPresenter(EventBus eventBus, AdminView adminView) {
 		this.eventBus = eventBus;
 		this.adminView = adminView;
-		
-		String token = null;
-		NodeList<Element> nodes = Document.get().getElementsByTagName("meta");
-	    for (int i = 0; i < nodes.getLength(); i++) {
-	        MetaElement meta = MetaElement.as(nodes.getItem(i));
-	        if (meta.getName().equals("channelToken")) {
-	            token = meta.getContent();
-	            break;
-	        }
-	    }
-
-	    ChannelFactory.createChannel(token, new ChannelCreatedCallback() {
-			@Override
-			public void onChannelCreated(Channel channel) {
-				channel.open(AdminPresenter.this);
-			}
-		});
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void go(HasWidgets container) {
+		container.clear();
+		container.add(getDisplay());
+	}
+	
 	public Widget getDisplay() {
 		return adminView.asWidget();
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Returns the "sidebar slot" where a navigation widget can be displayed.
+	 * 
+	 * @return a panel, or similar, that can hold a widget
 	 */
-	@Override
-	public void onOpen() {
-		adminView.addServerMessage("Server channel open");
+	public HasWidgets getSidebarContentSlot() {
+		return adminView.getSidebarContentSlot();
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Returns the "main slot" where the primary content widget is displayed.
+	 * 
+	 * @return a panel, or similar, that can hold a widget
 	 */
-	@Override
-	public void onMessage(String message) {
-		ServerMessage serverMessage = new ServerMessage(message);
-		switch (serverMessage.getMessageType()) {
-		case PROGRESS_UPDATE:
-			adminView.addServerMessage(serverMessage.getMessage());
-			break;
-		case SERVER_ERROR:
-			adminView.addServerMessage("Server error: " + serverMessage.getMessage());
-			break;
-		case USER_ERROR:
-			adminView.addServerMessage("User error: " + serverMessage.getMessage());
-			break;
-		default:
-			adminView.addServerMessage("Internal error!");
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onError(SocketError error) {
-		adminView.addServerMessage("SocketError " + error.getCode() + ": " + error.getDescription());
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onClose() {
-		adminView.addServerMessage("Server channel closed");
+	public HasWidgets getMainContentSlot() {
+		return adminView.getMainContentSlot();
 	}
 
 }

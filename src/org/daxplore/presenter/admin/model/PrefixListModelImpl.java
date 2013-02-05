@@ -18,6 +18,7 @@
  */
 package org.daxplore.presenter.admin.model;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -32,7 +33,7 @@ public class PrefixListModelImpl implements PrefixListModel {
 	@Override
 	public List<String> getPrefixList() {
 		// TODO Auto-generated method stub
-		return null;
+		return Arrays.asList("a", "b", "c");
 	}
 
 	/**

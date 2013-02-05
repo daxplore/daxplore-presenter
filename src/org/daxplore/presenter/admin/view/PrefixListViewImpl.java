@@ -20,7 +20,6 @@ package org.daxplore.presenter.admin.view;
 
 import java.util.List;
 
-
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -53,7 +52,7 @@ public class PrefixListViewImpl extends Composite implements PrefixListView {
 	
 	
 	@Inject
-	protected PrefixListViewImpl() {
+	public PrefixListViewImpl() {
 		TextCell textCell = new TextCell();
 		prefixCellList = new CellList<String>(textCell);
 		prefixCellList.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
@@ -94,7 +93,7 @@ public class PrefixListViewImpl extends Composite implements PrefixListView {
 	@Override
 	public String promptForPrefixName() {
 		String prefix = Window.prompt("Enter the name for the new prefix. \n" +
-				"It must be a single word. Only standard English letters (a-z, A-Z) and digits (0-9) are allowed.", "");
+				"It must be a single word. Only standard English letters (a-z, A-Z) are allowed.", "");
 		return prefix;
 	}
 	
@@ -104,7 +103,7 @@ public class PrefixListViewImpl extends Composite implements PrefixListView {
 	@Override
 	public void alertInvalidPrefix(String prefix) {
 		Window.alert("The prefix name '"+prefix+"' is not valid.\n" +
-				"Make sure to write the prefix as a single word, only using letters (a-z, A-Z) and digits (0-9).");
+				"Make sure to write the prefix as a single word, only using letters (a-z, A-Z).");
 		
 	}
 

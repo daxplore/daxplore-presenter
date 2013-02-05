@@ -5,17 +5,7 @@
 	xmlns:d="urn:import:org.daxplore.presenter.admin.view">
 	
 	<g:HorizontalPanel>
-		<d:PrefixListView ui:field='prefixListView'/>
-		<g:VerticalPanel>
-			<g:Label>Admin for prefix ?</g:Label>
-			<g:FormPanel ui:field='uploadForm'>
-				<g:VerticalPanel>
-					<g:Label>Upload a file:</g:Label>
-					<g:FileUpload ui:field='uploadWidget' name='dataUpload'/>
-					<g:Button ui:field='uploadButton'>Submit</g:Button>
-					<g:TextArea ui:field='serverMessageArea'/>
-				</g:VerticalPanel>		
-			</g:FormPanel>
-		</g:VerticalPanel>
-	</g:HorizontalPanel>
+		<g:SimplePanel ui:field='sidebarContentSlot'/>
+		<g:SimplePanel ui:field='mainContentSlot' />
+	</g:HorizontalPanel> 
 </ui:UiBinder> 
