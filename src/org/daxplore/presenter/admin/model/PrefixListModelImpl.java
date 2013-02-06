@@ -18,8 +18,19 @@
  */
 package org.daxplore.presenter.admin.model;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.LinkedList;
+
+import org.daxplore.presenter.admin.event.PrefixListUpdateEvent;
+
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.URL;
+import com.google.gwt.user.client.Window;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 
 /**
  * The PrefixList model is responsible for editing the prefix list on the server
@@ -27,13 +38,47 @@ import java.util.List;
  */
 public class PrefixListModelImpl implements PrefixListModel {
 
+	private final EventBus eventBus;
+	private String href;
+	
+	
+	@Inject
+	protected PrefixListModelImpl(EventBus eventBus) {
+		this.eventBus = eventBus;
+		href = Window.Location.getHref();
+		href = href.substring(0, href.lastIndexOf('/'));
+		href = href + "/getStats?action=";
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<String> getPrefixList() {
-		// TODO Auto-generated method stub
-		return Arrays.asList("a", "b", "c");
+	public void updatePrefixList() {
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, URL.encode(href + "list"));
+		builder.setTimeoutMillis(1000); // TODO use reattempts with increasing
+										// times?
+		try {
+			builder.sendRequest(null, new RequestCallback() {
+
+				@Override
+				public void onResponseReceived(Request request, Response response) {
+					LinkedList<String> prefixes = new LinkedList<String>();
+					response.getText();
+					// TODO parse response text as a json-array and put in list
+					// ...
+					// ...
+					eventBus.fireEvent(new PrefixListUpdateEvent(prefixes));
+				}
+
+				@Override
+				public void onError(Request request, Throwable exception) {
+					// TODO reattempt? send global error?
+				}
+			});
+		} catch (RequestException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

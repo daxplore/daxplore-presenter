@@ -18,8 +18,10 @@
  */
 package org.daxplore.presenter.admin.presenter;
 
-import java.util.List;
+import java.util.LinkedList;
 
+import org.daxplore.presenter.admin.event.PrefixListUpdateEvent;
+import org.daxplore.presenter.admin.event.PrefixListUpdateHandler;
 import org.daxplore.presenter.admin.event.SelectPrefixEvent;
 import org.daxplore.presenter.admin.model.PrefixListModel;
 import org.daxplore.presenter.admin.view.PrefixListView;
@@ -38,6 +40,7 @@ public class PrefixListPresenter implements Presenter {
 	private final PrefixListModel model;
 	private final PrefixListView display;
 	
+	private String prefixToBeSelected;
 	
 	@Inject
 	public PrefixListPresenter(EventBus eventBus, PrefixListModel model, PrefixListView view) {
@@ -61,6 +64,13 @@ public class PrefixListPresenter implements Presenter {
 				eventBus.fireEvent(new SelectPrefixEvent(prefix));
 			}
 		});
+		
+		PrefixListUpdateEvent.register(eventBus, new PrefixListUpdateHandler() {
+			@Override
+			public void onPrefixListUpdate(PrefixListUpdateEvent event) {
+				doUpdatePrefixList(event.getPrefixList());
+			}
+		});
 	}
 	
 	public void doAddPrefixName() {
@@ -77,8 +87,17 @@ public class PrefixListPresenter implements Presenter {
 		}
 		
 		model.addPrefix(prefix);
-		display.setPrefixes(model.getPrefixList());
-		display.selectPrefix(prefix); // This will fire a SelectionChangeEvent
+		prefixToBeSelected = prefix;
+	}
+	
+	public void doUpdatePrefixList(LinkedList<String> prefixList) {
+		display.setPrefixes(prefixList);
+	    if (prefixToBeSelected!=null) {
+	    	display.selectPrefix(prefixToBeSelected); // This will fire a SelectionChangeEvent
+	    	prefixToBeSelected = null;
+	    } else if (prefixList.size() > 0) {
+	    	display.selectPrefix(prefixList.get(0)); // This will fire a SelectionChangeEvent
+		}
 	}
 	
 	@Override
@@ -87,10 +106,6 @@ public class PrefixListPresenter implements Presenter {
 		container.clear();
 	    container.add(display.asWidget());
 	    
-	    List<String> prefixList = model.getPrefixList();
-	    display.setPrefixes(prefixList);
-	    if (prefixList.size() > 0) {
-	    	display.selectPrefix(prefixList.get(0)); // This will fire a SelectionChangeEvent
-		}
+	    model.updatePrefixList(); // This will eventually fire a PrefixListUpdateEvent
 	}
 }
