@@ -18,6 +18,11 @@
  */
 package org.daxplore.presenter.server.storage;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.PrimaryKey;
 
@@ -32,5 +37,21 @@ public class PrefixStore {
 
 	public String getPrefix() {
 		return prefix;
+	}
+	
+	public static LinkedList<String> getPrefixes(PersistenceManager pm) {
+		LinkedList<String> prefixes = new LinkedList<String>();
+		Query q = pm.newQuery(PrefixStore.class);
+
+		try {
+			@SuppressWarnings("unchecked")
+			List<PrefixStore> results = (List<PrefixStore>) q.execute();
+			for (PrefixStore prefixStore : results) {
+				prefixes.add(prefixStore.getPrefix());
+			}
+		} finally {
+			q.closeAll();
+		}
+		return prefixes;
 	}
 }
