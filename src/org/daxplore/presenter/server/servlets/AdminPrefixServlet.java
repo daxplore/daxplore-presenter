@@ -41,9 +41,10 @@ public class AdminPrefixServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 			String action = request.getParameter("action"); //TODO clean input
-			PersistenceManager pm = PMF.get().getPersistenceManager();
+			
 			switch(action) {
 			case "list":
 				// List is printed for all actions after the switch statement
@@ -74,6 +75,8 @@ public class AdminPrefixServlet extends HttpServlet {
 		} catch (InternalServerException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} finally {
+			pm.close();
 		}
 	}
 	

@@ -97,6 +97,15 @@
 		<servlet-name>uploadUnpack</servlet-name>
 		<url-pattern>/admin/uploadUnpack</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>adminPrefix</servlet-name>
+		<servlet-class>org.daxplore.presenter.server.servlets.AdminPrefixServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>adminPrefix</servlet-name>
+		<url-pattern>/admin/prefix</url-pattern>
+	</servlet-mapping>
 
 
 	<!-- Administrator security constraints -->

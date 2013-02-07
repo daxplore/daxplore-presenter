@@ -18,6 +18,7 @@
  */
 package org.daxplore.presenter.admin.model;
 
+import java.util.Collections;
 import java.util.LinkedList;
 
 import org.daxplore.presenter.admin.event.PrefixListUpdateEvent;
@@ -28,6 +29,8 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.user.client.Window;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -47,7 +50,7 @@ public class PrefixListModelImpl implements PrefixListModel {
 		this.eventBus = eventBus;
 		href = Window.Location.getHref();
 		href = href.substring(0, href.lastIndexOf('/'));
-		href = href + "/getStats?action=";
+		href = href + "/admin/prefix?action=";
 	}
 	
 	/**
@@ -55,30 +58,7 @@ public class PrefixListModelImpl implements PrefixListModel {
 	 */
 	@Override
 	public void updatePrefixList() {
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, URL.encode(href + "list"));
-		builder.setTimeoutMillis(1000); // TODO use reattempts with increasing
-										// times?
-		try {
-			builder.sendRequest(null, new RequestCallback() {
-
-				@Override
-				public void onResponseReceived(Request request, Response response) {
-					LinkedList<String> prefixes = new LinkedList<String>();
-					response.getText();
-					// TODO parse response text as a json-array and put in list
-					// ...
-					// ...
-					eventBus.fireEvent(new PrefixListUpdateEvent(prefixes));
-				}
-
-				@Override
-				public void onError(Request request, Throwable exception) {
-					// TODO reattempt? send global error?
-				}
-			});
-		} catch (RequestException e) {
-			e.printStackTrace();
-		}
+		sendRequest("list");
 	}
 
 	/**
@@ -86,8 +66,7 @@ public class PrefixListModelImpl implements PrefixListModel {
 	 */
 	@Override
 	public void addPrefix(String prefix) {
-		// TODO Auto-generated method stub
-		
+		sendRequest("add&prefix="+prefix);
 	}
 
 	/**
@@ -95,8 +74,40 @@ public class PrefixListModelImpl implements PrefixListModel {
 	 */
 	@Override
 	public void deletePrefix(String prefix) {
-		// TODO Auto-generated method stub
-		
+		sendRequest("delete&prefix="+prefix);
 	}
-
+	
+	private void sendRequest(String arguments) {
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, URL.encode(href + arguments));
+		builder.setTimeoutMillis(1000); // TODO use reattempts with increasing times?
+		try {
+			builder.sendRequest(null, new ResponseReciever());
+		} catch (RequestException e) {
+			e.printStackTrace(); //TODO handle exception
+		}
+	}
+	
+	private class ResponseReciever implements RequestCallback {
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void onResponseReceived(Request request, Response response) {
+			LinkedList<String> prefixes = new LinkedList<String>();
+			String responseText = response.getText();
+			JSONArray array = JSONParser.parseStrict(responseText).isArray();
+			for (int i=0; i<array.size(); i++) {
+				prefixes.add(array.get(i).isString().stringValue());
+			}
+			eventBus.fireEvent(new PrefixListUpdateEvent(Collections.unmodifiableList(prefixes)));
+		}
+	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void onError(Request request, Throwable exception) {
+			// TODO Reattempt? Depends on why it failed and number of attempts.
+		}
+	}
 }

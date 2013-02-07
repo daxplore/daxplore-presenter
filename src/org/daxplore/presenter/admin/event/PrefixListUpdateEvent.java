@@ -18,7 +18,7 @@
  */
 package org.daxplore.presenter.admin.event;
 
-import java.util.LinkedList;
+import java.util.List;
 
 import com.google.web.bindery.event.shared.Event;
 import com.google.web.bindery.event.shared.EventBus;
@@ -32,7 +32,7 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
 public class PrefixListUpdateEvent extends Event<PrefixListUpdateHandler> {
 	private static final Type<PrefixListUpdateHandler> TYPE = new Type<PrefixListUpdateHandler>();
 	
-	private final LinkedList<String> prefixList;
+	private final List<String> prefixList;
 
 	/**
 	 * Instantiates a new image button event.
@@ -40,7 +40,7 @@ public class PrefixListUpdateEvent extends Event<PrefixListUpdateHandler> {
 	 * @param prefixList
 	 *            the new prefix list
 	 */
-	public PrefixListUpdateEvent(LinkedList<String> prefixList) {
+	public PrefixListUpdateEvent(List<String> prefixList) {
 		this.prefixList = prefixList;
 	}
 
@@ -49,7 +49,7 @@ public class PrefixListUpdateEvent extends Event<PrefixListUpdateHandler> {
 	 * 
 	 * @return the new prefix list
 	 */
-	public LinkedList<String> getPrefixList() {
+	public List<String> getPrefixList() {
 		return prefixList;
 	}
 

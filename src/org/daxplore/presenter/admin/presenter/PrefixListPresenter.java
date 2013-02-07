@@ -18,7 +18,7 @@
  */
 package org.daxplore.presenter.admin.presenter;
 
-import java.util.LinkedList;
+import java.util.List;
 
 import org.daxplore.presenter.admin.event.PrefixListUpdateEvent;
 import org.daxplore.presenter.admin.event.PrefixListUpdateHandler;
@@ -90,7 +90,7 @@ public class PrefixListPresenter implements Presenter {
 		prefixToBeSelected = prefix;
 	}
 	
-	public void doUpdatePrefixList(LinkedList<String> prefixList) {
+	public void doUpdatePrefixList(List<String> prefixList) {
 		display.setPrefixes(prefixList);
 	    if (prefixToBeSelected!=null) {
 	    	display.selectPrefix(prefixToBeSelected); // This will fire a SelectionChangeEvent
