@@ -1,0 +1,92 @@
+/*
+ *  Copyright 2012 Axel Winkler, Daniel Dunér
+ * 
+ *  This file is part of Daxplore Presenter.
+ *
+ *  Daxplore Presenter is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 2.1 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Daxplore Presenter is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.daxplore.presenter.server.storage;
+
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
+
+public class DeleteData {
+	protected static Logger logger = Logger.getLogger(DeleteData.class.getName());
+	
+	public static String deleteForPrefix(PersistenceManager pm, String prefix) {
+		long time = System.currentTimeMillis();
+		StringBuilder resultMessage = new StringBuilder("Removed data for prefix '").append(prefix).append("': ");
+		// Delete the single prefix item, this should be enough to remove the prefix from the system
+		// We still need to remove all related datastore/blobstore items to prevent storage memory leaks
+		// and to make sure that no settings or data remains if the prefix is reused/overwritten later.
+		Query query = pm.newQuery(PrefixStore.class);
+		query.declareParameters("String specificPrefix");
+		query.setFilter("prefix.equals(specificPrefix)");
+		long deletedPrefixItems = query.deletePersistentAll(prefix); // should always be 1
+		resultMessage.append(deletedPrefixItems).append(" prefix item, ");
+		
+		// Delete the single locale entry for the prefix
+		query = pm.newQuery(LocaleStore.class);
+		query.declareParameters("String specificPrefix");
+		query.setFilter("prefix.equals(specificPrefix)");
+		long deletedLocaleItems = query.deletePersistentAll(prefix); // should always be 1
+		resultMessage.append(deletedLocaleItems).append(" locale item, ");
+		
+		// Delete all statistical data items related to the prefix
+		query = pm.newQuery(StatDataItemStore.class);
+		query.declareParameters("String prefix");
+		query.setFilter("key.startsWith(prefix)");
+		long deletedStatDataItems = query.deletePersistentAll(prefix + "/");
+		resultMessage.append(deletedStatDataItems).append(" statistical data items, ");
+		
+		// Delete all setting items related to the prefix
+		query = pm.newQuery(SettingItemStore.class);
+		query.declareParameters("String prefix");
+		query.setFilter("key.startsWith(prefix)");
+		long deletedSettingItems = query.deletePersistentAll(prefix + "/");
+		resultMessage.append(deletedSettingItems).append(" settings, ");
+
+		// Delete all the blobstore-stored files
+		query = pm.newQuery(StaticFileItemStore.class);
+		query.declareParameters("String prefix");
+		query.setFilter("key.startsWith(prefix)");
+		@SuppressWarnings("unchecked")
+		List<StaticFileItemStore> fileItems = (List<StaticFileItemStore>)query.execute(prefix + "/");
+		int deletedBlobs = 0;
+		for (StaticFileItemStore item : fileItems) {
+			StaticFileItemStore.deleteBlob(item.getBlobKey());
+			deletedBlobs++;
+		}
+		resultMessage.append(deletedBlobs).append(" file blobs deleted, ");
+		
+		// Delete all the datastore entries that were tracking the blobstore files
+		query = pm.newQuery(StaticFileItemStore.class);
+		query.declareParameters("String prefix");
+		query.setFilter("key.startsWith(prefix)");
+		long deletedStaticFileItems = query.deletePersistentAll(prefix + "/");
+		resultMessage.append(deletedStaticFileItems).append(" static file pointers ");
+		
+		long totalDeleted = deletedPrefixItems + deletedLocaleItems + deletedStatDataItems + deletedSettingItems + deletedStaticFileItems;
+		double timeSeconds = ((System.currentTimeMillis()-time)/Math.pow(10, 6));
+		resultMessage.append(" (" + totalDeleted + " items in " +  timeSeconds + " seconds)");
+		
+		String result = resultMessage.toString();
+		logger.log(Level.INFO, result);
+		return result;
+	}
+}

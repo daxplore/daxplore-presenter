@@ -31,7 +31,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,6 +39,7 @@ import org.daxplore.presenter.server.ServerTools;
 import org.daxplore.presenter.server.admin.ClientMessageSender;
 import org.daxplore.presenter.server.admin.UnpackQueue;
 import org.daxplore.presenter.server.admin.UploadFileManifest;
+import org.daxplore.presenter.server.storage.DeleteData;
 import org.daxplore.presenter.server.storage.LocaleStore;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.PrefixStore;
@@ -118,62 +118,6 @@ public class DataUnpackServlet extends HttpServlet {
 		}
 	}
 	
-	protected void purgeExistingData(String prefix, ClientMessageSender messageSender) throws InternalServerException {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		long time = System.currentTimeMillis();
-		
-		// Delete the single prefix item, this should be enough to remove the prefix from the system
-		// We still need to remove all related datastore/blobstore items to prevent storage memory leaks
-		// and to make sure that no settings or data remains if the prefix is reused/overwritten later.
-		Query query = pm.newQuery(PrefixStore.class);
-		query.declareParameters("String specificPrefix");
-		query.setFilter("prefix.equals(specificPrefix)");
-		long deletedPrefixItems = query.deletePersistentAll(prefix); // should always be 1
-		messageSender.send(MessageType.PROGRESS_UPDATE, "Removed the stored prefix '" + prefix + '"');
-		
-		// Delete the single locale entry for the prefix
-		query = pm.newQuery(LocaleStore.class);
-		query.declareParameters("String specificPrefix");
-		query.setFilter("prefix.equals(specificPrefix)");
-		long deletedLocaleItems = query.deletePersistentAll(prefix); // should always be 1
-		messageSender.send(MessageType.PROGRESS_UPDATE, "Removed the locale item for prefix '" + prefix + '"');
-		
-		// Delete all statistical data items related to the prefix
-		query = pm.newQuery(StatDataItemStore.class);
-		query.declareParameters("String prefix");
-		query.setFilter("key.startsWith(prefix)");
-		long deletedStatDataItems = query.deletePersistentAll(prefix + "/");
-		messageSender.send(MessageType.PROGRESS_UPDATE, "Removed " + deletedStatDataItems + " old statistical data items");
-		
-		// Delete all setting items related to the prefix
-		query = pm.newQuery(SettingItemStore.class);
-		query.declareParameters("String prefix");
-		query.setFilter("key.startsWith(prefix)");
-		long deletedSettingItems = query.deletePersistentAll(prefix + "/");
-		messageSender.send(MessageType.PROGRESS_UPDATE, "Removed " + deletedSettingItems + " old settings");
-
-		// Delete all the blobstore-stored files
-		query = pm.newQuery(StaticFileItemStore.class);
-		query.declareParameters("String prefix");
-		query.setFilter("key.startsWith(prefix)");
-		@SuppressWarnings("unchecked")
-		List<StaticFileItemStore> fileItems = (List<StaticFileItemStore>)query.execute(prefix + "/");
-		for (StaticFileItemStore item : fileItems) {
-			StaticFileItemStore.deleteBlob(item.getBlobKey());
-		}
-		
-		// Delete all the datastore entries that were tracking the blobstore files
-		query = pm.newQuery(StaticFileItemStore.class);
-		query.declareParameters("String prefix");
-		query.setFilter("key.startsWith(prefix)");
-		long deletedStaticFileItems = query.deletePersistentAll(prefix + "/");
-		messageSender.send(MessageType.PROGRESS_UPDATE, "Removed " + deletedStaticFileItems + " old static files");
-		
-		long totalDeleted = deletedPrefixItems + deletedLocaleItems + deletedStatDataItems + deletedSettingItems + deletedStaticFileItems;
-		double timeSeconds = ((System.currentTimeMillis()-time)/Math.pow(10, 6));
-		logger.log(Level.INFO, "Deleted " + totalDeleted + " old data items in " + timeSeconds + "seconds");
-	}
-	
 	protected void enqueueForUnpacking(UnpackQueue unpackQueue, String fileName, BlobKey blobKey) {
 		if(fileName.startsWith("properties/")){
 			unpackQueue.addTask(UnpackType.PROPERTIES, blobKey.getKeyString());
@@ -238,10 +182,14 @@ public class DataUnpackServlet extends HttpServlet {
 			throw new BadReqException("Uploaded file contains extra files: " + SharedTools.join(unwantedUploadFiles, ", "));
 		}
 		
-		// Purge all existing data that uses this prefix
-		purgeExistingData(prefix, messageSender);
-		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
+		
+		// Purge all existing data that uses this prefix
+		String deleteResult = DeleteData.deleteForPrefix(pm, prefix);
+		messageSender.send(MessageType.PROGRESS_UPDATE, deleteResult);
+		
+		
+		// Since we just deleted the prefix and all it's data, we have to add it again
 		pm.makePersistent(new PrefixStore(prefix));
 		logger.log(Level.INFO, "Added prefix to system: " + prefix);
 		messageSender.send(MessageType.PROGRESS_UPDATE, "Added prefix to system: " + prefix);

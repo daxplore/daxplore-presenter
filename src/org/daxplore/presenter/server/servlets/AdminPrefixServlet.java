@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.daxplore.presenter.server.storage.DeleteData;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.PrefixStore;
 import org.daxplore.presenter.server.throwable.BadReqException;
@@ -42,7 +43,7 @@ public class AdminPrefixServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) {
 		try {
-			String action = request.getParameter("action");
+			String action = request.getParameter("action"); //TODO clean input
 			PersistenceManager pm = PMF.get().getPersistenceManager();
 			switch(action) {
 			case "list":
@@ -57,10 +58,14 @@ public class AdminPrefixServlet extends HttpServlet {
 				}
 				break;
 			case "add":
-				//TODO
+				String prefix = request.getParameter("prefix"); //TODO clean input
+				pm.makePersistent(new PrefixStore(prefix));
+				logger.log(Level.INFO, "Added prefix to system: " + prefix);
 				break;
 			case "delete":
-				//TODO
+				prefix = request.getParameter("prefix"); //TODO clean input
+				/*String result =*/ DeleteData.deleteForPrefix(pm, prefix); // Logs it's own action
+				//TODO send result over server channel?
 				break;
 			default:
 				throw new BadReqException("Invalid action '" + action + "' requested");
