@@ -39,7 +39,6 @@ import org.json.simple.JSONArray;
 public class AdminPrefixServlet extends HttpServlet {
 	protected static Logger logger = Logger.getLogger(AdminPrefixServlet.class.getName());
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) {
 		try {
@@ -47,15 +46,7 @@ public class AdminPrefixServlet extends HttpServlet {
 			PersistenceManager pm = PMF.get().getPersistenceManager();
 			switch(action) {
 			case "list":
-				List<String> prefixes = PrefixStore.getPrefixes(pm);
-				JSONArray jsonArray = new JSONArray();
-				jsonArray.addAll(prefixes);
-				jsonArray.toJSONString();
-				try {
-					response.getWriter().write(jsonArray.toJSONString());
-				} catch (IOException e) {
-					throw new InternalServerException("Failed to write prefix list", e);
-				}
+				// List is printed for all actions after the switch statement
 				break;
 			case "add":
 				String prefix = request.getParameter("prefix"); //TODO clean input
@@ -70,6 +61,13 @@ public class AdminPrefixServlet extends HttpServlet {
 			default:
 				throw new BadReqException("Invalid action '" + action + "' requested");
 			}
+			
+			try {
+				response.getWriter().write(getPrefixJson(pm));
+			} catch (IOException e) {
+				throw new InternalServerException("Failed to write prefix list", e);
+			}
+			
 		} catch (BadReqException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -77,6 +75,15 @@ public class AdminPrefixServlet extends HttpServlet {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private String getPrefixJson(PersistenceManager pm) {
+		List<String> prefixes = PrefixStore.getPrefixes(pm);
+		JSONArray jsonArray = new JSONArray();
+		jsonArray.addAll(prefixes);
+		jsonArray.toJSONString();
+		return jsonArray.toJSONString();
 	}
 	
 }
