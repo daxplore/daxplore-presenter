@@ -29,6 +29,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
  * from the end user.
  */
 public interface PrefixListView {
+	
 	void addAddPrefixButtonClickHandler(ClickHandler handler);
 
 	String promptForPrefixName();
@@ -42,6 +43,8 @@ public interface PrefixListView {
 	void setPrefixes(List<String> prefixList);
 
 	void selectPrefix(String prefix);
+	
+	boolean containsPrefix(String prefix);
 
 	Widget asWidget();
 }

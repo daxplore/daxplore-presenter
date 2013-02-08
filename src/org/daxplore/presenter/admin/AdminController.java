@@ -49,7 +49,6 @@ public class AdminController implements Presenter, ValueChangeHandler<String> {
 	private final EventBus eventBus;
 	private final AdminPresenter adminPresenter;
 	private final PrefixListPresenter prefixListPresenter;
-	private HasWidgets container;
 
 	@Inject
 	protected AdminController(EventBus eventBus, AdminPresenter adminPresenter, PrefixListPresenter prefixListPresenter) {
@@ -108,29 +107,26 @@ public class AdminController implements Presenter, ValueChangeHandler<String> {
 		SelectPrefixEvent.register(eventBus, new SelectPrefixHandler() {
 			@Override
 			public void onSelectPrefix(SelectPrefixEvent event) {
-				doSelectPrefix(event.getPrefix());
-				
+				History.newItem("prefix="+event.getPrefix());
 			}
 		});
 	}
 
 	@Override
 	public void go(final HasWidgets container) {
-		this.container = container;
 		adminPresenter.go(container);
-		prefixListPresenter.go(adminPresenter.getSidebarContentSlot());
-		if (History.getToken().isEmpty()) {
-			History.newItem("");
+		String token = History.getToken();
+		if (token==null || token.isEmpty()) {
+			History.newItem("", false);
 		} else {
-			History.fireCurrentHistoryState();
+			History.newItem(token, false);
+			if (token.startsWith("prefix=")) {
+				String prefix = token.split("=", 2)[1];
+				prefixListPresenter.selectPrefix(prefix);
+			}
 		}
 	}
 
-	
-	public void doSelectPrefix(String prefix) {
-		History.newItem("prefix="+prefix);
-	}
-	
 	/**
 	 * Handle history changes
 	 */
@@ -139,20 +135,13 @@ public class AdminController implements Presenter, ValueChangeHandler<String> {
 		String token = event.getValue();
 
 		if (token != null) {
-			Presenter presenter = null;
-
 			if (token.startsWith("prefix=")) {
 				String prefix = token.split("=", 2)[1];
-				presenter = null;
-			}
-
-			if (presenter != null) {
-				// Let the presenter display itself inside the adminPresenter's main slot
-				presenter.go(adminPresenter.getMainContentSlot());
+				prefixListPresenter.selectPrefix(prefix);
+				//presenter = new PrefixDisplayPresenter(eventBus, new PrefixDisplayViewImpl(), prefix);
 			}
 		}
 	}
-
 
 }
 

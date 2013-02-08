@@ -16,29 +16,31 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.admin.view;
+package org.daxplore.presenter.admin.presenter;
+
+import org.daxplore.presenter.admin.view.PrefixDisplayView;
 
 import com.google.gwt.user.client.ui.HasWidgets;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 
-public interface AdminView {
-	/**
-	 * Returns the "sidebar slot" where a navigation widget can be displayed.
-	 * 
-	 * @return a panel, or similar, that can hold a widget
-	 */
-	public HasWidgets getSidebarContentSlot();
-	
-	
-	/**
-	 * Returns the "main slot" where the primary content widget is displayed.
-	 * 
-	 * @return a panel, or similar, that can hold a widget
-	 */
-	public HasWidgets getMainContentSlot();
-	
-	public void addServerMessage(String message);
-	public Widget asWidget();
+public class PrefixDisplayPresenter implements Presenter {
 
+	private final EventBus eventBus;
+	private PrefixDisplayView prefixDisplayView;
 	
+	public PrefixDisplayPresenter(EventBus eventBus, PrefixDisplayView prefixDisplayView, String prefix) {
+		this.eventBus = eventBus;
+		this.prefixDisplayView = prefixDisplayView;
+		prefixDisplayView.setHeader("Administration panel for prefix: " + prefix);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void go(HasWidgets container) {
+		container.clear();
+		container.add(prefixDisplayView.asWidget());
+	}
 }

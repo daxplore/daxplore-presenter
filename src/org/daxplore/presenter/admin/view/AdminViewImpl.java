@@ -38,38 +38,17 @@ public class AdminViewImpl extends Composite implements AdminView {
 	interface AdminViewPanel extends UiBinder<Widget, AdminViewImpl> {}
 	private static AdminViewPanel uiBinder = GWT.create(AdminViewPanel.class);
 	
-	protected EventBus eventBus;
+	private EventBus eventBus;
 	
 	@UiField protected SimplePanel mainContentSlot;
 	@UiField protected SimplePanel sidebarContentSlot;
-//	@UiField protected FormPanel uploadForm;
-//	@UiField protected FileUpload uploadWidget;
-//	@UiField protected Button uploadButton;
-//	@UiField protected TextArea serverMessageArea;
 		  
 	@Inject
 	public AdminViewImpl(EventBus eventBus) {
 		this.eventBus = eventBus;
 	    
 		initWidget(uiBinder.createAndBindUi(this));
-		
-//		uploadForm.setAction("/admin/upload");
-//		uploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
-//		uploadForm.setMethod(FormPanel.METHOD_POST);
 	}
-
-//	@UiHandler("uploadButton")
-//	protected void handleClick(ClickEvent e) {
-//		uploadForm.submit();
-//	}
-//
-//	@UiHandler("uploadForm")
-//	protected void handleSubmit(SubmitEvent event) {
-//	}
-//
-//	@UiHandler("uploadForm")
-//	protected void handleSubmitComplete(SubmitCompleteEvent event) {
-//	}
 
 	/**
 	 * {@inheritDoc}

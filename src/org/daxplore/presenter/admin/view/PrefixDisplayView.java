@@ -18,27 +18,14 @@
  */
 package org.daxplore.presenter.admin.view;
 
-import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Widget;
 
-public interface AdminView {
-	/**
-	 * Returns the "sidebar slot" where a navigation widget can be displayed.
-	 * 
-	 * @return a panel, or similar, that can hold a widget
-	 */
-	public HasWidgets getSidebarContentSlot();
+public interface PrefixDisplayView {
+
+	void setHeader(String header);
 	
-	
-	/**
-	 * Returns the "main slot" where the primary content widget is displayed.
-	 * 
-	 * @return a panel, or similar, that can hold a widget
-	 */
-	public HasWidgets getMainContentSlot();
-	
-	public void addServerMessage(String message);
-	public Widget asWidget();
+	Widget asWidget();
 
 	
+
 }

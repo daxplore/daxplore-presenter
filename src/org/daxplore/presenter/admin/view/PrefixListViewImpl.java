@@ -18,6 +18,7 @@
  */
 package org.daxplore.presenter.admin.view;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import com.google.gwt.cell.client.TextCell;
@@ -49,6 +50,7 @@ public class PrefixListViewImpl extends Composite implements PrefixListView {
 	protected Button addPrefixButton;
 	
 	private SingleSelectionModel<String> selectionModel;
+	private List<String> prefixList = new LinkedList<String>();
 	
 	
 	@Inject
@@ -92,8 +94,8 @@ public class PrefixListViewImpl extends Composite implements PrefixListView {
 	 */
 	@Override
 	public String promptForPrefixName() {
-		String prefix = Window.prompt("Enter the name for the new prefix. \n" +
-				"It must be a single word. Only standard English letters (a-z, A-Z) are allowed.", "");
+		String prefix = Window.prompt("Enter the name for the new prefix.\n\n" +
+				"It must be a single word using standard letters (a-z, A-Z).", "");
 		return prefix;
 	}
 	
@@ -102,7 +104,7 @@ public class PrefixListViewImpl extends Composite implements PrefixListView {
 	 */
 	@Override
 	public void alertInvalidPrefix(String prefix) {
-		Window.alert("The prefix name '"+prefix+"' is not valid.\n" +
+		Window.alert("The prefix name '"+prefix+"' is not valid.\n\n" +
 				"Make sure to write the prefix as a single word, only using letters (a-z, A-Z).");
 		
 	}
@@ -112,6 +114,7 @@ public class PrefixListViewImpl extends Composite implements PrefixListView {
 	 */
 	@Override
 	public void setPrefixes(List<String> prefixList) {
+		this.prefixList = prefixList;
 		prefixCellList.setRowData(prefixList);
 	}
 
@@ -129,5 +132,13 @@ public class PrefixListViewImpl extends Composite implements PrefixListView {
 	@Override
 	public Widget asWidget() {
 		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean containsPrefix(String prefix) {
+		return prefixList.contains(prefix);
 	}
 }

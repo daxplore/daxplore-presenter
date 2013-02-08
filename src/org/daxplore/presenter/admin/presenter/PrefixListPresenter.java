@@ -108,4 +108,13 @@ public class PrefixListPresenter implements Presenter {
 	    
 	    model.updatePrefixList(); // This will eventually fire a PrefixListUpdateEvent
 	}
+
+	public void selectPrefix(String prefix) {
+		if(display.containsPrefix(prefix)) {
+			display.selectPrefix(prefix); // This will fire a SelectionChangeEvent
+		} else {
+			prefixToBeSelected = prefix;
+			model.updatePrefixList(); // This will eventually fire a PrefixListUpdateEvent
+		}
+	}
 }

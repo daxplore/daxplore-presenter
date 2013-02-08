@@ -18,7 +18,10 @@
  */
 package org.daxplore.presenter.admin.presenter;
 
+import org.daxplore.presenter.admin.event.SelectPrefixEvent;
+import org.daxplore.presenter.admin.event.SelectPrefixHandler;
 import org.daxplore.presenter.admin.view.AdminView;
+import org.daxplore.presenter.admin.view.PrefixDisplayViewImpl;
 
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Widget;
@@ -26,13 +29,27 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
 public class AdminPresenter implements Presenter {
-	protected EventBus eventBus;
-	protected AdminView adminView;
+	private EventBus eventBus;
+	private AdminView adminView;
+	private PrefixListPresenter prefixListPresenter; 
 	
 	@Inject
-	protected AdminPresenter(EventBus eventBus, AdminView adminView) {
+	protected AdminPresenter(EventBus eventBus, AdminView adminView, PrefixListPresenter prefixListPresenter) {
 		this.eventBus = eventBus;
 		this.adminView = adminView;
+		this.prefixListPresenter = prefixListPresenter;
+		bind();
+	}
+
+	private void bind() {
+		SelectPrefixEvent.register(eventBus, new SelectPrefixHandler() {
+			@Override
+			public void onSelectPrefix(SelectPrefixEvent event) {
+				String prefix = event.getPrefix();
+				PrefixDisplayPresenter prefixDisplayPresenter = new PrefixDisplayPresenter(eventBus, new PrefixDisplayViewImpl(), prefix);
+				prefixDisplayPresenter.go(adminView.getMainContentSlot());
+			}
+		});
 	}
 
 	/**
@@ -42,28 +59,11 @@ public class AdminPresenter implements Presenter {
 	public void go(HasWidgets container) {
 		container.clear();
 		container.add(getDisplay());
+		prefixListPresenter.go(adminView.getSidebarContentSlot());
 	}
 	
 	public Widget getDisplay() {
 		return adminView.asWidget();
-	}
-
-	/**
-	 * Returns the "sidebar slot" where a navigation widget can be displayed.
-	 * 
-	 * @return a panel, or similar, that can hold a widget
-	 */
-	public HasWidgets getSidebarContentSlot() {
-		return adminView.getSidebarContentSlot();
-	}
-
-	/**
-	 * Returns the "main slot" where the primary content widget is displayed.
-	 * 
-	 * @return a panel, or similar, that can hold a widget
-	 */
-	public HasWidgets getMainContentSlot() {
-		return adminView.getMainContentSlot();
 	}
 
 }
