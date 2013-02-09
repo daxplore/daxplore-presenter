@@ -22,7 +22,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public interface PrefixDisplayView {
 
-	void setHeader(String header);
+	void setPrefix(String prefix);
 	
 	Widget asWidget();
 

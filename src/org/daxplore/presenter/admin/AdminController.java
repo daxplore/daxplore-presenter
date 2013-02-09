@@ -117,7 +117,6 @@ public class AdminController implements Presenter, ValueChangeHandler<String> {
 		adminPresenter.go(container);
 		String token = History.getToken();
 		if (token==null || token.isEmpty()) {
-			History.newItem("", false);
 		} else {
 			History.newItem(token, false);
 			if (token.startsWith("prefix=")) {

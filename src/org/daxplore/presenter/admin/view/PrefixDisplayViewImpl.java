@@ -70,7 +70,7 @@ public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayVie
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setHeader(String header) {
-		uploadHeader.setText(header);
+	public void setPrefix(String prefix) {
+		uploadHeader.setText(prefix);
 	}
 }

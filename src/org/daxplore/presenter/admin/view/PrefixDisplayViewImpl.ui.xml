@@ -5,6 +5,7 @@
 	
 	<g:DecoratorPanel>
 		<g:VerticalPanel>
+			<g:Label>Administration panel for prefix:</g:Label>
 			<g:Label ui:field='uploadHeader'></g:Label>
 			<g:FormPanel ui:field='uploadForm'>
 				<g:VerticalPanel>

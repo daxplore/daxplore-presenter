@@ -21,7 +21,6 @@ package org.daxplore.presenter.admin.presenter;
 import org.daxplore.presenter.admin.view.PrefixDisplayView;
 
 import com.google.gwt.user.client.ui.HasWidgets;
-import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
 public class PrefixDisplayPresenter implements Presenter {
@@ -32,7 +31,7 @@ public class PrefixDisplayPresenter implements Presenter {
 	public PrefixDisplayPresenter(EventBus eventBus, PrefixDisplayView prefixDisplayView, String prefix) {
 		this.eventBus = eventBus;
 		this.prefixDisplayView = prefixDisplayView;
-		prefixDisplayView.setHeader("Administration panel for prefix: " + prefix);
+		prefixDisplayView.setPrefix(prefix);
 	}
 
 	/**
