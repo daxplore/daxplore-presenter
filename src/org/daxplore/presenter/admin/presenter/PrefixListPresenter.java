@@ -81,7 +81,7 @@ public class PrefixListPresenter implements Presenter {
 			return;
 		}
 		prefix = prefix.trim();
-		if (!prefix.matches("[a-zA-Z]+")) { // TODO Used shared resources regexp for this
+		if (!prefix.matches("[a-z]+")) { // TODO Used shared resources regexp for this
 			display.alertInvalidPrefix(prefix);
 			return;
 		}

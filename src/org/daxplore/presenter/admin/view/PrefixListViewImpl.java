@@ -95,7 +95,7 @@ public class PrefixListViewImpl extends Composite implements PrefixListView {
 	@Override
 	public String promptForPrefixName() {
 		String prefix = Window.prompt("Enter the name for the new prefix.\n\n" +
-				"It must be a single word using standard letters (a-z, A-Z).", "");
+				"A single word using lowercase letters a-z.", "");
 		return prefix;
 	}
 	
@@ -105,7 +105,7 @@ public class PrefixListViewImpl extends Composite implements PrefixListView {
 	@Override
 	public void alertInvalidPrefix(String prefix) {
 		Window.alert("The prefix name '"+prefix+"' is not valid.\n\n" +
-				"Make sure to write the prefix as a single word, only using letters (a-z, A-Z).");
+				"Make sure to write the prefix as a single word, only using lowercase letters a-z.");
 		
 	}
 
