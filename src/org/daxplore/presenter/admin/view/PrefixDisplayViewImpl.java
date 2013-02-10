@@ -24,6 +24,8 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FileUpload;
@@ -39,7 +41,9 @@ public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayVie
 	interface PrefixDisplayViewPanel extends UiBinder<Widget, PrefixDisplayViewImpl> {}
 	private static PrefixDisplayViewPanel uiBinder = GWT.create(PrefixDisplayViewPanel.class);
 	
-	@UiField protected Label uploadHeader;
+	@UiField protected Anchor prefixHeader;
+	@UiField protected Anchor mainlink;
+	@UiField protected Label something;
 	@UiField protected FormPanel uploadForm;
 	@UiField protected FileUpload uploadWidget;
 	@UiField protected Button uploadButton;
@@ -48,6 +52,8 @@ public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayVie
 	public PrefixDisplayViewImpl() {
 		initWidget(uiBinder.createAndBindUi(this));
 		
+		mainlink.setTarget("_blank");
+		
 		uploadForm.setAction("/admin/upload");
 		uploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
 		uploadForm.setMethod(FormPanel.METHOD_POST);
@@ -55,7 +61,10 @@ public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayVie
 	
 	@UiHandler("uploadButton")
 	protected void handleClick(ClickEvent e) {
-		uploadForm.submit();
+		boolean doUpload = Window.confirm("Are you sure you want to upload a new file, replacing all old data?");
+		if (doUpload) {
+			uploadForm.submit();
+		}
 	}
 
 	@UiHandler("uploadForm")
@@ -65,12 +74,30 @@ public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayVie
 	@UiHandler("uploadForm")
 	protected void handleSubmitComplete(SubmitCompleteEvent event) {
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void setPrefix(String prefix) {
-		uploadHeader.setText(prefix);
+		prefixHeader.setText(prefix);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setPrefixHref(String href) {
+		prefixHeader.setHref(href);
+		mainlink.setText(href);
+		mainlink.setHref(href);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setStatDataItemCount(String something) {
+		this.something.setText(something);
 	}
 }

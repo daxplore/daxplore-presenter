@@ -20,6 +20,7 @@ package org.daxplore.presenter.admin.presenter;
 
 import org.daxplore.presenter.admin.event.SelectPrefixEvent;
 import org.daxplore.presenter.admin.event.SelectPrefixHandler;
+import org.daxplore.presenter.admin.model.PrefixDataModel;
 import org.daxplore.presenter.admin.view.AdminView;
 import org.daxplore.presenter.admin.view.PrefixDisplayViewImpl;
 
@@ -29,15 +30,18 @@ import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
 public class AdminPresenter implements Presenter {
-	private EventBus eventBus;
-	private AdminView adminView;
-	private PrefixListPresenter prefixListPresenter; 
+	private final EventBus eventBus;
+	private final AdminView adminView;
+	private final PrefixListPresenter prefixListPresenter;
+	private final PrefixDataModel prefixDataModel;
 	
 	@Inject
-	protected AdminPresenter(EventBus eventBus, AdminView adminView, PrefixListPresenter prefixListPresenter) {
+	protected AdminPresenter(EventBus eventBus, AdminView adminView,
+			PrefixListPresenter prefixListPresenter, PrefixDataModel prefixDataModel) {
 		this.eventBus = eventBus;
 		this.adminView = adminView;
 		this.prefixListPresenter = prefixListPresenter;
+		this.prefixDataModel = prefixDataModel;
 		bind();
 	}
 
@@ -46,7 +50,7 @@ public class AdminPresenter implements Presenter {
 			@Override
 			public void onSelectPrefix(SelectPrefixEvent event) {
 				String prefix = event.getPrefix();
-				PrefixDisplayPresenter prefixDisplayPresenter = new PrefixDisplayPresenter(eventBus, new PrefixDisplayViewImpl(), prefix);
+				PrefixDisplayPresenter prefixDisplayPresenter = new PrefixDisplayPresenter(eventBus, new PrefixDisplayViewImpl(), prefixDataModel, prefix);
 				prefixDisplayPresenter.go(adminView.getMainContentSlot());
 			}
 		});

@@ -4,11 +4,32 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:w="urn:import:com.google.gwt.user.cellview.client">
 	
-	<g:DecoratorPanel>
-		<g:VerticalPanel>
-			<g:Label>Select a prefix</g:Label>
-			<w:CellList ui:field='prefixCellList'/>
-			<g:Button ui:field='addPrefixButton'>Add new prefix</g:Button>
-		</g:VerticalPanel>
-	</g:DecoratorPanel>
+	<ui:style>
+		.wrapper {
+			margin: 0 auto;
+			padding: 0px 20px 20px 0px;
+		}
+		.header {
+			font-size: large;
+			font-weight: bold;
+		}
+		.list {
+			padding: 5px;
+			border: solid 1px darkgray;
+			border-radius: 3px;
+			margin-top: 3px;
+			margin-bottom: 10px;
+		}
+		.list>div>div {
+			padding: 5px;
+		}
+		.button {
+			width: 100%;
+		}
+	</ui:style>
+	<g:VerticalPanel styleName="{style.wrapper}">
+		<g:Label styleName="{style.header}">Select a prefix</g:Label>
+		<w:CellList styleName="{style.list}" ui:field='prefixCellList'/>
+		<g:Button ui:field='addPrefixButton' styleName="{style.button}">Add a new prefix</g:Button>
+	</g:VerticalPanel>
 </ui:UiBinder> 

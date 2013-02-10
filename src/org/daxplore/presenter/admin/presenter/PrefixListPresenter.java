@@ -23,7 +23,7 @@ import java.util.List;
 import org.daxplore.presenter.admin.event.PrefixListUpdateEvent;
 import org.daxplore.presenter.admin.event.PrefixListUpdateHandler;
 import org.daxplore.presenter.admin.event.SelectPrefixEvent;
-import org.daxplore.presenter.admin.model.PrefixListModel;
+import org.daxplore.presenter.admin.model.PrefixDataModel;
 import org.daxplore.presenter.admin.view.PrefixListView;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -37,13 +37,13 @@ import com.google.web.bindery.event.shared.EventBus;
 public class PrefixListPresenter implements Presenter {
 
 	private final EventBus eventBus;
-	private final PrefixListModel model;
+	private final PrefixDataModel model;
 	private final PrefixListView display;
 	
 	private String prefixToBeSelected;
 	
 	@Inject
-	public PrefixListPresenter(EventBus eventBus, PrefixListModel model, PrefixListView view) {
+	public PrefixListPresenter(EventBus eventBus, PrefixDataModel model, PrefixListView view) {
 		this.eventBus = eventBus;
 		this.model = model;
 		this.display = view;

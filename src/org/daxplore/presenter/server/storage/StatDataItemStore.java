@@ -64,7 +64,6 @@ public class StatDataItemStore {
 		this.json = json;
 	}
 
-
 	/**
 	 * Get the key.
 	 * 

@@ -16,17 +16,16 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.admin.model;
+package org.daxplore.presenter.admin.event;
 
+import com.google.gwt.event.shared.EventHandler;
+import com.google.web.bindery.event.shared.EventBus;
 
 /**
- * The PrefixList model is responsible for editing the prefix list on the server
- * and fetching existing prefixes.
+ * An event sent when a new set of Prefix Metadata has been received from the server.
+ * 
+ * <p>Send the event over the system's {@link EventBus}.</p>
  */
-public interface PrefixListModel {
-	public void updatePrefixList();
-
-	public void addPrefix(String prefix);
-
-	public void deletePrefix(String prefix);
+public interface PrefixMetadataHandler extends EventHandler {
+	void onPrefixMetadataUpdate(PrefixMetadataEvent event);
 }

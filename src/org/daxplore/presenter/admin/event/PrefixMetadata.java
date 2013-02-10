@@ -16,14 +16,27 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.admin.view;
+package org.daxplore.presenter.admin.event;
 
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
 
-public interface PrefixDisplayView {
-	void setPrefix(String prefix);
-	void setPrefixHref(String href);
-	void setStatDataItemCount(String something);
+public class PrefixMetadata {
 
-	Widget asWidget();
+	private final String prefix;
+	private final String statDataItemCount;
+	
+	public PrefixMetadata (String json) {
+		JSONObject metaMap = JSONParser.parseStrict(json).isObject();
+		prefix = metaMap.get("prefix").isString().stringValue();
+		statDataItemCount = metaMap.get("statcount").isString().stringValue();
+	}
+
+	public String getPrefix() {
+		return prefix;
+	}
+	
+	public String getStatDataItemCount() {
+		return statDataItemCount;
+	}
 }

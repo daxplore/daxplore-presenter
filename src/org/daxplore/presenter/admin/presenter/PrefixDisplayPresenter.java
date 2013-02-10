@@ -18,22 +18,52 @@
  */
 package org.daxplore.presenter.admin.presenter;
 
+import org.daxplore.presenter.admin.event.PrefixMetadata;
+import org.daxplore.presenter.admin.event.PrefixMetadataEvent;
+import org.daxplore.presenter.admin.event.PrefixMetadataHandler;
+import org.daxplore.presenter.admin.model.PrefixDataModel;
 import org.daxplore.presenter.admin.view.PrefixDisplayView;
 
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.web.bindery.event.shared.EventBus;
 
 public class PrefixDisplayPresenter implements Presenter {
 
 	private final EventBus eventBus;
-	private PrefixDisplayView prefixDisplayView;
+	private final String prefix;
+	private final PrefixDisplayView prefixDisplayView;
 	
-	public PrefixDisplayPresenter(EventBus eventBus, PrefixDisplayView prefixDisplayView, String prefix) {
+	private static String href;
+	
+	public PrefixDisplayPresenter(EventBus eventBus, PrefixDisplayView prefixDisplayView,
+			PrefixDataModel prefixModel, String prefix) {
 		this.eventBus = eventBus;
 		this.prefixDisplayView = prefixDisplayView;
+		this.prefix = prefix;
 		prefixDisplayView.setPrefix(prefix);
+		if (href == null) {
+			href = Window.Location.getHref();
+			href = href.substring(0, href.lastIndexOf('/'));
+			href = href + "/";
+		}
+		prefixDisplayView.setPrefixHref(href + prefix);
+		bind();
+		prefixModel.updatePrefixMetadata(prefix);
 	}
-
+	
+	private void bind() {
+		PrefixMetadataEvent.register(eventBus, new PrefixMetadataHandler() {
+			@Override
+			public void onPrefixMetadataUpdate(PrefixMetadataEvent event) {
+				PrefixMetadata metadata = event.getPrefixMetadata();
+				if(metadata.getPrefix().equals(prefix)) {
+					prefixDisplayView.setStatDataItemCount(metadata.getStatDataItemCount());
+				}
+			}
+		});
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

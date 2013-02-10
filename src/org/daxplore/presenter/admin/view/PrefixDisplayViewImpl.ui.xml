@@ -3,18 +3,89 @@
 	xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
 	
-	<g:DecoratorPanel>
-		<g:VerticalPanel>
-			<g:Label>Administration panel for prefix:</g:Label>
-			<g:Label ui:field='uploadHeader'></g:Label>
+	<ui:style>
+		.scrollpanel {
+			width: 100%;
+			height: 100%;
+		}
+		.header-top {
+			font-size: large;
+			font-weight: bold;
+			margin-bottom: -5px;
+		}
+		.header-bottom {
+			font-size: xx-large;
+			margin-left: 20px;
+		}
+		.header {
+			font-size: large;
+			font-weight: bold;
+			border-top: solid 1px lightgray;
+			padding-top: 10px;
+			margin-top: 35px;
+			width: 100%;
+		}
+		.header-subtext {
+			margin-bottom: 5px;
+		}
+		.bubble {
+			padding: 5px;
+			border: solid 5px hsl(210, 5%, 90%);
+			background-color: hsl(210, 5%, 90%);
+			border-radius: 5px;
+			margin-left: 20px;
+			margin-top: 10px;
+			width: 70%;
+		}
+		.upload-button {
+			float: right;
+		}
+		.maxwidth {
+			width: 100%;
+		}
+		.messagearea {
+			width: 95%;
+			height: 150px;
+			margin-top: 10px;
+		}
+		.inlinelabel {
+			display: inline;
+		}
+		.inlinelabel-header {
+			display: inline;
+			font-weight: bold;
+		}
+	</ui:style>
+	
+	<g:ScrollPanel styleName="{style.scrollpanel}">
+		<g:VerticalPanel styleName="{style.maxwidth}">
+			<g:Label styleName="{style.header-top}">Prefix:&nbsp;&nbsp;</g:Label>
+			<g:Anchor ui:field='prefixHeader' styleName="{style.header-bottom}"></g:Anchor>
+			<g:Label styleName="{style.header}">Prefix status</g:Label>
+			<g:Label styleName="{style.header-subtext}">Information and statistics.</g:Label>
+			<g:FlowPanel>
+				<g:Label styleName="{style.inlinelabel-header}">Main presenter:&nbsp;</g:Label>
+				<g:Anchor ui:field='mainlink'></g:Anchor>
+			</g:FlowPanel>
+			<g:FlowPanel>
+				<g:Label styleName="{style.inlinelabel-header}">StatDataItem count:&nbsp;</g:Label>
+				<g:Label ui:field='something' styleName="{style.inlinelabel}"></g:Label>
+			</g:FlowPanel>
+			
 			<g:FormPanel ui:field='uploadForm'>
-				<g:VerticalPanel>
-					<g:Label>Upload a file:</g:Label>
-					<g:FileUpload ui:field='uploadWidget' name='dataUpload'/>
-					<g:Button ui:field='uploadButton'>Submit</g:Button>
-					<g:TextArea ui:field='serverMessageArea'/>
+				<g:VerticalPanel styleName="{style.maxwidth}">
+					<g:Label styleName="{style.header}">Upload a new Daxplore file</g:Label>
+					<g:Label styleName="{style.header-subtext}">Upload a file created with Daxplore Producer. This will completely replace all the current content on this prefix.</g:Label>
+					<g:FlowPanel styleName="{style.bubble}">
+						<g:FileUpload ui:field='uploadWidget' name='dataUpload'/>
+						<g:Button ui:field='uploadButton' styleName="{style.upload-button}">Submit</g:Button>
+					</g:FlowPanel>
 				</g:VerticalPanel>		
 			</g:FormPanel>
+			
+			<g:Label styleName="{style.header}">Server updates</g:Label>
+			<g:Label styleName="{style.header-subtext}">Status updates sent from the server when uploading new data.</g:Label>
+			<g:TextArea styleName="{style.messagearea}" ui:field='serverMessageArea'/>
 		</g:VerticalPanel>
-	</g:DecoratorPanel>
+	</g:ScrollPanel>
 </ui:UiBinder> 

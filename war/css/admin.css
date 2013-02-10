@@ -1,0 +1,18 @@
+body {
+	background-color: hsl(210, 50%, 20%) !important;
+	color: hsl(210, 50%, 20%) !important;
+}
+
+a {
+	color: hsl(210, 50%, 35%) !important;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+a:HOVER {
+	color: hsl(210, 50%, 42%) !important;
+}
+
+a:ACTIVE {
+	color: hsl(210, 50%, 49%) !important;
+}

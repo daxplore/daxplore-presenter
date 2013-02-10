@@ -34,6 +34,7 @@ import org.daxplore.presenter.server.storage.PrefixStore;
 import org.daxplore.presenter.server.throwable.BadReqException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 @SuppressWarnings("serial")
 public class AdminPrefixServlet extends HttpServlet {
@@ -45,26 +46,33 @@ public class AdminPrefixServlet extends HttpServlet {
 		try {
 			String action = request.getParameter("action"); //TODO clean input
 			
+			String responseText = ""; 
 			switch(action) {
 			case "list":
-				// List is printed for all actions after the switch statement
+				responseText = getPrefixListJson(pm);
 				break;
 			case "add":
 				String prefix = request.getParameter("prefix"); //TODO clean input
 				pm.makePersistent(new PrefixStore(prefix));
 				logger.log(Level.INFO, "Added prefix to system: " + prefix);
+				responseText = getPrefixListJson(pm);
 				break;
 			case "delete":
 				prefix = request.getParameter("prefix"); //TODO clean input
 				/*String result =*/ DeleteData.deleteForPrefix(pm, prefix); // Logs it's own action
 				//TODO send result over server channel?
+				responseText = getPrefixListJson(pm);
+				break;
+			case "metadata":
+				prefix = request.getParameter("prefix"); //TODO clean input
+				responseText = getPrefixMetadata(pm, prefix);
 				break;
 			default:
 				throw new BadReqException("Invalid action '" + action + "' requested");
 			}
 			
 			try {
-				response.getWriter().write(getPrefixJson(pm));
+				response.getWriter().write(responseText);
 			} catch (IOException e) {
 				throw new InternalServerException("Failed to write prefix list", e);
 			}
@@ -81,12 +89,23 @@ public class AdminPrefixServlet extends HttpServlet {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private String getPrefixJson(PersistenceManager pm) {
+	private String getPrefixListJson(PersistenceManager pm) {
 		List<String> prefixes = PrefixStore.getPrefixes(pm);
 		JSONArray jsonArray = new JSONArray();
 		jsonArray.addAll(prefixes);
 		jsonArray.toJSONString();
 		return jsonArray.toJSONString();
+	}
+	
+	@SuppressWarnings("unchecked")
+	private String getPrefixMetadata(PersistenceManager pm, String prefix) {
+		JSONObject metaMap = new JSONObject();
+		metaMap.put("prefix", prefix);
+		
+		//TODO count items or some such
+		// or figure out some relevant statistics that's equally interesting
+		metaMap.put("statcount", "???");
+		return metaMap.toJSONString();
 	}
 	
 }

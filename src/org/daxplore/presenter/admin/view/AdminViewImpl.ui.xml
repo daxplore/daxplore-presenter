@@ -3,9 +3,67 @@
 	xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:d="urn:import:org.daxplore.presenter.admin.view">
-	
-	<g:HorizontalPanel>
-		<g:SimplePanel ui:field='sidebarContentSlot'/>
-		<g:SimplePanel ui:field='mainContentSlot' />
-	</g:HorizontalPanel> 
+
+	<ui:style>
+		.layout {
+			width: 90%;
+			height: 90%;
+			border: 2px solid black;
+			margin: 10px auto;
+			margin-top: 20px;
+			padding: 10px;
+			
+			border-radius: 10px;
+			border-width: 10px;
+			border-color: white;
+			background-color: white;
+		}
+		
+		.header {
+			font-family: sans-serif;
+			font-size: xx-large;
+			font-weight: bold;
+			text-align: center;
+			padding: 10px;
+			border-bottom: solid 1px darkgray;
+			margin-bottom: 10px;
+		}
+		
+		.footer {
+			border-top: solid 1px darkgray;
+			margin-top: 15px;
+			padding-top: 10px;
+			padding: 5px;
+		}
+		
+		.sidebar {
+			border-right: solid 1px darkgray;
+			margin-left: 15px;
+			margin-top: 5px;
+			padding-top: 10px;
+		}
+		
+		.main {
+			margin: 10px;
+			margin-top: 5px;
+			margin-left: 20px;
+			padding-top: 10px;
+		}
+	</ui:style>
+    
+	<g:DockLayoutPanel styleName="{style.layout}" unit='PX'>
+		<g:north size='70'>
+			<g:Label styleName="{style.header}">Administration panel for Daxplore Presenter</g:Label>
+		</g:north>
+		<g:south size='40'>
+			<g:Label styleName="{style.footer}">Daxplore Presenter is free software. Developed by Axel Winkler and Daniel Dunér at Stockholm University.</g:Label>
+		</g:south>
+		<g:west size='175'>
+			<g:SimplePanel styleName="{style.sidebar}" ui:field='sidebarContentSlot'/>
+		</g:west>
+		<g:center>
+			<g:SimplePanel styleName="{style.main}" ui:field='mainContentSlot' />
+		</g:center>
+		
+	</g:DockLayoutPanel> 
 </ui:UiBinder> 

@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 
 import org.daxplore.presenter.admin.event.PrefixListUpdateEvent;
+import org.daxplore.presenter.admin.event.PrefixMetadata;
+import org.daxplore.presenter.admin.event.PrefixMetadataEvent;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -39,14 +41,14 @@ import com.google.web.bindery.event.shared.EventBus;
  * The PrefixList model is responsible for editing the prefix list on the server
  * and fetching existing prefixes.
  */
-public class PrefixListModelImpl implements PrefixListModel {
+public class PrefixDataModelImpl implements PrefixDataModel {
 
 	private final EventBus eventBus;
 	private String href;
 	
 	
 	@Inject
-	protected PrefixListModelImpl(EventBus eventBus) {
+	protected PrefixDataModelImpl(EventBus eventBus) {
 		this.eventBus = eventBus;
 		href = Window.Location.getHref();
 		href = href.substring(0, href.lastIndexOf('/'));
@@ -58,7 +60,7 @@ public class PrefixListModelImpl implements PrefixListModel {
 	 */
 	@Override
 	public void updatePrefixList() {
-		sendRequest("list");
+		sendRequest("list", new ListResponseReciever());
 	}
 
 	/**
@@ -66,7 +68,7 @@ public class PrefixListModelImpl implements PrefixListModel {
 	 */
 	@Override
 	public void addPrefix(String prefix) {
-		sendRequest("add&prefix="+prefix);
+		sendRequest("add&prefix="+prefix, new ListResponseReciever());
 	}
 
 	/**
@@ -74,20 +76,28 @@ public class PrefixListModelImpl implements PrefixListModel {
 	 */
 	@Override
 	public void deletePrefix(String prefix) {
-		sendRequest("delete&prefix="+prefix);
+		sendRequest("delete&prefix="+prefix, new ListResponseReciever());
 	}
 	
-	private void sendRequest(String arguments) {
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void updatePrefixMetadata(String prefix) {
+		sendRequest("metadata&prefix="+prefix, new MetadataResponseReciever());
+	}
+	
+	private void sendRequest(String arguments, RequestCallback requestCallback) {
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, URL.encode(href + arguments));
-		builder.setTimeoutMillis(1000); // TODO use reattempts with increasing times?
+		builder.setTimeoutMillis(10000); // TODO use reattempts with increasing times?
 		try {
-			builder.sendRequest(null, new ResponseReciever());
+			builder.sendRequest(null, requestCallback);
 		} catch (RequestException e) {
 			e.printStackTrace(); //TODO handle exception
 		}
 	}
 	
-	private class ResponseReciever implements RequestCallback {
+	private class ListResponseReciever implements RequestCallback {
 		/**
 		 * {@inheritDoc}
 		 */
@@ -102,6 +112,25 @@ public class PrefixListModelImpl implements PrefixListModel {
 			eventBus.fireEvent(new PrefixListUpdateEvent(Collections.unmodifiableList(prefixes)));
 		}
 	
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void onError(Request request, Throwable exception) {
+			// TODO Reattempt? Depends on why it failed and number of attempts.
+		}
+	}
+	
+	private class MetadataResponseReciever implements RequestCallback {
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void onResponseReceived(Request request, Response response) {
+			PrefixMetadata prefixMetadata = new PrefixMetadata(response.getText());
+			eventBus.fireEvent(new PrefixMetadataEvent(prefixMetadata));
+		}
+
 		/**
 		 * {@inheritDoc}
 		 */
