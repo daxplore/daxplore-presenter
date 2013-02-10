@@ -5,19 +5,28 @@
 	<!-- Default page to serve -->
 	
 	<welcome-file-list>
-		<welcome-file>presentation</welcome-file>
+		<welcome-file>presentation-browser</welcome-file>
 	</welcome-file-list>
 
 
 	<!-- Public display servlet -->
 
 	<servlet>
+		<servlet-name>presentation-browser</servlet-name>
+		<servlet-class>org.daxplore.presenter.server.servlets.PresenterBrowserServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>presentation-browser</servlet-name>
+		<url-pattern>/presentations</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
 		<servlet-name>presentation</servlet-name>
 		<servlet-class>org.daxplore.presenter.server.servlets.PresenterServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>presentation</servlet-name>
-		<url-pattern>/presentation</url-pattern>
+		<url-pattern>/p/*</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>

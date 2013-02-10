@@ -52,7 +52,15 @@ public class PresenterServlet extends HttpServlet {
 		PersistenceManager pm = null;
 		try {
 			// Get input from URL
-			String prefix = request.getParameter("prefix");
+			String prefix = request.getPathInfo();
+			if (prefix!=null && !prefix.isEmpty()) {
+				if(prefix.charAt(0)=='/') {
+					prefix = prefix.substring(1);
+				}
+				if(!prefix.isEmpty() && prefix.charAt(prefix.length()-1)=='/'){
+					prefix = prefix.substring(0, prefix.length()-2);
+				}
+			}
 			String useragent = request.getHeader("user-agent");
 			Cookie[] cookies = request.getCookies();
 			
