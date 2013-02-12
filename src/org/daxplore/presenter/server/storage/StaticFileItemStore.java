@@ -56,23 +56,26 @@ public class StaticFileItemStore {
 	private String key;
 	@Persistent
 	private String blobKey;
+	@Persistent
+	private String prefix;
 
 	/**
 	 * Instantiate a new static file item, which acts as a pointer to a file
 	 * stored in the BlobStore.
 	 * 
-	 * <p>The key should be on the format "prefix/name". The prefix defines
+	 * <p>The key should be on the format "prefix#name". The prefix defines
 	 * which presenter the setting belongs to and the name is the name
 	 * of the file.</p>
 	 * 
 	 * @param key
-	 *            a key on the format "prefix/name"
+	 *            a key on the format "prefix#name"
 	 * @param blobKey
 	 *            the {@link BlobKey} of the tracked file
 	 */
 	public StaticFileItemStore(String key, BlobKey blobKey) {
 		this.key = key;
 		this.blobKey = blobKey.getKeyString();
+		this.prefix = key.substring(0, key.indexOf('#'));
 	}
 
 	/**
@@ -148,7 +151,7 @@ public class StaticFileItemStore {
 	
 	public static String readStaticFile(PersistenceManager pm, String prefix,
 			String name, Locale locale, String suffix) throws BadReqException {
-		String statStoreKey = prefix + "/" + name + "_" + locale.getLanguage() + "suffix";
+		String statStoreKey = prefix + "#" + name + "_" + locale.getLanguage() + "suffix";
 		StaticFileItemStore item;
 		try {
 			item = pm.getObjectById(StaticFileItemStore.class, statStoreKey);

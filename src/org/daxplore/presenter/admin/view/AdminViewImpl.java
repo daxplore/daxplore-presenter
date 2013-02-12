@@ -25,7 +25,6 @@ import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
 
 /**
  * The base widget for the admin page.
@@ -38,25 +37,12 @@ public class AdminViewImpl extends Composite implements AdminView {
 	interface AdminViewPanel extends UiBinder<Widget, AdminViewImpl> {}
 	private static AdminViewPanel uiBinder = GWT.create(AdminViewPanel.class);
 	
-	private EventBus eventBus;
-	
 	@UiField protected SimplePanel mainContentSlot;
 	@UiField protected SimplePanel sidebarContentSlot;
 		  
 	@Inject
-	public AdminViewImpl(EventBus eventBus) {
-		this.eventBus = eventBus;
-	    
+	public AdminViewImpl() {
 		initWidget(uiBinder.createAndBindUi(this));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void addServerMessage(String message) {
-//		String text = serverMessageArea.getText() + "\n" + message;
-//		serverMessageArea.setText(text);
 	}
 
 	/**

@@ -18,12 +18,15 @@
  */
 package org.daxplore.presenter.admin.view;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface PrefixDisplayView {
 	void setPrefix(String prefix);
 	void setPrefixHref(String href);
 	void setStatDataItemCount(String something);
-
+	void addServerMessage(String message);
+	void addDeletePrefixClickHandler(ClickHandler handler);
+	boolean promptDeleteConfirmation(String prefix);
 	Widget asWidget();
 }

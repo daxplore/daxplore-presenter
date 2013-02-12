@@ -50,7 +50,7 @@ public class PrefixListPresenter implements Presenter {
 	}
 	
 	private void bind() {
-		display.addAddPrefixButtonClickHandler(new ClickHandler() {
+		display.addAddPrefixClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				doAddPrefixName();

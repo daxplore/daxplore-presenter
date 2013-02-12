@@ -30,7 +30,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
  */
 public interface PrefixListView {
 	
-	void addAddPrefixButtonClickHandler(ClickHandler handler);
+	void addAddPrefixClickHandler(ClickHandler handler);
 
 	String promptForPrefixName();
 

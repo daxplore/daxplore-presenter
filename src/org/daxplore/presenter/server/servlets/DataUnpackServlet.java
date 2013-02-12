@@ -200,7 +200,7 @@ public class DataUnpackServlet extends HttpServlet {
 		pm.close();
 		UnpackQueue unpackQueue = new UnpackQueue(prefix, messageSender.getChannelToken());
 		for (String fileName : fileMap.keySet()) {
-			BlobKey blobKey = StaticFileItemStore.writeBlob(prefix + "/" + fileName, fileMap.get(fileName));
+			BlobKey blobKey = StaticFileItemStore.writeBlob(prefix + "#" + fileName, fileMap.get(fileName));
 			enqueueForUnpacking(unpackQueue, fileName, blobKey);
 		}
 	}
@@ -218,7 +218,7 @@ public class DataUnpackServlet extends HttpServlet {
 				// Assumes that the data is in a "key = value\n" format
 				int splitPoint = line.indexOf('=');
 				String key = line.substring(0, splitPoint).trim();
-				key = prefix + "/" + fileName.substring(0, fileName.lastIndexOf('.')) + "/" + key;
+				key = prefix + "#" + fileName.substring(0, fileName.lastIndexOf('.')) + "/" + key;
 				String value = line.substring(splitPoint+1).trim();
 				
 				pm.makePersistent(new SettingItemStore(key, value));
@@ -235,7 +235,7 @@ public class DataUnpackServlet extends HttpServlet {
 	protected void unpackStaticFile(String prefix, String fileName, BlobKey blobKey, ClientMessageSender messageSender)
 			throws BadRequestException, InternalServerException {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		String datstoreKey = prefix + "/" + fileName;
+		String datstoreKey = prefix + "#" + fileName;
 		pm.makePersistent(new StaticFileItemStore(datstoreKey, blobKey));
 		pm.close();
 		messageSender.send(MessageType.PROGRESS_UPDATE, "Stored the static file " + fileName);
@@ -253,7 +253,7 @@ public class DataUnpackServlet extends HttpServlet {
 			while ((line=reader.readLine())!=null) {
 				// Assumes that the data is in a "key,json\n" format
 				int splitPoint = line.indexOf(',');
-				String key = prefix + "/" + line.substring(0, splitPoint);
+				String key = prefix + "#" + line.substring(0, splitPoint);
 				String json = line.substring(splitPoint+1);
 				json = json.substring(1, json.length() - 1);
 				json = json.replaceAll("\"\"", "\"");

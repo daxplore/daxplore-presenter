@@ -37,8 +37,5 @@ public interface AdminView {
 	 */
 	public HasWidgets getMainContentSlot();
 	
-	public void addServerMessage(String message);
 	public Widget asWidget();
-
-	
 }

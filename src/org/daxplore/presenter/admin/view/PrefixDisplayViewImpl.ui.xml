@@ -29,7 +29,7 @@
 			margin-bottom: 5px;
 		}
 		.bubble {
-			padding: 5px;
+			padding: 8px;
 			border: solid 5px hsl(210, 5%, 90%);
 			background-color: hsl(210, 5%, 90%);
 			border-radius: 5px;
@@ -37,7 +37,7 @@
 			margin-top: 10px;
 			width: 70%;
 		}
-		.upload-button {
+		.bubble-button {
 			float: right;
 		}
 		.maxwidth {
@@ -78,10 +78,17 @@
 					<g:Label styleName="{style.header-subtext}">Upload a file created with Daxplore Producer. This will completely replace all the current content on this prefix.</g:Label>
 					<g:FlowPanel styleName="{style.bubble}">
 						<g:FileUpload ui:field='uploadWidget' name='dataUpload'/>
-						<g:Button ui:field='uploadButton' styleName="{style.upload-button}">Submit</g:Button>
+						<g:Button ui:field='uploadButton' styleName="{style.bubble-button}">Submit</g:Button>
 					</g:FlowPanel>
 				</g:VerticalPanel>		
 			</g:FormPanel>
+			
+			<g:Label styleName="{style.header}">Delete prefix</g:Label>
+			<g:Label styleName="{style.header-subtext}">Delete the prefix and all data, texts and information that belongs to it.</g:Label>
+			<g:FlowPanel styleName="{style.bubble}">
+				<g:Label ui:field='deletePrefixLabel' styleName='{style.inlinelabel-header}'>Delete prefix ?:</g:Label>
+				<g:Button ui:field='deleteButton' styleName="{style.bubble-button}">Delete ?</g:Button>
+			</g:FlowPanel>
 			
 			<g:Label styleName="{style.header}">Server updates</g:Label>
 			<g:Label styleName="{style.header-subtext}">Status updates sent from the server when uploading new data.</g:Label>

@@ -20,6 +20,7 @@ package org.daxplore.presenter.admin.view;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -48,6 +49,8 @@ public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayVie
 	@UiField protected FileUpload uploadWidget;
 	@UiField protected Button uploadButton;
 	@UiField protected TextArea serverMessageArea;
+	@UiField protected Label deletePrefixLabel;
+	@UiField protected Button deleteButton;
 	
 	public PrefixDisplayViewImpl() {
 		initWidget(uiBinder.createAndBindUi(this));
@@ -81,6 +84,8 @@ public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayVie
 	@Override
 	public void setPrefix(String prefix) {
 		prefixHeader.setText(prefix);
+		deletePrefixLabel.setText("Delete prefix " + prefix + ":");
+		deleteButton.setText("Delete " + prefix);
 	}
 
 	/**
@@ -99,5 +104,31 @@ public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayVie
 	@Override
 	public void setStatDataItemCount(String something) {
 		this.something.setText(something);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void addServerMessage(String message) {
+		String text = serverMessageArea.getText() + "\n" + message;
+		serverMessageArea.setText(text);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void addDeletePrefixClickHandler(ClickHandler handler) {
+		deleteButton.addClickHandler(handler);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean promptDeleteConfirmation(String prefix) {
+		return Window.confirm("Are you sure you want to delete the prefix '"
+				+ prefix + "'.\n\nThis will also remove all data and information that belongs to it.");
 	}
 }

@@ -69,7 +69,7 @@ public class PrefixListViewImpl extends Composite implements PrefixListView {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void addAddPrefixButtonClickHandler(ClickHandler handler) {
+	public void addAddPrefixClickHandler(ClickHandler handler) {
 		addPrefixButton.addClickHandler(handler);
 	}
 

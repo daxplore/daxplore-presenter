@@ -21,9 +21,13 @@ package org.daxplore.presenter.admin.presenter;
 import org.daxplore.presenter.admin.event.PrefixMetadata;
 import org.daxplore.presenter.admin.event.PrefixMetadataEvent;
 import org.daxplore.presenter.admin.event.PrefixMetadataHandler;
+import org.daxplore.presenter.admin.event.ServerChannelEvent;
+import org.daxplore.presenter.admin.event.ServerChannelHandler;
 import org.daxplore.presenter.admin.model.PrefixDataModel;
 import org.daxplore.presenter.admin.view.PrefixDisplayView;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.web.bindery.event.shared.EventBus;
@@ -31,15 +35,17 @@ import com.google.web.bindery.event.shared.EventBus;
 public class PrefixDisplayPresenter implements Presenter {
 
 	private final EventBus eventBus;
-	private final String prefix;
 	private final PrefixDisplayView prefixDisplayView;
+	private final PrefixDataModel prefixDataModel;
+	private final String prefix;
 	
 	private static String href;
 	
 	public PrefixDisplayPresenter(EventBus eventBus, PrefixDisplayView prefixDisplayView,
-			PrefixDataModel prefixModel, String prefix) {
+			PrefixDataModel prefixDataModel, String prefix) {
 		this.eventBus = eventBus;
 		this.prefixDisplayView = prefixDisplayView;
+		this.prefixDataModel = prefixDataModel;
 		this.prefix = prefix;
 		prefixDisplayView.setPrefix(prefix);
 		if (href == null) {
@@ -49,10 +55,19 @@ public class PrefixDisplayPresenter implements Presenter {
 		}
 		prefixDisplayView.setPrefixHref(href + prefix);
 		bind();
-		prefixModel.updatePrefixMetadata(prefix);
+		prefixDataModel.updatePrefixMetadata(prefix);
 	}
 	
 	private void bind() {
+		prefixDisplayView.addDeletePrefixClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if(prefixDisplayView.promptDeleteConfirmation(prefix)) {
+					prefixDataModel.deletePrefix(prefix);
+				}
+			}
+		});
+		
 		PrefixMetadataEvent.register(eventBus, new PrefixMetadataHandler() {
 			@Override
 			public void onPrefixMetadataUpdate(PrefixMetadataEvent event) {
@@ -60,6 +75,15 @@ public class PrefixDisplayPresenter implements Presenter {
 				if(metadata.getPrefix().equals(prefix)) {
 					prefixDisplayView.setStatDataItemCount(metadata.getStatDataItemCount());
 				}
+			}
+		});
+		ServerChannelEvent.register(eventBus, new ServerChannelHandler() {
+			@Override
+			public void onServerStatus(ServerChannelEvent event) {
+				//TODO give better feedback than plain text messages
+				prefixDisplayView.addServerMessage(
+						event.getServerStatus().toString().toLowerCase()
+						+ ": " + event.getServerStatusMessage());
 			}
 		});
 	}

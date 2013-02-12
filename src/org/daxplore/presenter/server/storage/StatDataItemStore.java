@@ -45,23 +45,26 @@ public class StatDataItemStore {
 	private String key;
 	@Persistent
 	private String json;
+	@Persistent
+	private String prefix;
 
 	/**
 	 * Instantiate a new stat data item, which is a piece of anonymized
 	 * statistical data that can be presented to users.
 	 * 
-	 * <p>The key should be on the format "prefix/name". The prefix defines
+	 * <p>The key should be on the format "prefix#name". The prefix defines
 	 * which presenter the setting belongs to and the name is the name
 	 * of the data item.</p>
 	 * 
 	 * @param key
-	 *            a key on the format "prefix/name"
+	 *            a key on the format "prefix#name"
 	 * @param json
 	 *            the data item as json
 	 */
 	public StatDataItemStore(String key, String json) {
 		this.key = key;
 		this.json = json;
+		this.prefix = key.substring(0, key.indexOf('#'));
 	}
 
 	/**
@@ -92,13 +95,13 @@ public class StatDataItemStore {
 		if (questionID.equals("")) {
 			throw new BadReqException("Empty questionID used in request");
 		} else if (perspectiveID.equals("") || usedPerspectiveOptions.size() == 0) {
-			datastoreKeys.add(prefix + "/Q=" + questionID);
+			datastoreKeys.add(prefix + "#Q=" + questionID);
 		} else {
 			if (useTotal) {
-				datastoreKeys.add(prefix + "/Q=" + questionID);
+				datastoreKeys.add(prefix + "#Q=" + questionID);
 			}
 			for (int alt: usedPerspectiveOptions) {
-				datastoreKeys.add(prefix + "/" + perspectiveID + "=" + (alt+1) + "+Q=" + questionID);
+				datastoreKeys.add(prefix + "#" + perspectiveID + "=" + (alt+1) + "+Q=" + questionID);
 			}
 		}
 

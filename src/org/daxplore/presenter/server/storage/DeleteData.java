@@ -36,49 +36,45 @@ public class DeleteData {
 		// and to make sure that no settings or data remains if the prefix is reused/overwritten later.
 		Query query = pm.newQuery(PrefixStore.class);
 		query.declareParameters("String specificPrefix");
-		query.setFilter("prefix.equals(specificPrefix)");
+		query.setFilter("prefix == specificPrefix");
+		pm.deletePersistentAll();
 		long deletedPrefixItems = query.deletePersistentAll(prefix); // should always be 1
 		resultMessage.append(deletedPrefixItems).append(" prefix item, ");
 		
 		// Delete the single locale entry for the prefix
 		query = pm.newQuery(LocaleStore.class);
 		query.declareParameters("String specificPrefix");
-		query.setFilter("prefix.equals(specificPrefix)");
+		query.setFilter("prefix == specificPrefix");
 		long deletedLocaleItems = query.deletePersistentAll(prefix); // should always be 1
 		resultMessage.append(deletedLocaleItems).append(" locale item, ");
 		
-		// Delete all statistical data items related to the prefix
-		query = pm.newQuery(StatDataItemStore.class);
-		query.declareParameters("String prefix");
-		query.setFilter("key.startsWith(prefix)");
-		long deletedStatDataItems = query.deletePersistentAll(prefix + "/");
-		resultMessage.append(deletedStatDataItems).append(" statistical data items, ");
-		
 		// Delete all setting items related to the prefix
 		query = pm.newQuery(SettingItemStore.class);
-		query.declareParameters("String prefix");
-		query.setFilter("key.startsWith(prefix)");
-		long deletedSettingItems = query.deletePersistentAll(prefix + "/");
+		query.declareParameters("String specificPrefix");
+		query.setFilter("prefix == specificPrefix");
+		long deletedSettingItems = query.deletePersistentAll(prefix);
 		resultMessage.append(deletedSettingItems).append(" settings, ");
-
+				
+		// Delete all statistical data items related to the prefix
+		query = pm.newQuery(StatDataItemStore.class);
+		query.declareParameters("String specificPrefix");
+		query.setFilter("prefix == specificPrefix");
+		long deletedStatDataItems = query.deletePersistentAll(prefix);
+		resultMessage.append(deletedStatDataItems).append(" statistical data items, ");
+		
 		// Delete all the blobstore-stored files
 		query = pm.newQuery(StaticFileItemStore.class);
-		query.declareParameters("String prefix");
-		query.setFilter("key.startsWith(prefix)");
+		query.declareParameters("String specificPrefix");
+		query.setFilter("prefix == specificPrefix");
 		@SuppressWarnings("unchecked")
-		List<StaticFileItemStore> fileItems = (List<StaticFileItemStore>)query.execute(prefix + "/");
-		int deletedBlobs = 0;
+		List<StaticFileItemStore> fileItems = (List<StaticFileItemStore>)query.execute(prefix);
 		for (StaticFileItemStore item : fileItems) {
 			StaticFileItemStore.deleteBlob(item.getBlobKey());
-			deletedBlobs++;
 		}
+		pm.deletePersistentAll(fileItems);
+		int deletedBlobs = fileItems.size();
+		int deletedStaticFileItems = fileItems.size();
 		resultMessage.append(deletedBlobs).append(" file blobs deleted, ");
-		
-		// Delete all the datastore entries that were tracking the blobstore files
-		query = pm.newQuery(StaticFileItemStore.class);
-		query.declareParameters("String prefix");
-		query.setFilter("key.startsWith(prefix)");
-		long deletedStaticFileItems = query.deletePersistentAll(prefix + "/");
 		resultMessage.append(deletedStaticFileItems).append(" static file pointers ");
 		
 		long totalDeleted = deletedPrefixItems + deletedLocaleItems + deletedStatDataItems + deletedSettingItems + deletedStaticFileItems;

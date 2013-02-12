@@ -38,10 +38,9 @@ import org.daxplore.presenter.server.throwable.BadReqException;
  */
 @PersistenceCapable
 public class SettingItemStore {
-	@PrimaryKey
-	private String key;
-	@Persistent
-	private String value;
+	@Persistent private String prefix;
+	@PrimaryKey private String key;
+	@Persistent private String value;
 
 	/**
 	 * Creates a new settings item to hold a setting uploaded by an administrator
@@ -51,14 +50,17 @@ public class SettingItemStore {
 	 * which presenter the setting belongs to, the name is the name of the
 	 * setting and locale is a Locale.toLanguageTag.</p>
 	 * 
+	 * @param prefix
+	 *            the prefix that this item belongs to
 	 * @param key
-	 *            a key on the format "prefix/filename[_locale]/propertyname"
+	 *            a key on the format "prefix#filename[_locale]/propertyname"
 	 * @param value
 	 *            the value of the setting
 	 */
 	public SettingItemStore(String key, String value) {
 		this.key = key;
 		this.value = value;
+		this.prefix = key.substring(0, key.indexOf('#'));
 	}
 
 	/**
@@ -79,8 +81,9 @@ public class SettingItemStore {
 		return value;
 	}
 	
-	public static String getProperty(PersistenceManager pm, String prefix, String fileName, String propertyName) throws BadReqException {
-		String statStoreKey = prefix + "/" + fileName + "/" + propertyName;
+	public static String getProperty(PersistenceManager pm, String prefix,
+			String fileName, String propertyName) throws BadReqException {
+		String statStoreKey = prefix + "#" + fileName + "/" + propertyName;
 		try {
 			return pm.getObjectById(SettingItemStore.class, statStoreKey).getValue();
 		} catch (Exception e) {
@@ -90,7 +93,7 @@ public class SettingItemStore {
 	
 	public static String getLocalizedProperty(PersistenceManager pm, String prefix,
 			String fileName, Locale locale, String propertyName) throws BadReqException {
-		String statStoreKey = prefix + "/" + fileName + "_" + locale.toLanguageTag() + "/" + propertyName;
+		String statStoreKey = prefix + "#" + fileName + "_" + locale.toLanguageTag() + "/" + propertyName;
 		try {
 			return pm.getObjectById(SettingItemStore.class, statStoreKey).getValue();
 		} catch (Exception e) {
