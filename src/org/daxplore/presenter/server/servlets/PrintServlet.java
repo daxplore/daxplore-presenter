@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.daxplore.presenter.server.ServerTools;
 import org.daxplore.presenter.server.storage.LocaleStore;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.SettingItemStore;
@@ -59,19 +58,7 @@ public class PrintServlet extends HttpServlet {
 			
 			// Clean user input
 			if(prefix==null || !SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
-				logger.log(Level.WARNING, "Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
-				try {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				} catch (IOException e1) {}
-				return;
-			}
-			
-			if(queryString==null || !ServerTools.isSyntacticallyValidQueryString(queryString)) {
-				logger.log(Level.WARNING, "Someone tried to use a syntactically invalid query string: '" + queryString+ "'");
-				try {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				} catch (IOException e1) {}
-				return;
+				throw new BadReqException("Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
 			}
 			
 			pm = PMF.get().getPersistenceManager();

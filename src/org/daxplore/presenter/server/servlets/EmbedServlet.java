@@ -41,7 +41,6 @@ import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QuestionMetadata;
 import org.daxplore.presenter.shared.SharedTools;
-import org.daxplore.shared.SharedResourceTools;
 
 @SuppressWarnings("serial")
 public class EmbedServlet extends HttpServlet {
@@ -59,20 +58,8 @@ public class EmbedServlet extends HttpServlet {
 			String queryString = request.getParameter("q");
 			
 			// Clean user input
-			if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
-				logger.log(Level.WARNING, "Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
-				try {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				} catch (IOException e1) {}
-				return;
-			}
-			
 			if(queryString==null || !ServerTools.isSyntacticallyValidQueryString(queryString)) {
-				logger.log(Level.WARNING, "Someone tried to use a syntactically invalid query string: '" + queryString+ "'");
-				try {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				} catch (IOException e1) {}
-				return;
+				throw new BadReqException("Someone tried to use a syntactically invalid query string: '" + queryString+ "'");
 			}
 					
 			Locale locale = ServerTools.selectLocale(request, prefix);

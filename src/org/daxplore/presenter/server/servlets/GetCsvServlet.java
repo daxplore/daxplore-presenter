@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.daxplore.presenter.server.ServerTools;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.QuestionMetadataServerImpl;
 import org.daxplore.presenter.server.storage.StatDataItemStore;
@@ -85,26 +84,12 @@ public class GetCsvServlet extends HttpServlet {
 			
 			// Clean user input
 			if(prefix==null || !SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
-				logger.log(Level.WARNING, "Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
-				try {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				} catch (IOException e1) {}
-				return;
-			}
-			
-			if(queryString==null || !ServerTools.isSyntacticallyValidQueryString(queryString)) {
-				logger.log(Level.WARNING, "Someone tried to use a syntactically invalid query string: '" + queryString+ "'");
-				try {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				} catch (IOException e1) {}
-				return;
+				throw new BadReqException("Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
 			}
 			
 			if (localeString==null) {
 				localeString = "";
 			}
-			
-			
 			
 			try {
 				PrintWriter respWriter = new PrintWriter(new OutputStreamWriter(response.getOutputStream(), "UTF8"), true);
@@ -114,9 +99,7 @@ public class GetCsvServlet extends HttpServlet {
 				throw new InternalServerException("Failed to write csv response", e);
 			}
 			
-	
 			pm = PMF.get().getPersistenceManager();
-			
 			
 			Locale locale = new Locale(localeString);
 			QuestionMetadata questionMetadata;

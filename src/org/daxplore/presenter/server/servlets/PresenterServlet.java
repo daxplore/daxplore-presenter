@@ -66,11 +66,7 @@ public class PresenterServlet extends HttpServlet {
 			
 			// Clean user input
 			if(prefix==null || !SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
-				logger.log(Level.WARNING, "Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
-				try {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				} catch (IOException e1) {}
-				return;
+				throw new BadReqException("Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
 			}
 			
 			boolean browserSupported = true;
