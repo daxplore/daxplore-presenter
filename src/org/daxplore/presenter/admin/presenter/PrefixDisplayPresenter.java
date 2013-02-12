@@ -53,7 +53,7 @@ public class PrefixDisplayPresenter implements Presenter {
 			href = href.substring(0, href.lastIndexOf('/'));
 			href = href + "/";
 		}
-		prefixDisplayView.setPrefixHref(href + prefix);
+		prefixDisplayView.setPrefixHref(href + "/p/" + prefix);
 		bind();
 		prefixDataModel.updatePrefixMetadata(prefix);
 	}
@@ -77,6 +77,7 @@ public class PrefixDisplayPresenter implements Presenter {
 				}
 			}
 		});
+		
 		ServerChannelEvent.register(eventBus, new ServerChannelHandler() {
 			@Override
 			public void onServerStatus(ServerChannelEvent event) {
