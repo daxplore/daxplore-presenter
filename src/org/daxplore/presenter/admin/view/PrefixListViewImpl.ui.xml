@@ -7,7 +7,7 @@
 	<ui:style>
 		.wrapper {
 			margin: 0 auto;
-			padding: 0px 20px 20px 0px;
+			padding-top: 5px;
 		}
 		.header {
 			font-size: large;
@@ -17,7 +17,7 @@
 			padding: 5px;
 			border: solid 1px darkgray;
 			border-radius: 3px;
-			margin-top: 3px;
+			margin-top: 10px;
 			margin-bottom: 10px;
 		}
 		.list>div>div {
