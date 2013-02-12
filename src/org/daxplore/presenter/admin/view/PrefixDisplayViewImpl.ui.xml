@@ -32,6 +32,9 @@
 		.header-subtext {
 			margin-bottom: 5px;
 		}
+		.formpanel {
+			margin-bottom: 0; /* Override form panel default margin */
+		}
 		.bubble {
 			padding: 8px;
 			border: solid 5px hsl(210, 5%, 90%);
@@ -79,7 +82,7 @@
 				<g:Label ui:field='something' styleName="{style.inlinelabel}"></g:Label>
 			</g:FlowPanel>
 			
-			<g:FormPanel ui:field='uploadForm'>
+			<g:FormPanel ui:field='uploadForm' styleName="{style.formpanel}">
 				<g:VerticalPanel styleName="{style.maxwidth}">
 					<g:Label styleName="{style.header}">Upload a new Daxplore file</g:Label>
 					<g:Label styleName="{style.header-subtext}">Upload a file created with Daxplore Producer. This will completely replace all the current content on this prefix.</g:Label>
