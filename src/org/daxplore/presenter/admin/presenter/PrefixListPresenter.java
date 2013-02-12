@@ -92,7 +92,7 @@ public class PrefixListPresenter implements Presenter {
 	
 	public void doUpdatePrefixList(List<String> prefixList) {
 		display.setPrefixes(prefixList);
-	    if (prefixToBeSelected!=null) {
+	    if (prefixToBeSelected!=null && display.containsPrefix(prefixToBeSelected)) {
 	    	display.selectPrefix(prefixToBeSelected); // This will fire a SelectionChangeEvent
 	    	prefixToBeSelected = null;
 	    } else if (prefixList.size() > 0) {

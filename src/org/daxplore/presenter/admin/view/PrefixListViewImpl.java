@@ -23,6 +23,8 @@ import java.util.List;
 
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -113,9 +115,15 @@ public class PrefixListViewImpl extends Composite implements PrefixListView {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setPrefixes(List<String> prefixList) {
+	public void setPrefixes(final List<String> prefixList) {
 		this.prefixList = prefixList;
-		prefixCellList.setRowData(prefixList);
+		// Do it deferred due to strange bug when changing list size from 2 to 1
+		Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+			@Override
+			public void execute() {
+				prefixCellList.setRowData(prefixList);
+			}
+		});
 	}
 
 	/**

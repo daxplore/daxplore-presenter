@@ -8,6 +8,10 @@
 			width: 100%;
 			height: 100%;
 		}
+		.wrapper {
+			width: 100%;
+			padding: 15px;
+		}
 		.header-top {
 			font-size: large;
 			font-weight: bold;
@@ -40,6 +44,9 @@
 		.bubble-button {
 			float: right;
 		}
+		.delete-button {
+			margin-top: -5px;
+		}
 		.maxwidth {
 			width: 100%;
 		}
@@ -58,7 +65,7 @@
 	</ui:style>
 	
 	<g:ScrollPanel styleName="{style.scrollpanel}">
-		<g:VerticalPanel styleName="{style.maxwidth}">
+		<g:VerticalPanel addStyleNames="{style.wrapper}">
 			<g:Label styleName="{style.header-top}">Prefix:&nbsp;&nbsp;</g:Label>
 			<g:Anchor ui:field='prefixHeader' styleName="{style.header-bottom}"></g:Anchor>
 			<g:Label styleName="{style.header}">Prefix status</g:Label>
@@ -78,7 +85,7 @@
 					<g:Label styleName="{style.header-subtext}">Upload a file created with Daxplore Producer. This will completely replace all the current content on this prefix.</g:Label>
 					<g:FlowPanel styleName="{style.bubble}">
 						<g:FileUpload ui:field='uploadWidget' name='dataUpload'/>
-						<g:Button ui:field='uploadButton' styleName="{style.bubble-button}">Submit</g:Button>
+						<g:Button ui:field='uploadButton' styleName="{style.bubble-button}">Upload</g:Button>
 					</g:FlowPanel>
 				</g:VerticalPanel>		
 			</g:FormPanel>
@@ -87,7 +94,7 @@
 			<g:Label styleName="{style.header-subtext}">Delete the prefix and all data, texts and information that belongs to it.</g:Label>
 			<g:FlowPanel styleName="{style.bubble}">
 				<g:Label ui:field='deletePrefixLabel' styleName='{style.inlinelabel-header}'>Delete prefix ?:</g:Label>
-				<g:Button ui:field='deleteButton' styleName="{style.bubble-button}">Delete ?</g:Button>
+				<g:Button ui:field='deleteButton' addStyleNames="{style.bubble-button} {style.delete-button}">Delete ?</g:Button>
 			</g:FlowPanel>
 			
 			<g:Label styleName="{style.header}">Server updates</g:Label>
