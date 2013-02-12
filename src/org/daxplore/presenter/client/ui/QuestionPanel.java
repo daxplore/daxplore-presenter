@@ -34,6 +34,7 @@ import com.google.gwt.event.logical.shared.OpenEvent;
 import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Label;
@@ -230,7 +231,7 @@ public class QuestionPanel extends Composite implements QueryUpdateHandler{
 	private class GroupItem extends TreeItem {
 
 		GroupItem(String text) {
-			super(text);
+			super(new SafeHtmlBuilder().appendEscaped(text).toSafeHtml());
 		}
 
 		public boolean hasSelectedChild() {
