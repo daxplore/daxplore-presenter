@@ -72,23 +72,10 @@ public class EmbedServlet extends HttpServlet {
 			// remove module name
 			serverPath = serverPath.substring(0, serverPath.lastIndexOf("/"));
 			
-			QueryDefinition queryDefinition = new QueryDefinition(metadataMap.get(prefix), queryString);
-			LinkedList<String> statItems = StatDataItemStore.getStats(pm, prefix, queryDefinition);
-
-			LinkedList<String> questions = new LinkedList<String>();
-			questions.add(queryDefinition.getQuestionID());
-			questions.add(queryDefinition.getPerspectiveID());
-			
-			String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
-			
-			String jsondata = SharedTools.join(statItems, ",");
-			
-			String questionsString = StorageTools.getQuestionDefinitions(pm, prefix, questions, locale);
-
 			Writer writer;
 			try {
 				writer = response.getWriter();
-				writer.write(getEmbedHTML(prefix, locale, pageTitle, jsondata, questionsString));
+				writer.write(getEmbedHTML(pm, prefix, locale, queryString));
 				writer.close();
 			} catch (IOException e) {
 				throw new InternalServerException("Failed to display the embed servlet", e);
@@ -102,8 +89,21 @@ public class EmbedServlet extends HttpServlet {
 		}
 	}
 	
-	private String getEmbedHTML(String prefix, Locale locale, String pageTitle,
-			String jsondata, String questionString) throws InternalServerException {
+	private String getEmbedHTML(PersistenceManager pm, String prefix, Locale locale,
+			String queryString) throws BadReqException, InternalServerException {
+		
+		QueryDefinition queryDefinition = new QueryDefinition(metadataMap.get(prefix), queryString);
+		LinkedList<String> statItems = StatDataItemStore.getStats(pm, prefix, queryDefinition);
+
+		LinkedList<String> questions = new LinkedList<String>();
+		questions.add(queryDefinition.getQuestionID());
+		questions.add(queryDefinition.getPerspectiveID());
+		
+		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
+		
+		String jsondata = SharedTools.join(statItems, ",");
+		
+		String questionString = StorageTools.getQuestionDefinitions(pm, prefix, questions, locale);
 		
 		String[] arguments = {
 			prefix, 				// {0}

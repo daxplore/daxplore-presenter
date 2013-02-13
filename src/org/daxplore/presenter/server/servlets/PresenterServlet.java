@@ -89,18 +89,11 @@ public class PresenterServlet extends HttpServlet {
 			Locale locale = ServerTools.selectLocale(request, prefix);
 			
 			pm = PMF.get().getPersistenceManager();
-			// TODO Add caching for loaded files
-			String perspectives = "", groups = "", questions = "";
-			perspectives = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/perspectives", locale, ".json");
-			questions = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/questions", locale, ".json");
-			groups = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/groups", locale, ".json");
-			
-			String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
 		
 			response.setContentType("text/html; charset=UTF-8");
 			try {
 				Writer writer = response.getWriter();
-				writer.write(getPresenterHTML(locale, pageTitle, perspectives, questions, groups));
+				writer.write(getPresenterHTML(pm, prefix, locale));
 				writer.close();
 			} catch (IOException e) {
 				throw new InternalServerException("Failed to display presenter servlet", e);
@@ -147,8 +140,16 @@ public class PresenterServlet extends HttpServlet {
 		}
 	}
 	
-	private String getPresenterHTML(Locale locale, String pageTitle, String perspectives,
-			String questions, String groups) throws InternalServerException {
+	private String getPresenterHTML(PersistenceManager pm, String prefix, Locale locale)
+			throws InternalServerException, BadReqException {
+		
+		// TODO Add caching for loaded files
+		String perspectives = "", groups = "", questions = "";
+		perspectives = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/perspectives", locale, ".json");
+		questions = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/questions", locale, ".json");
+		groups = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/groups", locale, ".json");
+		
+		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
 		
 		String[] arguments = {
 			locale.toLanguageTag(), // {0}

@@ -95,14 +95,6 @@ public class PrintServlet extends HttpServlet {
 				}
 			}
 			
-			LinkedList<EmbedFlag> flags = new LinkedList<EmbedFlag>();
-			flags.add(EmbedFlag.LEGEND);
-			flags.add(EmbedFlag.TRANSPARENT);
-			flags.add(EmbedFlag.PRINT);
-			String embedDefinition = new EmbedDefinition(flags).getAsString();
-	
-			String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
-			
 			String serverPath = request.getRequestURL().toString();
 			// remove last slash
 			if (serverPath.charAt(serverPath.length() - 1) == '/') {
@@ -113,7 +105,7 @@ public class PrintServlet extends HttpServlet {
 			
 			try {
 				Writer writer = response.getWriter();
-				writer.write(getPrintHTML(prefix, locale, pageTitle, serverPath, queryString, embedDefinition));
+				writer.write(getPrintHTML(pm, prefix, locale, serverPath, queryString));
 				writer.close();
 			} catch (IOException e) {
 				throw new InternalServerException("Failed to display print servlet", e);
@@ -131,8 +123,16 @@ public class PrintServlet extends HttpServlet {
 		}
 	}
 	
-	private String getPrintHTML(String prefix, Locale locale, String pageTitle, String serverPath,
-			String queryString, String embedDefinition) throws InternalServerException {
+	private String getPrintHTML(PersistenceManager pm, String prefix, Locale locale,
+			String serverPath, String queryString) throws InternalServerException, BadReqException {
+		
+		LinkedList<EmbedFlag> flags = new LinkedList<EmbedFlag>();
+		flags.add(EmbedFlag.LEGEND);
+		flags.add(EmbedFlag.TRANSPARENT);
+		flags.add(EmbedFlag.PRINT);
+		String embedDefinition = new EmbedDefinition(flags).getAsString();
+
+		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
 		
 		String[] arguments = {
 			pageTitle,				// {0}
