@@ -28,25 +28,7 @@
 		<servlet-name>presentation</servlet-name>
 		<url-pattern>/p/*</url-pattern>
 	</servlet-mapping>
-	
-	<servlet>
-		<servlet-name>embed</servlet-name>
-		<servlet-class>org.daxplore.presenter.server.servlets.EmbedServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>embed</servlet-name>
-		<url-pattern>/embed</url-pattern>
-	</servlet-mapping>
-	
-	<servlet>
-		<servlet-name>print</servlet-name>
-		<servlet-class>org.daxplore.presenter.server.servlets.PrintServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>print</servlet-name>
-		<url-pattern>/print</url-pattern>
-	</servlet-mapping>
-	
+
 
 	<!-- Public support servlets -->
 
