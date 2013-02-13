@@ -19,7 +19,8 @@ package org.daxplore.presenter.server.servlets;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.MessageFormat;
-import java.util.List;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,18 +35,27 @@ import org.apache.commons.io.IOUtils;
 import org.daxplore.presenter.server.ServerTools;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.SettingItemStore;
+import org.daxplore.presenter.server.storage.StatDataItemStore;
 import org.daxplore.presenter.server.storage.StaticFileItemStore;
+import org.daxplore.presenter.server.storage.StorageTools;
 import org.daxplore.presenter.server.throwable.BadReqException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
+import org.daxplore.presenter.shared.EmbedDefinition;
+import org.daxplore.presenter.shared.QueryDefinition;
+import org.daxplore.presenter.shared.QuestionMetadata;
+import org.daxplore.presenter.shared.SharedTools;
+import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
 import org.daxplore.shared.SharedResourceTools;
 
 @SuppressWarnings("serial")
 public class PresenterServlet extends HttpServlet {
-	protected static Logger logger = Logger.getLogger(PresenterServlet.class.getName());
-	protected static String presenterHtmlTemplate = null;
-	protected static String browserSuggestionTemplate = null;
+	private static Logger logger = Logger.getLogger(PresenterServlet.class.getName());
+	private static String presenterHtmlTemplate = null;
+	private static String browserSuggestionTemplate = null;
+	private static String printHtmlTemplate = null;
+	private static String embedHtmlTemplate = null;
 	
-	protected static List<Locale> supportedLocales;
+	private HashMap<String, QuestionMetadata> metadataMap = new HashMap<String, QuestionMetadata>(); 
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -63,6 +73,7 @@ public class PresenterServlet extends HttpServlet {
 			}
 			String useragent = request.getHeader("user-agent");
 			Cookie[] cookies = request.getCookies();
+			String feature = request.getParameter("f");
 			
 			// Clean user input
 			if(prefix==null || !SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
@@ -84,11 +95,35 @@ public class PresenterServlet extends HttpServlet {
 			String responseHTML = "";
 			if (!browserSupported) {
 				responseHTML = getUnsupportedBrowserHTML();
-				return;
 			} else {
 				Locale locale = ServerTools.selectLocale(request, prefix);
 				pm = PMF.get().getPersistenceManager();
-				responseHTML = getPresenterHTML(pm, prefix, locale);
+				
+				if (feature!=null && feature.equalsIgnoreCase("embed")) { // embedded chart
+					
+					// TODO clean query string
+					String queryString = request.getParameter("q");
+					responseHTML = getEmbedHTML(pm, prefix, locale, queryString);
+					
+				} else if (feature!=null && feature.equalsIgnoreCase("print")) { // printer-friendly chart
+					
+					String serverPath = request.getRequestURL().toString();
+					// remove last slash
+					if (serverPath.charAt(serverPath.length() - 1) == '/') {
+						serverPath = serverPath.substring(0, serverPath.length() - 1);
+					}
+					// remove module name
+					serverPath = serverPath.substring(0, serverPath.lastIndexOf("/"));
+					
+					// TODO clean query string
+					String queryString = request.getParameter("q");
+					responseHTML = getPrintHTML(pm, prefix, locale, serverPath, queryString);
+					
+				} else { // standard presenter
+					
+					responseHTML = getPresenterHTML(pm, prefix, locale);
+					
+				}
 			}
 			
 			response.setContentType("text/html; charset=UTF-8");
@@ -155,5 +190,71 @@ public class PresenterServlet extends HttpServlet {
 		}
 		
 		return MessageFormat.format(presenterHtmlTemplate, (Object[])arguments);
+	}
+	
+	private String getEmbedHTML(PersistenceManager pm, String prefix, Locale locale,
+			String queryString) throws BadReqException, InternalServerException {
+		
+		QueryDefinition queryDefinition = new QueryDefinition(metadataMap.get(prefix), queryString);
+		LinkedList<String> statItems = StatDataItemStore.getStats(pm, prefix, queryDefinition);
+
+		LinkedList<String> questions = new LinkedList<String>();
+		questions.add(queryDefinition.getQuestionID());
+		questions.add(queryDefinition.getPerspectiveID());
+		
+		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
+		
+		String jsondata = SharedTools.join(statItems, ",");
+		
+		String questionString = StorageTools.getQuestionDefinitions(pm, prefix, questions, locale);
+		
+		String[] arguments = {
+			prefix, 				// {0}
+			locale.toLanguageTag(), // {1}
+			pageTitle,				// {2}
+			jsondata, 				// {3}
+			questionString			// {4}
+		};
+		
+		if (embedHtmlTemplate == null) {
+			try {
+				embedHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/embed.html"));
+			} catch (IOException e) {
+				throw new InternalServerException("Failed to load the embed html template", e);
+			}
+		}
+		
+		return MessageFormat.format(embedHtmlTemplate, (Object[])arguments);
+	}
+	
+	private String getPrintHTML(PersistenceManager pm, String prefix, Locale locale,
+			String serverPath, String queryString) throws InternalServerException, BadReqException {
+		
+		LinkedList<EmbedFlag> flags = new LinkedList<EmbedFlag>();
+		flags.add(EmbedFlag.LEGEND);
+		flags.add(EmbedFlag.TRANSPARENT);
+		flags.add(EmbedFlag.PRINT);
+		String embedDefinition = new EmbedDefinition(flags).getAsString();
+
+		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
+		
+		String[] arguments = {
+			pageTitle,				// {0}
+			serverPath,				// {1}
+			queryString,			// {2}
+			locale.toLanguageTag(),	// {3}
+			prefix,					// {4}
+			embedDefinition			// {5}
+		};
+		
+		if (printHtmlTemplate == null) {
+			try {
+				printHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/print.html"));
+			} catch (IOException e) {
+				throw new InternalServerException("Failed to load print html template", e);
+			}
+		}
+		
+		return MessageFormat.format(printHtmlTemplate, (Object[])arguments);
 	}
 }
