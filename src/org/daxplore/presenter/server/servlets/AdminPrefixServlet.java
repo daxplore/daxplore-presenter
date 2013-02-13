@@ -102,9 +102,8 @@ public class AdminPrefixServlet extends HttpServlet {
 		JSONObject metaMap = new JSONObject();
 		metaMap.put("prefix", prefix);
 		
-		//TODO count items or some such
 		// or figure out some relevant statistics that's equally interesting
-		metaMap.put("statcount", "???");
+		metaMap.put("statcount", "<TODO>"); //TODO count items or some such
 		return metaMap.toJSONString();
 	}
 	
