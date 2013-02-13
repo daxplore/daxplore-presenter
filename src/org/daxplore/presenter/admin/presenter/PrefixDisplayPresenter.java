@@ -51,7 +51,6 @@ public class PrefixDisplayPresenter implements Presenter {
 		if (href == null) {
 			href = Window.Location.getHref();
 			href = href.substring(0, href.lastIndexOf('/'));
-			href = href + "/";
 		}
 		prefixDisplayView.setPrefixHref(href + "/p/" + prefix);
 		bind();
