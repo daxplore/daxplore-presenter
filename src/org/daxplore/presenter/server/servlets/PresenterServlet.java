@@ -81,19 +81,20 @@ public class PresenterServlet extends HttpServlet {
 			}
 			browserSupported = browserSupported | ignoreBadBrowser;
 			
+			String responseHTML = "";
 			if (!browserSupported) {
-				displayUnsupportedBrowserPage(response);
+				responseHTML = getUnsupportedBrowserHTML();
 				return;
+			} else {
+				Locale locale = ServerTools.selectLocale(request, prefix);
+				pm = PMF.get().getPersistenceManager();
+				responseHTML = getPresenterHTML(pm, prefix, locale);
 			}
 			
-			Locale locale = ServerTools.selectLocale(request, prefix);
-			
-			pm = PMF.get().getPersistenceManager();
-		
 			response.setContentType("text/html; charset=UTF-8");
 			try {
 				Writer writer = response.getWriter();
-				writer.write(getPresenterHTML(pm, prefix, locale));
+				writer.write(responseHTML);
 				writer.close();
 			} catch (IOException e) {
 				throw new InternalServerException("Failed to display presenter servlet", e);
@@ -111,33 +112,19 @@ public class PresenterServlet extends HttpServlet {
 		}
 	}
 	
-	protected void displayUnsupportedBrowserPage(HttpServletResponse response) {
+	private String getUnsupportedBrowserHTML() throws InternalServerException {
 		if (browserSuggestionTemplate == null) {
 			try {
 				browserSuggestionTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/browser-suggestion.html"));
 			} catch (IOException e) {
-				logger.log(Level.SEVERE, "Failed to load the html browser suggestion template", e);
-				try {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				} catch (IOException e1) {}
-				return;
+				throw new InternalServerException("Failed to load the html browser suggestion template", e);
 			}
 		}
 		
 		String[] arguments = {
 			};
 		
-		try {
-			Writer writer = response.getWriter();
-			writer.write(MessageFormat.format(browserSuggestionTemplate, (Object[])arguments));
-			writer.close();
-		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Failed to display presenter servlet", e);
-			try {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {}
-			return;
-		}
+		return MessageFormat.format(browserSuggestionTemplate, (Object[])arguments);
 	}
 	
 	private String getPresenterHTML(PersistenceManager pm, String prefix, Locale locale)
