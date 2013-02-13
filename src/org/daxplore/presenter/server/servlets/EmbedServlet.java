@@ -85,31 +85,10 @@ public class EmbedServlet extends HttpServlet {
 			
 			String questionsString = StorageTools.getQuestionDefinitions(pm, prefix, questions, locale);
 
-		
-			if (embedHtmlTemplate == null) {
-				try {
-					embedHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/embed.html"));
-				} catch (IOException e) {
-					logger.log(Level.SEVERE, "Failed to load the html embed template", e);
-					try {
-						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-					} catch (IOException e1) {}
-					return;
-				}
-			}
-			
-			String[] arguments = {
-					prefix, 				// {0}
-					locale.toLanguageTag(), // {1}
-					pageTitle,				// {2}
-					jsondata, 				// {3}
-					questionsString			// {4}
-					};
-			
 			Writer writer;
 			try {
 				writer = response.getWriter();
-				writer.write(MessageFormat.format(embedHtmlTemplate, (Object[])arguments));
+				writer.write(getEmbedHTML(prefix, locale, pageTitle, jsondata, questionsString));
 				writer.close();
 			} catch (IOException e) {
 				throw new InternalServerException("Failed to display the embed servlet", e);
@@ -121,5 +100,27 @@ public class EmbedServlet extends HttpServlet {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
+	}
+	
+	private String getEmbedHTML(String prefix, Locale locale, String pageTitle,
+			String jsondata, String questionString) throws InternalServerException {
+		
+		String[] arguments = {
+			prefix, 				// {0}
+			locale.toLanguageTag(), // {1}
+			pageTitle,				// {2}
+			jsondata, 				// {3}
+			questionString			// {4}
+		};
+		
+		if (embedHtmlTemplate == null) {
+			try {
+				embedHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/embed.html"));
+			} catch (IOException e) {
+				throw new InternalServerException("Failed to load the embed html template", e);
+			}
+		}
+		
+		return MessageFormat.format(embedHtmlTemplate, (Object[])arguments);
 	}
 }

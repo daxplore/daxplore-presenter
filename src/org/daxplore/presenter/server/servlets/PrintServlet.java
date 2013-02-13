@@ -94,7 +94,6 @@ public class PrintServlet extends HttpServlet {
 					}
 				}
 			}
-	
 			
 			LinkedList<EmbedFlag> flags = new LinkedList<EmbedFlag>();
 			flags.add(EmbedFlag.LEGEND);
@@ -112,26 +111,9 @@ public class PrintServlet extends HttpServlet {
 			// remove module name
 			serverPath = serverPath.substring(0, serverPath.lastIndexOf("/"));
 			
-			if (printHtmlTemplate == null) {
-				try {
-					printHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/print.html"));
-				} catch (IOException e) {
-					throw new InternalServerException("Failed to load print html template", e);
-				}
-			}
-			
-			String[] arguments = {
-				pageTitle,				// {0}
-				serverPath,				// {1}
-				queryString,			// {2}
-				locale.toLanguageTag(),	// {3}
-				prefix,					// {4}
-				embedDefinition			// {5}
-			};
-	
 			try {
 				Writer writer = response.getWriter();
-				writer.write(MessageFormat.format(printHtmlTemplate, (Object[])arguments));
+				writer.write(getPrintHTML(prefix, locale, pageTitle, serverPath, queryString, embedDefinition));
 				writer.close();
 			} catch (IOException e) {
 				throw new InternalServerException("Failed to display print servlet", e);
@@ -147,5 +129,28 @@ public class PrintServlet extends HttpServlet {
 				pm.close();
 			}
 		}
+	}
+	
+	private String getPrintHTML(String prefix, Locale locale, String pageTitle, String serverPath,
+			String queryString, String embedDefinition) throws InternalServerException {
+		
+		String[] arguments = {
+			pageTitle,				// {0}
+			serverPath,				// {1}
+			queryString,			// {2}
+			locale.toLanguageTag(),	// {3}
+			prefix,					// {4}
+			embedDefinition			// {5}
+		};
+		
+		if (printHtmlTemplate == null) {
+			try {
+				printHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/print.html"));
+			} catch (IOException e) {
+				throw new InternalServerException("Failed to load print html template", e);
+			}
+		}
+		
+		return MessageFormat.format(printHtmlTemplate, (Object[])arguments);
 	}
 }

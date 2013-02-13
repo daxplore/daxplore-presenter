@@ -97,18 +97,10 @@ public class PresenterServlet extends HttpServlet {
 			
 			String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
 		
-			String[] arguments = {
-				locale.toLanguageTag(), // {0}
-				pageTitle,				// {1}
-				perspectives,			// {2}
-				questions,				// {3}
-				groups					// {4}
-			};
-			
 			response.setContentType("text/html; charset=UTF-8");
 			try {
 				Writer writer = response.getWriter();
-				writer.write(MessageFormat.format(presenterHtmlTemplate, (Object[])arguments));
+				writer.write(getPresenterHTML(locale, pageTitle, perspectives, questions, groups));
 				writer.close();
 			} catch (IOException e) {
 				throw new InternalServerException("Failed to display presenter servlet", e);
@@ -153,5 +145,27 @@ public class PresenterServlet extends HttpServlet {
 			} catch (IOException e1) {}
 			return;
 		}
+	}
+	
+	private String getPresenterHTML(Locale locale, String pageTitle, String perspectives,
+			String questions, String groups) throws InternalServerException {
+		
+		String[] arguments = {
+			locale.toLanguageTag(), // {0}
+			pageTitle,				// {1}
+			perspectives,			// {2}
+			questions,				// {3}
+			groups					// {4}
+		};
+		
+		if (presenterHtmlTemplate == null) {
+			try {
+				presenterHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/presenter.html"));
+			} catch (IOException e) {
+				throw new InternalServerException("Failed to load the embed html template", e);
+			}
+		}
+		
+		return MessageFormat.format(presenterHtmlTemplate, (Object[])arguments);
 	}
 }
