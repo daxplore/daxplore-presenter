@@ -195,7 +195,9 @@ public class BarChartCompare extends BarChart {
 				drawBetweenGroupsTick();
 			}
 			if (queryResult.hasData(perspectiveOption)) {
-				drawBarGroup(perspectiveOptionTexts.get(perspectiveOption), queryResult.getPopulation(perspectiveOption), queryResult.getCountDataPercentages(perspectiveOption), queryResult.getPopulationSecondary(perspectiveOption), queryResult.getCountDataPercentagesSecondary(perspectiveOption));
+				drawBarGroup(perspectiveOptionTexts.get(perspectiveOption),
+						queryResult.getPopulation(perspectiveOption), queryResult.getCountDataPercentages(perspectiveOption),
+						queryResult.getPopulationSecondary(perspectiveOption), queryResult.getCountDataPercentagesSecondary(perspectiveOption));
 			} else {
 				drawMissingBarGroup(perspectiveOptionTexts.get(perspectiveOption));
 			}
@@ -208,7 +210,9 @@ public class BarChartCompare extends BarChart {
 			}
 			String totalText = chartTexts.compareWithAll();
 			if (queryResult.hasTotalDataItemData()) {
-				drawBarGroup(totalText, queryResult.getTotalPopulation(), queryResult.getTotalCountDataPercentages(), queryResult.getTotalPopulationSecondary(), queryResult.getTotalCountDataPercentagesSecondary());
+				drawBarGroup(totalText,
+						queryResult.getTotalPopulation(), queryResult.getTotalCountDataPercentages(),
+						queryResult.getTotalPopulationSecondary(), queryResult.getTotalCountDataPercentagesSecondary());
 			} else {
 				drawMissingBarGroup(totalText);
 			}

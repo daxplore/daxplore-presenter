@@ -40,6 +40,10 @@ import org.json.simple.JSONObject;
 public class AdminPrefixServlet extends HttpServlet {
 	protected static Logger logger = Logger.getLogger(AdminPrefixServlet.class.getName());
 
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+		doPost(request, response);
+	}
+	
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();

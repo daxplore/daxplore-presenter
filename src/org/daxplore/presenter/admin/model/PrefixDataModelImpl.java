@@ -46,13 +46,11 @@ public class PrefixDataModelImpl implements PrefixDataModel {
 	private final EventBus eventBus;
 	private String href;
 	
-	
 	@Inject
 	protected PrefixDataModelImpl(EventBus eventBus) {
 		this.eventBus = eventBus;
-		href = Window.Location.getHref();
-		href = href.substring(0, href.lastIndexOf('/'));
-		href = href + "/admin/prefix?action=";
+		// assume that path ends with /admin/ so that we get /admin/prefix
+		href = Window.Location.getProtocol() + "//" + Window.Location.getHost() + Window.Location.getPath() + "/prefix?action=";
 	}
 	
 	/**
