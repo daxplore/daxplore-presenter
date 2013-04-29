@@ -31,6 +31,8 @@ import org.daxplore.presenter.server.throwable.BadReqException;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
+import com.google.appengine.api.datastore.Text;
+
 /**
  * A representation of a {@link StatDataItem} and it's key that can be
  * persisted (stored) using a {@link PersistenceManager}.
@@ -44,7 +46,7 @@ public class StatDataItemStore {
 	@PrimaryKey
 	private String key;
 	@Persistent
-	private String json;
+	private Text json;
 	@Persistent
 	private String prefix;
 
@@ -63,7 +65,7 @@ public class StatDataItemStore {
 	 */
 	public StatDataItemStore(String key, String json) {
 		this.key = key;
-		this.json = json;
+		this.json = new Text(json);
 		this.prefix = key.substring(0, key.indexOf('#'));
 	}
 
@@ -82,7 +84,7 @@ public class StatDataItemStore {
 	 * @return the data
 	 */
 	public String getJson() {
-		return json;
+		return json.getValue();
 	}
 	
 	public static LinkedList<String> getStats(PersistenceManager pm, String prefix, QueryDefinition queryDefinition) throws BadReqException {

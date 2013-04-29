@@ -49,7 +49,7 @@ public class PrefixDataModelImpl implements PrefixDataModel {
 	@Inject
 	protected PrefixDataModelImpl(EventBus eventBus) {
 		this.eventBus = eventBus;
-		// assume that path ends with /admin/ so that we get /admin/prefix
+		// assume that path ends with /admin so that we get /admin/prefix
 		href = Window.Location.getProtocol() + "//" + Window.Location.getHost() + Window.Location.getPath() + "/prefix?action=";
 	}
 	

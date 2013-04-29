@@ -17,6 +17,7 @@
 package org.daxplore.presenter.server.servlets;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,6 +29,7 @@ import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
 import org.daxplore.presenter.server.admin.ClientMessageSender;
 import org.daxplore.presenter.server.admin.UnpackQueue;
@@ -36,6 +38,7 @@ import org.daxplore.presenter.server.storage.StaticFileItemStore;
 import org.daxplore.presenter.server.throwable.BadReqException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.ClientServerMessage.MessageType;
+import org.daxplore.shared.SharedResourceTools;
 
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.users.User;
@@ -73,18 +76,35 @@ public class DataUploadServlet extends HttpServlet {
 			ClientMessageSender messageSender = new ClientMessageSender(channelToken);
 			
 			FileItemIterator fileIterator = upload.getItemIterator(req);
-			if (!fileIterator.hasNext()) {
-				throw new BadReqException("No file uploaded");
+			String fileName = "";
+			byte[] fileData = null;
+			String prefix = null;
+			while(fileIterator.hasNext()) {
+				FileItemStream item = fileIterator.next();
+				InputStream stream = item.openStream();
+				if(item.isFormField()) {
+					if(item.getFieldName().equals("prefix")) {
+						prefix = Streams.asString(stream);
+					} else {
+						throw new BadReqException("Form contains extra fields");
+					}
+				} else {
+					fileName = item.getName();
+					fileData = IOUtils.toByteArray(stream);
+				}
 			}
-			FileItemStream file = fileIterator.next();
-			byte[] fileData = IOUtils.toByteArray(file.openStream());
-			if (fileIterator.hasNext()) {
-				throw new BadReqException("More than one file uploaded in a single request");
+			if(SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
+				if(fileData!=null && !fileName.equals("")) {
+					BlobKey blobKey = StaticFileItemStore.writeBlob(fileName, fileData);
+					UnpackQueue unpackQueue = new UnpackQueue(prefix, channelToken);
+					unpackQueue.addTask(UnpackType.UNZIP_ALL, blobKey.getKeyString());
+					messageSender.send(MessageType.PROGRESS_UPDATE, "User is uploading a new file with presenter data");
+				} else {
+					throw new BadReqException("No file uploaded");
+				}
+			} else {
+				throw new BadReqException("Request made with invalid prefix: '" + prefix + "'");
 			}
-			BlobKey blobKey = StaticFileItemStore.writeBlob(file.getFieldName(), fileData);
-			UnpackQueue unpackQueue = new UnpackQueue("", channelToken);
-			unpackQueue.addTask(UnpackType.UNZIP_ALL, blobKey.getKeyString());
-			messageSender.send(MessageType.PROGRESS_UPDATE, "User is uploading a new file with presenter data");
 		} catch (FileUploadException | IOException | BadReqException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
 			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);

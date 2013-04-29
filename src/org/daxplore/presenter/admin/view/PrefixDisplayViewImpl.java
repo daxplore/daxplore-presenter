@@ -33,6 +33,7 @@ import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
+import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
@@ -51,6 +52,7 @@ public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayVie
 	@UiField protected TextArea serverMessageArea;
 	@UiField protected Label deletePrefixLabel;
 	@UiField protected Button deleteButton;
+	@UiField protected Hidden uploadPrefix;
 	
 	public PrefixDisplayViewImpl() {
 		initWidget(uiBinder.createAndBindUi(this));
@@ -86,6 +88,7 @@ public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayVie
 		prefixHeader.setText(prefix);
 		deletePrefixLabel.setText("Delete prefix " + prefix + ":");
 		deleteButton.setText("Delete " + prefix);
+		uploadPrefix.setValue(prefix);
 	}
 
 	/**

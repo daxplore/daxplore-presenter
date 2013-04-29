@@ -1,3 +1,4 @@
+package org.daxplore.presenter.server.servlets;
 /**
  *  This file is part of Daxplore Presenter.
  *
@@ -14,7 +15,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.server.servlets;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.daxplore.presenter.server.ServerTools;
 import org.daxplore.presenter.server.admin.ClientMessageSender;
 import org.daxplore.presenter.server.admin.UnpackQueue;
@@ -133,18 +134,13 @@ public class DataUnpackServlet extends HttpServlet {
 					throws BadReqException, InternalServerException {
 		LinkedHashMap<String, byte[]> fileMap = new LinkedHashMap<String, byte[]>();
 		
-		ZipInputStream zipIn = ServerTools.getAsZipInputStream(fileData); 
-		
+		ZipInputStream zipIn = ServerTools.getAsZipInputStream(fileData);
 		// Unzip all the files and put them in a map
 		try {
 			ZipEntry entry;
 			while ((entry = zipIn.getNextEntry()) != null) {
-				if(!entry.isDirectory()) {
-					byte[] data = new byte[(int) entry.getSize()];
-					int read = 0;
-					while (read < data.length) {
-						read += zipIn.read(data, read, Math.min(1024, data.length-read));
-					}
+				if(entry.getSize()>0 && !entry.isDirectory()) {
+					byte[] data = IOUtils.toByteArray(zipIn);
 					fileMap.put(entry.getName(), data);
 				}
 			}
@@ -257,6 +253,7 @@ public class DataUnpackServlet extends HttpServlet {
 				String json = line.substring(splitPoint+1);
 				json = json.substring(1, json.length() - 1);
 				json = json.replaceAll("\"\"", "\"");
+				System.out.println(json);
 				items.add(new StatDataItemStore(key, json));
 				count++;
 			}

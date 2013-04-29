@@ -53,7 +53,7 @@ public class SharedResourceTools {
 	
 	
 	public static boolean isSyntacticallyValidPrefix(String prefix) {
-		return Pattern.matches("[a-z]+", prefix);
+		return prefix!=null && Pattern.matches("[a-z]+", prefix);
 	}
 	
 }

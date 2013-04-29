@@ -88,6 +88,7 @@
 					<g:Label styleName="{style.header-subtext}">Upload a file created with Daxplore Producer. This will completely replace all the current content on this prefix.</g:Label>
 					<g:FlowPanel styleName="{style.bubble}">
 						<g:FileUpload ui:field='uploadWidget' name='dataUpload'/>
+						<g:Hidden name='prefix' ui:field='uploadPrefix'></g:Hidden>
 						<g:Button ui:field='uploadButton' styleName="{style.bubble-button}">Upload</g:Button>
 					</g:FlowPanel>
 				</g:VerticalPanel>		
