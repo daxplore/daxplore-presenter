@@ -25,6 +25,8 @@ import java.util.logging.Logger;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import com.google.appengine.api.blobstore.BlobKey;
+
 public class DeleteData {
 	protected static Logger logger = Logger.getLogger(DeleteData.class.getName());
 	
@@ -69,7 +71,7 @@ public class DeleteData {
 		@SuppressWarnings("unchecked")
 		List<StaticFileItemStore> fileItems = (List<StaticFileItemStore>)query.execute(prefix);
 		for (StaticFileItemStore item : fileItems) {
-			StaticFileItemStore.deleteBlob(item.getBlobKey());
+			StaticFileItemStore.deleteBlob(new BlobKey(item.getBlobKey()));
 		}
 		pm.deletePersistentAll(fileItems);
 		int deletedBlobs = fileItems.size();

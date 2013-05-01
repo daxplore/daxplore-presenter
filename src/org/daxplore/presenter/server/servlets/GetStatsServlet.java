@@ -38,6 +38,7 @@ import org.daxplore.presenter.server.storage.QuestionMetadataServerImpl;
 import org.daxplore.presenter.server.storage.StatDataItemStore;
 import org.daxplore.presenter.server.storage.StaticFileItemStore;
 import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QuestionMetadata;
 
@@ -75,23 +76,21 @@ public class GetStatsServlet extends HttpServlet {
 				LocaleStore localeStore = ((List<LocaleStore>) query.execute(prefix)).get(0);
 				
 				//it shouldn't matter what locale we use here, as we don't read any localized data
-				String questionText = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/questions", localeStore.getDefaultLocale(), ".json");
+				String questionText = StaticFileItemStore.readStaticFile(pm, prefix, "meta/questions", localeStore.getDefaultLocale(), ".json");
 				questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
 			}
 			
 			QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, queryString);
 			
 			response.setContentType("text/html; charset=UTF-8");
-			
-			for (String json : StatDataItemStore.getStats(pm, prefix, queryDefinition)) {
-				respWriter.write(json + "\n");
-			}
-			
+			respWriter.write(StatDataItemStore.getStats(pm, prefix, queryDefinition));
 			response.setStatus(HttpServletResponse.SC_OK);
-			
 		} catch (BadReqException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		} catch (InternalServerException e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} finally {
 			respWriter.close();
 		}

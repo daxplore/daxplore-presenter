@@ -43,7 +43,6 @@ import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.EmbedDefinition;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QuestionMetadata;
-import org.daxplore.presenter.shared.SharedTools;
 import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
 import org.daxplore.shared.SharedResourceTools;
 
@@ -74,6 +73,9 @@ public class PresenterServlet extends HttpServlet {
 			String useragent = request.getHeader("user-agent");
 			Cookie[] cookies = request.getCookies();
 			String feature = request.getParameter("f");
+			String baseurl = request.getRequestURL().toString();
+			baseurl = baseurl.substring(0, baseurl.lastIndexOf("/"));
+			baseurl = baseurl.substring(0, baseurl.lastIndexOf("/")+1);
 			
 			// Clean user input
 			if(prefix==null || !SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
@@ -90,11 +92,11 @@ public class PresenterServlet extends HttpServlet {
 			if(cookies != null) {
 				ignoreBadBrowser = ServerTools.ignoreBadBrowser(cookies);
 			}
-			browserSupported = browserSupported | ignoreBadBrowser;
+			browserSupported |= ignoreBadBrowser;
 			
 			String responseHTML = "";
 			if (!browserSupported) {
-				responseHTML = getUnsupportedBrowserHTML();
+				responseHTML = getUnsupportedBrowserHTML(baseurl);
 			} else {
 				Locale locale = ServerTools.selectLocale(request, prefix);
 				pm = PMF.get().getPersistenceManager();
@@ -103,7 +105,7 @@ public class PresenterServlet extends HttpServlet {
 					
 					// TODO clean query string
 					String queryString = request.getParameter("q");
-					responseHTML = getEmbedHTML(pm, prefix, locale, queryString);
+					responseHTML = getEmbedHTML(pm, prefix, locale, queryString, baseurl);
 					
 				} else if (feature!=null && feature.equalsIgnoreCase("print")) { // printer-friendly chart
 					
@@ -117,11 +119,11 @@ public class PresenterServlet extends HttpServlet {
 					
 					// TODO clean query string
 					String queryString = request.getParameter("q");
-					responseHTML = getPrintHTML(pm, prefix, locale, serverPath, queryString);
+					responseHTML = getPrintHTML(pm, prefix, locale, serverPath, queryString, baseurl);
 					
 				} else { // standard presenter
 					
-					responseHTML = getPresenterHTML(pm, prefix, locale);
+					responseHTML = getPresenterHTML(pm, prefix, locale, baseurl);
 					
 				}
 			}
@@ -147,7 +149,7 @@ public class PresenterServlet extends HttpServlet {
 		}
 	}
 	
-	private String getUnsupportedBrowserHTML() throws InternalServerException {
+	private String getUnsupportedBrowserHTML(String baseurl) throws InternalServerException {
 		if (browserSuggestionTemplate == null) {
 			try {
 				browserSuggestionTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/browser-suggestion.html"));
@@ -157,33 +159,35 @@ public class PresenterServlet extends HttpServlet {
 		}
 		
 		String[] arguments = {
-			};
+			baseurl					// {0}
+		};
 		
 		return MessageFormat.format(browserSuggestionTemplate, (Object[])arguments);
 	}
 	
-	private String getPresenterHTML(PersistenceManager pm, String prefix, Locale locale)
+	private String getPresenterHTML(PersistenceManager pm, String prefix, Locale locale, String baseurl)
 			throws InternalServerException, BadReqException {
 		
 		// TODO Add caching for loaded files
 		String perspectives = "", groups = "", questions = "";
-		perspectives = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/perspectives", locale, ".json");
-		questions = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/questions", locale, ".json");
-		groups = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/groups", locale, ".json");
+		perspectives = StaticFileItemStore.readStaticFile(pm, prefix, "meta/perspectives", locale, ".json");
+		questions = StaticFileItemStore.readStaticFile(pm, prefix, "meta/questions", locale, ".json");
+		groups = StaticFileItemStore.readStaticFile(pm, prefix, "meta/groups", locale, ".json");
 		
-		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
+		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "pagetitle");
 		
 		String[] arguments = {
 			locale.toLanguageTag(), // {0}
-			pageTitle,				// {1}
-			perspectives,			// {2}
-			questions,				// {3}
-			groups					// {4}
+			baseurl,				// {1}
+			pageTitle,				// {2}
+			perspectives,			// {3}
+			questions,				// {4}
+			groups					// {5}
 		};
 		
 		if (presenterHtmlTemplate == null) {
 			try {
-				presenterHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/presenter.html"));
+				presenterHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/presentation.html"));
 			} catch (IOException e) {
 				throw new InternalServerException("Failed to load the embed html template", e);
 			}
@@ -193,18 +197,16 @@ public class PresenterServlet extends HttpServlet {
 	}
 	
 	private String getEmbedHTML(PersistenceManager pm, String prefix, Locale locale,
-			String queryString) throws BadReqException, InternalServerException {
+			String queryString, String baseurl) throws BadReqException, InternalServerException {
 		
 		QueryDefinition queryDefinition = new QueryDefinition(metadataMap.get(prefix), queryString);
-		LinkedList<String> statItems = StatDataItemStore.getStats(pm, prefix, queryDefinition);
+		String statItem = StatDataItemStore.getStats(pm, prefix, queryDefinition);
 
 		LinkedList<String> questions = new LinkedList<String>();
 		questions.add(queryDefinition.getQuestionID());
 		questions.add(queryDefinition.getPerspectiveID());
 		
-		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
-		
-		String jsondata = SharedTools.join(statItems, ",");
+		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "pagetitle");
 		
 		String questionString = StorageTools.getQuestionDefinitions(pm, prefix, questions, locale);
 		
@@ -212,8 +214,9 @@ public class PresenterServlet extends HttpServlet {
 			prefix, 				// {0}
 			locale.toLanguageTag(), // {1}
 			pageTitle,				// {2}
-			jsondata, 				// {3}
-			questionString			// {4}
+			baseurl, 				// {3}
+			statItem, 				// {4}
+			questionString			// {5}
 		};
 		
 		if (embedHtmlTemplate == null) {
@@ -228,7 +231,7 @@ public class PresenterServlet extends HttpServlet {
 	}
 	
 	private String getPrintHTML(PersistenceManager pm, String prefix, Locale locale,
-			String serverPath, String queryString) throws InternalServerException, BadReqException {
+			String serverPath, String queryString, String baseurl) throws InternalServerException, BadReqException {
 		
 		LinkedList<EmbedFlag> flags = new LinkedList<EmbedFlag>();
 		flags.add(EmbedFlag.LEGEND);
@@ -236,15 +239,16 @@ public class PresenterServlet extends HttpServlet {
 		flags.add(EmbedFlag.PRINT);
 		String embedDefinition = new EmbedDefinition(flags).getAsString();
 
-		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
+		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "pagetitle");
 		
 		String[] arguments = {
 			pageTitle,				// {0}
-			serverPath,				// {1}
-			queryString,			// {2}
-			locale.toLanguageTag(),	// {3}
-			prefix,					// {4}
-			embedDefinition			// {5}
+			baseurl,				// {1}
+			serverPath,				// {2}
+			queryString,			// {3}
+			locale.toLanguageTag(),	// {4}
+			prefix,					// {5}
+			embedDefinition			// {6}
 		};
 		
 		if (printHtmlTemplate == null) {

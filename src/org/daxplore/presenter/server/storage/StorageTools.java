@@ -55,7 +55,7 @@ public class StorageTools {
 			};
 			
 			BufferedReader reader = new BufferedReader(
-					StaticFileItemStore.getStaticFileReader(pm, prefix, "definitions/questions", locale, ".json"));
+					StaticFileItemStore.getStaticFileReader(pm, prefix, "meta/questions", locale, ".json"));
 			
 			JSONParser parser = new JSONParser();
 			List<Map> questionList = (List<Map>)parser.parse(reader, containerFactory);

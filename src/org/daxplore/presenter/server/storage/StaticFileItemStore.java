@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.util.Locale;
@@ -63,18 +64,18 @@ public class StaticFileItemStore {
 	 * Instantiate a new static file item, which acts as a pointer to a file
 	 * stored in the BlobStore.
 	 * 
-	 * <p>The key should be on the format "prefix#name". The prefix defines
+	 * <p>The key should be in the format "prefix#name". The prefix defines
 	 * which presenter the setting belongs to and the name is the name
 	 * of the file.</p>
 	 * 
 	 * @param key
-	 *            a key on the format "prefix#name"
+	 *            a key in the format "prefix#name"
 	 * @param blobKey
 	 *            the {@link BlobKey} of the tracked file
 	 */
-	public StaticFileItemStore(String key, BlobKey blobKey) {
+	public StaticFileItemStore(String key, String blobKey) {
 		this.key = key;
-		this.blobKey = blobKey.getKeyString();
+		this.blobKey = blobKey;
 		this.prefix = key.substring(0, key.indexOf('#'));
 	}
 
@@ -92,12 +93,11 @@ public class StaticFileItemStore {
 	 * 
 	 * @return the BlobKey of the tracked BlobStore file
 	 */
-	public BlobKey getBlobKey() {
-		return new BlobKey(blobKey);
+	public String getBlobKey() {
+		return blobKey;
 	}
 	
 	public static byte[] readBlob(BlobKey blobKey) throws BadReqException {
-		try {
 			FileService fileService = FileServiceFactory.getFileService();
 			AppEngineFile file = fileService.getBlobFile(blobKey);
 			FileReadChannel readChannel = null;
@@ -110,16 +110,17 @@ public class StaticFileItemStore {
 		            throw new IOException("Failed to read blobstore entry");
 		        }
 		        return output.toByteArray();
-			} catch (LockException | FileNotFoundException e) {
-				throw new IOException(e);
+			} catch(FileNotFoundException e) {
+				throw new BadReqException(String.format("File not found for blobKey: '%s'", blobKey), e);
+			} catch (IOException e) {
+				throw new BadReqException(String.format("Failed to read data for blobKey: '%s'", blobKey), e);
 			} finally {
 				if (readChannel != null) {
-					readChannel.close();
+					try {
+						readChannel.close();
+					} catch (IOException e) {}
 				}
 			}
-		} catch (Exception e) {
-			throw new BadReqException("Failed to read a file from blobstore", e);
-		}
 	}
 	
 	public static BlobKey writeBlob(String fileName, byte[] data) throws InternalServerException {
@@ -145,19 +146,19 @@ public class StaticFileItemStore {
 	}
 	
 	public static Reader getStaticFileReader(PersistenceManager pm, String prefix,
-			String name, Locale locale, String suffix) throws BadReqException {
+			String name, Locale locale, String suffix) throws BadReqException, InternalServerException {
 		return new StringReader(readStaticFile(pm, prefix, name, locale, suffix));
 	}
 	
 	public static String readStaticFile(PersistenceManager pm, String prefix,
-			String name, Locale locale, String suffix) throws BadReqException {
-		String statStoreKey = prefix + "#" + name + "_" + locale.getLanguage() + "suffix";
-		StaticFileItemStore item;
+			String name, Locale locale, String suffix) throws BadReqException, InternalServerException {
+		String statStoreKey = prefix + "#" + name + "_" + locale.getLanguage() + suffix;
+		StaticFileItemStore item = pm.getObjectById(StaticFileItemStore.class, statStoreKey);
+		byte[] data = readBlob(new BlobKey(item.getBlobKey()));
 		try {
-			item = pm.getObjectById(StaticFileItemStore.class, statStoreKey);
-			return new String(readBlob(item.getBlobKey()), "UTF-8");
-		} catch(Exception e) {
-			throw new BadReqException("Could not static file '" + statStoreKey + "'", e);
+			return new String(data, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new InternalServerException("UTF-8 not supported !?");
 		}
 	}
 }

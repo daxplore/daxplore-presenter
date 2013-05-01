@@ -80,7 +80,7 @@ public class QuestionPanel extends Composite implements QueryUpdateHandler{
 
 		for (int i = 0; i < groups.getGroupCount(); i++) {
 			String txt = groups.getGroupName(i);
-			txt = "<span class=\"daxplore-QuestionPanel-branch\">&nbsp;" + txt.substring(0, 1).toUpperCase() + txt.substring(1).toLowerCase() + "&nbsp;</span>";
+			txt = "<span class=\"daxplore-QuestionPanel-branch\">&nbsp;" + txt + "&nbsp;</span>";
 			GroupItem gr = new GroupItem(txt);
 			List<String> qlist = groups.getQuestionIDs(i);
 			for (String q : qlist) {

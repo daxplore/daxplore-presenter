@@ -23,7 +23,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -46,9 +45,9 @@ import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 import org.daxplore.presenter.shared.QuestionMetadata;
 import org.daxplore.shared.SharedResourceTools;
-import org.json.simple.parser.ContainerFactory;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import au.com.bytecode.opencsv.CSVWriter;
 
@@ -72,7 +71,6 @@ public class GetCsvServlet extends HttpServlet {
 	protected static final Map<String, QuestionMetadata> metadataMap = new HashMap<String, QuestionMetadata>();
 	
 	@Override
-	@SuppressWarnings({ "rawtypes" })
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 		PersistenceManager pm = null;
 		CSVWriter csvWriter = null;
@@ -106,82 +104,52 @@ public class GetCsvServlet extends HttpServlet {
 			if(metadataMap.containsKey(locale.getLanguage())) {
 				questionMetadata = metadataMap.get(locale.getLanguage());
 			} else {
-				String questionText = StaticFileItemStore.readStaticFile(pm, prefix, "definitions/questions", locale, ".json");
+				String questionText = StaticFileItemStore.readStaticFile(pm, prefix, "meta/questions", locale, ".json");
 				questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
 				metadataMap.put(locale.getLanguage(), questionMetadata);
 			}
 			QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, queryString);
-			List<String[]> csvOutput = new LinkedList<String[]>();
-			
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			
 			List<String> questionOptionTexts = queryDefinition.getQuestionOptionTexts();
 			List<String> perspectiveOptionTexts = queryDefinition.getPerspectiveOptionTexts();
 			List<Integer> usedPerspectiveOptions = queryDefinition.getUsedPerspectiveOptions();
 			
+			List<String[]> csvOutput = new LinkedList<String[]>();
 			questionOptionTexts.add(0,  queryDefinition.getPerspectiveShortText() + " \\ " + queryDefinition.getQuestionShortText());
 			csvOutput.add(questionOptionTexts.toArray(new String[0]));
 			
-			LinkedList<String> statItems = StatDataItemStore.getStats(pm, prefix, queryDefinition);
-	
-			
-			ContainerFactory containerFactory = new ContainerFactory() {
-				@Override
-				public Map createObjectContainer() {
-					return new LinkedHashMap();
-				}
-				@Override
-				public List creatArrayContainer() {
-					return new LinkedList();
-				}
-			};
-			
-			JSONParser parser = new JSONParser();
-			for (String json : statItems) {
-				Map jo;
-				try {
-					jo = (Map)parser.parse(json, containerFactory);
-				} catch (ParseException e) {
-					throw new BadReqException("Failed to parse json data", e);
-				}
-	
-				Long perspectiveLong = (Long)jo.get("s");
-				if (perspectiveLong!=null) {
-					int index = perspectiveLong.intValue()-1;
-					if (usedPerspectiveOptions.contains(index)) {
-						String[] row = new String[1 + queryDefinition.getQuestionOptionCount()];
-						List respondents = (List)jo.get("d");
-						if (queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
-							row[0] = perspectiveOptionTexts.get(index) + " (1)"; //TODO mark primary (1) in some better way?
-						} else {
-							row[0] = perspectiveOptionTexts.get(index);
-						}
-						for (int i=1; i<row.length; i++) {
-							if (i-1<respondents.size()) {
-								row[i] = ((Long)respondents.get(i-1)).toString();
-							} else {
-								row[i] = "0";
-							}
+			JSONObject statItem = (JSONObject)JSONValue.parse(StatDataItemStore.getStats(pm, prefix, queryDefinition));
+			if(queryDefinition.getPerspectiveOptionCount()>0){
+				JSONObject timepoint1 = (JSONObject)statItem.get("0");
+				JSONObject timepoint2 = (JSONObject)statItem.get("1");
+				for(int i=0; i<usedPerspectiveOptions.size(); i++) {
+					String[] row = new String[1 + queryDefinition.getQuestionOptionCount()];
+					int perspectiveOption = usedPerspectiveOptions.get(i);
+					if (queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
+						row[0] = perspectiveOptionTexts.get(perspectiveOption) + " (1)"; //TODO mark primary (1) in some better way?
+					} else {
+						row[0] = perspectiveOptionTexts.get(perspectiveOption);
+					}
+					JSONArray questionData = (JSONArray)timepoint1.get(Integer.toString(perspectiveOption));
+					for (int j=1; j<row.length; j++) {
+						row[j] = questionData.get(j-1).toString();
+					}
+					csvOutput.add(row);
+
+					if (queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
+						row = new String[1 + queryDefinition.getQuestionOptionCount()];
+						row[0] = perspectiveOptionTexts.get(perspectiveOption) + " (2)"; //TODO mark primary (1) in some better way?
+						questionData = (JSONArray)timepoint2.get(Integer.toString(perspectiveOption));
+						for (int j=1; j<row.length; j++) {
+							row[j] = questionData.get(j-1).toString();
 						}
 						csvOutput.add(row);
-						
-						if (queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
-							row = new String[1 + queryDefinition.getQuestionOptionCount()];
-							respondents = (List)jo.get("o");
-							row[0] = perspectiveOptionTexts.get(index) + " (2)"; //TODO mark secondary (2) in some better way?
-							for (int i=1; i<row.length; i++) {
-								if (i-1<respondents.size()) {
-									row[i] = ((Long)respondents.get(i-1)).toString();
-								} else {
-									row[i] = "0";
-								}
-							}
-							csvOutput.add(row);
-						}
 					}
-				} else {
-					//TODO All respondents, ignore or add?
 				}
+			}
+			
+			if(queryDefinition.hasFlag(QueryFlag.TOTAL) || queryDefinition.getPerspectiveOptionCount()>0){
+				//TODO add all item if requested or if nothing else is requested
 			}
 			
 			// write response

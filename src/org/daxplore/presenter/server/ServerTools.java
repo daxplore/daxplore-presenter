@@ -32,7 +32,6 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipInputStream;
 
 import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
@@ -154,11 +153,7 @@ public class ServerTools {
 		
 		// Set up supported locales:
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query query = pm.newQuery(LocaleStore.class);
-		query.declareParameters("String specificPrefix");
-		query.setFilter("prefix.equals(specificPrefix)");
-		@SuppressWarnings("unchecked")
-		LocaleStore localeStore = ((List<LocaleStore>)query.execute(prefix)).get(0);
+		LocaleStore localeStore = pm.getObjectById(LocaleStore.class, prefix);
 		List<Locale> supportedLocales = localeStore.getSupportedLocales();
 		pm.close();
 		
@@ -166,7 +161,9 @@ public class ServerTools {
 		List<Locale> desiredLocales = new LinkedList<Locale>();
 		
 		// 1. Add browser request string locale
-		desiredLocales.add(new Locale(queryLocale));
+		if(queryLocale!=null) {
+			desiredLocales.add(new Locale(queryLocale));
+		}
 		
 		// 2. Add cookie-preferred locale
 		if(cookies != null) {

@@ -53,8 +53,10 @@ import org.daxplore.presenter.shared.ClientMessage;
 import org.daxplore.presenter.shared.ClientServerMessage.MessageType;
 import org.daxplore.presenter.shared.SharedTools;
 import org.daxplore.shared.SharedResourceTools;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
-import com.google.api.server.spi.response.BadRequestException;
 import com.google.appengine.api.blobstore.BlobInfoFactory;
 import com.google.appengine.api.blobstore.BlobKey;
 
@@ -70,7 +72,8 @@ public class DataUnpackServlet extends HttpServlet {
 	public void doGet(HttpServletRequest req, HttpServletResponse res) {
 		String prefix = req.getParameter("prefix");
 		UnpackType type = UnpackType.valueOf(req.getParameter("type").toUpperCase());
-		BlobKey blobKey = new BlobKey(req.getParameter("key"));
+		String blobKeyString = req.getParameter("key");
+		BlobKey blobKey = new BlobKey(blobKeyString);
 		String channelToken = req.getParameter("channel");
 		
 		try {
@@ -78,28 +81,28 @@ public class DataUnpackServlet extends HttpServlet {
 			
 			ClientMessageSender messageSender = new ClientMessageSender(channelToken);
 			
-			String fileName = new BlobInfoFactory().loadBlobInfo(blobKey).getFilename();
-			byte[] fileData = StaticFileItemStore.readBlob(blobKey);
+			//the filename always starts with prefix#, except for the original uploadfile
+			String fileName = new BlobInfoFactory().loadBlobInfo(blobKey).getFilename(); 
 			messageSender.send(new ClientMessage(MessageType.PROGRESS_UPDATE, "Unpacking: " + fileName));
 
 			switch(type) {
 			case UNZIP_ALL:
+				byte[] fileData = StaticFileItemStore.readBlob(blobKey);
 				unzipAll(prefix, fileData, messageSender);
 				break;
 			case PROPERTIES:
-				unpackPropertyFile(prefix, fileName, fileData, messageSender);
+				fileData = StaticFileItemStore.readBlob(blobKey);
+				unpackPropertyFile(fileName, fileData, messageSender);
 				break;
 			case STATIC_FILE:
-				unpackStaticFile(prefix, fileName, blobKey, messageSender);
+				unpackStaticFile(fileName, blobKeyString, messageSender);
 				break;
 			case STATISTICAL_DATA:
+				fileData = StaticFileItemStore.readBlob(blobKey);
 				unpackStatisticalDataFile(prefix, fileData, messageSender);
 				break;
 			}
 		
-		} catch (BadRequestException e) {
-			logger.log(Level.WARNING, e.getMessage(), e);
-			//TODO communicate error to user
 		} catch (InternalServerException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 			//TODO communicate error to user
@@ -111,7 +114,9 @@ public class DataUnpackServlet extends HttpServlet {
 			// it will cause a requeue-loop in AppEngine, so we use an extra try here
 			// to be on the safe side.
 			try { 
-				StaticFileItemStore.deleteBlob(blobKey);
+				if(type!=UnpackType.STATIC_FILE) { // if static file, keep it in the store
+					StaticFileItemStore.deleteBlob(blobKey);
+				}
 			} catch (Exception e) {
 				logger.log(Level.SEVERE, e.getMessage(), e);
 				//TODO communicate error to user
@@ -124,8 +129,7 @@ public class DataUnpackServlet extends HttpServlet {
 			unpackQueue.addTask(UnpackType.PROPERTIES, blobKey.getKeyString());
 		} else if(fileName.startsWith("data/")) {
 			unpackQueue.addTask(UnpackType.STATISTICAL_DATA, blobKey.getKeyString());
-		} else if(fileName.startsWith("definitions/")
-				|| fileName.startsWith("texts/")) {
+		} else if(fileName.startsWith("meta/")) {
 			unpackQueue.addTask(UnpackType.STATIC_FILE, blobKey.getKeyString());
 		}
 	}
@@ -202,8 +206,8 @@ public class DataUnpackServlet extends HttpServlet {
 	}
 	
 	
-	protected void unpackPropertyFile(String prefix, String fileName, byte[] fileData, ClientMessageSender messageSender)
-			throws BadRequestException, InternalServerException {
+	protected void unpackPropertyFile(String fileName, byte[] fileData, ClientMessageSender messageSender)
+			throws InternalServerException {
 		BufferedReader reader = ServerTools.getAsBufferedReader(fileData);
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
@@ -214,7 +218,7 @@ public class DataUnpackServlet extends HttpServlet {
 				// Assumes that the data is in a "key = value\n" format
 				int splitPoint = line.indexOf('=');
 				String key = line.substring(0, splitPoint).trim();
-				key = prefix + "#" + fileName.substring(0, fileName.lastIndexOf('.')) + "/" + key;
+				key = fileName.substring(0, fileName.lastIndexOf('.')) + "/" + key;
 				String value = line.substring(splitPoint+1).trim();
 				
 				pm.makePersistent(new SettingItemStore(key, value));
@@ -228,44 +232,33 @@ public class DataUnpackServlet extends HttpServlet {
 		}
 	}
 
-	protected void unpackStaticFile(String prefix, String fileName, BlobKey blobKey, ClientMessageSender messageSender)
-			throws BadRequestException, InternalServerException {
+	protected void unpackStaticFile(String fileName, String blobKey, ClientMessageSender messageSender)
+			throws InternalServerException {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		String datstoreKey = prefix + "#" + fileName;
-		pm.makePersistent(new StaticFileItemStore(datstoreKey, blobKey));
+		String datstoreKey = fileName;
+		StaticFileItemStore item = new StaticFileItemStore(datstoreKey, blobKey); 
+		pm.makePersistent(item);
 		pm.close();
 		messageSender.send(MessageType.PROGRESS_UPDATE, "Stored the static file " + fileName);
 	}
 	
 	protected void unpackStatisticalDataFile(String prefix, byte[] fileData, ClientMessageSender messageSender)
-			throws BadRequestException, InternalServerException {
+			throws InternalServerException {
 		long time = System.currentTimeMillis();
 		BufferedReader reader = ServerTools.getAsBufferedReader(fileData);
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		try {
-			int count = 0;
-			String line;
-			Collection<StatDataItemStore> items = new LinkedList<StatDataItemStore>(); 
-			while ((line=reader.readLine())!=null) {
-				// Assumes that the data is in a "key,json\n" format
-				int splitPoint = line.indexOf(',');
-				String key = prefix + "#" + line.substring(0, splitPoint);
-				String json = line.substring(splitPoint+1);
-				json = json.substring(1, json.length() - 1);
-				json = json.replaceAll("\"\"", "\"");
-				System.out.println(json);
-				items.add(new StatDataItemStore(key, json));
-				count++;
-			}
-			pm.makePersistentAll(items);
-			time = System.currentTimeMillis()-time;
-			String message = "Unpacked " + count + " statistical data items in " + (time/Math.pow(10, 6)) + " seconds";
-			logger.log(Level.INFO, message);
-			messageSender.send(MessageType.PROGRESS_UPDATE, message);
-		} catch (IOException e) {
-			throw new InternalServerException("Failed to unpack statistical data file", e);
-		} finally {
-			pm.close();
+		Collection<StatDataItemStore> items = new LinkedList<StatDataItemStore>(); 
+		JSONArray dataArray = (JSONArray)JSONValue.parse(reader);
+		for(Object v : dataArray) {
+			JSONObject entry = (JSONObject)v;
+			String key = String.format("%s#Q=%s&P=%s", prefix, entry.get("q"), entry.get("p"));
+			String value = ((JSONObject)entry.get("values")).toJSONString();
+			items.add(new StatDataItemStore(key, value));
 		}
+		pm.makePersistentAll(items);
+		time = System.currentTimeMillis()-time;
+		String message = "Unpacked " + items.size() + " statistical data items in " + (time/Math.pow(10, 6)) + " seconds";
+		logger.log(Level.INFO, message);
+		messageSender.send(MessageType.PROGRESS_UPDATE, message);
 	}
 }

@@ -90,7 +90,7 @@ public class UploadFileManifest {
 				}
 			}
 		} catch (SAXException e) {
-			throw new BadReqException("Manifest doesn't comply to the upload file schema", e);
+			throw new BadReqException("Manifest doesn't comply with the upload file schema", e);
 		} catch (IOException e) {
 			throw new BadReqException("Failed to read the uploaded file's manifest", e);
 		}

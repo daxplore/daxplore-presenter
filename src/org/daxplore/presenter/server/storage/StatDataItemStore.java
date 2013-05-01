@@ -18,9 +18,6 @@
  */
 package org.daxplore.presenter.server.storage;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -29,7 +26,6 @@ import javax.jdo.annotations.PrimaryKey;
 import org.daxplore.presenter.client.json.shared.StatDataItem;
 import org.daxplore.presenter.server.throwable.BadReqException;
 import org.daxplore.presenter.shared.QueryDefinition;
-import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
 import com.google.appengine.api.datastore.Text;
 
@@ -87,36 +83,14 @@ public class StatDataItemStore {
 		return json.getValue();
 	}
 	
-	public static LinkedList<String> getStats(PersistenceManager pm, String prefix, QueryDefinition queryDefinition) throws BadReqException {
-		String perspectiveID = queryDefinition.getPerspectiveID();
+	public static String getStats(PersistenceManager pm, String prefix, QueryDefinition queryDefinition) throws BadReqException {
 		String questionID = queryDefinition.getQuestionID();
-		boolean useTotal = queryDefinition.hasFlag(QueryFlag.TOTAL);
-		List<Integer> usedPerspectiveOptions = queryDefinition.getUsedPerspectiveOptions();
-		
-		LinkedList<String> datastoreKeys = new LinkedList<String>();
-		if (questionID.equals("")) {
-			throw new BadReqException("Empty questionID used in request");
-		} else if (perspectiveID.equals("") || usedPerspectiveOptions.size() == 0) {
-			datastoreKeys.add(prefix + "#Q=" + questionID);
-		} else {
-			if (useTotal) {
-				datastoreKeys.add(prefix + "#Q=" + questionID);
-			}
-			for (int alt: usedPerspectiveOptions) {
-				datastoreKeys.add(prefix + "#" + perspectiveID + "=" + (alt+1) + "+Q=" + questionID);
-			}
+		String perspectiveID = queryDefinition.getPerspectiveID();
+		String key = String.format("%s#Q=%s&P%s", prefix, questionID, perspectiveID);
+		try {
+			return pm.getObjectById(StatDataItemStore.class, key.toUpperCase()).getJson();
+		} catch (Exception e) {
+			throw new BadReqException("Could not read data item '" + key + "'", e);
 		}
-
-		LinkedList<String> datastoreJsons = new LinkedList<String>();
-		for (String key : datastoreKeys) {
-			try {
-				StatDataItemStore statStore = pm.getObjectById(StatDataItemStore.class, key.toUpperCase());
-				datastoreJsons.add(statStore.getJson());
-			} catch (Exception e) {
-				throw new BadReqException("Could not read data item '" + key + "'", e);
-			}
-		}
-		
-		return datastoreJsons;
 	}
 }

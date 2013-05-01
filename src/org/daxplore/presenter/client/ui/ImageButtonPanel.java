@@ -30,6 +30,7 @@ import org.daxplore.presenter.shared.QueryDefinition;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
@@ -107,7 +108,7 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 		address = address.substring(0, address.lastIndexOf("/")+1); //remove module name
 		address += "getCsv/";
 		String fileName = queryDefinition.getPerspectiveShortText() + " - " + queryDefinition.getQuestionShortText() + ".csv";
-		fileName = fileName.replace(" ", "%20");
+		fileName = URL.encodeQueryString(fileName);
 		return address + fileName + "?q=" + queryDefinition.getAsString() + "&l=" + LocaleInfo.getCurrentLocale().getLocaleName();
 	}
 	
