@@ -48,8 +48,6 @@ import com.google.appengine.api.files.FileReadChannel;
 import com.google.appengine.api.files.FileService;
 import com.google.appengine.api.files.FileServiceFactory;
 import com.google.appengine.api.files.FileWriteChannel;
-import com.google.appengine.api.files.LockException;
-
 
 @PersistenceCapable
 public class StaticFileItemStore {

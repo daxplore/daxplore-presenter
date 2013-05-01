@@ -41,9 +41,9 @@ import org.daxplore.presenter.server.storage.StorageTools;
 import org.daxplore.presenter.server.throwable.BadReqException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.EmbedDefinition;
+import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QuestionMetadata;
-import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
 import org.daxplore.shared.SharedResourceTools;
 
 @SuppressWarnings("serial")
