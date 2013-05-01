@@ -20,12 +20,10 @@ package org.daxplore.presenter.server.servlets;
 
 import java.io.PrintWriter;
 import java.io.StringReader;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -41,6 +39,7 @@ import org.daxplore.presenter.server.throwable.BadReqException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QuestionMetadata;
+import org.daxplore.shared.SharedResourceTools;
 
 /**
  * The {@linkplain GetStatsServlet} serves {@link StatDataItem} data.
@@ -64,17 +63,15 @@ public class GetStatsServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, java.io.IOException {
 		PrintWriter respWriter = response.getWriter();
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		String prefix = request.getParameter("prefix"); //TODO check input
-		String queryString = request.getParameter("q"); //TODO check input
 		try {
+			PersistenceManager pm = PMF.get().getPersistenceManager();
+			String prefix = request.getParameter("prefix");
+			if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)){
+				throw new BadReqException("Request made with syntactically invalid prefix: '" + prefix + "'");
+			}
+			String queryString = request.getParameter("q"); //TODO check input
 			if (questionMetadata == null) {
-				Query query = pm.newQuery(LocaleStore.class);
-				query.declareParameters("String specificPrefix");
-				query.setFilter("prefix.equals(specificPrefix)");
-				@SuppressWarnings("unchecked")
-				LocaleStore localeStore = ((List<LocaleStore>) query.execute(prefix)).get(0);
-				
+				LocaleStore localeStore = pm.getObjectById(LocaleStore.class, prefix);
 				//it shouldn't matter what locale we use here, as we don't read any localized data
 				String questionText = StaticFileItemStore.readStaticFile(pm, prefix, "meta/questions", localeStore.getDefaultLocale(), ".json");
 				questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));

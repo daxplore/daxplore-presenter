@@ -41,7 +41,7 @@ class GroupJson extends JavaScriptObject {
 	 * @return the group name
 	 */
 	public final native String getGroupName() /*-{
-		return this.group;
+		return this.name;
 	}-*/;
 
 	private final native JsArrayString getQuestionIDsNative() /*-{

@@ -103,7 +103,8 @@ public class QuestionMetadataClientImpl implements QuestionMetadata {
 	 */
 	@Override
 	public boolean hasSecondary(String questionID) {
-		return getQuestion(questionID).hasSecondaryData();
+		//TODO Remove the assumption that the "seconday" data has timepoint index 1!
+		return getQuestion(questionID).hasDataForTimepoint(1);
 	}
 
 	/**

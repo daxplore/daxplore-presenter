@@ -252,7 +252,8 @@ public class DataUnpackServlet extends HttpServlet {
 		for(Object v : dataArray) {
 			JSONObject entry = (JSONObject)v;
 			String key = String.format("%s#Q=%s&P=%s", prefix, entry.get("q"), entry.get("p"));
-			String value = ((JSONObject)entry.get("values")).toJSONString();
+			String value = entry.toJSONString();
+			System.out.println(value);
 			items.add(new StatDataItemStore(key, value));
 		}
 		pm.makePersistentAll(items);

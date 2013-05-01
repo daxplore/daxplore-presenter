@@ -85,7 +85,7 @@ public abstract class QueryResult {
 				return item;
 			}
 		}
-		throw new Error("No such perspective option: " + perspectiveOptionIndex);
+		throw new AssertionError("No such perspective option: " + perspectiveOptionIndex);
 	}
 
 	/**
@@ -105,7 +105,7 @@ public abstract class QueryResult {
 		if (item != null) {
 			return item.hasData();
 		}
-		throw new Error("No such perspective option: " + perspectiveOption);
+		throw new AssertionError("No such perspective option: " + perspectiveOption);
 	}
 
 	/*
@@ -147,6 +147,6 @@ public abstract class QueryResult {
 		if (hasTotalDataItem()) {
 			return totalItem;
 		}
-		throw new Error("No total item exists.");
+		throw new AssertionError("No total item exists.");
 	}
 }

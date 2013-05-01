@@ -24,6 +24,7 @@ import java.util.List;
 import org.daxplore.presenter.chart.display.MeanChart;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArrayInteger;
 import com.google.gwt.core.client.JsArrayString;
 
 /**
@@ -43,12 +44,18 @@ public class QuestionJson extends JavaScriptObject {
 	}-*/;
 
 	/**
-	 * Checks if this question has data from the secondary data set.
+	 * Checks if this question has data for a specific timepoint.
 	 * 
-	 * @return true, if there is secondary data
+	 * @param timepointIndex the index of the timepoint as given by the producer
+	 * @return true, if there is data for the timepoint
 	 */
-	public final native boolean hasSecondaryData() /*-{
-		return this.hasOld != null && this.hasOld == true;
+	public final native boolean hasDataForTimepoint(int timepointIndex) /*-{
+		for (var i=0; i<this.timepoints.length; i++) {
+			if(this.timepoints[i] == timepointIndex) {
+				return true;
+			}	
+		}
+		return false;
 	}-*/;
 
 	/**
@@ -58,7 +65,8 @@ public class QuestionJson extends JavaScriptObject {
 	 * @return true, if it can be shown as a mean
 	 */
 	public final native boolean hasMean() /*-{
-		return this.hasMean != null && this.hasMean == true;
+		// TODO add support for mean data when the producer supports it
+		return false;
 	}-*/;
 
 	/**
@@ -92,6 +100,19 @@ public class QuestionJson extends JavaScriptObject {
 
 	private final native JsArrayString getOptionsNative() /*-{
 		return this.options;
+	}-*/;
+	
+	/**
+	 * Get a list of all the supported timepoints.
+	 * 
+	 * @return the option texts
+	 */
+	public final List<Integer> getTimepointIndexes() {
+		return Collections.unmodifiableList(JsonTools.jsArrayAsList(getTimepointIndexesNative()));
+	}
+
+	private final native JsArrayInteger getTimepointIndexesNative() /*-{
+		return this.timepoints;
 	}-*/;
 
 	/**

@@ -106,9 +106,13 @@ public class Query implements QueryInterface {
 		this.queryActiveAnimation = queryActiveAnimation;
 		this.queryDefinition = queryDefinition;
 
+		//TODO write more elegant/stable code for this
 		href = Window.Location.getHref();
+		String prefix = href.substring(href.lastIndexOf('/')+1);
+		prefix = prefix.substring(0, prefix.lastIndexOf('?'));
 		href = href.substring(0, href.lastIndexOf('/'));
-		href = href + "/getStats?";
+		href = href.substring(0, href.lastIndexOf('/'));
+		href = href + "/getStats?prefix="+prefix +"&";
 
 		requestString = "q=" + this.queryDefinition.getAsString();
 	}

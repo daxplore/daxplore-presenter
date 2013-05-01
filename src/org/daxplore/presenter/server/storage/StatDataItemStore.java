@@ -86,9 +86,9 @@ public class StatDataItemStore {
 	public static String getStats(PersistenceManager pm, String prefix, QueryDefinition queryDefinition) throws BadReqException {
 		String questionID = queryDefinition.getQuestionID();
 		String perspectiveID = queryDefinition.getPerspectiveID();
-		String key = String.format("%s#Q=%s&P%s", prefix, questionID, perspectiveID);
+		String key = String.format("%s#Q=%s&P=%s", prefix, questionID.toUpperCase(), perspectiveID.toUpperCase());
 		try {
-			return pm.getObjectById(StatDataItemStore.class, key.toUpperCase()).getJson();
+			return pm.getObjectById(StatDataItemStore.class, key).getJson();
 		} catch (Exception e) {
 			throw new BadReqException("Could not read data item '" + key + "'", e);
 		}

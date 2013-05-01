@@ -130,7 +130,8 @@ public class Presenter implements ValueChangeHandler<String>, SelectionUpdateHan
 		List<QueryFlag> flags = new LinkedList<QueryFlag>();
 		flags.addAll(optionsPanel.getFlags());
 		flags.addAll(perspectivePanel.getFlags());
-		QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, perspectivePanel.getQuestionID(), questionPanel.getQuestionID(), perspectivePanel.getPerspectiveOptions(), flags);
+		QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, perspectivePanel.getQuestionID(),
+				questionPanel.getQuestionID(), perspectivePanel.getPerspectiveOptions(), flags);
 		Query oldQuery = currentQuery;
 		try {
 			currentQuery = queryFactory.createQuery(queryDefinition);
@@ -169,7 +170,11 @@ public class Presenter implements ValueChangeHandler<String>, SelectionUpdateHan
 			googleAnalyticsTrack(queryDefinition.getQuestionID(), queryDefinition.getPerspectiveID());
 		} catch (IllegalArgumentException e) {
 			if (currentQuery == null) {
-				queryDefinition = new QueryDefinition(questionMetadata, config.defaultQueryString());
+				try {
+					queryDefinition = new QueryDefinition(questionMetadata, config.defaultQueryString());
+				} catch (IllegalArgumentException e2) {
+					return;
+				}
 			} else {
 				// queryDefinition = currentQuery.getQueryDefinition();
 				return;
