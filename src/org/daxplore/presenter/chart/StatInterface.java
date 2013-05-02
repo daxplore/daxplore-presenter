@@ -36,7 +36,7 @@ public interface StatInterface {
 	 * 
 	 * @return true, if it is matched to a perspective option
 	 */
-	public boolean hasPerspectiveOption();
+	public boolean isNotTotalItem(); //TODO don't use double negative form
 
 	/**
 	 * Gets the perspective option.
@@ -70,19 +70,15 @@ public interface StatInterface {
 	public int[] getCountData();
 
 	/**
-	 * Gets the total population count from the primary dataset, correcting for
-	 * trailing incorrect data.
+	 * Gets the total population count from the primary dataset.
 	 * 
 	 * <p>This is a temporary fix used to handle errors in the old data
-	 * generation tool.</p>
-	 * 
-	 * <p>TODO: replace this method when the new Daxplore Producer is ready.</p>
 	 * 
 	 * @param questionOptionCount
 	 *            the actual number of question options
 	 * @return the population
 	 */
-	public int getPopulationCorrectingForTrailingIncorrectData(int questionOptionCount);
+	public int getPopulationCount();
 
 	/**
 	 * Gets the primary count data (frequencies) as percentages.
@@ -108,7 +104,7 @@ public interface StatInterface {
 	 *            the actual number of question options
 	 * @return the population
 	 */
-	public int getPopulationSecondaryCorrectingForTrailingIncorrectData(int questionOptionCount);
+	public int getPopulationCountSecondary();
 
 	/**
 	 * Gets the primary count data (frequencies) as percentages.

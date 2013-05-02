@@ -19,14 +19,12 @@
 package org.daxplore.presenter.embed;
 
 import java.util.LinkedList;
-import java.util.List;
 
 import org.daxplore.presenter.chart.display.ChartFactory;
 import org.daxplore.presenter.chart.display.GChartChart;
-import org.daxplore.presenter.client.json.shared.StatDataItem;
+import org.daxplore.presenter.client.json.shared.QueryData;
 import org.daxplore.presenter.embed.EmbedQuery.EmbedQueryFactory;
 import org.daxplore.presenter.embed.inject.EmbedInjector;
-import org.daxplore.presenter.embed.json.QueryData;
 import org.daxplore.presenter.shared.EmbedDefinition;
 import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
 import org.daxplore.presenter.shared.QueryDefinition;
@@ -77,8 +75,8 @@ public class EmbedEntryPoint implements EntryPoint {
 		}
 
 		try {
-			List<StatDataItem> datalist = QueryData.getData();
-			EmbedQuery query = queryFactory.createQuery(queryDefinition, datalist);
+			QueryData queryData = QueryData.getQueryDataEmbedded();
+			EmbedQuery query = queryFactory.createQuery(queryDefinition, queryData);
 			GChartChart chart;
 			boolean printMode = embedDefinition.hasFlag(EmbedFlag.PRINT);
 			if (queryDefinition.hasFlag(QueryFlag.SECONDARY)) {

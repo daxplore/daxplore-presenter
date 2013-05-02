@@ -22,12 +22,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.daxplore.presenter.chart.QueryInterface;
+import org.daxplore.presenter.chart.StatInterface;
 import org.daxplore.presenter.chart.data.QueryResult;
 import org.daxplore.presenter.chart.data.QueryResultCount;
 import org.daxplore.presenter.chart.data.QueryResultCountCompare;
 import org.daxplore.presenter.chart.data.QueryResultMean;
 import org.daxplore.presenter.chart.data.QueryResultMeanCompare;
-import org.daxplore.presenter.client.json.shared.StatDataItem;
+import org.daxplore.presenter.client.json.shared.QueryData;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 import org.daxplore.presenter.shared.QuestionMetadata;
@@ -46,8 +47,8 @@ public class EmbedQuery implements QueryInterface {
 	protected String questionID, perspectiveID;
 	protected List<Integer> usedPerspectiveOptions;
 	protected boolean total = false;
-	protected LinkedList<StatDataItem> dataItemList;
-	protected StatDataItem totalDataItem;
+	protected List<StatInterface> dataItemList;
+	protected StatInterface totalDataItem;
 	protected QueryResult result = null;
 	protected QueryDefinition queryDefinition = null;
 	
@@ -77,13 +78,13 @@ public class EmbedQuery implements QueryInterface {
 		 *            the data items
 		 * @return the embed query
 		 */
-		public EmbedQuery createQuery(QueryDefinition qd, List<StatDataItem> dataItems){
-			return new EmbedQuery(questions, qd, dataItems);
+		public EmbedQuery createQuery(QueryDefinition qd, QueryData queryData){
+			return new EmbedQuery(questions, qd, queryData);
 		}
 		
 	}
 	
-	protected EmbedQuery(QuestionMetadata questions, QueryDefinition qd, List<StatDataItem> dataItems) {
+	protected EmbedQuery(QuestionMetadata questions, QueryDefinition qd, QueryData queryData) {
 		this.queryDefinition = qd;
 		this.questions = questions;
 		this.questionID = qd.getQuestionID();
@@ -102,14 +103,8 @@ public class EmbedQuery implements QueryInterface {
 			this.usedPerspectiveOptions = qd.getUsedPerspectiveOptions();
 		}
 		
-		dataItemList = new LinkedList<StatDataItem>();
-		for(StatDataItem item : dataItems){
-			if(item.hasPerspectiveOption()) {
-				dataItemList.add(item);
-			} else {
-				totalDataItem = item;
-			}
-		}
+		dataItemList = queryData.getDataItems();
+		totalDataItem = queryData.getTotalDataItem();
 	}
 	
 	/**

@@ -85,7 +85,7 @@ public abstract class QueryResult {
 				return item;
 			}
 		}
-		throw new AssertionError("No such perspective option: " + perspectiveOptionIndex);
+		throw new IndexOutOfBoundsException("No such perspective option: " + perspectiveOptionIndex);
 	}
 
 	/**
@@ -105,7 +105,7 @@ public abstract class QueryResult {
 		if (item != null) {
 			return item.hasData();
 		}
-		throw new AssertionError("No such perspective option: " + perspectiveOption);
+		throw new IndexOutOfBoundsException("No such perspective option: " + perspectiveOption);
 	}
 
 	/*
@@ -147,6 +147,6 @@ public abstract class QueryResult {
 		if (hasTotalDataItem()) {
 			return totalItem;
 		}
-		throw new AssertionError("No total item exists.");
+		throw new UnsupportedOperationException("No total item exists (check hasTotalDataItem() first)");
 	}
 }

@@ -135,7 +135,7 @@ public class QueryResultCountCompare extends QueryResultCount {
 	public int getPopulationSecondary(int perspectiveOption) {
 		StatInterface item = getItem(perspectiveOption);
 		if (item != null) {
-			return item.getPopulationSecondaryCorrectingForTrailingIncorrectData(query.getDefinition().getQuestionOptionCount());
+			return item.getPopulationCountSecondary();
 		}
 		throw new Error("No such perspective option: " + perspectiveOption);
 	}
@@ -189,7 +189,7 @@ public class QueryResultCountCompare extends QueryResultCount {
 	public int getTotalPopulationSecondary() {
 		StatInterface totalItem = getTotalDataItem();
 		if (totalItem != null) {
-			return totalItem.getPopulationSecondaryCorrectingForTrailingIncorrectData(query.getDefinition().getQuestionOptionCount());
+			return totalItem.getPopulationCountSecondary();
 		}
 		throw new Error("No total data item.");
 	}

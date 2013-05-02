@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.daxplore.presenter.client.json.shared.StatDataItem;
 import org.daxplore.presenter.server.storage.LocaleStore;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.QuestionMetadataServerImpl;
@@ -42,10 +41,10 @@ import org.daxplore.presenter.shared.QuestionMetadata;
 import org.daxplore.shared.SharedResourceTools;
 
 /**
- * The {@linkplain GetStatsServlet} serves {@link StatDataItem} data.
+ * The {@linkplain GetStatsServlet} serves StatDataItem data.
  * 
  * <p>The data is sent on requests made by Daxplore clients. The data is sent
- * as a number of json-serialized {@linkplain} StatDataItem}s.</p>
+ * as a number of json-serialized StatDataItems.</p>
  * 
  * <p>The servlet takes the arguments:
  * <ul>

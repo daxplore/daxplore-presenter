@@ -85,12 +85,12 @@ public class QueryResultMeanCompare extends QueryResultMean {
 			for (int i = 0; i < questionOptionCount && i < raw.length; i++) {
 				sum += (i + 1) * raw[i];
 			}
-			double avg = sum / item.getPopulationSecondaryCorrectingForTrailingIncorrectData(query.getDefinition().getQuestionOptionCount());
+			double avg = sum / item.getPopulationCountSecondary();
 			sum = 0.0;
 			for (int i = 0; i < questionOptionCount && i < raw.length; i++) {
 				sum += Math.pow(((i + 1) - avg), 2) * raw[i];
 			}
-			double dev = Math.sqrt(sum / (item.getPopulationSecondaryCorrectingForTrailingIncorrectData(query.getDefinition().getQuestionOptionCount()) - 1));
+			double dev = Math.sqrt(sum / (item.getPopulationCountSecondary() - 1));
 
 			averagesSecondary[item.getPerspectiveOption()] = avg;
 			deviationsSecondary[item.getPerspectiveOption()] = dev;
@@ -101,12 +101,12 @@ public class QueryResultMeanCompare extends QueryResultMean {
 			for (int i = 0; i < questionOptionCount && i < raw.length; i++) {
 				sum += (i + 1) * raw[i];
 			}
-			double avg = sum / totalDataItem.getPopulationSecondaryCorrectingForTrailingIncorrectData(query.getDefinition().getQuestionOptionCount());
+			double avg = sum / totalDataItem.getPopulationCountSecondary();
 			sum = 0.0;
 			for (int i = 0; i < questionOptionCount && i < raw.length; i++) {
 				sum += Math.pow(((i + 1) - avg), 2) * raw[i];
 			}
-			double dev = Math.sqrt(sum / (totalDataItem.getPopulationSecondaryCorrectingForTrailingIncorrectData(query.getDefinition().getQuestionOptionCount()) - 1));
+			double dev = Math.sqrt(sum / (totalDataItem.getPopulationCountSecondary() - 1));
 
 			averagesSecondary[0] = avg;
 			deviationsSecondary[0] = dev;
@@ -129,7 +129,7 @@ public class QueryResultMeanCompare extends QueryResultMean {
 	public int getPopulationSecondary(int perspectiveOption) {
 		StatInterface item = getItem(perspectiveOption);
 		if (item != null) {
-			return item.getPopulationSecondaryCorrectingForTrailingIncorrectData(query.getDefinition().getQuestionOptionCount());
+			return item.getPopulationCountSecondary();
 		}
 		throw new Error("No such perspective option");
 	}
@@ -194,7 +194,7 @@ public class QueryResultMeanCompare extends QueryResultMean {
 	public int getTotalPopulationSecondary() {
 		StatInterface totalItem = getTotalDataItem();
 		if (totalItem != null) {
-			return totalItem.getPopulationSecondaryCorrectingForTrailingIncorrectData(query.getDefinition().getQuestionOptionCount());
+			return totalItem.getPopulationCountSecondary();
 		}
 		throw new Error("No total data exists");
 	}

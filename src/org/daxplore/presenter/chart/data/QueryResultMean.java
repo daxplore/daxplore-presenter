@@ -91,12 +91,12 @@ public class QueryResultMean extends QueryResult {
 			for (int i = 0; i < questionOptionCount && i < raw.length; i++) {
 				sum += (i + 1) * raw[i];
 			}
-			double avg = sum / item.getPopulationCorrectingForTrailingIncorrectData(queryDefinition.getQuestionOptionCount());
+			double avg = sum / item.getPopulationCount();
 			sum = 0.0;
 			for (int i = 0; i < questionOptionCount && i < raw.length; i++) {
 				sum += Math.pow((i + 1 - avg), 2) * raw[i];
 			}
-			double dev = Math.sqrt(sum / (item.getPopulationCorrectingForTrailingIncorrectData(queryDefinition.getQuestionOptionCount()) - 1));
+			double dev = Math.sqrt(sum / (item.getPopulationCount() - 1));
 
 			averages[item.getPerspectiveOption()] = avg;
 			deviations[item.getPerspectiveOption()] = dev;
@@ -107,12 +107,12 @@ public class QueryResultMean extends QueryResult {
 			for (int i = 0; i < questionOptionCount && i < raw.length; i++) {
 				sum += (i + 1) * raw[i];
 			}
-			double avg = sum / totalDataItem.getPopulationCorrectingForTrailingIncorrectData(queryDefinition.getQuestionOptionCount());
+			double avg = sum / totalDataItem.getPopulationCount();
 			sum = 0.0;
 			for (int i = 0; i < questionOptionCount && i < raw.length; i++) {
 				sum += Math.pow((i + 1 - avg), 2) * raw[i];
 			}
-			double dev = Math.sqrt(sum / (totalDataItem.getPopulationCorrectingForTrailingIncorrectData(queryDefinition.getQuestionOptionCount()) - 1));
+			double dev = Math.sqrt(sum / (totalDataItem.getPopulationCount() - 1));
 
 			averages[0] = avg;
 			deviations[0] = dev;
@@ -158,7 +158,7 @@ public class QueryResultMean extends QueryResult {
 	public int getPopulation(int perspectiveOption) {
 		StatInterface item = getItem(perspectiveOption);
 		if (item != null) {
-			return item.getPopulationCorrectingForTrailingIncorrectData(query.getDefinition().getQuestionOptionCount());
+			return item.getPopulationCount();
 		}
 		throw new Error("No such perspective option");
 	}
@@ -200,7 +200,7 @@ public class QueryResultMean extends QueryResult {
 	public int getTotalPopulation() {
 		StatInterface totalItem = getTotalDataItem();
 		if (totalItem != null) {
-			return totalItem.getPopulationCorrectingForTrailingIncorrectData(query.getDefinition().getQuestionOptionCount());
+			return totalItem.getPopulationCount();
 		}
 		throw new Error("No total data exists");
 	}

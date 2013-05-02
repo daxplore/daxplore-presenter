@@ -23,14 +23,13 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
-import org.daxplore.presenter.client.json.shared.StatDataItem;
 import org.daxplore.presenter.server.throwable.BadReqException;
 import org.daxplore.presenter.shared.QueryDefinition;
 
 import com.google.appengine.api.datastore.Text;
 
 /**
- * A representation of a {@link StatDataItem} and it's key that can be
+ * A representation of a StatDataItem and it's key that can be
  * persisted (stored) using a {@link PersistenceManager}.
  * 
  * <p>This acts like an item in a hash table (represented by the

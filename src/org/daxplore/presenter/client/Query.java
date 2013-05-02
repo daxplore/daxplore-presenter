@@ -18,16 +18,17 @@
  */
 package org.daxplore.presenter.client;
 
-import java.util.LinkedList;
+import java.util.List;
 
 import org.daxplore.presenter.chart.QueryActiveAnimation;
 import org.daxplore.presenter.chart.QueryInterface;
+import org.daxplore.presenter.chart.StatInterface;
 import org.daxplore.presenter.chart.data.QueryResult;
 import org.daxplore.presenter.chart.data.QueryResultCount;
 import org.daxplore.presenter.chart.data.QueryResultCountCompare;
 import org.daxplore.presenter.chart.data.QueryResultMean;
 import org.daxplore.presenter.chart.data.QueryResultMeanCompare;
-import org.daxplore.presenter.client.json.shared.StatDataItem;
+import org.daxplore.presenter.client.json.shared.QueryData;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QuestionMetadata;
 import org.daxplore.presenter.shared.SharedTools;
@@ -62,8 +63,8 @@ public class Query implements QueryInterface {
 	private String href;
 	private Request currentRequest;
 	private boolean hasFetchedData = false;
-	private LinkedList<StatDataItem> dataItemList;
-	private StatDataItem totalDataItem;
+	private List<StatInterface> dataItemList;
+	private StatInterface totalDataItem;
 	private final String requestString;
 	private int timeoutCount = 0;
 
@@ -186,7 +187,7 @@ public class Query implements QueryInterface {
 	 * @param total
 	 *            the total data item
 	 */
-	public void gotResponse(LinkedList<StatDataItem> dataItemList, StatDataItem total) {
+	public void gotResponse(List<StatInterface> dataItemList, StatInterface total) {
 		this.dataItemList = dataItemList;
 		this.totalDataItem = total;
 		hasFetchedData = true;
@@ -268,20 +269,11 @@ public class Query implements QueryInterface {
 		@Override
 		public void onResponseReceived(Request request, Response response) {
 			if (200 == response.getStatusCode()) {
-				SharedTools.println(response.getText());
 				resetTimeoutCount();
-				StatDataItem total = null;
 				String responseText = response.getText();
-				String[] responseLines = responseText.split("\n");
-				LinkedList<StatDataItem> dataItemList = new LinkedList<StatDataItem>();
-				for (int i = 0; i < responseLines.length; i++) {
-					StatDataItem current = StatDataItem.makeStatDataItem(responseLines[i]);
-					if (current.hasPerspectiveOption()) {
-						dataItemList.add(current);
-					} else {
-						total = current;
-					}
-				}
+				QueryData data = QueryData.getQueryData(responseText);
+				List<StatInterface> dataItemList = data.getDataItems();
+				StatInterface total = data.getTotalDataItem();
 				gotResponse(dataItemList, total);
 			} else {
 				// TODO Handle the error.
