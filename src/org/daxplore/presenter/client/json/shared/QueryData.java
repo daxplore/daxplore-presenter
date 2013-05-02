@@ -54,7 +54,7 @@ public class QueryData extends JavaScriptObject {
 	}-*/;
 	
 	public final static QueryData getQueryData(String json) {
-		System.out.println("json: " + json);
+		System.out.println("Query data: " + json);
 		return getDataNative(json);
 	}
 	private final static native QueryData getDataNative(String json) /*-{
@@ -92,7 +92,6 @@ public class QueryData extends JavaScriptObject {
 	 * @return the data
 	 */
 	public final List<StatInterface> getDataItems() {
-		System.out.println("getDataItems enter");
 		int[] timepoints = JsonTools.jsArrayAsArray(getTimepoints());
 		int perspectiveCount = getPerspectiveCount(timepoints[0]);
 		List<StatInterface> list = new ArrayList<StatInterface>(perspectiveCount);
@@ -101,7 +100,7 @@ public class QueryData extends JavaScriptObject {
 			int[] primaryData = JsonTools.jsArrayAsArray(getData(timepoints[0], Integer.toString(i)));
 			int[] secondaryData = null;
 			if(timepoints.length==2) { //TODO invalid assumptions about timepoints
-				JsonTools.jsArrayAsArray(getData(timepoints[1], Integer.toString(i)));
+				secondaryData = JsonTools.jsArrayAsArray(getData(timepoints[1], Integer.toString(i)));
 			}
 			list.add(new StatDataItemGWT(primaryData, secondaryData, i, false));
 		}
@@ -114,7 +113,7 @@ public class QueryData extends JavaScriptObject {
 		int[] primaryData = JsonTools.jsArrayAsArray(getData(timepoints[0], "all"));
 		int[] secondaryData = null;
 		if(timepoints.length==2) { //TODO invalid assumptions about timepoints
-			JsonTools.jsArrayAsArray(getData(timepoints[1], "all"));
+			secondaryData = JsonTools.jsArrayAsArray(getData(timepoints[1], "all"));
 		}
 		return new StatDataItemGWT(primaryData, secondaryData, -1, true);
 	}

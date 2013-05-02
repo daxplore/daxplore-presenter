@@ -27,6 +27,7 @@ public class StatDataItemGWT implements StatInterface {
 	public StatDataItemGWT(int[] primaryData, int[] secondaryData, int perspectiveOption, boolean isTotalItem) {
 		this.primaryData = primaryData;
 		this.secondaryData = secondaryData;
+		this.perspectiveOption = perspectiveOption;
 		this.isTotalItem = isTotalItem;
 	}
 	
@@ -121,9 +122,9 @@ public class StatDataItemGWT implements StatInterface {
 	@Override
 	public double[] getCountDataPercentagesSecondary() {
 		double[] percentages = new double[secondaryData.length];
-		int sum = getPopulationCount();
+		int sum = getPopulationCountSecondary();
 		for(int i=0; i<secondaryData.length; i++) {
-			percentages[i] = ((double)primaryData[i])/sum;
+			percentages[i] = ((double)secondaryData[i])/sum;
 		}
 		return percentages;
 	}

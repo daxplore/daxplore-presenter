@@ -231,7 +231,7 @@ public class QuestionPanel extends Composite implements QueryUpdateHandler{
 	private class GroupItem extends TreeItem {
 
 		GroupItem(String text) {
-			super(new SafeHtmlBuilder().appendEscaped(text).toSafeHtml());
+			super(text);
 		}
 
 		public boolean hasSelectedChild() {
