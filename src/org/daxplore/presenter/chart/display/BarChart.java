@@ -21,7 +21,6 @@ package org.daxplore.presenter.chart.display;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.daxplore.presenter.chart.ChartTools;
 import org.daxplore.presenter.chart.QueryInterface;
 import org.daxplore.presenter.chart.QueryInterface.QueryCallback;
 import org.daxplore.presenter.chart.data.QueryResult;
@@ -283,13 +282,8 @@ public class BarChart extends GChartChart {
 	 * @see setYAxis
 	 */
 	private void setupAxes() {
-		if (ChartTools.ieVersion() > 1) {
-			getXAxis().setTickLabelFontSize(12);
-			getXAxis().setTickLabelThickness(20);
-		} else {
-			getXAxis().setTickLabelFontSize(20);
-			getXAxis().setTickLabelThickness(40);
-		}
+		getXAxis().setTickLabelFontSize(12);
+		getXAxis().setTickLabelThickness(35);
 		getXAxis().setTickLength(6); // small tick-like gap...
 		getXAxis().setTickThickness(0); // but with invisible ticks
 		getXAxis().setAxisMin(0); // keeps first bar on chart

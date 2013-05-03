@@ -101,8 +101,7 @@ public class ChartPanel extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 		setStylePrimaryName("daxplore-ChartPanel");
 
-		maxWidth = 800; // this is temporary, the wanted value is set using
-						// setMaxWidth(int width)
+		maxWidth = 800; // TODO this is temporary, the wanted value is set using setMaxWidth(int width)
 		maxHeight = chartConfig.chartHeight();
 
 		setChart(new BlankChart());
@@ -185,7 +184,9 @@ public class ChartPanel extends Composite {
 		int diffWidth = maxWidth - actualWidth;
 		int diffHeight = maxHeight - actualHeight;
 
-		if (chart == null || (resizeRecursions != 0 && actualWidth == maxWidth && actualHeight == maxHeight) || (resizeRecursions != 0 && diffWidth == 0 && diffHeight == 0)) {
+		if (chart == null 
+				|| (resizeRecursions != 0 && actualWidth == maxWidth && actualHeight == maxHeight) 
+				|| (resizeRecursions != 0 && diffWidth == 0 && diffHeight == 0)) {
 			return;
 		}
 

@@ -20,7 +20,6 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -207,29 +206,26 @@ public class DataUnpackServlet extends HttpServlet {
 	
 	
 	protected void unpackPropertyFile(String fileName, byte[] fileData, ClientMessageSender messageSender)
-			throws InternalServerException {
+			throws InternalServerException, BadReqException {
+		String[] properties = {"page_title"};
+		long time = System.currentTimeMillis();
 		BufferedReader reader = ServerTools.getAsBufferedReader(fileData);
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		try {
-			int count = 0;
-			String line;
-			while ((line=reader.readLine())!=null) {
-				
-				// Assumes that the data is in a "key = value\n" format
-				int splitPoint = line.indexOf('=');
-				String key = line.substring(0, splitPoint).trim();
-				key = fileName.substring(0, fileName.lastIndexOf('.')) + "/" + key;
-				String value = line.substring(splitPoint+1).trim();
-				
-				pm.makePersistent(new SettingItemStore(key, value));
-				count++;
+		List<SettingItemStore> items = new LinkedList<SettingItemStore>();
+		JSONObject dataMap = (JSONObject)JSONValue.parse(reader);
+		for(String prop : properties) {
+			String key = fileName.substring(0, fileName.lastIndexOf('.')) + "/" + prop;
+			String value = (String)dataMap.get(prop);
+			if(value==null){
+				throw new BadReqException("Missing property '"+key+"' in upload file");
 			}
-			messageSender.send(MessageType.PROGRESS_UPDATE, "Unpacked " + count + " properties!");
-		} catch (IOException e) {
-			throw new InternalServerException("Failed to unpack property file", e);
-		} finally {
-			pm.close();
+			items.add(new SettingItemStore(key, value));
 		}
+		pm.makePersistentAll(items);
+		time = System.currentTimeMillis()-time;
+		String message = "Set " + properties.length + " properties in " + (time/Math.pow(10, 6)) + " seconds";
+		logger.log(Level.INFO, message);
+		messageSender.send(MessageType.PROGRESS_UPDATE, message);
 	}
 
 	protected void unpackStaticFile(String fileName, String blobKey, ClientMessageSender messageSender)
@@ -239,7 +235,9 @@ public class DataUnpackServlet extends HttpServlet {
 		StaticFileItemStore item = new StaticFileItemStore(datstoreKey, blobKey); 
 		pm.makePersistent(item);
 		pm.close();
-		messageSender.send(MessageType.PROGRESS_UPDATE, "Stored the static file " + fileName);
+		String message = "Stored the static file " + fileName;
+		logger.log(Level.INFO, message);
+		messageSender.send(MessageType.PROGRESS_UPDATE, message);
 	}
 	
 	protected void unpackStatisticalDataFile(String prefix, byte[] fileData, ClientMessageSender messageSender)
@@ -247,13 +245,12 @@ public class DataUnpackServlet extends HttpServlet {
 		long time = System.currentTimeMillis();
 		BufferedReader reader = ServerTools.getAsBufferedReader(fileData);
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Collection<StatDataItemStore> items = new LinkedList<StatDataItemStore>(); 
+		List<StatDataItemStore> items = new LinkedList<StatDataItemStore>(); 
 		JSONArray dataArray = (JSONArray)JSONValue.parse(reader);
 		for(Object v : dataArray) {
 			JSONObject entry = (JSONObject)v;
 			String key = String.format("%s#Q=%s&P=%s", prefix, entry.get("q"), entry.get("p"));
 			String value = entry.toJSONString();
-			System.out.println(value);
 			items.add(new StatDataItemStore(key, value));
 		}
 		pm.makePersistentAll(items);

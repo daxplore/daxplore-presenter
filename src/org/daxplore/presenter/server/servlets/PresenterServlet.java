@@ -174,7 +174,7 @@ public class PresenterServlet extends HttpServlet {
 		questions = StaticFileItemStore.readStaticFile(pm, prefix, "meta/questions", locale, ".json");
 		groups = StaticFileItemStore.readStaticFile(pm, prefix, "meta/groups", locale, ".json");
 		
-		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "pagetitle");
+		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "page_title");
 		
 		String[] arguments = {
 			locale.toLanguageTag(), // {0}
@@ -206,7 +206,7 @@ public class PresenterServlet extends HttpServlet {
 		questions.add(queryDefinition.getQuestionID());
 		questions.add(queryDefinition.getPerspectiveID());
 		
-		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "pagetitle");
+		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "page_title");
 		
 		String questionString = StorageTools.getQuestionDefinitions(pm, prefix, questions, locale);
 		
@@ -239,7 +239,7 @@ public class PresenterServlet extends HttpServlet {
 		flags.add(EmbedFlag.PRINT);
 		String embedDefinition = new EmbedDefinition(flags).getAsString();
 
-		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "pagetitle");
+		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "page_title");
 		
 		String[] arguments = {
 			pageTitle,				// {0}

@@ -173,14 +173,8 @@ public class MeanChart extends GChartChart {
 	 * @see setYAxis
 	 */
 	private void setupAxes() {
-		if (ChartTools.ieVersion() > 1) {
-			getXAxis().setTickLabelFontSize(12);
-			getXAxis().setTickLabelThickness(20);
-		} else {
-			getXAxis().setTickLabelFontSize(20);
-			getXAxis().setTickLabelThickness(40);
-
-		}
+		getXAxis().setTickLabelFontSize(12);
+		getXAxis().setTickLabelThickness(35);
 		getXAxis().setTickLength(6); // small tick-like gap...
 		getXAxis().setTickThickness(0); // but with invisible ticks
 		getXAxis().setAxisMin(0); // keeps first bar on chart
