@@ -109,9 +109,9 @@ public class MeanChartCompare extends MeanChart {
 			addCurve();
 			Curve primaryLineCurve = getCurve();
 
-			addPrimaryBar(new MeanChartBarPrimary(chartTexts, primaryBarCurve, primaryLineCurve, getColorSet(perspective), printerMode));
+			addPrimaryBar(new MeanChartBarPrimary(chartTexts, primaryBarCurve, primaryLineCurve, getColorSet(perspective), printerMode, AnnotationLocation.SOUTH));
 
-			addSecondaryBar(new MeanChartBarSecondary(chartTexts, secondaryBarCurve, secondaryLineCurve, getColorSet(perspective), printerMode));
+			addSecondaryBar(new MeanChartBarSecondary(chartTexts, secondaryBarCurve, secondaryLineCurve, getColorSet(perspective), printerMode, AnnotationLocation.SOUTH));
 		}
 		if (queryDefinition.hasFlag(QueryFlag.TOTAL)) {
 			addCurve();
@@ -123,9 +123,9 @@ public class MeanChartCompare extends MeanChart {
 			addCurve();
 			Curve primaryLineCurve = getCurve();
 
-			addPrimaryBar(new MeanChartBarPrimary(chartTexts, primaryBarCurve, primaryLineCurve, getColorSet(queryDefinition.getPerspectiveOptionCount()), printerMode));
+			addPrimaryBar(new MeanChartBarPrimary(chartTexts, primaryBarCurve, primaryLineCurve, getColorSet(queryDefinition.getPerspectiveOptionCount()), printerMode, AnnotationLocation.SOUTH));
 
-			addSecondaryBar(new MeanChartBarSecondary(chartTexts, secondaryBarCurve, secondaryLineCurve, getColorSet(queryDefinition.getPerspectiveOptionCount()), printerMode));
+			addSecondaryBar(new MeanChartBarSecondary(chartTexts, secondaryBarCurve, secondaryLineCurve, getColorSet(queryDefinition.getPerspectiveOptionCount()), printerMode, AnnotationLocation.SOUTH));
 		}
 		addPaddingCurve();
 	}
@@ -248,18 +248,6 @@ public class MeanChartCompare extends MeanChart {
 		setChartSize(width, height);
 		setChartSize(Math.max(2 * width - getXChartSizeDecorated() - 5, 0), Math.max(2 * height - getYChartSizeDecorated() - 15, 0));
 		update();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void updateHoverPositions() {
-		super.updateHoverPositions();
-		ChartBar bar = getBarSecondary(groupCount - 1);
-		Symbol symbol = bar.getCurve().getSymbol();
-		symbol.setHoverLocation(AnnotationLocation.SOUTHWEST);
-		symbol.setHoverXShift((int) (getModelUnitInPixelsX() + 10));
 	}
 
 }

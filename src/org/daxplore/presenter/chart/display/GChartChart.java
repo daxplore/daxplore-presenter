@@ -203,11 +203,6 @@ public abstract class GChartChart extends GChart implements Chart {
 		return externalHeader;
 	}
 
-	/**
-	 * Update the position of the mouse over annotation texts.
-	 */
-	public abstract void updateHoverPositions();
-
 	protected double getModelUnitInPixelsX() {
 		return getXAxis().modelToPixel(1) - getXAxis().modelToPixel(0);
 	}

@@ -71,7 +71,7 @@ abstract class ChartBar {
 	 * @param hoverText
 	 *            The GChart-formatted text to display when the bar is hovered.
 	 */
-	ChartBar(ChartTexts chartTexts, Curve barCurve, BarColors color, boolean printerMode) {
+	ChartBar(ChartTexts chartTexts, Curve barCurve, BarColors color, boolean printerMode, AnnotationLocation hoverLocation) {
 		this.curve = barCurve;
 		this.color = color;
 		this.chartTexts = chartTexts;
@@ -84,7 +84,13 @@ abstract class ChartBar {
 		symbol.setModelWidth(1.0);
 		symbol.setDistanceMetric(0, 0);
 		symbol.setHoverSelectionEnabled(false);
-		symbol.setHoverLocation(AnnotationLocation.SOUTH);
+		
+		symbol.setHoverLocation(hoverLocation);
+		if(hoverLocation==AnnotationLocation.SOUTHWEST) {
+			symbol.setHoverXShift(20);
+		} else if(hoverLocation==AnnotationLocation.SOUTHEAST) {
+			symbol.setHoverXShift(-20);
+		}
 
 		symbol.setHoverAnnotationEnabled(!printerMode);
 	}

@@ -21,6 +21,7 @@ package org.daxplore.presenter.chart.display;
 import org.daxplore.presenter.chart.ChartTools;
 import org.daxplore.presenter.chart.resources.ChartTexts;
 
+import com.googlecode.gchart.client.GChart.AnnotationLocation;
 import com.googlecode.gchart.client.GChart.Curve;
 import com.googlecode.gchart.client.GChart.Symbol;
 
@@ -51,8 +52,8 @@ class BarChartBarSecondary extends BarChartBarPrimary {
 	 * @param color
 	 *            The color set, used to color this bar.
 	 */
-	BarChartBarSecondary(ChartTexts chartTexts, Curve barCurve, BarColors color, boolean printerMode) {
-		super(chartTexts, barCurve, color, printerMode);
+	BarChartBarSecondary(ChartTexts chartTexts, Curve barCurve, BarColors color, boolean printerMode, AnnotationLocation hoverLocation) {
+		super(chartTexts, barCurve, color, printerMode, hoverLocation);
 		Symbol symbol = barCurve.getSymbol();
 		symbol.setDistanceMetric(1000, 1000);
 	}

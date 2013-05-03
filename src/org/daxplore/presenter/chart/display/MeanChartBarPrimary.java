@@ -21,6 +21,7 @@ package org.daxplore.presenter.chart.display;
 import org.daxplore.presenter.chart.ChartTools;
 import org.daxplore.presenter.chart.resources.ChartTexts;
 
+import com.googlecode.gchart.client.GChart.AnnotationLocation;
 import com.googlecode.gchart.client.GChart.Curve;
 import com.googlecode.gchart.client.GChart.Symbol;
 import com.googlecode.gchart.client.GChart.SymbolType;
@@ -58,8 +59,8 @@ class MeanChartBarPrimary extends ChartBar {
 	 * @param color
 	 *            The color set, used to color this bar.
 	 */
-	MeanChartBarPrimary(ChartTexts chartTexts, Curve barCurve, Curve lineCurve, BarColors color, boolean printerMode) {
-		super(chartTexts, barCurve, color, printerMode);
+	MeanChartBarPrimary(ChartTexts chartTexts, Curve barCurve, Curve lineCurve, BarColors color, boolean printerMode, AnnotationLocation hoverLocation) {
+		super(chartTexts, barCurve, color, printerMode, hoverLocation);
 
 		Symbol symbol = barCurve.getSymbol();
 		symbol.setDistanceMetric(0, 0);

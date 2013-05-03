@@ -143,14 +143,14 @@ public class MeanChart extends GChartChart {
 			Curve barCurve = getCurve();
 			addCurve();
 			Curve lineCurve = getCurve();
-			addPrimaryBar(new MeanChartBarPrimary(chartTexts, barCurve, lineCurve, getColorSet(perspective), printerMode));
+			addPrimaryBar(new MeanChartBarPrimary(chartTexts, barCurve, lineCurve, getColorSet(perspective), printerMode, AnnotationLocation.SOUTH));
 		}
 		if (queryDefinition.hasFlag(QueryFlag.TOTAL)) {
 			addCurve();
 			Curve barCurve = getCurve();
 			addCurve();
 			Curve lineCurve = getCurve();
-			addPrimaryBar(new MeanChartBarPrimary(chartTexts, barCurve, lineCurve, getColorSet(queryDefinition.getPerspectiveOptionCount()), printerMode));
+			addPrimaryBar(new MeanChartBarPrimary(chartTexts, barCurve, lineCurve, getColorSet(queryDefinition.getPerspectiveOptionCount()), printerMode, AnnotationLocation.SOUTH));
 		}
 		addPaddingCurve();
 	}
@@ -353,17 +353,6 @@ public class MeanChart extends GChartChart {
 
 	protected void drawPaddingBar() {
 		getCurve(paddingBarIndex).addPoint(currentPosition, 0);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void updateHoverPositions() {
-		ChartBar bar = getBarPrimary(groupCount - 1);
-		Symbol symbol = bar.getCurve().getSymbol();
-		symbol.setHoverLocation(AnnotationLocation.SOUTHWEST);
-		symbol.setHoverXShift((int) (getModelUnitInPixelsX() + 10));
 	}
 
 	/**

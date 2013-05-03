@@ -235,7 +235,13 @@ public class BarChart extends GChartChart {
 			for (int questionIndex = 0; questionIndex < questionOptionCount; questionIndex++) {
 				addCurve();
 				Curve curve = getCurve();
-				addPrimaryBar(new BarChartBarPrimary(chartTexts, curve, getColorSet(questionIndex), printerMode));
+				AnnotationLocation hoverLocation = AnnotationLocation.SOUTH;
+				if(groupCount>1 && groupIndex==0){
+					hoverLocation = AnnotationLocation.SOUTHEAST;
+				} else if(groupCount>1 && groupIndex==groupCount-1) {
+					hoverLocation = AnnotationLocation.SOUTHWEST;
+				}
+				addPrimaryBar(new BarChartBarPrimary(chartTexts, curve, getColorSet(questionIndex), printerMode, hoverLocation));
 			}
 		}
 		for (int i = 0; i < groupCount; i++) {
@@ -508,45 +514,6 @@ public class BarChart extends GChartChart {
 	protected void drawBetweenGroupsTick() {
 		getCurve(betweenGroupsTickCurveIndex + currentGroup).addPoint(currentPosition - groupSpacing / 2 - 1.0, -0.01);
 		getCurve(betweenGroupsTickCurveIndex + currentGroup).addPoint(currentPosition - groupSpacing / 2 - 1.0, 0.01);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void updateHoverPositions() {
-		if (groupCount == 1) {
-			for (int barIndex = 0; barIndex < questionOptionCount; barIndex++) {
-				ChartBar bar = getBarPrimary(barIndex);
-
-				if (2 * barIndex + 1 < questionOptionCount) {
-					Symbol symbol = bar.getCurve().getSymbol();
-					symbol.setHoverLocation(AnnotationLocation.SOUTHEAST);
-					symbol.setHoverXShift((int) (-getModelUnitInPixelsX() - 10));
-				} else if (2 * barIndex + 1 > questionOptionCount) {
-					Symbol symbol = bar.getCurve().getSymbol();
-					symbol.setHoverLocation(AnnotationLocation.SOUTHWEST);
-					symbol.setHoverXShift((int) (getModelUnitInPixelsX() + 10));
-				}
-
-			}
-		} else {
-			for (int barIndex = 0; barIndex < questionOptionCount; barIndex++) {
-				ChartBar bar = getBarPrimary(barIndex);
-				if (bar.getAnnotationWidth() > getModelUnitInPixelsX() + 10) {
-					Symbol symbol = bar.getCurve().getSymbol();
-					symbol.setHoverLocation(AnnotationLocation.SOUTHEAST);
-					symbol.setHoverXShift((int) (-getModelUnitInPixelsX() - 10));
-				}
-
-				bar = getBarPrimary(groupCount * questionOptionCount - 1 - barIndex);
-				if (bar.getAnnotationWidth() > getModelUnitInPixelsX() + 10) {
-					Symbol symbol = bar.getCurve().getSymbol();
-					symbol.setHoverLocation(AnnotationLocation.SOUTHWEST);
-					symbol.setHoverXShift((int) (getModelUnitInPixelsX() + 10));
-				}
-			}
-		}
 	}
 
 	/**
