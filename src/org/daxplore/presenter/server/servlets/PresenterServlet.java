@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.daxplore.presenter.server.ServerPrefixProperties;
 import org.daxplore.presenter.server.ServerTools;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.SettingItemStore;
@@ -94,6 +95,8 @@ public class PresenterServlet extends HttpServlet {
 			}
 			browserSupported |= ignoreBadBrowser;
 			
+			ServerPrefixProperties prefixProperties = new ServerPrefixProperties(prefix);
+			
 			String responseHTML = "";
 			if (!browserSupported) {
 				responseHTML = getUnsupportedBrowserHTML(baseurl);
@@ -105,7 +108,7 @@ public class PresenterServlet extends HttpServlet {
 					
 					// TODO clean query string
 					String queryString = request.getParameter("q");
-					responseHTML = getEmbedHTML(pm, prefix, locale, queryString, baseurl);
+					responseHTML = getEmbedHTML(pm, prefix, locale, queryString, baseurl, prefixProperties);
 					
 				} else if (feature!=null && feature.equalsIgnoreCase("print")) { // printer-friendly chart
 					
@@ -123,7 +126,7 @@ public class PresenterServlet extends HttpServlet {
 					
 				} else { // standard presenter
 					
-					responseHTML = getPresenterHTML(pm, prefix, locale, baseurl);
+					responseHTML = getPresenterHTML(pm, prefix, locale, baseurl, prefixProperties);
 					
 				}
 			}
@@ -165,7 +168,7 @@ public class PresenterServlet extends HttpServlet {
 		return MessageFormat.format(browserSuggestionTemplate, (Object[])arguments);
 	}
 	
-	private String getPresenterHTML(PersistenceManager pm, String prefix, Locale locale, String baseurl)
+	private String getPresenterHTML(PersistenceManager pm, String prefix, Locale locale, String baseurl, ServerPrefixProperties properties)
 			throws InternalServerException, BadReqException {
 		
 		// TODO Add caching for loaded files
@@ -173,6 +176,7 @@ public class PresenterServlet extends HttpServlet {
 		perspectives = StaticFileItemStore.readStaticFile(pm, prefix, "meta/perspectives", locale, ".json");
 		questions = StaticFileItemStore.readStaticFile(pm, prefix, "meta/questions", locale, ".json");
 		groups = StaticFileItemStore.readStaticFile(pm, prefix, "meta/groups", locale, ".json");
+		String prefixProperties = properties.toJson().toJSONString();
 		
 		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "page_title");
 		
@@ -182,7 +186,8 @@ public class PresenterServlet extends HttpServlet {
 			pageTitle,				// {2}
 			perspectives,			// {3}
 			questions,				// {4}
-			groups					// {5}
+			groups,					// {5}
+			prefixProperties		// {6}
 		};
 		
 		if (presenterHtmlTemplate == null) {
@@ -197,7 +202,7 @@ public class PresenterServlet extends HttpServlet {
 	}
 	
 	private String getEmbedHTML(PersistenceManager pm, String prefix, Locale locale,
-			String queryString, String baseurl) throws BadReqException, InternalServerException {
+			String queryString, String baseurl, ServerPrefixProperties properties) throws BadReqException, InternalServerException {
 		
 		QueryDefinition queryDefinition = new QueryDefinition(metadataMap.get(prefix), queryString);
 		String statItem = StatDataItemStore.getStats(pm, prefix, queryDefinition);
@@ -210,13 +215,16 @@ public class PresenterServlet extends HttpServlet {
 		
 		String questionString = StorageTools.getQuestionDefinitions(pm, prefix, questions, locale);
 		
+		String prefixProperties = properties.toJson().toJSONString();
+		
 		String[] arguments = {
 			prefix, 				// {0}
 			locale.toLanguageTag(), // {1}
 			pageTitle,				// {2}
 			baseurl, 				// {3}
 			statItem, 				// {4}
-			questionString			// {5}
+			questionString,			// {5}
+			prefixProperties		// {6}
 		};
 		
 		if (embedHtmlTemplate == null) {

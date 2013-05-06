@@ -29,6 +29,7 @@ import org.daxplore.presenter.chart.data.QueryResultCountCompare;
 import org.daxplore.presenter.chart.data.QueryResultMean;
 import org.daxplore.presenter.chart.data.QueryResultMeanCompare;
 import org.daxplore.presenter.client.json.shared.QueryData;
+import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QuestionMetadata;
 import org.daxplore.presenter.shared.SharedTools;
@@ -74,6 +75,7 @@ public class Query implements QueryInterface {
 	public static class QueryFactory {
 		protected final QuestionMetadata questions;
 		protected final QueryActiveAnimation queryActiveAnimation;
+		protected final PrefixProperties prefixProperties;
 
 		/**
 		 * Instantiates a new query factory.
@@ -84,9 +86,10 @@ public class Query implements QueryInterface {
 		 *            the loading chart animation
 		 */
 		@Inject
-		public QueryFactory(QuestionMetadata questions, QueryActiveAnimation queryActiveAnimation) {
+		public QueryFactory(QuestionMetadata questions, QueryActiveAnimation queryActiveAnimation, PrefixProperties prefixProperties) {
 			this.questions = questions;
 			this.queryActiveAnimation = queryActiveAnimation;
+			this.prefixProperties = prefixProperties;
 		}
 
 		/**
@@ -97,24 +100,20 @@ public class Query implements QueryInterface {
 		 * @return the query
 		 */
 		public Query createQuery(QueryDefinition queryDefinition) {
-			return new Query(questions, queryActiveAnimation, queryDefinition);
+			return new Query(questions, queryActiveAnimation, queryDefinition, prefixProperties);
 		}
 
 	}
 
-	protected Query(QuestionMetadata questions, QueryActiveAnimation queryActiveAnimation, QueryDefinition queryDefinition) {
+	protected Query(QuestionMetadata questions, QueryActiveAnimation queryActiveAnimation, QueryDefinition queryDefinition, PrefixProperties prefixProperties) {
 		this.questions = questions;
 		this.queryActiveAnimation = queryActiveAnimation;
 		this.queryDefinition = queryDefinition;
 
 		//TODO write more elegant/stable code for this
-		href = Window.Location.getHref();
-		String prefix = href.substring(href.lastIndexOf('/')+1);
-		prefix = prefix.substring(0, prefix.lastIndexOf('?'));
-		href = href.substring(0, href.lastIndexOf('/'));
-		href = href.substring(0, href.lastIndexOf('/'));
-		href = href + "/getStats?prefix="+prefix +"&";
-
+		String prefix = prefixProperties.getPrefix();
+		href = Window.Location.getProtocol() + "//" + Window.Location.getHost() + "/getStats?prefix="+prefix +"&";
+		
 		requestString = "q=" + this.queryDefinition.getAsString();
 	}
 

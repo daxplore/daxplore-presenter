@@ -30,6 +30,7 @@ import org.daxplore.presenter.client.Query.QueryFactory;
 import org.daxplore.presenter.client.event.SelectionUpdateHandler;
 import org.daxplore.presenter.client.json.Groups;
 import org.daxplore.presenter.client.json.Perspectives;
+import org.daxplore.presenter.client.json.shared.ClientPrefixProperties;
 import org.daxplore.presenter.client.json.shared.QuestionMetadataClientImpl;
 import org.daxplore.presenter.client.resources.UITexts;
 import org.daxplore.presenter.client.ui.ChartTypeOptionsPanel;
@@ -41,6 +42,7 @@ import org.daxplore.presenter.client.ui.PerspectiveQuestionsPanel.PerspectiveQue
 import org.daxplore.presenter.client.ui.QuestionPanel;
 import org.daxplore.presenter.client.ui.StagePanel;
 import org.daxplore.presenter.client.ui.WarningBanner.WarningBannerFactory;
+import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QuestionMetadata;
 
 import com.google.gwt.inject.client.AbstractGinModule;
@@ -92,6 +94,7 @@ public class PresentationModule extends AbstractGinModule {
 		bind(Groups.class).in(Singleton.class);
 		bind(QuestionMetadata.class).to(QuestionMetadataClientImpl.class).in(Singleton.class);
 		bind(Perspectives.class).in(Singleton.class);
+		bind(PrefixProperties.class).to(ClientPrefixProperties.class).in(Singleton.class);
 
 		/* client.resources */
 		bind(UITexts.class).in(Singleton.class);
