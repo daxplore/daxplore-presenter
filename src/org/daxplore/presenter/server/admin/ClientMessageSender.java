@@ -16,8 +16,8 @@
  */
 package org.daxplore.presenter.server.admin;
 
+import org.daxplore.presenter.server.ClientMessage;
 import org.daxplore.presenter.server.throwable.InternalServerException;
-import org.daxplore.presenter.shared.ClientMessage;
 import org.daxplore.presenter.shared.ClientServerMessage.MessageType;
 
 import com.google.appengine.api.channel.ChannelMessage;

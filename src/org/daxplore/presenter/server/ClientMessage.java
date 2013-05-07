@@ -14,8 +14,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.shared;
+package org.daxplore.presenter.server;
 
+import org.daxplore.presenter.shared.ClientServerMessage;
 import org.json.simple.JSONObject;
 
 public class ClientMessage implements ClientServerMessage {

@@ -151,6 +151,7 @@ public class Presenter implements ValueChangeHandler<String>, SelectionUpdateHan
 			SharedTools.println("History set: " + historyString);
 			History.newItem(historyString, false);
 			googleAnalyticsTrack(queryDefinition.getQuestionID(), queryDefinition.getPerspectiveID());
+			iFrameTrack(historyString);
 		}
 	}
 
@@ -168,6 +169,7 @@ public class Presenter implements ValueChangeHandler<String>, SelectionUpdateHan
 		try {
 			queryDefinition = new QueryDefinition(questionMetadata, storeString);
 			googleAnalyticsTrack(queryDefinition.getQuestionID(), queryDefinition.getPerspectiveID());
+			iFrameTrack(queryDefinition.getAsString());
 		} catch (IllegalArgumentException e) {
 			if (currentQuery == null) {
 				try {
@@ -176,7 +178,7 @@ public class Presenter implements ValueChangeHandler<String>, SelectionUpdateHan
 					return;
 				}
 			} else {
-				// queryDefinition = currentQuery.getQueryDefinition();
+				// TODO queryDefinition = currentQuery.getQueryDefinition(); ?
 				return;
 			}
 		}
@@ -219,6 +221,10 @@ public class Presenter implements ValueChangeHandler<String>, SelectionUpdateHan
 	private void googleAnalyticsTrack(String questionID, String perspectiveID) {
 		Tracking.track(config.googleAnalyticsID(), "q=" + questionID + "&p=" + perspectiveID);
 	}
+	
+	private final native void iFrameTrack(String historyToken) /*-{
+	    $wnd.parent.postMessage(historyToken, '*');
+	}-*/;
 
 	/**
 	 * {@inheritDoc}

@@ -18,7 +18,7 @@ package org.daxplore.presenter.server.upload;
 
 import static org.junit.Assert.*;
 
-import org.daxplore.presenter.shared.ClientMessage;
+import org.daxplore.presenter.server.ClientMessage;
 import org.daxplore.presenter.shared.ClientServerMessage.MessageType;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
