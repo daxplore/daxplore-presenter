@@ -23,4 +23,7 @@
 	<source path='admin' />
 	<source path='shared' />
 	<source path='client.json.shared' />
+	
+	<!-- Suppress GWT Quirks Mode warning -->
+	<extend-configuration-property name="document.compatMode" value="BackCompat" />
 </module>

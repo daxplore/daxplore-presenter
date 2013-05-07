@@ -30,4 +30,7 @@
 	<source path='embed' />
 	<source path='client/json/shared' />
 	<source path='shared' />
+	
+	<!-- Suppress GWT Quirks Mode warning -->
+	<extend-configuration-property name="document.compatMode" value="BackCompat" />
 </module>
