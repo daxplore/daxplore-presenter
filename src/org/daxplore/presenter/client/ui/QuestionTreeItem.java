@@ -18,6 +18,7 @@
  */
 package org.daxplore.presenter.client.ui;
 
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.TreeItem;
 
 /**
@@ -30,8 +31,8 @@ class QuestionTreeItem extends TreeItem {
 
 	String questionID;
 
-	QuestionTreeItem(String text, String questionID) {
-		super(text);
+	QuestionTreeItem(SafeHtml html, String questionID) {
+		super(html);
 		this.questionID = questionID;
 	}
 

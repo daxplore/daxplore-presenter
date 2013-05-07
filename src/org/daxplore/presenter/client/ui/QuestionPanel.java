@@ -34,6 +34,7 @@ import com.google.gwt.event.logical.shared.OpenEvent;
 import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
@@ -80,12 +81,21 @@ public class QuestionPanel extends Composite implements QueryUpdateHandler{
 
 		for (int i = 0; i < groups.getGroupCount(); i++) {
 			String txt = groups.getGroupName(i);
-			txt = "<span class=\"daxplore-QuestionPanel-branch\">&nbsp;" + txt + "&nbsp;</span>";
-			GroupItem gr = new GroupItem(txt);
+			SafeHtmlBuilder html = new SafeHtmlBuilder();
+			html.appendHtmlConstant("<span class=\"daxplore-QuestionPanel-branch\">&nbsp;");
+			html.appendEscaped(txt);
+			html.appendHtmlConstant("&nbsp;</span>");
+			GroupItem gr = new GroupItem(html.toSafeHtml());
 			List<String> qlist = groups.getQuestionIDs(i);
 			for (String q : qlist) {
-				boolean ho = questions.hasSecondary(q);
-				QuestionTreeItem qi = new QuestionTreeItem("&nbsp;" + questions.getShortText(q) + (ho ? " <span class=\"super\">'92</span>" : "") + "&nbsp;", q);
+				html = new SafeHtmlBuilder();
+				html.appendHtmlConstant("&nbsp;");
+				html.appendEscaped(questions.getShortText(q));
+				if(questions.hasSecondary(q)) {
+					html.appendHtmlConstant("<span class=\"super\">'92</span>");
+				}
+				html.appendHtmlConstant("&nbsp;");
+				QuestionTreeItem qi = new QuestionTreeItem(html.toSafeHtml(), q);
 				qi.setTitle(questions.getFullText(q));
 				gr.addItem(qi);
 			}
@@ -230,8 +240,8 @@ public class QuestionPanel extends Composite implements QueryUpdateHandler{
 	 */
 	private class GroupItem extends TreeItem {
 
-		GroupItem(String text) {
-			super(text);
+		GroupItem(SafeHtml html) {
+			super(html);
 		}
 
 		public boolean hasSelectedChild() {

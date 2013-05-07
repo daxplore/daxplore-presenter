@@ -25,6 +25,7 @@ import org.daxplore.presenter.shared.QuestionMetadata;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Label;
@@ -87,8 +88,12 @@ public class PerspectiveQuestionsPanel extends FlowPanel implements HasSelection
 
 		perspectiveList = new Tree();
 		for (String questionID : perspectives.getQuestionIDs()) {
-			String itemText = questions.getShortText(questionID) + (questions.hasSecondary(questionID) ? " <span class=\"super\">'92</span>" : "");
-			QuestionTreeItem item = new QuestionTreeItem(itemText, questionID);
+			SafeHtmlBuilder html = new SafeHtmlBuilder();
+			html.appendEscaped(questions.getShortText(questionID));
+			if(questions.hasSecondary(questionID)) {
+				html.appendHtmlConstant(" <span class=\"super\">'92</span>");
+			}
+			QuestionTreeItem item = new QuestionTreeItem(html.toSafeHtml(), questionID);
 			perspectiveList.addItem(item);
 		}
 		setPerspective(perspectives.getQuestionIDs().get(0), false);
