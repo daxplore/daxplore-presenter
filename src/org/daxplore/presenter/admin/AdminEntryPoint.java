@@ -31,6 +31,6 @@ public class AdminEntryPoint implements EntryPoint {
 	public void onModuleLoad() {
 		AdminInjector injector = GWT.create(AdminInjector.class);
 		AdminController adminController = injector.getAdminController();
-		adminController.go(RootPanel.get());
+		adminController.go(RootPanel.get("ID-AdminPanel"));
 	}
 }
