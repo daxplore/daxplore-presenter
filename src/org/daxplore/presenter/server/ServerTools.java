@@ -150,6 +150,7 @@ public class ServerTools {
 		String queryLocale = request.getParameter("locale");
 		@SuppressWarnings("unchecked")
 		Enumeration<Locale> locales = (Enumeration<Locale>)request.getLocales();
+
 		
 		// Set up supported locales:
 		PersistenceManager pm = PMF.get().getPersistenceManager();
@@ -184,9 +185,9 @@ public class ServerTools {
 		
 		//Pick the first supported locale in the queue
 		for(Locale desired : desiredLocales){
-			String desiredLanguage = desired.getLanguage();
+			String desiredLocale = desired.getLanguage();
 			for(Locale supported : supportedLocales){
-				if(supported.getLanguage().equalsIgnoreCase(desiredLanguage)){
+				if(supported.getLanguage().equalsIgnoreCase(desiredLocale)){
 					return supported;
 				}
 			}
