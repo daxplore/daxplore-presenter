@@ -96,7 +96,6 @@ public class PresenterServlet extends HttpServlet {
 			}
 			browserSupported |= ignoreBadBrowser;
 			
-			ServerPrefixProperties prefixProperties = new ServerPrefixProperties(prefix);
 			
 			String responseHTML = "";
 			if (!browserSupported) {
@@ -105,6 +104,11 @@ public class PresenterServlet extends HttpServlet {
 				Locale locale = ServerTools.selectLocale(request, prefix);
 				pm = PMF.get().getPersistenceManager();
 				
+				String secondaryFlagText = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "secondary_flag");
+				String timepoint0Text = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "timepoint_0");
+				String timepoint1Text = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "timepoint_1");
+				ServerPrefixProperties prefixProperties = new ServerPrefixProperties(prefix, secondaryFlagText, timepoint0Text, timepoint1Text);
+
 				if (feature!=null && feature.equalsIgnoreCase("embed")) { // embedded chart
 					
 					// TODO clean query string

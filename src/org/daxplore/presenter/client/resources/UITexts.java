@@ -63,12 +63,12 @@ public interface UITexts extends Messages {
 	String embedShowLegend();
 	
 	// OptionsPanel buttons
-	String onlyShowNew();
-	String onlyShowNewTitleEnabled();
-	String onlyShowNewTitleDisabled();
-	String compareWithOld();
-	String compareWithOldTitleEnabled();
-	String compareWithOldTitleDisabled();
+	String onlyShowNew(String timepoint0Text);
+	String onlyShowNewTitleEnabled(String timepoint0Text);
+	String onlyShowNewTitleDisabled(String timepoint0Text);
+	String compareWithOld(String timepoint1Text);
+	String compareWithOldTitleEnabled(String timepoint1Text, String timepoint0Text);
+	String compareWithOldTitleDisabled(String timepoint1Text);
 	String showFrequency();
 	String showFrequencyTitleEnabled();
 	String showFrequencyTitleDisabled();

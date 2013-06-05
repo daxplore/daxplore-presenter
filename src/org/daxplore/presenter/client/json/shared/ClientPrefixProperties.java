@@ -36,12 +36,48 @@ public class ClientPrefixProperties implements PrefixProperties {
 		return properties.getPrefix();
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getSecondaryFlagText() {
+		return properties.getSecondaryFlagText();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getTimepoint0Text() {
+		return properties.getTimepoint0Text();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getTimepoint1Text() {
+		return properties.getTimepoint1Text();
+	}
+
 	private final static class NativePrefixProperties extends JavaScriptObject {
 		
 		protected NativePrefixProperties() {}
 		
 		public native String getPrefix() /*-{
 			return this.prefix;
+		}-*/;
+		
+		public native String getSecondaryFlagText() /*-{
+			return this.secondary_flag;
+		}-*/;
+
+		public native String getTimepoint0Text() /*-{
+			return this.timepoint_0;
+		}-*/;
+		
+		public native String getTimepoint1Text() /*-{
+			return this.timepoint_1;
 		}-*/;
 		
 		private static native NativePrefixProperties getPrefixProperties() /*-{

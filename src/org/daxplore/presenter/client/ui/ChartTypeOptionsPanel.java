@@ -26,6 +26,7 @@ import org.daxplore.presenter.client.event.QueryUpdateHandler;
 import org.daxplore.presenter.client.event.SelectionUpdateEvent;
 import org.daxplore.presenter.client.resources.DaxploreConfig;
 import org.daxplore.presenter.client.resources.UITexts;
+import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
@@ -66,15 +67,20 @@ public class ChartTypeOptionsPanel extends Composite implements QueryUpdateHandl
 	private boolean showMeanButtons;
 	
 	@Inject
-	protected ChartTypeOptionsPanel(EventBus eventBus, UITexts uiTexts, DaxploreConfig config) {
+	protected ChartTypeOptionsPanel(EventBus eventBus, UITexts uiTexts, DaxploreConfig config, PrefixProperties prefixProperties) {
 		this.eventBus = eventBus;
 		
 		this.showMeanButtons = config.showMeanButtons();
 
 		mainPanel = new VerticalPanel();
-
+		
+		String timepoint0Text = prefixProperties.getTimepoint0Text();
+		String timepoint1Text = prefixProperties.getTimepoint1Text();
+		
 		dontShowSecondaryButton = new TitleToggleButton(
-						uiTexts.onlyShowNew(), uiTexts.onlyShowNewTitleEnabled(), uiTexts.onlyShowNewTitleDisabled());
+						uiTexts.onlyShowNew(timepoint0Text),
+						uiTexts.onlyShowNewTitleEnabled(timepoint0Text),
+						uiTexts.onlyShowNewTitleDisabled(timepoint0Text));
 		dontShowSecondaryButton.setValue(true);
 		dontShowSecondaryButton.setEnabled(false);
 		dontShowSecondaryButton.addValueChangeHandler(this);
@@ -82,7 +88,9 @@ public class ChartTypeOptionsPanel extends Composite implements QueryUpdateHandl
 		mainPanel.add(dontShowSecondaryButton);
 
 		showSecondaryButton = new TitleToggleButton(
-						uiTexts.compareWithOld(), uiTexts.compareWithOldTitleEnabled(), uiTexts.compareWithOldTitleDisabled());
+						uiTexts.compareWithOld(timepoint1Text),
+						uiTexts.compareWithOldTitleEnabled(timepoint1Text, timepoint0Text),
+						uiTexts.compareWithOldTitleDisabled(timepoint1Text));
 		showSecondaryButton.setEnabled(false);
 		showSecondaryButton.addValueChangeHandler(this);
 		showSecondaryButton.setValue(false, false);

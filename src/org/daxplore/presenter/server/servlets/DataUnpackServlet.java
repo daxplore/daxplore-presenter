@@ -207,7 +207,7 @@ public class DataUnpackServlet extends HttpServlet {
 	
 	protected void unpackPropertyFile(String fileName, byte[] fileData, ClientMessageSender messageSender)
 			throws InternalServerException, BadReqException {
-		String[] properties = {"page_title"};
+		String[] properties = {"page_title", "secondary_flag", "timepoint_0", "timepoint_1", };
 		long time = System.currentTimeMillis();
 		BufferedReader reader = ServerTools.getAsBufferedReader(fileData);
 		PersistenceManager pm = PMF.get().getPersistenceManager();

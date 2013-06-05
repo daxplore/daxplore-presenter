@@ -27,6 +27,7 @@ import org.daxplore.presenter.client.event.SelectionUpdateEvent;
 import org.daxplore.presenter.client.json.Groups;
 import org.daxplore.presenter.client.resources.UIResources;
 import org.daxplore.presenter.client.resources.UITexts;
+import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QuestionMetadata;
 
@@ -63,7 +64,7 @@ public class QuestionPanel extends Composite implements QueryUpdateHandler{
 	private VerticalPanel vp = new VerticalPanel();
 
 	@Inject
-	QuestionPanel(QuestionMetadata questions, Groups groups, EventBus eventBus, UITexts uiTexts, UIResources uiResources) {
+	QuestionPanel(QuestionMetadata questions, Groups groups, EventBus eventBus, UITexts uiTexts, UIResources uiResources, PrefixProperties prefixProperties) {
 		this.questions = questions;
 		this.eventBus = eventBus;
 		
@@ -92,7 +93,9 @@ public class QuestionPanel extends Composite implements QueryUpdateHandler{
 				html.appendHtmlConstant("&nbsp;");
 				html.appendEscaped(questions.getShortText(q));
 				if(questions.hasSecondary(q)) {
-					html.appendHtmlConstant("<span class=\"super\">'92</span>");
+					html.appendHtmlConstant("&nbsp;<span class=\"super\">");
+					html.appendEscaped(prefixProperties.getSecondaryFlagText());
+					html.appendHtmlConstant("</span>");
 				}
 				html.appendHtmlConstant("&nbsp;");
 				QuestionTreeItem qi = new QuestionTreeItem(html.toSafeHtml(), q);
