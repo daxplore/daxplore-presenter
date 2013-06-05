@@ -118,10 +118,11 @@ public class GetCsvServlet extends HttpServlet {
 			questionOptionTexts.add(0,  queryDefinition.getPerspectiveShortText() + " \\ " + queryDefinition.getQuestionShortText());
 			csvOutput.add(questionOptionTexts.toArray(new String[0]));
 			
-			JSONObject statItem = (JSONObject)JSONValue.parse(StatDataItemStore.getStats(pm, prefix, queryDefinition));
+			String statString = StatDataItemStore.getStats(pm, prefix, queryDefinition);
+			JSONObject statJsonObject = (JSONObject)JSONValue.parse(statString);
+			JSONObject valueJsonObject = (JSONObject)statJsonObject.get("values");
 			if(queryDefinition.getPerspectiveOptionCount()>0){
-				JSONObject timepoint1 = (JSONObject)statItem.get("0");
-				JSONObject timepoint2 = (JSONObject)statItem.get("1");
+				JSONObject timepoint1 = (JSONObject)valueJsonObject.get("0");
 				for(int i=0; i<usedPerspectiveOptions.size(); i++) {
 					String[] row = new String[1 + queryDefinition.getQuestionOptionCount()];
 					int perspectiveOption = usedPerspectiveOptions.get(i);
@@ -137,6 +138,7 @@ public class GetCsvServlet extends HttpServlet {
 					csvOutput.add(row);
 
 					if (queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
+						JSONObject timepoint2 = (JSONObject)valueJsonObject.get("1");
 						row = new String[1 + queryDefinition.getQuestionOptionCount()];
 						row[0] = perspectiveOptionTexts.get(perspectiveOption) + " (2)"; //TODO mark primary (1) in some better way?
 						questionData = (JSONArray)timepoint2.get(Integer.toString(perspectiveOption));

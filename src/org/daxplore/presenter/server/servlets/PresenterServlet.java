@@ -62,6 +62,7 @@ public class PresenterServlet extends HttpServlet {
 		PersistenceManager pm = null;
 		try {
 			// Get input from URL
+			//TODO use better and more stable parsing
 			String prefix = request.getPathInfo();
 			if (prefix!=null && !prefix.isEmpty()) {
 				if(prefix.charAt(0)=='/') {
