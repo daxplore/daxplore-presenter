@@ -26,7 +26,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.web.bindery.event.shared.EventBus;
 
 /**
  * A button widget that has an image on it.
@@ -41,14 +40,12 @@ public class ImageButton extends Composite implements HasClickHandlers {
 	/**
 	 * Instantiates a new image button.
 	 * 
-	 * @param eventBus
-	 *            the system's event bus
 	 * @param buttonImage
 	 *            the image displayed on the button
 	 * @param titleText
 	 *            the title text, displayed on mouse over
 	 */
-	public ImageButton(EventBus eventBus, Image buttonImage, String titleText){
+	public ImageButton(Image buttonImage, String titleText){
 		this.buttonImage = buttonImage;
 		buttonImage.setTitle(titleText);
 		mainPanel = new SimplePanel();

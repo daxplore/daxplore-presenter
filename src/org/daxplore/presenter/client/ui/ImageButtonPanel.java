@@ -25,6 +25,7 @@ import org.daxplore.presenter.client.event.QueryUpdateEvent;
 import org.daxplore.presenter.client.event.QueryUpdateHandler;
 import org.daxplore.presenter.client.resources.UIResources;
 import org.daxplore.presenter.client.resources.UITexts;
+import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QueryDefinition;
 
 import com.google.gwt.core.client.GWT;
@@ -53,32 +54,31 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 	protected HorizontalPanel mainPanel;
 	protected EmbedPopup embedPopup;
 	protected QueryDefinition queryDefinition;
+	private PrefixProperties prefixProperties;
+	
+	private WidgetAnchor csvWidgetAnchor;
 	
 	@Inject
-	protected ImageButtonPanel(final EventBus eventBus, UITexts uiTexts, UIResources uiResources, EmbedPopup embedPopup) {
+	protected ImageButtonPanel(final EventBus eventBus, UITexts uiTexts, UIResources uiResources, EmbedPopup embedPopup, PrefixProperties prefixProperties) {
 		this.embedPopup = embedPopup;
+		this.prefixProperties = prefixProperties;
 		
-		Image buttonImage = new Image(uiResources.printButtonImage());
-		ImageButton printButton = new ImageButton(eventBus, buttonImage, uiTexts.printButtonTitle());
-		printButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				eventBus.fireEvent(new ImageButtonEvent(ImageButtonAction.PRINT));
-			}
-		});
+//		Image buttonImage = new Image(uiResources.printButtonImage());
+//		ImageButton printButton = new ImageButton(buttonImage, uiTexts.printButtonTitle());
+//		printButton.addClickHandler(new ClickHandler() {
+//			@Override
+//			public void onClick(ClickEvent event) {
+//				eventBus.fireEvent(new ImageButtonEvent(ImageButtonAction.PRINT));
+//			}
+//		});
 		
-		buttonImage = new Image(uiResources.csvButtonImage());
-		ImageButton csvButton = new ImageButton(eventBus, buttonImage, uiTexts.csvButtonTitle());
-		csvButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				eventBus.fireEvent(new ImageButtonEvent(ImageButtonAction.CSV));
-			}
-		});
+		Image buttonImage = new Image(uiResources.csvButtonImage());
+		ImageButton csvButton = new ImageButton(buttonImage, uiTexts.csvButtonTitle());
+		csvWidgetAnchor = new WidgetAnchor("", csvButton);
 		
 		
 		buttonImage = new Image(uiResources.embedButtonImage());
-		ImageButton embedButton = new ImageButton(eventBus, buttonImage, uiTexts.embedButtonTitle());
+		ImageButton embedButton = new ImageButton(buttonImage, uiTexts.embedButtonTitle());
 		embedButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -88,8 +88,8 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 		ButtonWithPopup embedButtonPopup = new ButtonWithPopup(embedButton, embedPopup);
 		
 		mainPanel = new HorizontalPanel();
-		mainPanel.add(printButton);
-		mainPanel.add(csvButton);
+//		mainPanel.add(printButton);
+		mainPanel.add(csvWidgetAnchor);
 		mainPanel.add(embedButtonPopup);
 		
 		mainPanel.setSpacing(5);
@@ -103,17 +103,22 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 	}
 	
 	protected String getCsvDownloadSrc() {
+		//TODO use better parsing
 		String address = GWT.getModuleBaseURL(); //get address with module, e.g. http://127.0.0.1/presentation/
 		address = address.substring(0, address.length()-1); //remove last slash
 		address = address.substring(0, address.lastIndexOf("/")+1); //remove module name
 		address += "getCsv/";
 		String fileName = queryDefinition.getPerspectiveShortText() + " - " + queryDefinition.getQuestionShortText() + ".csv";
-		fileName = URL.encodeQueryString(fileName);
-		return address + fileName + "?q=" + queryDefinition.getAsString() + "&l=" + LocaleInfo.getCurrentLocale().getLocaleName();
+		fileName = URL.encodePathSegment(fileName);
+		return address + fileName
+				+ "?q=" + queryDefinition.getAsString()
+				+ "&l=" + LocaleInfo.getCurrentLocale().getLocaleName()
+				+ "&prefix=" + prefixProperties.getPrefix();
 	}
 	
 	protected void openPrintPage(){
 		if(queryDefinition != null) {
+			//TODO use better parsing
 			String address = GWT.getModuleBaseURL(); //get address with module, e.g. http://127.0.0.1/presentation/
 			if (address.charAt(address.length()-1) == '/') {
 				address = address.substring(0, address.length()-1); //remove trailing slash
@@ -136,9 +141,6 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 		case PRINT:
 			openPrintPage();
 			break;
-		case CSV:
-			Window.open(getCsvDownloadSrc(), "_blank", "enabled");
-			break;
 		default:
 			break;
 		}
@@ -150,6 +152,7 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 	@Override
 	public void onQueryUpdate(QueryUpdateEvent event) {
 		queryDefinition = event.getQueryDefinition();
+		csvWidgetAnchor.setHref(getCsvDownloadSrc());
 	}
 	
 }
