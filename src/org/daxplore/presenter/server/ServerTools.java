@@ -147,7 +147,7 @@ public class ServerTools {
 	public static Locale selectLocale(HttpServletRequest request, String prefix) throws InternalServerException {
 		// Get locale data from request
 		Cookie[] cookies = request.getCookies();
-		String queryLocale = request.getParameter("locale");
+		String queryLocale = request.getParameter("l");
 		@SuppressWarnings("unchecked")
 		Enumeration<Locale> locales = (Enumeration<Locale>)request.getLocales();
 
