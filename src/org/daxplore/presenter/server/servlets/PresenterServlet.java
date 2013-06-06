@@ -17,6 +17,7 @@
 package org.daxplore.presenter.server.servlets;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.Writer;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ import org.apache.commons.io.IOUtils;
 import org.daxplore.presenter.server.ServerPrefixProperties;
 import org.daxplore.presenter.server.ServerTools;
 import org.daxplore.presenter.server.storage.PMF;
+import org.daxplore.presenter.server.storage.QuestionMetadataServerImpl;
 import org.daxplore.presenter.server.storage.SettingItemStore;
 import org.daxplore.presenter.server.storage.StatDataItemStore;
 import org.daxplore.presenter.server.storage.StaticFileItemStore;
@@ -209,7 +211,17 @@ public class PresenterServlet extends HttpServlet {
 	private String getEmbedHTML(PersistenceManager pm, String prefix, Locale locale,
 			String queryString, String baseurl, ServerPrefixProperties properties) throws BadReqException, InternalServerException {
 		
-		QueryDefinition queryDefinition = new QueryDefinition(metadataMap.get(prefix), queryString);
+		QuestionMetadata questionMetadata;
+		String key = prefix + "_" + locale.toLanguageTag();
+		if(metadataMap.containsKey(key)) {
+			questionMetadata = metadataMap.get(key);
+		} else {
+			String questionText = StaticFileItemStore.readStaticFile(pm, prefix, "meta/questions", locale, ".json");
+			questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
+			metadataMap.put(key, questionMetadata);
+		}
+		
+		QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, queryString);
 		String statItem = StatDataItemStore.getStats(pm, prefix, queryDefinition);
 
 		LinkedList<String> questions = new LinkedList<String>();

@@ -30,6 +30,7 @@ import org.daxplore.presenter.client.event.QueryUpdateHandler;
 import org.daxplore.presenter.client.resources.DaxploreConfig;
 import org.daxplore.presenter.client.resources.UITexts;
 import org.daxplore.presenter.shared.EmbedDefinition;
+import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
 import org.daxplore.presenter.shared.QueryDefinition;
 
@@ -76,6 +77,7 @@ public class EmbedPopup extends PopupPanel implements EmbedSizeHandler, QueryUpd
 	protected EventBus eventBus;
 	protected UITexts uiTexts;
 	protected DaxploreConfig config;
+	private PrefixProperties prefixProperties;
 
 	protected VerticalPanel mainPanel;
 
@@ -103,10 +105,12 @@ public class EmbedPopup extends PopupPanel implements EmbedSizeHandler, QueryUpd
 	 *            supplies configuration parameters to the client
 	 */
 	@Inject
-	public EmbedPopup(final EventBus eventBus, UITexts uiTexts, DaxploreConfig config) {
+	public EmbedPopup(final EventBus eventBus, UITexts uiTexts, DaxploreConfig config, PrefixProperties prefixProperties) {
 		super(true);
 		this.eventBus = eventBus;
 		this.uiTexts = uiTexts;
+		this.prefixProperties = prefixProperties;
+		
 		mainPanel = new VerticalPanel();
 		mainPanel.setSpacing(5);
 
@@ -195,18 +199,10 @@ public class EmbedPopup extends PopupPanel implements EmbedSizeHandler, QueryUpd
 			int width = currentEmbedSize.getWidth(config);
 			int height = currentEmbedSize.getHeight(config);
 			
-			// get address with module, e.g. http://127.0.0.1/presentation/
-			String address = GWT.getModuleBaseURL(); 
+			// get base address, e.g. http://127.0.0.1/p/myprefix
+			String address = GWT.getHostPageBaseURL() + prefixProperties.getPrefix();
 			
-			// remove last slash
-			if (address.charAt(address.length()-1) == '/') {
-				address = address.substring(0, address.length() - 1);
-			}
-			
-			// remove module name
-			address = address.substring(0, address.lastIndexOf("/") + 1);
-			
-			address += "embed?q=" + queryDefinition.getAsString();
+			address += "?f=embed&q=" + queryDefinition.getAsString();
 
 			address += "&l=" + LocaleInfo.getCurrentLocale().getLocaleName();
 

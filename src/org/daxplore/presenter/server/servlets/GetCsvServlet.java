@@ -101,12 +101,13 @@ public class GetCsvServlet extends HttpServlet {
 			
 			Locale locale = new Locale(localeString);
 			QuestionMetadata questionMetadata;
-			if(metadataMap.containsKey(locale.getLanguage())) {
-				questionMetadata = metadataMap.get(locale.getLanguage());
+			String key = prefix + "_" + locale.toLanguageTag();
+			if(metadataMap.containsKey(key)) {
+				questionMetadata = metadataMap.get(key);
 			} else {
 				String questionText = StaticFileItemStore.readStaticFile(pm, prefix, "meta/questions", locale, ".json");
 				questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
-				metadataMap.put(locale.getLanguage(), questionMetadata);
+				metadataMap.put(key, questionMetadata);
 			}
 			QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, queryString);
 			
