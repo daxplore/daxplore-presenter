@@ -422,7 +422,8 @@ public class BarChart extends GChartChart {
 			if (currentGroup > 0) {
 				drawBetweenGroupsTick();
 			}
-			if (queryResult.hasData(perspectiveOption)) {
+			if (queryResult.hasData(perspectiveOption)
+					&& queryResult.getPopulation(perspectiveOption)!=0) { //TODO temporary hack, handle cut-off properly producer 
 				drawBarGroup(perspectiveOptionTexts.get(perspectiveOption), queryResult.getPopulation(perspectiveOption), queryResult.getCountDataPercentages(perspectiveOption));
 			} else {
 				drawMissingBarGroup(perspectiveOptionTexts.get(perspectiveOption));
@@ -435,7 +436,7 @@ public class BarChart extends GChartChart {
 				drawBetweenGroupsTick();
 			}
 			String totalText = chartTexts.compareWithAll();
-			if (queryResult.hasTotalDataItemData()) {
+			if (queryResult.hasTotalDataItemData() && queryResult.getTotalPopulation()!=0) { //TODO temporary hack, handle cut-off properly producer
 				drawBarGroup(totalText, queryResult.getTotalPopulation(), queryResult.getTotalCountDataPercentages());
 			} else {
 				drawMissingBarGroup(totalText);
