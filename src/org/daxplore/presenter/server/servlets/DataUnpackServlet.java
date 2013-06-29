@@ -207,13 +207,13 @@ public class DataUnpackServlet extends HttpServlet {
 	
 	protected void unpackPropertyFile(String fileName, byte[] fileData, ClientMessageSender messageSender)
 			throws InternalServerException, BadReqException {
-		String[] properties = {"page_title", "secondary_flag", "timepoint_0", "timepoint_1", };
+		String[] propertiesWhitelist = {"page_title", "secondary_flag", "timepoint_0", "timepoint_1"};
 		long time = System.currentTimeMillis();
 		BufferedReader reader = ServerTools.getAsBufferedReader(fileData);
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<SettingItemStore> items = new LinkedList<SettingItemStore>();
 		JSONObject dataMap = (JSONObject)JSONValue.parse(reader);
-		for(String prop : properties) {
+		for(String prop : propertiesWhitelist) {
 			String key = fileName.substring(0, fileName.lastIndexOf('.')) + "/" + prop;
 			String value = (String)dataMap.get(prop);
 			if(value==null){
@@ -223,7 +223,7 @@ public class DataUnpackServlet extends HttpServlet {
 		}
 		pm.makePersistentAll(items);
 		time = System.currentTimeMillis()-time;
-		String message = "Set " + properties.length + " properties in " + (time/Math.pow(10, 6)) + " seconds";
+		String message = "Set " + propertiesWhitelist.length + " properties in " + (time/Math.pow(10, 6)) + " seconds";
 		logger.log(Level.INFO, message);
 		messageSender.send(MessageType.PROGRESS_UPDATE, message);
 	}
