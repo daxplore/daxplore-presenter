@@ -20,7 +20,7 @@ public interface PrefixProperties {
 
 	public String getPrefix();
 	public String getSecondaryFlagText();
-	public String getTimepoint0Text();
-	public String getTimepoint1Text();
+	public String getTimepointPrimaryText();
+	public String getTimepointSecondaryText();
 	
 }

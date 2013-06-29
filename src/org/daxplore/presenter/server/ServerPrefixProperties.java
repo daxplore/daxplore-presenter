@@ -51,7 +51,7 @@ public class ServerPrefixProperties implements PrefixProperties {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getTimepoint0Text() {
+	public String getTimepointPrimaryText() {
 		return timepoint0Text;
 	}
 	
@@ -59,7 +59,7 @@ public class ServerPrefixProperties implements PrefixProperties {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getTimepoint1Text() {
+	public String getTimepointSecondaryText() {
 		return timepoint1Text;
 	}
 	

@@ -48,7 +48,7 @@ public class ClientPrefixProperties implements PrefixProperties {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getTimepoint0Text() {
+	public String getTimepointPrimaryText() {
 		return properties.getTimepoint0Text();
 	}
 	
@@ -56,7 +56,7 @@ public class ClientPrefixProperties implements PrefixProperties {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getTimepoint1Text() {
+	public String getTimepointSecondaryText() {
 		return properties.getTimepoint1Text();
 	}
 

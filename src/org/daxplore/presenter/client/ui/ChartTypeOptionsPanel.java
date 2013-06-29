@@ -74,8 +74,8 @@ public class ChartTypeOptionsPanel extends Composite implements QueryUpdateHandl
 
 		mainPanel = new VerticalPanel();
 		
-		String timepoint0Text = prefixProperties.getTimepoint0Text();
-		String timepoint1Text = prefixProperties.getTimepoint1Text();
+		String timepoint0Text = prefixProperties.getTimepointPrimaryText();
+		String timepoint1Text = prefixProperties.getTimepointSecondaryText();
 		
 		dontShowSecondaryButton = new TitleToggleButton(
 						uiTexts.onlyShowNew(timepoint0Text),
