@@ -16,6 +16,8 @@
 
 package org.daxplore.presenter.shared;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * A Base64 encoder/decoder.
  * 
@@ -184,15 +186,21 @@ public class Base64 {
 	}
 
 	/**
-	 * Decodes a string from Base64 format. No blanks or line breaks are allowed
-	 * within the Base64 encoded input data.
+	 * Decodes a string from Base64 format.
+	 * 
+	 * <p>No blanks or line breaks are allowed within the Base64 encoded input
+	 * data. Decodes assuming it's UTF-8 encoded data.
 	 * 
 	 * @param s
-	 *            A Base64 String to be decoded.
+	 *            A Base64 String to be decoded as an UTF-8 text
 	 * @return A String containing the decoded data.
 	 */
 	public static String decodeString(String s) {
-		return new String(decode(s));
+		try {
+			return new String(decode(s), "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new AssertionError("UTF-8 not supported on this platform.");
+		}
 	}
 
 	/**
