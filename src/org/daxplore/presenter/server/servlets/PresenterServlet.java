@@ -107,6 +107,7 @@ public class PresenterServlet extends HttpServlet {
 				pm = PMF.get().getPersistenceManager();
 				
 				String secondaryFlagText = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "secondary_flag");
+				//TODO handle timepoints properly
 				String timepoint0Text = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "timepoint_0");
 				String timepoint1Text = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "timepoint_1");
 				ServerPrefixProperties prefixProperties = new ServerPrefixProperties(prefix, secondaryFlagText, timepoint0Text, timepoint1Text);

@@ -25,6 +25,9 @@ import java.util.logging.Logger;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.daxplore.presenter.server.servlets.GetCsvServlet;
+import org.daxplore.presenter.server.servlets.GetStatsServlet;
+
 import com.google.appengine.api.blobstore.BlobKey;
 
 public class DeleteData {
@@ -32,6 +35,7 @@ public class DeleteData {
 	
 	public static String deleteForPrefix(PersistenceManager pm, String prefix) {
 		long time = System.currentTimeMillis();
+		
 		StringBuilder resultMessage = new StringBuilder("Removed data for prefix '").append(prefix).append("': ");
 		// Delete the single prefix item, this should be enough to remove the prefix from the system
 		// We still need to remove all related datastore/blobstore items to prevent storage memory leaks
@@ -78,6 +82,10 @@ public class DeleteData {
 		int deletedStaticFileItems = fileItems.size();
 		resultMessage.append(deletedBlobs).append(" file blobs deleted, ");
 		resultMessage.append(deletedStaticFileItems).append(" static file pointers ");
+		
+		//Clear caches in different places
+		GetStatsServlet.clearServletCache(prefix);
+		GetCsvServlet.clearServletCache();
 		
 		long totalDeleted = deletedPrefixItems + deletedLocaleItems + deletedStatDataItems + deletedSettingItems + deletedStaticFileItems;
 		double timeSeconds = ((System.currentTimeMillis()-time)/Math.pow(10, 6));

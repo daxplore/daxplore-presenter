@@ -20,6 +20,8 @@ package org.daxplore.presenter.server.servlets;
 
 import java.io.PrintWriter;
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,7 +59,7 @@ import org.daxplore.shared.SharedResourceTools;
 @SuppressWarnings("serial")
 public class GetStatsServlet extends HttpServlet {
 	private static Logger logger = Logger.getLogger(GetStatsServlet.class.getName());
-	QuestionMetadata questionMetadata = null;
+	private static Map<String, QuestionMetadata> metadataPrefixMap = new HashMap<>();
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, java.io.IOException {
@@ -69,14 +71,14 @@ public class GetStatsServlet extends HttpServlet {
 				throw new BadReqException("Request made with syntactically invalid prefix: '" + prefix + "'");
 			}
 			String queryString = request.getParameter("q"); //TODO check input
-			if (questionMetadata == null) {
+			if (!metadataPrefixMap.containsKey(prefix)) { // TODO clear on new upload (and in other similar places)
 				LocaleStore localeStore = pm.getObjectById(LocaleStore.class, prefix);
 				//it shouldn't matter what locale we use here, as we don't read any localized data
 				String questionText = StaticFileItemStore.readStaticFile(pm, prefix, "meta/questions", localeStore.getDefaultLocale(), ".json");
-				questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
+				metadataPrefixMap.put(prefix, new QuestionMetadataServerImpl(new StringReader(questionText)));
 			}
 			
-			QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, queryString);
+			QueryDefinition queryDefinition = new QueryDefinition(metadataPrefixMap.get(prefix), queryString);
 			
 			response.setContentType("text/html; charset=UTF-8");
 			respWriter.write(StatDataItemStore.getStats(pm, prefix, queryDefinition));
@@ -90,5 +92,9 @@ public class GetStatsServlet extends HttpServlet {
 		} finally {
 			respWriter.close();
 		}
+	}
+	
+	public static void clearServletCache(String prefix) {
+		metadataPrefixMap.remove(prefix);
 	}
 }

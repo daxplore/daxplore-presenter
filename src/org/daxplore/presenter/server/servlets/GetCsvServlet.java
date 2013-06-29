@@ -68,7 +68,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 @SuppressWarnings("serial")
 public class GetCsvServlet extends HttpServlet {
 	Logger logger = Logger.getLogger(GetCsvServlet.class.getName());
-	protected static final Map<String, QuestionMetadata> metadataMap = new HashMap<String, QuestionMetadata>();
+	private static Map<String, QuestionMetadata> metadataMap = new HashMap<>();
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -123,7 +123,7 @@ public class GetCsvServlet extends HttpServlet {
 			JSONObject statJsonObject = (JSONObject)JSONValue.parse(statString);
 			JSONObject valueJsonObject = (JSONObject)statJsonObject.get("values");
 			if(queryDefinition.getPerspectiveOptionCount()>0){
-				JSONObject timepoint1 = (JSONObject)valueJsonObject.get("0");
+				JSONObject timepoint1 = (JSONObject)valueJsonObject.get("0"); //TODO: check what to do here
 				for(int i=0; i<usedPerspectiveOptions.size(); i++) {
 					String[] row = new String[1 + queryDefinition.getQuestionOptionCount()];
 					int perspectiveOption = usedPerspectiveOptions.get(i);
@@ -175,5 +175,9 @@ public class GetCsvServlet extends HttpServlet {
 				pm.close();
 			}
 		}
+	}
+	
+	public static void clearServletCache() {
+		metadataMap.clear();
 	}
 }
