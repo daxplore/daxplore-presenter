@@ -35,20 +35,20 @@ public interface ChartTexts extends Messages {
 	// Chart tick text
 	String standardTick(String tickName, int respondentCount);
 	String missingTick(String tickName, int respondentCountCutoff);
-	String compareTick(String tickName, int respondentCountPrimary, int respondentCountSecondary);
+	String compareTick(String tickName, String timepointPrimary, int respondentCountPrimary, String timepointSecondary, int respondentCountSecondary);
 	String compareMissingTick(String tickName, int respondentCountCutoff);
-	String compareMissingSecondaryTick(String tickName, int respondentCountPrimary, int respondentCountCutoff);
+	String compareMissingSecondaryTick(String tickName, String timepointPrimary, int respondentCountPrimary, String timepointSecondary, int respondentCountCutoff);
 
 	// Chart annotation text
 	String barChartAnnotation(String answerPercentage, String answerText);
 	String barChartNoAnswerAnnotation(String answerText);
-	String barChartComparePrimaryAnnotation(String answerPercentage, String answerText);
-	String barChartComparePrimaryNoAnswerAnnotation(String answerText);
-	String barChartCompareSecondaryAnnotation(String answerPercentage, String answerText);
-	String barChartCompareSecondaryNoAnswerAnnotation(String answerText);
+	String barChartComparePrimaryAnnotation(String timepoint, String answerPercentage, String answerText);
+	String barChartComparePrimaryNoAnswerAnnotation(String timepoint, String answerText);
+	String barChartCompareSecondaryAnnotation(String timepoint, String answerPercentage, String answerText);
+	String barChartCompareSecondaryNoAnswerAnnotation(String timepoint, String answerText);
 	String meanChartAnnotation(String mean, String standardDeviation);
-	String meanChartComparePrimaryAnnotation(String mean, String standardDeviation);
-	String meanChartCompareSecondaryAnnotation(String mean, String standardDeviation);
+	String meanChartComparePrimaryAnnotation(String timepoint, String mean, String standardDeviation);
+	String meanChartCompareSecondaryAnnotation(String timepoint, String mean, String standardDeviation);
 
 	// ExternalChartLegend
 	String oneGroupHidden();

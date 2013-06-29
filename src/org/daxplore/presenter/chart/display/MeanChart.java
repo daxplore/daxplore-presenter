@@ -27,6 +27,7 @@ import org.daxplore.presenter.chart.QueryInterface.QueryCallback;
 import org.daxplore.presenter.chart.data.QueryResultMean;
 import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.chart.resources.ChartTexts;
+import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
 import com.google.gwt.event.dom.client.MouseMoveEvent;
@@ -102,8 +103,8 @@ public class MeanChart extends GChartChart {
 	protected int yTickWidth;
 	protected int yTickCharacterCount;
 
-	protected MeanChart(ChartTexts chartTexts, ChartConfig chartConfig, final QueryInterface query, boolean printerMode) {
-		super(chartTexts, chartConfig, query);
+	protected MeanChart(ChartTexts chartTexts, ChartConfig chartConfig, PrefixProperties prefixProperties, final QueryInterface query, boolean printerMode) {
+		super(chartTexts, chartConfig, prefixProperties, query);
 		this.query = query;
 		this.chartConfig = chartConfig;
 

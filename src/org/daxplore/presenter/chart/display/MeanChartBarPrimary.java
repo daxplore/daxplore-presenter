@@ -134,11 +134,11 @@ class MeanChartBarPrimary extends ChartBar {
 		curve.getSymbol().setHovertextTemplate(annotation);
 	}
 
-	void setHoverTextComparative(double mean, double deviation) {
+	void setHoverTextComparative(String timepointPrimaryText, double mean, double deviation) {
 		String annotation;
 		String meanString = ChartTools.formatAsTwoDigits(mean);
 		String deviationString = ChartTools.formatAsTwoDigits(deviation);
-		annotation = chartTexts.meanChartComparePrimaryAnnotation(meanString, deviationString);
+		annotation = chartTexts.meanChartComparePrimaryAnnotation(timepointPrimaryText, meanString, deviationString);
 		annotation = formatAsHoverText(annotation);
 		curve.getSymbol().setHovertextTemplate(annotation);
 	}

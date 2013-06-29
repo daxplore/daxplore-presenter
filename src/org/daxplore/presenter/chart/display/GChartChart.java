@@ -23,6 +23,7 @@ import org.daxplore.presenter.chart.ChartTools;
 import org.daxplore.presenter.chart.QueryInterface;
 import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.chart.resources.ChartTexts;
+import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QueryDefinition;
 
 import com.google.gwt.dom.client.Style.Position;
@@ -36,6 +37,7 @@ public abstract class GChartChart extends GChart implements Chart {
 	protected final ChartTexts chartTexts;
 
 	protected QueryDefinition queryDefinition;
+	protected PrefixProperties prefixProperties;
 
 	/**
 	 * Keeps track of the ready status of the chart.
@@ -76,8 +78,9 @@ public abstract class GChartChart extends GChart implements Chart {
 	 * @param titleDetail
 	 *            The explanatory text, that is shown under the header.
 	 */
-	protected GChartChart(ChartTexts chartTexts, ChartConfig chartConfig, QueryInterface query) {
+	protected GChartChart(ChartTexts chartTexts, ChartConfig chartConfig, PrefixProperties prefixProperties,  QueryInterface query) {
 		this.queryDefinition = query.getDefinition();
+		this.prefixProperties = prefixProperties;
 		this.chartTexts = chartTexts;
 		getElement().getStyle().setPosition(Position.RELATIVE);
 		externalHeader = new ExternalHeader(chartTexts, query);

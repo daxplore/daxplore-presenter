@@ -64,11 +64,11 @@ class MeanChartBarSecondary extends MeanChartBarPrimary {
 	}
 
 	@Override
-	void setHoverTextComparative(double mean, double deviation) {
+	void setHoverTextComparative(String timepointSecondaryText, double mean, double deviation) {
 		String annotation;
 		String meanString = ChartTools.formatAsTwoDigits(mean);
 		String deviationString = ChartTools.formatAsTwoDigits(deviation);
-		annotation = chartTexts.meanChartCompareSecondaryAnnotation(meanString, deviationString);
+		annotation = chartTexts.meanChartCompareSecondaryAnnotation(timepointSecondaryText, meanString, deviationString);
 		annotation = formatAsHoverText(annotation);
 		curve.getSymbol().setHovertextTemplate(annotation);
 	}

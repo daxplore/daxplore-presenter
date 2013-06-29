@@ -21,6 +21,7 @@ package org.daxplore.presenter.chart.display;
 import org.daxplore.presenter.chart.QueryInterface;
 import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.chart.resources.ChartTexts;
+import org.daxplore.presenter.shared.PrefixProperties;
 
 import com.google.inject.Inject;
 
@@ -30,6 +31,7 @@ import com.google.inject.Inject;
 public class ChartFactory {
 	protected final ChartTexts chartTexts;
 	protected final ChartConfig chartConfig;
+	protected final PrefixProperties prefixProperties;
 
 	/**
 	 * Instantiates a new chart factory.
@@ -40,9 +42,10 @@ public class ChartFactory {
 	 *            the chart config
 	 */
 	@Inject
-	protected ChartFactory(ChartTexts chartTexts, ChartConfig chartConfig) {
+	protected ChartFactory(ChartTexts chartTexts, ChartConfig chartConfig, PrefixProperties prefixProperties) {
 		this.chartTexts = chartTexts;
 		this.chartConfig = chartConfig;
+		this.prefixProperties = prefixProperties;
 	}
 
 	/**
@@ -55,7 +58,7 @@ public class ChartFactory {
 	 * @return the chart
 	 */
 	public BarChart createBarChart(QueryInterface query, boolean printerMode) {
-		return new BarChart(chartTexts, chartConfig, query, printerMode);
+		return new BarChart(chartTexts, chartConfig, prefixProperties, query, printerMode);
 	}
 
 	/**
@@ -68,7 +71,7 @@ public class ChartFactory {
 	 * @return the chart
 	 */
 	public BarChartCompare createBarChartCompare(QueryInterface query, boolean printerMode) {
-		return new BarChartCompare(chartTexts, chartConfig, query, printerMode);
+		return new BarChartCompare(chartTexts, chartConfig, prefixProperties, query, printerMode);
 	}
 
 	/**
@@ -81,7 +84,7 @@ public class ChartFactory {
 	 * @return the chart
 	 */
 	public MeanChart createMeanChart(QueryInterface query, boolean printerMode) {
-		return new MeanChart(chartTexts, chartConfig, query, printerMode);
+		return new MeanChart(chartTexts, chartConfig, prefixProperties, query, printerMode);
 	}
 
 	/**
@@ -94,6 +97,6 @@ public class ChartFactory {
 	 * @return the chart
 	 */
 	public MeanChartCompare createMeanChartCompare(QueryInterface query, boolean printerMode) {
-		return new MeanChartCompare(chartTexts, chartConfig, query, printerMode);
+		return new MeanChartCompare(chartTexts, chartConfig, prefixProperties, query, printerMode);
 	}
 }

@@ -88,13 +88,13 @@ class BarChartBarPrimary extends ChartBar {
 		annotationCharacterCount = Math.max(annotationCharacterCount, groupName.length());
 	}
 
-	void setHoverTextComparative(double percentage, String groupName) {
+	void setHoverTextComparative(String timepointPrimaryText, double percentage, String groupName) {
 		String annotation;
 		if (percentage == 0) {
 			annotation = chartTexts.barChartNoAnswerAnnotation(groupName);
 		} else {
 			String numberString = ChartTools.formatAsTwoDigitsPercentage(percentage);
-			annotation = chartTexts.barChartComparePrimaryAnnotation(numberString, groupName);
+			annotation = chartTexts.barChartComparePrimaryAnnotation(timepointPrimaryText, numberString, groupName);
 		}
 		annotation = formatAsHoverText(annotation);
 		curve.getSymbol().setHovertextTemplate(annotation);

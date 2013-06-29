@@ -59,13 +59,13 @@ class BarChartBarSecondary extends BarChartBarPrimary {
 	}
 
 	@Override
-	void setHoverTextComparative(double percentage, String groupName) {
+	void setHoverTextComparative(String timepointSecondaryText, double percentage, String groupName) {
 		String annotation;
 		if (percentage == 0) {
 			annotation = chartTexts.barChartNoAnswerAnnotation(groupName);
 		} else {
 			String numberString = ChartTools.formatAsTwoDigitsPercentage(percentage);
-			annotation = chartTexts.barChartCompareSecondaryAnnotation(numberString, groupName);
+			annotation = chartTexts.barChartCompareSecondaryAnnotation(timepointSecondaryText, numberString, groupName);
 		}
 		annotation = formatAsHoverText(annotation);
 		curve.getSymbol().setHovertextTemplate(annotation);

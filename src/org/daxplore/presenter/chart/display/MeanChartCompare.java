@@ -27,6 +27,7 @@ import org.daxplore.presenter.chart.QueryInterface.QueryCallback;
 import org.daxplore.presenter.chart.data.QueryResultMeanCompare;
 import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.chart.resources.ChartTexts;
+import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
 /**
@@ -64,8 +65,8 @@ public class MeanChartCompare extends MeanChart {
 	 */
 	private final double groupDistance;
 
-	protected MeanChartCompare(ChartTexts chartTexts, ChartConfig chartConfig, QueryInterface query, boolean printerMode) {
-		super(chartTexts, chartConfig, query, printerMode);
+	protected MeanChartCompare(ChartTexts chartTexts, ChartConfig chartConfig, PrefixProperties prefixProperties, QueryInterface query, boolean printerMode) {
+		super(chartTexts, chartConfig, prefixProperties, query, printerMode);
 
 		xTickMaxCharacterCount = 19;
 
@@ -211,13 +212,13 @@ public class MeanChartCompare extends MeanChart {
 
 		MeanChartBarPrimary primaryBar = getBarPrimary(currentGroup);
 		primaryBar.setDataPoint(currentPosition, primaryMean, primaryDeviation, queryDefinition.getQuestionOptionCount());
-		primaryBar.setHoverTextComparative(primaryMean, primaryDeviation);
+		primaryBar.setHoverTextComparative(prefixProperties.getTimepointPrimaryText(), primaryMean, primaryDeviation);
 
 		if (secondaryPopulation > 0) {
 			MeanChartBarSecondary secondaryBar = getBarSecondary(currentGroup);
 			secondaryBar.setDataPoint(currentPosition + secondaryBarShift, secondaryMean, secondaryDeviation, queryDefinition.getQuestionOptionCount());
 
-			secondaryBar.setHoverTextComparative(secondaryMean, secondaryDeviation);
+			secondaryBar.setHoverTextComparative(prefixProperties.getTimepointSecondaryText(), secondaryMean, secondaryDeviation);
 		}
 
 		// TODO calculate offset from widgets?
@@ -225,9 +226,9 @@ public class MeanChartCompare extends MeanChart {
 
 		String tickText;
 		if (secondaryPopulation > 0) {
-			tickText = chartTexts.compareTick(groupName, primaryPopulation, secondaryPopulation);
+			tickText = chartTexts.compareTick(groupName, prefixProperties.getTimepointPrimaryText(), primaryPopulation, prefixProperties.getTimepointSecondaryText(), secondaryPopulation);
 		} else {
-			tickText = chartTexts.compareMissingSecondaryTick(groupName, primaryPopulation, chartConfig.respondentCountCutoff());
+			tickText = chartTexts.compareMissingSecondaryTick(groupName, prefixProperties.getTimepointPrimaryText(), primaryPopulation, prefixProperties.getTimepointSecondaryText(), chartConfig.respondentCountCutoff());
 			xTickMaxCharacterCount = Math.max(xTickMaxCharacterCount, 23);
 		}
 

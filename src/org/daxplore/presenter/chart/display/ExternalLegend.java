@@ -77,7 +77,7 @@ public class ExternalLegend extends Composite {
 				}
 			}
 			if (unusedPerspectives > 0) {
-				html.append("<tr><td colspan=\"2\" class=\"pifoks-ExternalLegend-hiddenCount\">");
+				html.append("<tr><td colspan=\"2\" class=\"daxplore-ExternalLegend-hiddenCount\">"); //TODO is class used?
 				if (unusedPerspectives == 1) {
 					html.append(chartTexts.oneGroupHidden());
 				} else {
@@ -100,7 +100,7 @@ public class ExternalLegend extends Composite {
 				}
 			}
 			if (unusedOptions > 0) {
-				html.append("<tr><td colspan=\"2\" class=\"pifoks-ExternalLegend-hiddenCount\">");
+				html.append("<tr><td colspan=\"2\" class=\"daxplore-ExternalLegend-hiddenCount\">"); //TODO is class used?
 				if (unusedOptions == 1) {
 					html.append(chartTexts.oneOptionHidden());
 				} else {

@@ -28,6 +28,7 @@ import org.daxplore.presenter.chart.data.QueryResult;
 import org.daxplore.presenter.chart.data.QueryResultCountCompare;
 import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.chart.resources.ChartTexts;
+import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
 /**
@@ -82,8 +83,8 @@ public class BarChartCompare extends BarChart {
 	 * @param query
 	 *            The query that this chart will display.
 	 */
-	protected BarChartCompare(ChartTexts chartTexts, ChartConfig chartConfig, final QueryInterface query, boolean printerMode) {
-		super(chartTexts, chartConfig, query, printerMode);
+	protected BarChartCompare(ChartTexts chartTexts, ChartConfig chartConfig, PrefixProperties prefixProperties, final QueryInterface query, boolean printerMode) {
+		super(chartTexts, chartConfig, prefixProperties, query, printerMode);
 
 		xTickMaxCharacterCount = 19;
 
@@ -262,7 +263,7 @@ public class BarChartCompare extends BarChart {
 			if (dataIndex < percentageDataPrimary.length) {
 				curve.addPoint(currentPosition + dataIndex * (1 + secondaryBarShift + internalGroupSpacing), percentageDataPrimary[dataIndex]);
 
-				primaryBar.setHoverTextComparative(percentageDataPrimary[dataIndex], questionOptionTexts.get(dataIndex));
+				primaryBar.setHoverTextComparative(prefixProperties.getTimepointPrimaryText(), percentageDataPrimary[dataIndex], questionOptionTexts.get(dataIndex));
 
 				if (percentageDataPrimary[dataIndex] > maxValue) {
 					maxValue = percentageDataPrimary[dataIndex];
@@ -273,7 +274,7 @@ public class BarChartCompare extends BarChart {
 			curve = secondaryBar.getCurve();
 			if (groupSizeSecondary > 0 && dataIndex < percentageDataSecondary.length) {
 				curve.addPoint(currentPosition + dataIndex * (1 + secondaryBarShift + internalGroupSpacing) + secondaryBarShift, percentageDataSecondary[dataIndex]);
-				secondaryBar.setHoverTextComparative(percentageDataSecondary[dataIndex], questionOptionTexts.get(dataIndex));
+				secondaryBar.setHoverTextComparative(prefixProperties.getTimepointSecondaryText(), percentageDataSecondary[dataIndex], questionOptionTexts.get(dataIndex));
 
 				if (percentageDataSecondary[dataIndex] > maxValue) {
 					maxValue = percentageDataSecondary[dataIndex];
@@ -286,9 +287,9 @@ public class BarChartCompare extends BarChart {
 
 		String tickText;
 		if (groupSizeSecondary > 0) {
-			tickText = chartTexts.compareTick(groupName, groupSizePrimary, groupSizeSecondary);
+			tickText = chartTexts.compareTick(groupName, prefixProperties.getTimepointPrimaryText(), groupSizePrimary, prefixProperties.getTimepointSecondaryText(), groupSizeSecondary);
 		} else {
-			tickText = chartTexts.compareMissingSecondaryTick(groupName, groupSizePrimary, chartConfig.respondentCountCutoff());
+			tickText = chartTexts.compareMissingSecondaryTick(groupName, prefixProperties.getTimepointPrimaryText(), groupSizePrimary, prefixProperties.getTimepointSecondaryText(), chartConfig.respondentCountCutoff());
 			xTickMaxCharacterCount = Math.max(xTickMaxCharacterCount, 23);
 		}
 		getXAxis().addTick(currentPosition + groupWidth / 2 - 1, tickText);
