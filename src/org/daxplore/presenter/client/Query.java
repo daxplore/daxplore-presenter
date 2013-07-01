@@ -114,7 +114,7 @@ public class Query implements QueryInterface {
 		String prefix = prefixProperties.getPrefix();
 		href = Window.Location.getProtocol() + "//" + Window.Location.getHost() + "/getStats?prefix="+prefix +"&";
 		
-		requestString = "q=" + this.queryDefinition.getAsString();
+		requestString = "q=" + queryDefinition.getQuestionID() + "&p=" + queryDefinition.getPerspectiveID();
 	}
 
 	/**

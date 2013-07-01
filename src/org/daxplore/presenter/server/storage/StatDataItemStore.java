@@ -85,6 +85,10 @@ public class StatDataItemStore {
 	public static String getStats(PersistenceManager pm, String prefix, QueryDefinition queryDefinition) throws BadReqException {
 		String questionID = queryDefinition.getQuestionID();
 		String perspectiveID = queryDefinition.getPerspectiveID();
+		return getStats(pm, prefix, questionID, perspectiveID);
+	}
+	
+	public static String getStats(PersistenceManager pm, String prefix, String questionID, String perspectiveID) throws BadReqException {
 		String key = String.format("%s#Q=%s&P=%s", prefix, questionID.toUpperCase(), perspectiveID.toUpperCase());
 		try {
 			return pm.getObjectById(StatDataItemStore.class, key).getJson();
