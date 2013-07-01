@@ -38,14 +38,6 @@ public interface UITexts extends Messages {
 
 	// General page warnings
 	String hideWarningButton();
-
-	String ownLangaugeCode();
-
-	String otherLangaugeCode();
-
-	String cookiesDisabledOwnLanguageWarning();
-
-	String cookiesDisabledOtherLanguageWarning();
 	
 	// ImageButtonPanel
 	String printButtonTitle();

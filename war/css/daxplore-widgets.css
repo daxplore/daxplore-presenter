@@ -19,14 +19,6 @@
 	    margin-right: 50px;
 	}
 	
-	.daxplore-WarningBanner-text-sv{
-		background-image: url("/img/globallinks-lang-sv.gif");
-	}
-	
-	.daxplore-WarningBanner-text-en{
-		background-image: url("/img/globallinks-lang-en.gif");
-	}
-
 	.daxplore-WarningBanner-close{
 		position: absolute;
 		right: 10px;
