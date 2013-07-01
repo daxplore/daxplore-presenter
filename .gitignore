@@ -16,6 +16,8 @@ war/gwtAdmin
 war/gwtEmbed
 war/gwtPresentation
 
+war/org.daxplore.presenter.*.JUnit/
+
 war/WEB-INF/appengine-generated
 war/WEB-INF/deploy
 
@@ -28,7 +30,13 @@ war/WEB-INF/lib/datanucleus-appengine-*.jar
 /war/WEB-INF/lib/geronimo-jta_*.jar
 /war/WEB-INF/lib/gwt-servlet.jar
 /war/WEB-INF/lib/jdo2-api-*.jar
-/war/WEB-INF/lib/jsr107cache-1.1.jar
+/war/WEB-INF/lib/jsr107cache-*.jar
+war/WEB-INF/lib/asm-*.jar
+war/WEB-INF/lib/commons-io-*-bin.tar.gz
+war/WEB-INF/lib/datanucleus-api-jdo-*.jar
+war/WEB-INF/lib/datanucleus-api-jpa-*.jar
+war/WEB-INF/lib/jdo-api-*.jar
+war/WEB-INF/lib/jta-*.jar
 
 *.pyc
 .DS_Store
