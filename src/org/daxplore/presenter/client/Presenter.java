@@ -96,17 +96,6 @@ public class Presenter implements ValueChangeHandler<String>, SelectionUpdateHan
 		CloseWarningBannerEvent.register(eventBus, this);
 
 		History.addValueChangeHandler(this);
-
-		if (!Cookies.isCookieEnabled()) {
-			String ownLanguage = uiTexts.ownLangaugeCode();
-			String ownLanguageWarning = uiTexts.cookiesDisabledOwnLanguageWarning();
-
-			String otherLanguage = uiTexts.otherLangaugeCode();
-			String otherLanguageWarning = uiTexts.cookiesDisabledOtherLanguageWarning();
-
-			WarningBanner warningBanner = warningFactory.createWarningBanner(ownLanguage, ownLanguageWarning, otherLanguage, otherLanguageWarning);
-			eventBus.fireEvent(new SetWarningBannerEvent(warningBanner));
-		}
 	}
 
 	/**
