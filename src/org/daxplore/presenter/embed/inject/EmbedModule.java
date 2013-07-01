@@ -20,9 +20,11 @@ package org.daxplore.presenter.embed.inject;
 
 import org.daxplore.presenter.chart.display.ChartFactory;
 import org.daxplore.presenter.chart.resources.ChartConfig;
+import org.daxplore.presenter.client.json.shared.ClientPrefixProperties;
 import org.daxplore.presenter.client.json.shared.QuestionMetadataClientImpl;
 import org.daxplore.presenter.embed.EmbedEntryPoint;
 import org.daxplore.presenter.embed.EmbedQuery.EmbedQueryFactory;
+import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QuestionMetadata;
 
 import com.google.gwt.inject.client.AbstractGinModule;
@@ -58,6 +60,8 @@ public class EmbedModule extends AbstractGinModule {
 		
 		/* client.resources */
 		bind(ChartConfig.class).in(Singleton.class);
+		
+		bind(PrefixProperties.class).to(ClientPrefixProperties.class).in(Singleton.class);
 
 		/* com.google.web.bindery.event.shared */
 		bind(EventBus.class).to(SimpleEventBus.class).in(Singleton.class);
