@@ -21,6 +21,7 @@ package org.daxplore.presenter.embed;
 import java.util.LinkedList;
 
 import org.daxplore.presenter.chart.data.QueryResultCount;
+import org.daxplore.presenter.chart.data.QueryResultCountCompare;
 import org.daxplore.presenter.chart.display.BarChart;
 import org.daxplore.presenter.chart.display.BarChartCompare;
 import org.daxplore.presenter.chart.display.ChartFactory;
@@ -84,7 +85,7 @@ public class EmbedEntryPoint implements EntryPoint {
 				((BarChart)chart).addData(new QueryResultCount(queryData.getDataItems(), queryData.getTotalDataItem()));
 			} else {
 				chart = chartFactory.createBarChartCompare(queryDefinition, printMode);
-				((BarChartCompare)chart).addData(new QueryResultCount(queryData.getDataItems(), queryData.getTotalDataItem()));
+				((BarChartCompare)chart).addData(new QueryResultCountCompare(queryData.getDataItems(), queryData.getTotalDataItem()));
 			}
 			EmbedView embedView = new EmbedView(chart, Window.getClientWidth(),
 					Window.getClientHeight(), embedDefinition);

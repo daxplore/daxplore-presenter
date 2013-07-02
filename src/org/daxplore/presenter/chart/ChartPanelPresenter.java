@@ -22,8 +22,6 @@ import org.daxplore.presenter.chart.display.BarChart;
 import org.daxplore.presenter.chart.display.BarChartCompare;
 import org.daxplore.presenter.chart.display.BlankChart;
 import org.daxplore.presenter.chart.display.ChartFactory;
-import org.daxplore.presenter.client.event.QueryReadyEvent;
-import org.daxplore.presenter.client.event.QueryReadyHandler;
 import org.daxplore.presenter.client.json.shared.QueryData;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
@@ -31,7 +29,7 @@ import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
-public class ChartPanelPresenter implements QueryReadyHandler {
+public class ChartPanelPresenter  {
 	private ChartFactory chartFactory;
 	private ChartPanelView view;
 	
@@ -40,17 +38,9 @@ public class ChartPanelPresenter implements QueryReadyHandler {
 		this.chartFactory = chartFactory;
 		this.view = view;
 		view.setChart(new BlankChart());
-		QueryReadyEvent.register(eventBus, this);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onQueryReady(QueryReadyEvent event) {
-		QueryDefinition queryDefinition = event.getQueryDefinition();
-		QueryData queryData = event.getQueryData();
-		
+	public void onQueryReady(QueryDefinition queryDefinition, QueryData queryData) {
 		if (!queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
 			BarChart chart = chartFactory.createBarChart(queryDefinition, false);
 			QueryResultCount result = new QueryResultCount(queryData.getDataItems(), queryData.getTotalDataItem());

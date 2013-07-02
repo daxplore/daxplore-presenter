@@ -21,9 +21,11 @@ package org.daxplore.presenter.client;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.daxplore.presenter.chart.ChartPanelView;
+import org.daxplore.presenter.chart.ChartPanelPresenter;
 import org.daxplore.presenter.client.event.CloseWarningBannerEvent;
 import org.daxplore.presenter.client.event.CloseWarningBannerHandler;
+import org.daxplore.presenter.client.event.QueryReadyEvent;
+import org.daxplore.presenter.client.event.QueryReadyHandler;
 import org.daxplore.presenter.client.event.QueryUpdateEvent;
 import org.daxplore.presenter.client.event.QueryUpdateHandler;
 import org.daxplore.presenter.client.event.SelectionUpdateEvent;
@@ -60,12 +62,12 @@ import com.google.web.bindery.event.shared.EventBus;
  * project does not properly adhere to the MVP pattern, though.</p>
  */
 public class Presenter implements ValueChangeHandler<String>, SelectionUpdateHandler,
-SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler {
+SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryReadyHandler {
 
 	protected final PerspectivePanel perspectivePanel;
 	protected final QuestionPanel questionPanel;
 	protected final ChartTypeOptionsPanel optionsPanel;
-	protected final ChartPanelView chartPanel;
+	protected final ChartPanelPresenter chartPanelPresenter;
 	protected QuestionMetadata questionMetadata;
 	protected final EventBus eventBus;
 	protected DaxploreConfig config;
@@ -73,14 +75,14 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler {
 
 	@Inject
 	protected Presenter(StagePanel stagePanel, PerspectivePanel perspectivePanel, QuestionPanel questionPanel,
-			ChartTypeOptionsPanel optionsPanel, EventBus eventBus, ChartPanelView chartPanel,
+			ChartTypeOptionsPanel optionsPanel, EventBus eventBus, ChartPanelPresenter chartPanelPresenter,
 			QuestionMetadata questionMetadata, ImageButtonPanel imageButtonPanel, DaxploreConfig config, UITexts uiTexts,
 			WarningBannerFactory warningFactory, StatDataServerModel statDataServerModel) {
 		this.perspectivePanel = perspectivePanel;
 		this.questionPanel = questionPanel;
 		this.optionsPanel = optionsPanel;
 		this.questionMetadata = questionMetadata;
-		this.chartPanel = chartPanel;
+		this.chartPanelPresenter = chartPanelPresenter;
 		this.eventBus = eventBus;
 		this.config = config;
 		this.statDataServerModel = statDataServerModel;
@@ -88,12 +90,13 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler {
 		List<Widget> actionWidgetList = new LinkedList<Widget>();
 		actionWidgetList.add(imageButtonPanel);
 		actionWidgetList.add(optionsPanel);
-		chartPanel.setActionWidgets(actionWidgetList);
+		chartPanelPresenter.getView().setActionWidgets(actionWidgetList);
 
 		SelectionUpdateEvent.register(eventBus, this);
 		SetWarningBannerEvent.register(eventBus, this);
 		CloseWarningBannerEvent.register(eventBus, this);
 		QueryUpdateEvent.register(eventBus, this);
+		QueryReadyEvent.register(eventBus, this);
 
 		History.addValueChangeHandler(this);
 	}
@@ -249,5 +252,13 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler {
 	@Override
 	public void onQueryUpdate(QueryUpdateEvent event) {
 		statDataServerModel.makeRequest(event.getQueryDefinition());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void onQueryReady(QueryReadyEvent event) {
+		chartPanelPresenter.onQueryReady(event.getQueryDefinition(), event.getQueryData());
 	}
 }
