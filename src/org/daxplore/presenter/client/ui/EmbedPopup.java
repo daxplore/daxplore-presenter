@@ -30,8 +30,8 @@ import org.daxplore.presenter.client.event.QueryUpdateHandler;
 import org.daxplore.presenter.client.resources.DaxploreConfig;
 import org.daxplore.presenter.client.resources.UITexts;
 import org.daxplore.presenter.shared.EmbedDefinition;
-import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
+import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QueryDefinition;
 
 import com.google.gwt.core.client.GWT;

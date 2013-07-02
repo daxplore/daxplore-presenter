@@ -18,7 +18,8 @@
  */
 package org.daxplore.presenter.client.inject;
 
-import org.daxplore.presenter.chart.ChartPanel;
+import org.daxplore.presenter.chart.ChartPanelPresenter;
+import org.daxplore.presenter.chart.ChartPanelView;
 import org.daxplore.presenter.chart.QueryActiveAnimation;
 import org.daxplore.presenter.chart.display.ChartFactory;
 import org.daxplore.presenter.chart.resources.ChartConfig;
@@ -26,12 +27,12 @@ import org.daxplore.presenter.chart.resources.ChartResources;
 import org.daxplore.presenter.chart.resources.ChartTexts;
 import org.daxplore.presenter.client.PresentationEntryPoint;
 import org.daxplore.presenter.client.Presenter;
-import org.daxplore.presenter.client.Query.QueryFactory;
 import org.daxplore.presenter.client.event.SelectionUpdateHandler;
 import org.daxplore.presenter.client.json.Groups;
 import org.daxplore.presenter.client.json.Perspectives;
 import org.daxplore.presenter.client.json.shared.ClientPrefixProperties;
 import org.daxplore.presenter.client.json.shared.QuestionMetadataClientImpl;
+import org.daxplore.presenter.client.model.StatDataServerModel;
 import org.daxplore.presenter.client.resources.UITexts;
 import org.daxplore.presenter.client.ui.ChartTypeOptionsPanel;
 import org.daxplore.presenter.client.ui.EmbedPopup;
@@ -69,7 +70,8 @@ public class PresentationModule extends AbstractGinModule {
 	protected void configure() {
 
 		/* chart */
-		bind(ChartPanel.class).in(Singleton.class);
+		bind(ChartPanelPresenter.class).in(Singleton.class);
+		bind(ChartPanelView.class).in(Singleton.class);
 		bind(QueryActiveAnimation.class).in(Singleton.class);
 
 		/* chart.display */
@@ -85,7 +87,6 @@ public class PresentationModule extends AbstractGinModule {
 
 		/* client */
 		bind(Presenter.class).in(Singleton.class);
-		bind(QueryFactory.class).in(Singleton.class);
 
 		/* client.event */
 		bind(SelectionUpdateHandler.class).to(Presenter.class).in(Singleton.class);
@@ -95,6 +96,8 @@ public class PresentationModule extends AbstractGinModule {
 		bind(QuestionMetadata.class).to(QuestionMetadataClientImpl.class).in(Singleton.class);
 		bind(Perspectives.class).in(Singleton.class);
 		bind(PrefixProperties.class).to(ClientPrefixProperties.class).in(Singleton.class);
+		
+		bind(StatDataServerModel.class).in(Singleton.class);
 
 		/* client.resources */
 		bind(UITexts.class).in(Singleton.class);

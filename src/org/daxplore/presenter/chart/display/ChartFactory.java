@@ -18,10 +18,10 @@
  */
 package org.daxplore.presenter.chart.display;
 
-import org.daxplore.presenter.chart.QueryInterface;
 import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.chart.resources.ChartTexts;
 import org.daxplore.presenter.shared.PrefixProperties;
+import org.daxplore.presenter.shared.QueryDefinition;
 
 import com.google.inject.Inject;
 
@@ -36,10 +36,6 @@ public class ChartFactory {
 	/**
 	 * Instantiates a new chart factory.
 	 * 
-	 * @param chartTexts
-	 *            the chart texts
-	 * @param chartConfig
-	 *            the chart config
 	 */
 	@Inject
 	protected ChartFactory(ChartTexts chartTexts, ChartConfig chartConfig, PrefixProperties prefixProperties) {
@@ -51,52 +47,18 @@ public class ChartFactory {
 	/**
 	 * Creates a new BarChart.
 	 * 
-	 * @param query
-	 *            the query
-	 * @param printerMode
-	 *            the printer mode
 	 * @return the chart
 	 */
-	public BarChart createBarChart(QueryInterface query, boolean printerMode) {
-		return new BarChart(chartTexts, chartConfig, prefixProperties, query, printerMode);
+	public BarChart createBarChart(QueryDefinition queryDefinition, boolean printerMode) {
+		return new BarChart(chartTexts, chartConfig, prefixProperties, queryDefinition, printerMode);
 	}
 
 	/**
 	 * Creates a new BarChartCompare.
 	 * 
-	 * @param query
-	 *            the query
-	 * @param printerMode
-	 *            the printer mode
 	 * @return the chart
 	 */
-	public BarChartCompare createBarChartCompare(QueryInterface query, boolean printerMode) {
-		return new BarChartCompare(chartTexts, chartConfig, prefixProperties, query, printerMode);
-	}
-
-	/**
-	 * Creates a new MeanChart.
-	 * 
-	 * @param query
-	 *            the query
-	 * @param printerMode
-	 *            the printer mode
-	 * @return the chart
-	 */
-	public MeanChart createMeanChart(QueryInterface query, boolean printerMode) {
-		return new MeanChart(chartTexts, chartConfig, prefixProperties, query, printerMode);
-	}
-
-	/**
-	 * Creates a new MeanChartCompare.
-	 * 
-	 * @param query
-	 *            the query
-	 * @param printerMode
-	 *            the printer mode
-	 * @return the chart
-	 */
-	public MeanChartCompare createMeanChartCompare(QueryInterface query, boolean printerMode) {
-		return new MeanChartCompare(chartTexts, chartConfig, prefixProperties, query, printerMode);
+	public BarChartCompare createBarChartCompare(QueryDefinition queryDefinition, boolean printerMode) {
+		return new BarChartCompare(chartTexts, chartConfig, prefixProperties, queryDefinition, printerMode);
 	}
 }

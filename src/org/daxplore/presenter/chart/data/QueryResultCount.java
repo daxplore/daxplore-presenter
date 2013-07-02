@@ -20,7 +20,6 @@ package org.daxplore.presenter.chart.data;
 
 import java.util.Collection;
 
-import org.daxplore.presenter.chart.QueryInterface;
 import org.daxplore.presenter.chart.StatInterface;
 import org.daxplore.presenter.chart.display.BarChart;
 
@@ -47,8 +46,6 @@ import org.daxplore.presenter.chart.display.BarChart;
  */
 public class QueryResultCount extends QueryResult {
 
-	QueryInterface query;
-
 	/**
 	 * Build a new count result item.
 	 * 
@@ -65,9 +62,8 @@ public class QueryResultCount extends QueryResult {
 	 * @param query
 	 *            the query
 	 */
-	public QueryResultCount(Collection<? extends StatInterface> dataItems, StatInterface totalDataItem, QueryInterface query) {
+	public QueryResultCount(Collection<? extends StatInterface> dataItems, StatInterface totalDataItem) {
 		super(dataItems, totalDataItem);
-		this.query = query;
 	}
 
 	/*

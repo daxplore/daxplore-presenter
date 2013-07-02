@@ -20,7 +20,6 @@ package org.daxplore.presenter.embed.inject;
 
 import org.daxplore.presenter.chart.display.ChartFactory;
 import org.daxplore.presenter.embed.EmbedEntryPoint;
-import org.daxplore.presenter.embed.EmbedQuery.EmbedQueryFactory;
 import org.daxplore.presenter.shared.QuestionMetadata;
 
 import com.google.gwt.inject.client.GinModules;
@@ -45,7 +44,6 @@ import com.google.web.bindery.event.shared.EventBus;
 public interface EmbedInjector extends Ginjector {
 	EventBus getEventBus();
 	
-	EmbedQueryFactory getQueryFactory();
 	ChartFactory getChartFactory();
 	QuestionMetadata getQuestions();
 }

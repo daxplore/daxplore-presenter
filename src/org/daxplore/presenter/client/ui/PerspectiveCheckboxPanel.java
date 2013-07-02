@@ -55,8 +55,6 @@ public class PerspectiveCheckboxPanel extends FlowPanel implements ValueChangeHa
 
 	protected boolean selectionChangedHandlersInitialized;
 	
-	protected CheckBox lastSelectedBox;
-
 	/**
 	 * A factory for creating new PerspectiveCheckboxPanels.
 	 */
@@ -153,10 +151,6 @@ public class PerspectiveCheckboxPanel extends FlowPanel implements ValueChangeHa
 			}
 		}
 		
-		// In case nothing is selected, add the last de-selected checkbox
-		if (altList.size() == 0) {
-			altList.add(java.lang.Integer.parseInt(lastSelectedBox.getFormValue()));
-		}
 		return altList;
 	}
 
@@ -192,16 +186,7 @@ public class PerspectiveCheckboxPanel extends FlowPanel implements ValueChangeHa
 	 */
 	@Override
 	public void onValueChange(ValueChangeEvent<Boolean> event) {
-		// Only send an update if an option is selected, otherwise the chart will crash
-		if (getCheckedCount() > 0) {
-			ValueChangeEvent.fire(this, event.getValue());
-		} else if (event.getSource() instanceof CheckBox) {
-			// If all checkboxes are unchecked, remember what checkbox was
-			// last checked and treat this as the current state.
-			lastSelectedBox = (CheckBox) event.getSource();
-		} else {
-			throw new Error("PerspectiveCheckboxPanel listening to incorrect ValueChangeEvents");
-		}
+		ValueChangeEvent.fire(this, event.getValue());
 	}
 
 	/**

@@ -22,13 +22,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.daxplore.presenter.chart.ChartTools;
-import org.daxplore.presenter.chart.QueryInterface;
-import org.daxplore.presenter.chart.QueryInterface.QueryCallback;
 import org.daxplore.presenter.chart.data.QueryResult;
 import org.daxplore.presenter.chart.data.QueryResultCountCompare;
 import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.chart.resources.ChartTexts;
 import org.daxplore.presenter.shared.PrefixProperties;
+import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
 /**
@@ -55,7 +54,7 @@ public class BarChartCompare extends BarChart {
 	/**
 	 * The distance between the bar-pairs in a group.
 	 * 
-	 * <p>Meassured in GChart's internal distance system.
+	 * <p>Measured in GChart's internal distance system.
 	 */
 	private final static double internalGroupSpacing = 0.2;
 
@@ -63,7 +62,7 @@ public class BarChartCompare extends BarChart {
 	 * How far the secondary bar is shifted to the right, relative to it's
 	 * primary bar.
 	 * 
-	 * <p>Meassured in GChart's internal distance system.
+	 * <p>Measured in GChart's internal distance system.
 	 */
 	private final static double secondaryBarShift = 0.5;
 
@@ -83,8 +82,8 @@ public class BarChartCompare extends BarChart {
 	 * @param query
 	 *            The query that this chart will display.
 	 */
-	protected BarChartCompare(ChartTexts chartTexts, ChartConfig chartConfig, PrefixProperties prefixProperties, final QueryInterface query, boolean printerMode) {
-		super(chartTexts, chartConfig, prefixProperties, query, printerMode);
+	protected BarChartCompare(ChartTexts chartTexts, ChartConfig chartConfig, PrefixProperties prefixProperties, QueryDefinition queryDefinition, boolean printerMode) {
+		super(chartTexts, chartConfig, prefixProperties, queryDefinition, printerMode);
 
 		xTickMaxCharacterCount = 19;
 
@@ -99,17 +98,6 @@ public class BarChartCompare extends BarChart {
 		addStyleDependentName("compare");
 		if (ChartTools.ieVersion() > 0) {
 			addStyleDependentName("compare-IE");
-		}
-
-		if (query.hasResult()) {
-			addData();
-		} else {
-			query.requestResult(new QueryCallback() {
-				@Override
-				public void callback() {
-					addData();
-				}
-			});
 		}
 	}
 
@@ -191,9 +179,10 @@ public class BarChartCompare extends BarChart {
 		return null;
 	}
 
-	@Override
-	protected void addData() {
-		QueryResultCountCompare queryResult = (QueryResultCountCompare) query.getResult(true, false);
+	/**
+	 * Add the data and complete the construction of the chart.
+	 */
+	public void addData(QueryResultCountCompare queryResult) {
 		List<String> perspectiveOptionTexts = queryDefinition.getPerspectiveOptionTexts();
 		currentPosition = 1 + groupSpacing / 2;
 		currentGroup = 0;
@@ -201,7 +190,7 @@ public class BarChartCompare extends BarChart {
 			if (currentGroup > 0) {
 				drawBetweenGroupsTick();
 			}
-			if (queryResult.hasData(perspectiveOption) && queryResult.getPopulation(perspectiveOption)!=0) { //TODO temporary hack, handle cut-off properly producer
+			if (queryResult.hasData(perspectiveOption) && queryResult.getPopulation(perspectiveOption)!=0) { //TODO temporary hack, handle cut-off properly in producer
 				drawBarGroup(perspectiveOptionTexts.get(perspectiveOption),
 						queryResult.getPopulation(perspectiveOption), queryResult.getCountDataPercentages(perspectiveOption),
 						queryResult.getPopulationSecondary(perspectiveOption), queryResult.getCountDataPercentagesSecondary(perspectiveOption));
@@ -216,7 +205,7 @@ public class BarChartCompare extends BarChart {
 				drawBetweenGroupsTick();
 			}
 			String totalText = chartTexts.compareWithAll();
-			if (queryResult.hasTotalDataItemData()&& queryResult.getTotalPopulation()!=0) { //TODO temporary hack, handle cut-off properly producer
+			if (queryResult.hasTotalDataItemData()&& queryResult.getTotalPopulation()!=0) { //TODO temporary hack, handle cut-off properly in producer
 				drawBarGroup(totalText,
 						queryResult.getTotalPopulation(), queryResult.getTotalCountDataPercentages(),
 						queryResult.getTotalPopulationSecondary(), queryResult.getTotalCountDataPercentagesSecondary());
@@ -230,8 +219,9 @@ public class BarChartCompare extends BarChart {
 
 		drawPaddingBar();
 		setYAxis(maxValue);
-
-		setReady();
+		
+		update();
+		setVisible(true);
 	}
 
 	/**

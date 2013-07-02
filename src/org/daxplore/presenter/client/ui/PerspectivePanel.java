@@ -27,7 +27,6 @@ import org.daxplore.presenter.client.event.SelectionUpdateEvent;
 import org.daxplore.presenter.client.ui.PerspectiveCheckboxPanel.PerspectiveCheckboxPanelFactory;
 import org.daxplore.presenter.client.ui.PerspectiveQuestionsPanel.PerspectiveQuestionsFactory;
 import org.daxplore.presenter.shared.QueryDefinition;
-import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 import org.daxplore.presenter.shared.QuestionMetadata;
 
 import com.google.gwt.event.logical.shared.SelectionEvent;
@@ -99,12 +98,8 @@ public class PerspectivePanel extends HorizontalPanel
 	 * 
 	 * @return the flags
 	 */
-	public List<QueryFlag> getFlags() {
-		List<QueryFlag> flags = new LinkedList<QueryFlag>();
-		if(perspectiveCheckboxes != null && perspectiveCheckboxes.isTotalSet()) {
-			flags.add(QueryFlag.TOTAL);
-		}
-		return flags;
+	public boolean useTotalSelected() {
+		return perspectiveCheckboxes != null && perspectiveCheckboxes.isTotalSet();
 	}
 
 	/**

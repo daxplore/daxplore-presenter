@@ -23,42 +23,42 @@ import java.util.List;
 
 import org.daxplore.presenter.chart.StatInterface;
 
-
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArrayInteger;
 
 /**
- * This class supplies one set of StatDataItems that makes up the data
- * for a single chart.
- * 
- * <p>This corresponds to what the standard Daxplore client gets from
- *  a single server requests. But as the embed mode only should represent a
- *  single chart, this class contains all the numeric data a specific instance
- *  will ever need.</p>
+ * This class wraps a single StatData server response, which makes up the data
+ * for a question/perspective combination.
  */
 public class QueryData extends JavaScriptObject {
 	
 	protected QueryData() {}
 	
-	public final static QueryData getQueryDataEmbedded() {
-		return getDataEmbeddedNative();
-	}
 	/**
-	 * Get the data that makes up this embed chart, loaded from a variable
-	 * defined in the jsp-file.
+	 * Acts as a constructor for the class. Parses and wraps the json response.
+	 * 
+	 * @param json The json representation of the data
+	 * @return A new instance of this class
+	 */
+	public final static native QueryData parseStatDataItem(String json) /*-{
+		return eval('('+json+')');
+	}-*/;
+	
+	/**
+	 * Get the single data item that comes pre-loaded with embed charts.
 	 * 
 	 * @return the native json data
 	 */
-	private final static native QueryData getDataEmbeddedNative() /*-{
+	public final static native QueryData getEmbeddedData() /*-{
 		return $wnd.jsondata;
 	}-*/;
 	
-	public final static QueryData getQueryData(String json) {
-		System.out.println("Query data: " + json);
-		return getDataNative(json);
-	}
-	private final static native QueryData getDataNative(String json) /*-{
-		return eval('('+json+')');
+	public final native String getQuestionID() /*-{
+		return this.q;
+	}-*/;
+	
+	public final native String getPerspectiveID() /*-{
+		return this.p;
 	}-*/;
 	
 	private final native JsArrayInteger getTimepoints() /*-{

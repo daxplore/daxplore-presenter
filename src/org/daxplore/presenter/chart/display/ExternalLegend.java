@@ -20,10 +20,8 @@ package org.daxplore.presenter.chart.display;
 
 import java.util.List;
 
-import org.daxplore.presenter.chart.QueryInterface;
 import org.daxplore.presenter.chart.resources.ChartTexts;
 import org.daxplore.presenter.shared.QueryDefinition;
-import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
@@ -42,72 +40,35 @@ public class ExternalLegend extends Composite {
 	 *            the chart texts
 	 * @param query
 	 *            the query
-	 * @param useMean
-	 *            legend for the mean version of a chart
 	 * @param itemLimit
 	 *            max number of legend-items to be displayed
 	 * @param printerMode
 	 *            use the printer-friendly mode
 	 */
-	public ExternalLegend(ChartTexts chartTexts, final QueryInterface query, boolean useMean, int itemLimit, boolean printerMode) {
-		QueryDefinition queryDefinition = query.getDefinition();
-		List<String> perspectiveOptionTexts = queryDefinition.getPerspectiveOptionTexts();
+	public ExternalLegend(ChartTexts chartTexts, QueryDefinition queryDefinition, int itemLimit, boolean printerMode) {
 		StringBuilder html = new StringBuilder("<table class=\"daxplore-ExternalLegend\">");
-		if (useMean) {
-			int usedPerspectives = 0;
-			int unusedPerspectives = 0;
-			for (int perspectiveOption : queryDefinition.getUsedPerspectiveOptions()) {
-				if (usedPerspectives < itemLimit) {
-					String text = perspectiveOptionTexts.get(perspectiveOption);
-					String boxColor = BarColors.getChartColorSet(perspectiveOption).getPrimary();
-					html.append(legendRow(text, boxColor, printerMode));
-					usedPerspectives++;
-				} else {
-					unusedPerspectives++;
-				}
+
+		List<String> questionOptionTexts = queryDefinition.getQuestionOptionTexts();
+		int usedOptions = 0;
+		int unusedOptions = 0;
+		for (int optionIndex = 0; optionIndex < queryDefinition.getQuestionOptionCount(); optionIndex++) {
+			if (usedOptions < itemLimit) {
+				String text = questionOptionTexts.get(optionIndex);
+				String boxColor = BarColors.getChartColorSet(optionIndex).getPrimary();
+				html.append(legendRow(text, boxColor, printerMode));
+				usedOptions++;
+			} else {
+				unusedOptions++;
 			}
-			if (queryDefinition.hasFlag(QueryFlag.TOTAL)) {
-				if (usedPerspectives < itemLimit) {
-					String text = chartTexts.compareWithAll();
-					String boxColor = BarColors.getChartColorSet(queryDefinition.getPerspectiveOptionCount()).getPrimary();
-					html.append(legendRow(text, boxColor, printerMode));
-					usedPerspectives++;
-				} else {
-					unusedPerspectives++;
-				}
+		}
+		if (unusedOptions > 0) {
+			html.append("<tr><td colspan=\"2\" class=\"daxplore-ExternalLegend-hiddenCount\">"); //TODO is class used?
+			if (unusedOptions == 1) {
+				html.append(chartTexts.oneOptionHidden());
+			} else {
+				html.append(chartTexts.optionsHidden().replaceFirst("%d", "" + unusedOptions));
 			}
-			if (unusedPerspectives > 0) {
-				html.append("<tr><td colspan=\"2\" class=\"daxplore-ExternalLegend-hiddenCount\">"); //TODO is class used?
-				if (unusedPerspectives == 1) {
-					html.append(chartTexts.oneGroupHidden());
-				} else {
-					html.append(chartTexts.groupsHidden().replaceFirst("%d", "" + unusedPerspectives));
-				}
-				html.append("</td></tr>");
-			}
-		} else {
-			List<String> questionOptionTexts = queryDefinition.getQuestionOptionTexts();
-			int usedOptions = 0;
-			int unusedOptions = 0;
-			for (int optionIndex = 0; optionIndex < queryDefinition.getQuestionOptionCount(); optionIndex++) {
-				if (usedOptions < itemLimit) {
-					String text = questionOptionTexts.get(optionIndex);
-					String boxColor = BarColors.getChartColorSet(optionIndex).getPrimary();
-					html.append(legendRow(text, boxColor, printerMode));
-					usedOptions++;
-				} else {
-					unusedOptions++;
-				}
-			}
-			if (unusedOptions > 0) {
-				html.append("<tr><td colspan=\"2\" class=\"daxplore-ExternalLegend-hiddenCount\">"); //TODO is class used?
-				if (unusedOptions == 1) {
-					html.append(chartTexts.oneOptionHidden());
-				} else {
-					html.append(chartTexts.optionsHidden().replaceFirst("%d", "" + unusedOptions));
-				}
-				html.append("</td></tr>");
-			}
+			html.append("</td></tr>");
 		}
 		html.append("</table>");
 		content = new HTML(html.toString());

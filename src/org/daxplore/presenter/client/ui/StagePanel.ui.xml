@@ -9,7 +9,7 @@
 		<client:QuestionPanel ui:field='questionPanel'/>
 		
 		<g:VerticalPanel>
-			<chart:ChartPanel ui:field='chartPanel'/>
+			<chart:ChartPanelView ui:field='chartPanel'/>
 			<client:PerspectivePanel ui:field='perspectivePanel'/>
 		</g:VerticalPanel>
 		

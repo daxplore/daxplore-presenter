@@ -23,7 +23,6 @@ import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.client.json.shared.ClientPrefixProperties;
 import org.daxplore.presenter.client.json.shared.QuestionMetadataClientImpl;
 import org.daxplore.presenter.embed.EmbedEntryPoint;
-import org.daxplore.presenter.embed.EmbedQuery.EmbedQueryFactory;
 import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QuestionMetadata;
 
@@ -49,9 +48,6 @@ public class EmbedModule extends AbstractGinModule {
 
 	@Override
 	protected void configure() {
-		/* client */
-		bind(EmbedQueryFactory.class).in(Singleton.class);
-
 		/* client.chart.display */
 		bind(ChartFactory.class).in(Singleton.class);
 

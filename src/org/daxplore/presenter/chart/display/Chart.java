@@ -18,8 +18,6 @@
  */
 package org.daxplore.presenter.chart.display;
 
-import org.daxplore.presenter.chart.ChartPanel;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -71,31 +69,4 @@ public interface Chart extends IsWidget {
 	 * @return the external header
 	 */
 	public Widget getExternalHeader();
-
-	/**
-	 * Checks if the chart is ready to be displayed.
-	 * 
-	 * <p>We mainly need to wait for the data to be sent from the server.</p>
-	 * 
-	 * @return true, if the chard is ready
-	 */
-	public boolean isReady();
-
-	/**
-	 * Add a chart panel that will be called when the chart is ready.
-	 * 
-	 * <p>This is a semi-hacky solution.
-	 * TODO: create a more general solution.</p>
-	 * 
-	 * @param chartPanel
-	 *            the chart panel
-	 */
-	public void setCallback(ChartPanel chartPanel);
-
-	/**
-	 * Cancel the loading of the chart.
-	 * 
-	 * <p>Used to prevent the callback from being called.</p>
-	 */
-	public void cancelLoading();
 }

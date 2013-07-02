@@ -18,7 +18,7 @@
  */
 package org.daxplore.presenter.chart.display;
 
-import org.daxplore.presenter.chart.ChartPanel;
+import org.daxplore.presenter.chart.ChartPanelView;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -30,7 +30,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class BlankChart extends Composite implements Chart {
 
-	protected ChartPanel callbackPanel;
+	protected ChartPanelView callbackPanel;
 	protected SimplePanel mainPanel = new SimplePanel();
 
 	/**
@@ -73,26 +73,4 @@ public class BlankChart extends Composite implements Chart {
 		return new SimplePanel();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean isReady() {
-		return true;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setCallback(ChartPanel chartPanel) {
-		callbackPanel = chartPanel;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void cancelLoading() {
-	}
 }

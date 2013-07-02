@@ -20,10 +20,12 @@ package org.daxplore.presenter.embed;
 
 import java.util.LinkedList;
 
+import org.daxplore.presenter.chart.data.QueryResultCount;
+import org.daxplore.presenter.chart.display.BarChart;
+import org.daxplore.presenter.chart.display.BarChartCompare;
 import org.daxplore.presenter.chart.display.ChartFactory;
 import org.daxplore.presenter.chart.display.GChartChart;
 import org.daxplore.presenter.client.json.shared.QueryData;
-import org.daxplore.presenter.embed.EmbedQuery.EmbedQueryFactory;
 import org.daxplore.presenter.embed.inject.EmbedInjector;
 import org.daxplore.presenter.shared.EmbedDefinition;
 import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
@@ -61,7 +63,6 @@ public class EmbedEntryPoint implements EntryPoint {
 		QuestionMetadata questions = injector.getQuestions();
 		String queryString = Window.Location.getParameter("q");
 		QueryDefinition queryDefinition = new QueryDefinition(questions, queryString);
-		EmbedQueryFactory queryFactory = injector.getQueryFactory();
 		ChartFactory chartFactory = injector.getChartFactory();
 
 		String href = Window.Location.getHref();
@@ -75,22 +76,15 @@ public class EmbedEntryPoint implements EntryPoint {
 		}
 
 		try {
-			QueryData queryData = QueryData.getQueryDataEmbedded();
-			EmbedQuery query = queryFactory.createQuery(queryDefinition, queryData);
+			QueryData queryData = QueryData.getEmbeddedData();
 			GChartChart chart;
 			boolean printMode = embedDefinition.hasFlag(EmbedFlag.PRINT);
-			if (queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
-				if (queryDefinition.hasFlag(QueryFlag.MEAN)) {
-					chart = chartFactory.createMeanChartCompare(query, printMode);
-				} else {
-					chart = chartFactory.createBarChartCompare(query, printMode);
-				}
+			if (!queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
+				chart = chartFactory.createBarChart(queryDefinition, printMode);
+				((BarChart)chart).addData(new QueryResultCount(queryData.getDataItems(), queryData.getTotalDataItem()));
 			} else {
-				if (queryDefinition.hasFlag(QueryFlag.MEAN)) {
-					chart = chartFactory.createMeanChart(query, printMode);
-				} else {
-					chart = chartFactory.createBarChart(query, printMode);
-				}
+				chart = chartFactory.createBarChartCompare(queryDefinition, printMode);
+				((BarChartCompare)chart).addData(new QueryResultCount(queryData.getDataItems(), queryData.getTotalDataItem()));
 			}
 			EmbedView embedView = new EmbedView(chart, Window.getClientWidth(),
 					Window.getClientHeight(), embedDefinition);

@@ -18,7 +18,8 @@
  */
 package org.daxplore.presenter.client.ui;
 
-import org.daxplore.presenter.chart.ChartPanel;
+import org.daxplore.presenter.chart.ChartPanelPresenter;
+import org.daxplore.presenter.chart.ChartPanelView;
 import org.daxplore.presenter.client.resources.DaxploreConfig;
 import org.daxplore.presenter.client.resources.UIResources;
 
@@ -51,16 +52,16 @@ public class StagePanel extends Composite implements ResizeHandler {
 	protected final QuestionPanel questionPanel;
 	
 	@UiField(provided = true)
-	protected final ChartPanel chartPanel;
+	protected final ChartPanelView chartPanel;
 	
 	protected int minWidth;
 	
 	@Inject
-	protected StagePanel(PerspectivePanel perspectivePanel, QuestionPanel questionPanel, ChartPanel chartPanel,
+	protected StagePanel(PerspectivePanel perspectivePanel, QuestionPanel questionPanel, ChartPanelPresenter chartPanelPresenter,
 			UIResources uiResources, DaxploreConfig config) {
 		this.perspectivePanel = perspectivePanel;
 		this.questionPanel = questionPanel;
-		this.chartPanel = chartPanel;
+		this.chartPanel = chartPanelPresenter.getView();
 
 		minWidth = config.stagePanelMinWidth();
 		

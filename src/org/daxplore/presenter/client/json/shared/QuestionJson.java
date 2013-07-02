@@ -21,8 +21,6 @@ package org.daxplore.presenter.client.json.shared;
 import java.util.Collections;
 import java.util.List;
 
-import org.daxplore.presenter.chart.display.MeanChart;
-
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArrayInteger;
 import com.google.gwt.core.client.JsArrayString;

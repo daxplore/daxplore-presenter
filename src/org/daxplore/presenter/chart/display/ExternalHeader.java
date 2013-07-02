@@ -18,8 +18,8 @@
  */
 package org.daxplore.presenter.chart.display;
 
-import org.daxplore.presenter.chart.QueryInterface;
 import org.daxplore.presenter.chart.resources.ChartTexts;
+import org.daxplore.presenter.shared.QueryDefinition;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
@@ -38,9 +38,9 @@ public class ExternalHeader extends Composite {
 	 * @param query
 	 *            the query
 	 */
-	public ExternalHeader(ChartTexts chartTexts, QueryInterface query) {
-		String titleHeader = query.getDefinition().getQuestionShortText();
-		String titleDetail = query.getDefinition().getQuestionFullText();
+	public ExternalHeader(ChartTexts chartTexts, QueryDefinition queryDefinition) {
+		String titleHeader = queryDefinition.getQuestionShortText();
+		String titleDetail = queryDefinition.getQuestionFullText();
 
 		HTML content = new HTML();
 		if (titleHeader.equalsIgnoreCase(titleDetail)) {

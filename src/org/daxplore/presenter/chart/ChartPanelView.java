@@ -18,14 +18,11 @@
  */
 package org.daxplore.presenter.chart;
 
+import java.util.LinkedList;
 import java.util.List;
 
-import org.daxplore.presenter.chart.display.BlankChart;
 import org.daxplore.presenter.chart.display.Chart;
-import org.daxplore.presenter.chart.display.ChartFactory;
 import org.daxplore.presenter.chart.resources.ChartConfig;
-import org.daxplore.presenter.shared.QueryDefinition;
-import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
@@ -38,7 +35,6 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
 
 /**
  * A wrapper panel for charts.
@@ -46,8 +42,8 @@ import com.google.web.bindery.event.shared.EventBus;
  * <p>When a new chart should be displayed, call the setChart method. It will
  * display the new chart, once that chart is loaded.</p>
  */
-public class ChartPanel extends Composite {
-	interface ChartUiBinder extends UiBinder<Widget, ChartPanel> {
+public class ChartPanelView extends Composite {
+	interface ChartUiBinder extends UiBinder<Widget, ChartPanelView> {
 	}
 
 	private static ChartUiBinder uiBinder = GWT.create(ChartUiBinder.class);
@@ -64,17 +60,12 @@ public class ChartPanel extends Composite {
 	@UiField(provided = true)
 	protected final SimplePanel legendPanel;
 
-	protected final ChartFactory chartFactory;
-	protected EventBus eventBus;
-	protected ChartConfig chartConfig;
-	protected QueryInterface currentQuery;
-
-	protected List<Widget> actionWidgetList;
-
 	/**
 	 * The chart that belongs to this panel.
 	 */
 	private Chart chart;
+	
+	private List<Widget> actionWidgetList = new LinkedList<Widget>();
 
 	/**
 	 * Fields used to figure out and adjust the size of the chart and
@@ -86,11 +77,9 @@ public class ChartPanel extends Composite {
 	protected boolean scrolling = false, forceScrolling = false;
 
 	@Inject
-	protected ChartPanel(QueryActiveAnimation queryActiveAnimation, ChartFactory chartFactory, EventBus eventBus, ChartConfig chartConfig) {
+	protected ChartPanelView(QueryActiveAnimation queryActiveAnimation, ChartConfig chartConfig) {
 		this.queryActiveAnimation = queryActiveAnimation;
-		this.chartFactory = chartFactory;
-		this.eventBus = eventBus;
-		this.chartConfig = chartConfig;
+
 		this.sidebarArea = new VerticalPanel();
 
 		chartContainerPanel.setStylePrimaryName("daxplore-ChartContainerPanel");
@@ -103,31 +92,9 @@ public class ChartPanel extends Composite {
 
 		maxWidth = 800; // TODO this is temporary, the wanted value is set using setMaxWidth(int width)
 		maxHeight = chartConfig.chartHeight();
-
-		setChart(new BlankChart());
 	}
 
-	/**
-	 * Set a new chart to be displayed.
-	 * 
-	 * @param chart
-	 *            The chart that should be wrapped.
-	 */
-	protected void setChart(Chart chart) {
-		if (chart.isReady()) {
-			chartSwitchCallback(chart);
-		} else {
-			chart.setCallback(this);
-		}
-	}
-
-	/**
-	 * A callback function called by the chart, when it is ready to be drawn.
-	 * 
-	 * @param chart
-	 *            The new chart to display.
-	 */
-	public void chartSwitchCallback(Chart chart) {
+	public void setChart(Chart chart) {
 		headerPanel.setWidget(chart.getExternalHeader());
 		legendPanel.setWidget(chart.getExternalLegend());
 		if (scrolling) {
@@ -137,6 +104,26 @@ public class ChartPanel extends Composite {
 		}
 		this.chart = chart;
 		adjustSizeRecursively();
+	}
+	
+	/**
+	 * Sets widgets used to interact with the chart.
+	 * 
+	 * @param actionWidgetList
+	 *            the new action widgets
+	 */
+	public void setActionWidgets(List<Widget> actionWidgetList) {
+		if (this.actionWidgetList != null) {
+			for (Widget actionWidget : this.actionWidgetList) {
+				sidebarArea.remove(actionWidget);
+			}
+		}
+		int i = 1;
+		for (Widget actionWidget : actionWidgetList) {
+			sidebarArea.insert(actionWidget, i);
+			i++;
+		}
+		this.actionWidgetList = actionWidgetList;
 	}
 
 	/**
@@ -224,51 +211,5 @@ public class ChartPanel extends Composite {
 		}
 	}
 
-	/**
-	 * Send in a new query that is used to generate a new chart.
-	 * 
-	 * @param query
-	 *            the new data
-	 */
-	public void setData(QueryInterface query) {
-		currentQuery = query;
-		if (chart != null) {
-			chart.cancelLoading();
-		}
-		QueryDefinition queryDefinition = query.getDefinition();
-		if (queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
-			if (queryDefinition.hasFlag(QueryFlag.MEAN)) {
-				chart = chartFactory.createMeanChartCompare(query, false);
-			} else {
-				chart = chartFactory.createBarChartCompare(query, false);
-			}
-		} else {
-			if (queryDefinition.hasFlag(QueryFlag.MEAN)) {
-				chart = chartFactory.createMeanChart(query, false);
-			} else {
-				chart = chartFactory.createBarChart(query, false);
-			}
-		}
-		setChart(chart);
-	}
 
-	/**
-	 * Sets widgets used to interact with the chart.
-	 * 
-	 * @param actionWidgetList
-	 *            the new action widgets
-	 */
-	public void setActionWidgets(List<Widget> actionWidgetList) {
-		if (this.actionWidgetList != null) {
-			for (Widget actionWidget : this.actionWidgetList) {
-				sidebarArea.remove(actionWidget);
-			}
-		}
-		int i = 1;
-		for (Widget actionWidget : actionWidgetList) {
-			sidebarArea.insert(actionWidget, i);
-			i++;
-		}
-		this.actionWidgetList = actionWidgetList;
-	}
 }

@@ -21,13 +21,12 @@ package org.daxplore.presenter.chart.display;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.daxplore.presenter.chart.QueryInterface;
-import org.daxplore.presenter.chart.QueryInterface.QueryCallback;
 import org.daxplore.presenter.chart.data.QueryResult;
 import org.daxplore.presenter.chart.data.QueryResultCount;
 import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.chart.resources.ChartTexts;
 import org.daxplore.presenter.shared.PrefixProperties;
+import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
 import com.google.gwt.event.dom.client.MouseMoveEvent;
@@ -67,7 +66,7 @@ public class BarChart extends GChartChart {
 	/**
 	 * The distance between the bars in a group.
 	 * 
-	 * Meassured in GChart's internal distance system.
+	 * Measured in GChart's internal distance system.
 	 */
 	private final static double internalGroupSpacing = 0.15;
 
@@ -80,7 +79,7 @@ public class BarChart extends GChartChart {
 	/**
 	 * Keeps track of how wide each group is going to be.
 	 * 
-	 * <p>The value is computed in the constructor. Meassured in GChart's internal
+	 * <p>The value is computed in the constructor. Measured in GChart's internal
 	 * distance system.</p>
 	 */
 	protected double groupWidth;
@@ -88,7 +87,7 @@ public class BarChart extends GChartChart {
 	/**
 	 * Keeps track of the distance between the midpoint of each group.
 	 * 
-	 * <p>The value is computed in the constructor. Meassured in GChart's internal
+	 * <p>The value is computed in the constructor. Measured in GChart's internal
 	 * distance system.</p>
 	 */
 	protected double groupDistance;
@@ -166,10 +165,6 @@ public class BarChart extends GChartChart {
 	 */
 	private ChartBar hoveredBar;
 
-	/**
-	 * The query that this chart displays.
-	 */
-	protected final QueryInterface query;
 	protected ChartConfig chartConfig;
 
 	protected int xTickMaxCharacterCount = 13;
@@ -184,12 +179,12 @@ public class BarChart extends GChartChart {
 	 * @param query
 	 *            The query that this chart will display.
 	 */
-	protected BarChart(ChartTexts chartTexts, ChartConfig chartConfig, PrefixProperties prefixProperties, final QueryInterface query, boolean printerMode) {
-		super(chartTexts, chartConfig, prefixProperties, query);
-		this.query = query;
+	protected BarChart(ChartTexts chartTexts, ChartConfig chartConfig, PrefixProperties prefixProperties,
+			QueryDefinition queryDefinition, boolean printerMode) {
+		super(chartTexts, chartConfig, prefixProperties, queryDefinition);
 		this.chartConfig = chartConfig;
 
-		externalLegend = new ExternalLegend(chartTexts, query, false, chartConfig.externalLegendItemLimit(), printerMode);
+		externalLegend = new ExternalLegend(chartTexts, queryDefinition, chartConfig.externalLegendItemLimit(), printerMode);
 
 		usedPerspectiveOptions = queryDefinition.getUsedPerspectiveOptions();
 		groupCount = usedPerspectiveOptions.size() + (queryDefinition.hasFlag(QueryFlag.TOTAL) ? 1 : 0);
@@ -208,19 +203,6 @@ public class BarChart extends GChartChart {
 		createCurves(queryDefinition.getQuestionOptionTexts(), printerMode);
 		setupMouseHandlers();
 		setupAxes();
-
-		if (this.getClass().equals(BarChart.class)) {
-			if (query.hasResult()) {
-				addData();
-			} else {
-				query.requestResult(new QueryCallback() {
-					@Override
-					public void callback() {
-						addData();
-					}
-				});
-			}
-		}
 	}
 
 	/**
@@ -405,17 +387,9 @@ public class BarChart extends GChartChart {
 	}
 
 	/**
-	 * Add the data, to finish the construction of the chart.
-	 * 
-	 * <p>When the query is ready, this method is called. It will add the actual
-	 * data from the query. Once the data is added, the chart is ready to be
-	 * displayed. This method triggers the drawing of the chart by calling the
-	 * setReady() method.</p>
-	 * 
-	 * @param queryDefinition
+	 * Add the data and complete the construction of the chart.
 	 */
-	protected void addData() {
-		QueryResultCount queryResult = (QueryResultCount) query.getResult(false, false);
+	public void addData(QueryResultCount queryResult) {
 		List<String> perspectiveOptionTexts = queryDefinition.getPerspectiveOptionTexts();
 		currentPosition = 1 + groupSpacing / 2 + internalGroupSpacing;
 		currentGroup = 0;
@@ -449,8 +423,9 @@ public class BarChart extends GChartChart {
 
 		drawPaddingBar();
 		setYAxis(maxValue);
-
-		setReady();
+		
+		update();
+		setVisible(true);
 	}
 
 	/**

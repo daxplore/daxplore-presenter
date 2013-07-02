@@ -20,7 +20,7 @@ package org.daxplore.presenter.chart;
 
 
 /**
- * An interface for representating a single StatDataItem.
+ * An interface for representing a single StatDataItem.
  * 
  * <p>This represents a piece of data that contains the answer frequencies for a
  * specific group. They can also contain a dataset for "secondary" data from a

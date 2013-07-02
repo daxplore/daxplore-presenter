@@ -20,7 +20,6 @@ package org.daxplore.presenter.chart.data;
 
 import java.util.Collection;
 
-import org.daxplore.presenter.chart.QueryInterface;
 import org.daxplore.presenter.chart.StatInterface;
 import org.daxplore.presenter.chart.display.BarChart;
 import org.daxplore.presenter.chart.display.BarChartCompare;
@@ -59,9 +58,6 @@ public class QueryResultCountCompare extends QueryResultCount {
 	 * <p>The result is built up from a number of data items. Each item contains
 	 * data for a specific sub-group of the total population. </p>
 	 * 
-	 * <p>This version of the constructor also takes a total data item. This
-	 * item represents the entire population.</p>
-	 * 
 	 * @param dataItems
 	 *            A collection of data items to be used.
 	 * @param totalDataItem
@@ -69,8 +65,8 @@ public class QueryResultCountCompare extends QueryResultCount {
 	 * @param query
 	 *            the query
 	 */
-	public QueryResultCountCompare(Collection<? extends StatInterface> dataItems, StatInterface totalDataItem, QueryInterface query) {
-		super(dataItems, totalDataItem, query);
+	public QueryResultCountCompare(Collection<? extends StatInterface> dataItems, StatInterface totalDataItem) {
+		super(dataItems, totalDataItem);
 	}
 
 	/*

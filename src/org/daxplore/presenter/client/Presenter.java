@@ -21,15 +21,16 @@ package org.daxplore.presenter.client;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.daxplore.presenter.chart.ChartPanel;
-import org.daxplore.presenter.client.Query.QueryFactory;
+import org.daxplore.presenter.chart.ChartPanelView;
 import org.daxplore.presenter.client.event.CloseWarningBannerEvent;
 import org.daxplore.presenter.client.event.CloseWarningBannerHandler;
 import org.daxplore.presenter.client.event.QueryUpdateEvent;
+import org.daxplore.presenter.client.event.QueryUpdateHandler;
 import org.daxplore.presenter.client.event.SelectionUpdateEvent;
 import org.daxplore.presenter.client.event.SelectionUpdateHandler;
 import org.daxplore.presenter.client.event.SetWarningBannerEvent;
 import org.daxplore.presenter.client.event.SetWarningBannerHandler;
+import org.daxplore.presenter.client.model.StatDataServerModel;
 import org.daxplore.presenter.client.resources.DaxploreConfig;
 import org.daxplore.presenter.client.resources.UITexts;
 import org.daxplore.presenter.client.ui.ChartTypeOptionsPanel;
@@ -58,32 +59,31 @@ import com.google.web.bindery.event.shared.EventBus;
  * <p>It is named "Presenter" after the Model-View-Presenter design pattern. The
  * project does not properly adhere to the MVP pattern, though.</p>
  */
-public class Presenter implements ValueChangeHandler<String>, SelectionUpdateHandler, SetWarningBannerHandler, CloseWarningBannerHandler {
+public class Presenter implements ValueChangeHandler<String>, SelectionUpdateHandler,
+SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler {
 
 	protected final PerspectivePanel perspectivePanel;
 	protected final QuestionPanel questionPanel;
 	protected final ChartTypeOptionsPanel optionsPanel;
-	protected final QueryFactory queryFactory;
-	protected final ChartPanel chartPanel;
+	protected final ChartPanelView chartPanel;
 	protected QuestionMetadata questionMetadata;
 	protected final EventBus eventBus;
 	protected DaxploreConfig config;
-
-	private Query currentQuery;
+	private StatDataServerModel statDataServerModel;
 
 	@Inject
 	protected Presenter(StagePanel stagePanel, PerspectivePanel perspectivePanel, QuestionPanel questionPanel,
-			ChartTypeOptionsPanel optionsPanel, QueryFactory queryFactory, EventBus eventBus, ChartPanel chartPanel,
+			ChartTypeOptionsPanel optionsPanel, EventBus eventBus, ChartPanelView chartPanel,
 			QuestionMetadata questionMetadata, ImageButtonPanel imageButtonPanel, DaxploreConfig config, UITexts uiTexts,
-			WarningBannerFactory warningFactory) {
+			WarningBannerFactory warningFactory, StatDataServerModel statDataServerModel) {
 		this.perspectivePanel = perspectivePanel;
 		this.questionPanel = questionPanel;
 		this.optionsPanel = optionsPanel;
-		this.queryFactory = queryFactory;
 		this.questionMetadata = questionMetadata;
 		this.chartPanel = chartPanel;
 		this.eventBus = eventBus;
 		this.config = config;
+		this.statDataServerModel = statDataServerModel;
 
 		List<Widget> actionWidgetList = new LinkedList<Widget>();
 		actionWidgetList.add(imageButtonPanel);
@@ -93,6 +93,7 @@ public class Presenter implements ValueChangeHandler<String>, SelectionUpdateHan
 		SelectionUpdateEvent.register(eventBus, this);
 		SetWarningBannerEvent.register(eventBus, this);
 		CloseWarningBannerEvent.register(eventBus, this);
+		QueryUpdateEvent.register(eventBus, this);
 
 		History.addValueChangeHandler(this);
 	}
@@ -103,36 +104,31 @@ public class Presenter implements ValueChangeHandler<String>, SelectionUpdateHan
 	 * <p>The query is constructed based on user selections in the current
 	 * site.</p>
 	 * 
-	 * <p>This includes making a server request for the data (if needed) and
-	 * handing over the query to the chart system.</p>
-	 * 
 	 * <p>You can choose if you want to set browser history or not.</p>
 	 * 
 	 * @param setHistory
 	 *            true, if the browser history should be set
 	 */
 	public void makeQuery(boolean setHistory) {
-		if (currentQuery != null) {
-			currentQuery.cancelRequest();
-		}
 		List<QueryFlag> flags = new LinkedList<QueryFlag>();
-		flags.addAll(optionsPanel.getFlags());
-		flags.addAll(perspectivePanel.getFlags());
-		QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, perspectivePanel.getQuestionID(),
-				questionPanel.getQuestionID(), perspectivePanel.getPerspectiveOptions(), flags);
-		Query oldQuery = currentQuery;
-		try {
-			currentQuery = queryFactory.createQuery(queryDefinition);
-			currentQuery.fetchData();
-		} catch (Exception e) {
-			currentQuery = oldQuery;
-			SharedTools.println("Invalid query in makeQuery");
-			e.printStackTrace();
+		String questionID = questionPanel.getQuestionID();
+		String perspectiveID = perspectivePanel.getQuestionID();
+		List<Integer> perspectiveOptions = perspectivePanel.getPerspectiveOptions();
+		
+		if(questionMetadata.hasSecondary(questionID)
+				&& questionMetadata.hasSecondary(perspectiveID)
+				&& optionsPanel.useSecondarySelected()) {
+			flags.add(QueryFlag.SECONDARY);
 		}
-		// currentQuery.fetchData(oldQuery);
-		eventBus.fireEvent(new QueryUpdateEvent(queryDefinition));
+		
+		if(perspectiveOptions.size()==0 || perspectivePanel.useTotalSelected()) {
+			flags.add(QueryFlag.TOTAL);
+		}
+		
+		QueryDefinition queryDefinition =
+				new QueryDefinition(questionMetadata, perspectiveID, questionID, perspectiveOptions, flags);
 
-		chartPanel.setData(currentQuery);
+		eventBus.fireEvent(new QueryUpdateEvent(queryDefinition));
 
 		String historyString = queryDefinition.getAsString();
 		if (setHistory) {
@@ -159,24 +155,14 @@ public class Presenter implements ValueChangeHandler<String>, SelectionUpdateHan
 			googleAnalyticsTrack(queryDefinition.getQuestionID(), queryDefinition.getPerspectiveID());
 			iFrameTrack(queryDefinition.getAsString());
 		} catch (IllegalArgumentException e) {
-			if (currentQuery == null) {
-				try {
-					queryDefinition = new QueryDefinition(questionMetadata, config.defaultQueryString());
-				} catch (IllegalArgumentException e2) {
-					return;
-				}
-			} else {
-				// TODO queryDefinition = currentQuery.getQueryDefinition(); ?
+			try {
+				queryDefinition = new QueryDefinition(questionMetadata, config.defaultQueryString());
+			} catch (IllegalArgumentException e2) {
 				return;
 			}
 		}
 
-		currentQuery = queryFactory.createQuery(queryDefinition);
-		currentQuery.fetchData();
-
 		eventBus.fireEvent(new QueryUpdateEvent(queryDefinition));
-
-		chartPanel.setData(currentQuery);
 
 		if (setHistory) {
 			String historyString = queryDefinition.getAsString();
@@ -255,5 +241,13 @@ public class Presenter implements ValueChangeHandler<String>, SelectionUpdateHan
 			warningSection.remove(currentWarning);
 			currentWarning = null;
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void onQueryUpdate(QueryUpdateEvent event) {
+		statDataServerModel.makeRequest(event.getQueryDefinition());
 	}
 }

@@ -21,7 +21,6 @@ package org.daxplore.presenter.chart.data;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import org.daxplore.presenter.chart.QueryInterface;
 import org.daxplore.presenter.chart.StatInterface;
 
 /**

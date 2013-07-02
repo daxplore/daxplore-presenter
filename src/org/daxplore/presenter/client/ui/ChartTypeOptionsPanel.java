@@ -18,9 +18,6 @@
  */
 package org.daxplore.presenter.client.ui;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.daxplore.presenter.client.event.QueryUpdateEvent;
 import org.daxplore.presenter.client.event.QueryUpdateHandler;
 import org.daxplore.presenter.client.event.SelectionUpdateEvent;
@@ -122,31 +119,10 @@ public class ChartTypeOptionsPanel extends Composite implements QueryUpdateHandl
 		QueryUpdateEvent.register(eventBus, this);
 	}
 	
-	protected boolean useSecondary() {
-		return showSecondaryButton.isEnabled() && showSecondaryButton.getValue();
+	public boolean useSecondarySelected() {
+		return showSecondaryButton.getValue();
 	}
 
-	protected boolean useMean() {
-		return showMeanButtons && useMeanButton.isEnabled() && useMeanButton.getValue();
-	}
-	
-	/**
-	 * Get the query definition flags that are defined by the buttons the user
-	 * has pressed.
-	 * 
-	 * @return the flags
-	 */
-	public List<QueryFlag> getFlags() {
-		List<QueryFlag> flags = new LinkedList<QueryFlag>();
-		if (useSecondary()) {
-			flags.add(QueryFlag.SECONDARY);
-		}
-		if (useMean()) {
-			flags.add(QueryFlag.MEAN);
-		}
-		return flags;
-	}
-	
 	/**
 	 * {@inheritDoc}
 	 */

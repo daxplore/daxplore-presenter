@@ -18,9 +18,7 @@
  */
 package org.daxplore.presenter.chart.display;
 
-import org.daxplore.presenter.chart.ChartPanel;
 import org.daxplore.presenter.chart.ChartTools;
-import org.daxplore.presenter.chart.QueryInterface;
 import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.chart.resources.ChartTexts;
 import org.daxplore.presenter.shared.PrefixProperties;
@@ -40,27 +38,6 @@ public abstract class GChartChart extends GChart implements Chart {
 	protected PrefixProperties prefixProperties;
 
 	/**
-	 * Keeps track of the ready status of the chart.
-	 * 
-	 * <p>When the chart is ready type filter textto be drawn, this will be set
-	 * to true.</p>
-	 */
-	private boolean ready = false;
-
-	/**
-	 * If the chart no longer should be drawn, set canceled to true.
-	 */
-	private boolean canceled = false;
-
-	/**
-	 * The panel that this chart belongs to.
-	 * 
-	 * <p>When the chart is ready to be drawn, it will add itself to this
-	 * panel.</p>
-	 */
-	private ChartPanel callbackPanel;
-
-	/**
 	 * A widget containing a legend for the chart, that can be placed anywhere.
 	 */
 	protected ExternalLegend externalLegend;
@@ -78,12 +55,12 @@ public abstract class GChartChart extends GChart implements Chart {
 	 * @param titleDetail
 	 *            The explanatory text, that is shown under the header.
 	 */
-	protected GChartChart(ChartTexts chartTexts, ChartConfig chartConfig, PrefixProperties prefixProperties,  QueryInterface query) {
-		this.queryDefinition = query.getDefinition();
+	protected GChartChart(ChartTexts chartTexts, ChartConfig chartConfig, PrefixProperties prefixProperties, QueryDefinition queryDefinition) {
+		this.queryDefinition = queryDefinition;
 		this.prefixProperties = prefixProperties;
 		this.chartTexts = chartTexts;
 		getElement().getStyle().setPosition(Position.RELATIVE);
-		externalHeader = new ExternalHeader(chartTexts, query);
+		externalHeader = new ExternalHeader(chartTexts, queryDefinition);
 		if (ChartTools.ieVersion() > 0) {
 			addStyleDependentName("IE");
 		}
@@ -99,7 +76,7 @@ public abstract class GChartChart extends GChart implements Chart {
 	 * 
 	 * <p>The actual width and height that the chart will be given, are not
 	 * guaranteed to match the given width and height. This is due to how GChart
-	 * works internaly.</p>
+	 * works internally.</p>
 	 * 
 	 * @param width
 	 *            The wanted with of the chart.
@@ -119,7 +96,7 @@ public abstract class GChartChart extends GChart implements Chart {
 	 * predefined set of colors that can be used. Any number can be given, but
 	 * it is recommended that you start with color number 0 and count upwards
 	 * from there. If you pick colors in sequence, you will eventually get back
-	 * to the first color again (according to modulu operations).</p>
+	 * to the first color again (according to modulo operations).</p>
 	 * 
 	 * @param index
 	 *            A number, to which the corresponding color set will be
@@ -128,55 +105,6 @@ public abstract class GChartChart extends GChart implements Chart {
 	 */
 	protected static BarColors getColorSet(int index) {
 		return BarColors.getChartColorSet(index);
-	}
-
-	/**
-	 * Is this chart ready to be drawn?
-	 * 
-	 * @return True if the chart is ready to be drawn, otherwise false.
-	 */
-	public boolean isReady() {
-		return ready;
-	}
-
-	/**
-	 * When the chart is ready to be drawn, call this method.
-	 * 
-	 * <p>By this time, everything should be ready. Including axes, the legend
-	 * and all the data to be included.</p>
-	 */
-	protected void setReady() {
-		if (!canceled) {
-			update();
-			this.setVisible(true);
-			ready = true;
-			if (callbackPanel != null) {
-				callbackPanel.chartSwitchCallback(this);
-			}
-		}
-	}
-
-	/**
-	 * Set the panel to draw this chart in.
-	 * 
-	 * <p>When the chart is ready to be drawn, it will draw itself in this
-	 * panel.</p>
-	 * 
-	 * @param chartPanel
-	 *            the new callback
-	 */
-	public void setCallback(ChartPanel chartPanel) {
-		callbackPanel = chartPanel;
-	}
-
-	/**
-	 * Cancel the loading of the chart.
-	 * 
-	 * <p>If the chart should no longer be drawn but is still loading, call this
-	 * method.</p>
-	 */
-	public void cancelLoading() {
-		canceled = true;
 	}
 
 	/**
