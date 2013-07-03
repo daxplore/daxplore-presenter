@@ -68,7 +68,7 @@ public class EmbedView extends Composite {
 	 * Fields used to figure out and adjust the size of the chart and chartPanel.
 	 */
 	protected int resizeRecursions;
-	protected int maxWidth, maxHeight, chartWidth, chartHeight;
+	protected int maxWidth, maxHeight;
 	private ScrollPanel chartScrollPanel = new ScrollPanel();
 	protected boolean scrolling = false, forceScrolling = false;
 	
@@ -92,8 +92,8 @@ public class EmbedView extends Composite {
 	 */
 	public EmbedView(GChartChart chart, int width, int height, EmbedDefinition embedDefinition) {
 		this.chart = chart;
-		maxWidth = width - 10;
-		maxHeight = height - 10;
+		maxWidth = width;
+		maxHeight = height;
 		this.header = chart.getExternalHeader();
 		initWidget(uiBinder.createAndBindUi(this));
 		
@@ -123,82 +123,35 @@ public class EmbedView extends Composite {
 			main.getElement().addClassName(style.opaque());
 		}
 
-		adjustSizeRecursively();
-	}
-
-	/**
-	 * Try to adjust the size of the embed view, based on width and height.
-	 * 
-	 * <p>
-	 * The size will automatically be updated and adjusted in a number of
-	 * iterations. This is needed because the browser must draw the content
-	 * before its size can be calculated.
-	 * </p>
-	 */
-	protected void adjustSizeRecursively() {
-		resizeRecursions = 0;
-		forceScrolling = false;
-		Scheduler.get().scheduleDeferred(new ScheduledCommand() {
-			@Override
-			public void execute() {
-				adjustSizeRecursivelySub();
-			}
-		});
-	}
-	
-	/**
-	 * A recursive subprocess started by adjustSizeRecursively. <b>Do not call
-	 * directly!</b>
-	 * 
-	 * <p>Adjusts the size of the chart based on the embed view's actual size
-	 * (reported by the browser). Puts the chart in a scrollPanel if the chart
-	 * is too wide.</p>
-	 * 
-	 * <p>The method calls itself repeatedly until a correct size has been
-	 * found.</p>
-	 */
-	protected void adjustSizeRecursivelySub() {
-		int actualWidth = getOffsetWidth();
-		int actualHeight = chartArea.getOffsetHeight();
-		int diffWidth = maxWidth-actualWidth; 
-		int diffHeight = maxHeight-actualHeight;
-
-		if (chart==null ||
-				(resizeRecursions!=0 && actualWidth==maxWidth && actualHeight==maxHeight) ||
-				(resizeRecursions!=0 && diffWidth==0 && diffHeight==0) ||
-				(resizeRecursions>=10 && actualWidth<maxWidth && actualHeight<maxHeight) ||
-				(resizeRecursions>=15)){
-			return;
-		}
-
-		chartWidth += diffWidth;
-		chartWidth = Math.max(0, chartWidth);
-		
-		chartHeight += diffHeight;
-		chartHeight = Math.max(0, chartHeight);
-
-		if (chartWidth < chart.getMinWidth() || forceScrolling) {
-			if(!scrolling) {
-				chartContainerPanel.setWidget(chartScrollPanel);
-				chartScrollPanel.setWidget(chart);
-				scrolling = true;
-				forceScrolling = true;
-			}
-			chartScrollPanel.setSize(chartWidth + "px", chartHeight + "px");
-			chart.setChartSizeSmart(chart.getMinWidth(), chartHeight-40);
-		} else if (chartWidth >= chart.getMinWidth()) {
-			chartContainerPanel.setWidget(chart);
-			scrolling = false;
-			chart.setChartSizeSmart(chartWidth, chartHeight);
-		}
-		
-		resizeRecursions++;
-		
 		Scheduler.get().scheduleFinally(new ScheduledCommand() {
 			@Override
 			public void execute() {
-				adjustSizeRecursivelySub();
+				addChart();
 			}
 		});
 	}
+
+	/**
+	 * Add the chart to the page.
+	 * 
+	 * <p>Tries to adjust the size of the chart so that it will fit properly.
+	 * The chart will be wrapped in a scrollpanel if necessary.</p>
+	 */
+	protected void addChart() {
+		int width = maxWidth - chart.getExternalLegend().getOffsetWidth() - 30;
+		int height = maxHeight - chart.getExternalHeader().getOffsetHeight() - 30;
+		if (width < chart.getMinWidth()) {
+			chartContainerPanel.setWidget(chartScrollPanel);
+			chartScrollPanel.setWidget(chart);
+			if (chart.getExternalHeader().getOffsetWidth() > width) {
+				width = chart.getExternalHeader().getOffsetWidth();
+			}
+			chartScrollPanel.setSize(width + "px", height + "px");
+			chart.setChartSizeSmart(chart.getMinWidth(), height - 40);
+		} else {
+			chartContainerPanel.setWidget(chart);
+			chart.setChartSizeSmart(width, height);
+		}
+	}
+
 }
