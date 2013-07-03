@@ -28,7 +28,9 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.PersistenceCapable;
@@ -57,6 +59,8 @@ public class StaticFileItemStore {
 	private String blobKey;
 	@Persistent
 	private String prefix;
+	
+	private static Map<String, String> staticFileCache = new HashMap<>();
 
 	/**
 	 * Instantiate a new static file item, which acts as a pointer to a file
@@ -151,12 +155,22 @@ public class StaticFileItemStore {
 	public static String readStaticFile(PersistenceManager pm, String prefix,
 			String name, Locale locale, String suffix) throws BadReqException, InternalServerException {
 		String statStoreKey = prefix + "#" + name + "_" + locale.getLanguage() + suffix;
-		StaticFileItemStore item = pm.getObjectById(StaticFileItemStore.class, statStoreKey);
-		byte[] data = readBlob(new BlobKey(item.getBlobKey()));
-		try {
-			return new String(data, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw new InternalServerException("UTF-8 not supported !?");
+		if(staticFileCache.containsKey(statStoreKey)) {
+			return staticFileCache.get(statStoreKey);
+		} else {
+			StaticFileItemStore item = pm.getObjectById(StaticFileItemStore.class, statStoreKey);
+			byte[] data = readBlob(new BlobKey(item.getBlobKey()));
+			try {
+				String fileAsString = new String(data, "UTF-8");
+				staticFileCache.put(statStoreKey, fileAsString);
+				return fileAsString;
+			} catch (UnsupportedEncodingException e) {
+				throw new InternalServerException("UTF-8 not supported");
+			}
 		}
+	}
+
+	public static void clearStaticFileCache() {
+		staticFileCache.clear();
 	}
 }

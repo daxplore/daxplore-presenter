@@ -179,7 +179,6 @@ public class PresenterServlet extends HttpServlet {
 	private String getPresenterHTML(PersistenceManager pm, String prefix, Locale locale, String baseurl, ServerPrefixProperties properties)
 			throws InternalServerException, BadReqException {
 		
-		// TODO Add caching for loaded files
 		String perspectives = "", groups = "", questions = "";
 		perspectives = StaticFileItemStore.readStaticFile(pm, prefix, "meta/perspectives", locale, ".json");
 		questions = StaticFileItemStore.readStaticFile(pm, prefix, "meta/questions", locale, ".json");

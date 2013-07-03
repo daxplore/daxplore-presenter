@@ -84,6 +84,7 @@ public class DeleteData {
 		
 		//Clear caches in different places
 		GetCsvServlet.clearServletCache();
+		StaticFileItemStore.clearStaticFileCache();
 		
 		long totalDeleted = deletedPrefixItems + deletedLocaleItems + deletedStatDataItems + deletedSettingItems + deletedStaticFileItems;
 		double timeSeconds = ((System.currentTimeMillis()-time)/Math.pow(10, 6));
