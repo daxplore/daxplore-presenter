@@ -103,11 +103,13 @@ public class PrefixDataModelImpl implements PrefixDataModel {
 		public void onResponseReceived(Request request, Response response) {
 			LinkedList<String> prefixes = new LinkedList<String>();
 			String responseText = response.getText();
-			JSONArray array = JSONParser.parseStrict(responseText).isArray();
-			for (int i=0; i<array.size(); i++) {
-				prefixes.add(array.get(i).isString().stringValue());
+			if(responseText!=null && responseText.length()>0) {
+				JSONArray array = JSONParser.parseStrict(responseText).isArray();
+				for (int i=0; i<array.size(); i++) {
+					prefixes.add(array.get(i).isString().stringValue());
+				}
+				eventBus.fireEvent(new PrefixListUpdateEvent(Collections.unmodifiableList(prefixes)));
 			}
-			eventBus.fireEvent(new PrefixListUpdateEvent(Collections.unmodifiableList(prefixes)));
 		}
 	
 		/**
