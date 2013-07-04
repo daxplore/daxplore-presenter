@@ -96,9 +96,6 @@ public class BarChartCompare extends BarChart {
 		groupDistance = groupWidth + groupSpacing;
 
 		addStyleDependentName("compare");
-		if (ChartTools.ieVersion() > 0) {
-			addStyleDependentName("compare-IE");
-		}
 	}
 
 	@Override

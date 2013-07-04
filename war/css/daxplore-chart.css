@@ -16,18 +16,10 @@
 		margin: 0px;	
 	}
 	
-	.gchart-GChart-IE {
-		padding-bottom: 20px;
-	}
-	
 	.gchart-GChart-compare {
 		padding-bottom: 15px;
 	}
 	
-	.gchart-GChart-compare-IE {
-		padding-bottom: 30px;
-	}
-		
 	.gwt-Image[src$='gchart.gif'] {
 		z-index: 100 !important;
 	}

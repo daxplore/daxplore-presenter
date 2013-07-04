@@ -61,9 +61,6 @@ public abstract class GChartChart extends GChart implements Chart {
 		this.chartTexts = chartTexts;
 		getElement().getStyle().setPosition(Position.RELATIVE);
 		externalHeader = new ExternalHeader(chartTexts, queryDefinition);
-		if (ChartTools.ieVersion() > 0) {
-			addStyleDependentName("IE");
-		}
 		this.setVisible(false);
 	}
 
