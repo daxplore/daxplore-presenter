@@ -18,7 +18,6 @@
  */
 package org.daxplore.presenter.chart.display;
 
-import org.daxplore.presenter.chart.ChartTools;
 import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.chart.resources.ChartTexts;
 import org.daxplore.presenter.shared.PrefixProperties;

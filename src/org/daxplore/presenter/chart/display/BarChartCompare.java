@@ -21,7 +21,6 @@ package org.daxplore.presenter.chart.display;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.daxplore.presenter.chart.ChartTools;
 import org.daxplore.presenter.chart.data.QueryResult;
 import org.daxplore.presenter.chart.data.QueryResultCountCompare;
 import org.daxplore.presenter.chart.resources.ChartConfig;
