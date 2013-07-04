@@ -85,8 +85,6 @@ abstract class ChartBar {
 		symbol.setDistanceMetric(0, 0);
 		symbol.setHoverSelectionEnabled(false);
 		
-		barCurve.setYShift(1);
-		
 		symbol.setHoverLocation(hoverLocation);
 		if(hoverLocation==AnnotationLocation.SOUTHWEST) {
 			symbol.setHoverXShift(20);
