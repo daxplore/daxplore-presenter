@@ -28,13 +28,12 @@
 		padding-bottom: 30px;
 	}
 		
-	.gwt-Image[src^='/pixel/'] {
-		-moz-border-radius: 2px 2px 0 0;
-		border-radius: 2px 2px 0 0;
-	}
-	
 	.gwt-Image[src$='gchart.gif'] {
 		z-index: 100 !important;
+	}
+	
+	.gwt-Image[src$='daxplore-bar-blank.gif'], .gwt-Image[src^='/pixel/'] {
+		border-radius: 2px 2px 0 0;
 	}
 
 
@@ -43,7 +42,6 @@
 		border: none;
 		padding:6px;
 		margin-top:5px;
-		-moz-border-radius: 5px;
 		border-radius: 5px;
 		text-align: center;
 	}
@@ -56,10 +54,9 @@
 		padding-right: 5px;
 	}
 	
-	.daxplore-ExternalLegend div, img {
+	.daxplore-ExternalLegend div {
 		width: 1.1em;
 		height: 1.1em;
-		-moz-border-radius: 2px;
 		border-radius: 2px;
 	}
 	
@@ -79,12 +76,6 @@
 		padding-right: 3px;
 	}
 	
-	/* external-header-warning is used directly in questions_**.json */
-	.external-header-warning {
-		color: #888888;
-	}
-	
-
 /*** Query Active Animation ***/
 	.daxplore-QueryActiveAnimation {
 		position: relative;

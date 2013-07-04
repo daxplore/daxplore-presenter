@@ -54,7 +54,6 @@ class BarChartBarPrimary extends ChartBar {
 	 */
 	BarChartBarPrimary(ChartTexts chartTexts, Curve barCurve, BarColors color, boolean printerMode, AnnotationLocation hoverLocation) {
 		super(chartTexts, barCurve, color, printerMode, hoverLocation);
-
 		Symbol symbol = barCurve.getSymbol();
 		symbol.setDistanceMetric(0, 0);
 
@@ -65,14 +64,22 @@ class BarChartBarPrimary extends ChartBar {
 	void hover() {
 		Symbol symbol = getCurve().getSymbol();
 		symbol.setBackgroundColor(getColor().getPrimaryHover());
-		symbol.setImageURL("/pixel/" + color.getPrimaryHover().substring(1) + ".png");
+		if (printerMode) {
+			symbol.setImageURL("/pixel/" + color.getPrimaryHover().substring(1) + ".png");
+		} else {
+			symbol.setImageURL("/img/daxplore-bar-blank.gif");
+		}
 	}
 
 	@Override
 	void unhover() {
 		Symbol symbol = getCurve().getSymbol();
 		symbol.setBackgroundColor(getColor().getPrimary());
-		symbol.setImageURL("/pixel/" + color.getPrimary().substring(1) + ".png");
+		if (printerMode) {
+			symbol.setImageURL("/pixel/" + color.getPrimary().substring(1) + ".png");
+		} else {
+			symbol.setImageURL("/img/daxplore-bar-blank.gif");
+		}
 	}
 
 	void setHoverTextStandard(double percentage, String groupName) {

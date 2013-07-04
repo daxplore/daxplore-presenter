@@ -28,7 +28,7 @@ import com.googlecode.gchart.client.GChart.Symbol;
 /**
  * A class for creating a secondary bar in a barchart.
  * 
- * <p>Instead of using Gchart's built in bars, this class is used. It allowes
+ * <p>Instead of using Gchart's built in bars, this class is used. It allows
  * bars to overlap, but still be hovered over properly. Each bar should be
  * mapped against a GChart curve, and each curve should (at most) have one
  * bar.</p>
@@ -77,13 +77,21 @@ class BarChartBarSecondary extends BarChartBarPrimary {
 	void hover() {
 		Symbol symbol = getCurve().getSymbol();
 		symbol.setBackgroundColor(getColor().getSecondaryHover());
-		symbol.setImageURL("/pixel/" + color.getSecondaryHover().substring(1) + ".png");
+		if (printerMode) {
+			symbol.setImageURL("/pixel/" + color.getSecondaryHover().substring(1) + ".png");
+		} else {
+			symbol.setImageURL("/img/daxplore-bar-blank.gif");
+		}
 	}
 
 	@Override
 	void unhover() {
 		Symbol symbol = getCurve().getSymbol();
 		symbol.setBackgroundColor(getColor().getSecondary());
-		symbol.setImageURL("/pixel/" + color.getSecondary().substring(1) + ".png");
+		if (printerMode) {
+			symbol.setImageURL("/pixel/" + color.getSecondary().substring(1) + ".png");
+		} else {
+			symbol.setImageURL("/img/daxplore-bar-blank.gif");
+		}
 	}
 }
