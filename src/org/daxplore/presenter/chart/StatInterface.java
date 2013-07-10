@@ -72,10 +72,6 @@ public interface StatInterface {
 	/**
 	 * Gets the total population count from the primary dataset.
 	 * 
-	 * <p>This is a temporary fix used to handle errors in the old data
-	 * 
-	 * @param questionOptionCount
-	 *            the actual number of question options
 	 * @return the population
 	 */
 	public int getPopulationCount();
@@ -95,13 +91,8 @@ public interface StatInterface {
 	public int[] getCountDataSecondary();
 
 	/**
-	 * Gets the total population count from the secondary dataset. This is a
-	 * temporary fix used to handle errors in the old data generation tool.
+	 * Gets the total population count from the secondary dataset.
 	 * 
-	 * <p>TODO: replace this method when the new Daxplore Producer is ready.</p>
-	 * 
-	 * @param questionOptionCount
-	 *            the actual number of question options
 	 * @return the population
 	 */
 	public int getPopulationCountSecondary();
