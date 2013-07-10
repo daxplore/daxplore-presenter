@@ -33,6 +33,7 @@ import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.PrefixStore;
 import org.daxplore.presenter.server.throwable.BadReqException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
+import org.daxplore.shared.SharedResourceTools;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -55,19 +56,28 @@ public class AdminPrefixServlet extends HttpServlet {
 				responseText = getPrefixListJson(pm);
 				break;
 			case "add":
-				String prefix = request.getParameter("prefix"); //TODO clean input
+				String prefix = request.getParameter("prefix");
+				if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)){
+					throw new BadReqException("Not a syntactically valid prefix: '" + prefix + "'");
+				}
 				pm.makePersistent(new PrefixStore(prefix));
 				logger.log(Level.INFO, "Added prefix to system: " + prefix);
 				responseText = getPrefixListJson(pm);
 				break;
 			case "delete":
-				prefix = request.getParameter("prefix"); //TODO clean input
+				prefix = request.getParameter("prefix");
+				if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)){
+					throw new BadReqException("Not a syntactically valid prefix: '" + prefix + "'");
+				}
 				/*String result =*/ DeleteData.deleteForPrefix(pm, prefix); // Logs it's own action
 				//TODO send result over server channel?
 				responseText = getPrefixListJson(pm);
 				break;
 			case "metadata":
-				prefix = request.getParameter("prefix"); //TODO clean input
+				prefix = request.getParameter("prefix");
+				if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)){
+					throw new BadReqException("Not a syntactically valid prefix: '" + prefix + "'");
+				}
 				responseText = getPrefixMetadata(pm, prefix);
 				break;
 			default:
