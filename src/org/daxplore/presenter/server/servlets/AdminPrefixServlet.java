@@ -48,10 +48,9 @@ public class AdminPrefixServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
-			String action = request.getParameter("action"); //TODO clean input
 			
 			String responseText = ""; 
-			switch(action) {
+			switch(request.getParameter("action")) {
 			case "list":
 				responseText = getPrefixListJson(pm);
 				break;
@@ -72,7 +71,7 @@ public class AdminPrefixServlet extends HttpServlet {
 				responseText = getPrefixMetadata(pm, prefix);
 				break;
 			default:
-				throw new BadReqException("Invalid action '" + action + "' requested");
+				throw new BadReqException("Invalid action '" + request.getParameter("action") + "' requested");
 			}
 			
 			try {
