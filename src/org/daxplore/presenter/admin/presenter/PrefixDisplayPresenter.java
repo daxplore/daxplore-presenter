@@ -23,7 +23,10 @@ import org.daxplore.presenter.admin.event.PrefixMetadataEvent;
 import org.daxplore.presenter.admin.event.PrefixMetadataHandler;
 import org.daxplore.presenter.admin.event.ServerChannelEvent;
 import org.daxplore.presenter.admin.event.ServerChannelHandler;
+import org.daxplore.presenter.admin.event.SettingsUpdateEvent;
+import org.daxplore.presenter.admin.event.SettingsUpdateHandler;
 import org.daxplore.presenter.admin.model.PrefixDataModel;
+import org.daxplore.presenter.admin.model.SettingsDataModel;
 import org.daxplore.presenter.admin.view.PrefixDisplayView;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -42,7 +45,7 @@ public class PrefixDisplayPresenter implements Presenter {
 	private static String href;
 	
 	public PrefixDisplayPresenter(EventBus eventBus, PrefixDisplayView prefixDisplayView,
-			PrefixDataModel prefixDataModel, String prefix) {
+			PrefixDataModel prefixDataModel, SettingsDataModel settingsDataModel, String prefix) {
 		this.eventBus = eventBus;
 		this.prefixDisplayView = prefixDisplayView;
 		this.prefixDataModel = prefixDataModel;
@@ -54,6 +57,7 @@ public class PrefixDisplayPresenter implements Presenter {
 		}
 		prefixDisplayView.setPrefixHref(href + "/p/" + prefix);
 		bind();
+		settingsDataModel.fetchSettings(prefix);
 		prefixDataModel.updatePrefixMetadata(prefix);
 	}
 	
@@ -84,6 +88,18 @@ public class PrefixDisplayPresenter implements Presenter {
 				prefixDisplayView.addServerMessage(
 						event.getServerStatus().toString().toLowerCase()
 						+ ": " + event.getServerStatusMessage());
+			}
+		});
+		
+		SettingsUpdateEvent.register(eventBus, new SettingsUpdateHandler() {
+			@Override
+			public void onSettingsUpdate(SettingsUpdateEvent event) {
+				if(prefix.equalsIgnoreCase(event.getPrefix())) {
+					String gaID = event.getSetting("gaID");
+					if(gaID!=null) {
+						prefixDisplayView.setGoogleAnalyticsID(event.getSetting("gaID"));
+					}
+				}
 			}
 		});
 	}

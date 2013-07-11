@@ -42,6 +42,7 @@ import org.daxplore.presenter.client.ui.QuestionPanel;
 import org.daxplore.presenter.client.ui.StagePanel;
 import org.daxplore.presenter.client.ui.WarningBanner;
 import org.daxplore.presenter.client.ui.WarningBanner.WarningBannerFactory;
+import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 import org.daxplore.presenter.shared.QuestionMetadata;
@@ -72,12 +73,13 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 	protected final EventBus eventBus;
 	protected DaxploreConfig config;
 	private StatDataServerModel statDataServerModel;
+	private PrefixProperties prefixProperties;
 
 	@Inject
 	protected Presenter(StagePanel stagePanel, PerspectivePanel perspectivePanel, QuestionPanel questionPanel,
 			ChartTypeOptionsPanel optionsPanel, EventBus eventBus, ChartPanelPresenter chartPanelPresenter,
 			QuestionMetadata questionMetadata, ImageButtonPanel imageButtonPanel, DaxploreConfig config, UITexts uiTexts,
-			WarningBannerFactory warningFactory, StatDataServerModel statDataServerModel) {
+			WarningBannerFactory warningFactory, StatDataServerModel statDataServerModel, PrefixProperties prefixProperties) {
 		this.perspectivePanel = perspectivePanel;
 		this.questionPanel = questionPanel;
 		this.optionsPanel = optionsPanel;
@@ -86,6 +88,7 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		this.eventBus = eventBus;
 		this.config = config;
 		this.statDataServerModel = statDataServerModel;
+		this.prefixProperties = prefixProperties;
 
 		List<Widget> actionWidgetList = new LinkedList<Widget>();
 		actionWidgetList.add(imageButtonPanel);
@@ -196,7 +199,8 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 	 *            the perspective ID
 	 */
 	private void googleAnalyticsTrack(String questionID, String perspectiveID) {
-		Tracking.track(config.googleAnalyticsID(), "q=" + questionID + "&p=" + perspectiveID);
+		Tracking.track(prefixProperties.getGoogleAnalyticsID(), prefixProperties.getPrefix(),
+				"q=" + questionID + "&p=" + perspectiveID);
 	}
 	
 	private final native void iFrameTrack(String historyToken) /*-{

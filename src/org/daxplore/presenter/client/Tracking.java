@@ -32,13 +32,13 @@ public final class Tracking {
 	 * @param historyToken
 	 *            The text token that is sent to the server
 	 */
-	public static void track(String googleAnalyticsID, String historyToken) {
+	public static void track(String googleAnalyticsID, String prefix, String historyToken) {
 
 		if (historyToken == null) {
 			historyToken = "historyToken_null";
 		}
 
-		historyToken = "/#" + historyToken;
+		historyToken = "/" + prefix + "#" + historyToken;
 
 		trackGoogleAnalytics(googleAnalyticsID, historyToken);
 		SharedTools.println("Tracking: " + historyToken);

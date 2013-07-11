@@ -16,18 +16,16 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.admin.view;
+package org.daxplore.presenter.admin.event;
 
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.event.shared.EventHandler;
+import com.google.web.bindery.event.shared.EventBus;
 
-public interface PrefixDisplayView {
-	public void setPrefix(String prefix);
-	public void setPrefixHref(String href);
-	public void setGoogleAnalyticsID(String gaID);
-	public void setStatDataItemCount(String something);
-	public void addServerMessage(String message);
-	public void addDeletePrefixClickHandler(ClickHandler handler);
-	public boolean promptDeleteConfirmation(String prefix);
-	public Widget asWidget();
+/**
+ * An event sent when new settings are received from the server.
+ * 
+ * <p>Send the event over the system's {@link EventBus}.</p>
+ */
+public interface SettingsUpdateHandler extends EventHandler {
+	void onSettingsUpdate(SettingsUpdateEvent event);
 }

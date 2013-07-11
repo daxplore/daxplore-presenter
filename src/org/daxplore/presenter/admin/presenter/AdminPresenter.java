@@ -21,6 +21,7 @@ package org.daxplore.presenter.admin.presenter;
 import org.daxplore.presenter.admin.event.SelectPrefixEvent;
 import org.daxplore.presenter.admin.event.SelectPrefixHandler;
 import org.daxplore.presenter.admin.model.PrefixDataModel;
+import org.daxplore.presenter.admin.model.SettingsDataModel;
 import org.daxplore.presenter.admin.view.AdminView;
 import org.daxplore.presenter.admin.view.PrefixDisplayViewImpl;
 
@@ -34,14 +35,17 @@ public class AdminPresenter implements Presenter {
 	private final AdminView adminView;
 	private final PrefixListPresenter prefixListPresenter;
 	private final PrefixDataModel prefixDataModel;
+	private final SettingsDataModel settingsDataModel;
 	
 	@Inject
 	protected AdminPresenter(EventBus eventBus, AdminView adminView,
-			PrefixListPresenter prefixListPresenter, PrefixDataModel prefixDataModel) {
+			PrefixListPresenter prefixListPresenter, PrefixDataModel prefixDataModel,
+			SettingsDataModel settingsDataModel) {
 		this.eventBus = eventBus;
 		this.adminView = adminView;
 		this.prefixListPresenter = prefixListPresenter;
 		this.prefixDataModel = prefixDataModel;
+		this.settingsDataModel = settingsDataModel;
 		bind();
 	}
 
@@ -50,7 +54,8 @@ public class AdminPresenter implements Presenter {
 			@Override
 			public void onSelectPrefix(SelectPrefixEvent event) {
 				String prefix = event.getPrefix();
-				PrefixDisplayPresenter prefixDisplayPresenter = new PrefixDisplayPresenter(eventBus, new PrefixDisplayViewImpl(), prefixDataModel, prefix);
+				PrefixDisplayPresenter prefixDisplayPresenter = new PrefixDisplayPresenter(
+						eventBus, new PrefixDisplayViewImpl(), prefixDataModel, settingsDataModel, prefix);
 				prefixDisplayPresenter.go(adminView.getMainContentSlot());
 			}
 		});

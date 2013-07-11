@@ -59,7 +59,18 @@ public class ClientPrefixProperties implements PrefixProperties {
 	public String getTimepointSecondaryText() {
 		return properties.getTimepoint1Text();
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getGoogleAnalyticsID() {
+		return properties.getGoogleAnalyticsID();
+	}
 
+	/**
+	 * This class does all the work, but it's wrapped so that we can inject the outer one
+	 */
 	private final static class NativePrefixProperties extends JavaScriptObject {
 		
 		protected NativePrefixProperties() {}
@@ -80,9 +91,12 @@ public class ClientPrefixProperties implements PrefixProperties {
 			return this.timepoint_1;
 		}-*/;
 		
+		public native String getGoogleAnalyticsID() /*-{
+			return this.gaID;
+		}-*/;
+		
 		private static native NativePrefixProperties getPrefixProperties() /*-{
 			return $wnd.prefixProperties;
 		}-*/;
 	}
-
 }

@@ -110,7 +110,9 @@ public class PresenterServlet extends HttpServlet {
 				//TODO handle timepoints properly
 				String timepoint0Text = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "timepoint_0");
 				String timepoint1Text = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "timepoint_1");
-				ServerPrefixProperties prefixProperties = new ServerPrefixProperties(prefix, secondaryFlagText, timepoint0Text, timepoint1Text);
+				String googleAnalyticsID = SettingItemStore.getProperty(pm, prefix, "adminpanel", "gaID");
+				ServerPrefixProperties prefixProperties = new ServerPrefixProperties(
+						prefix, secondaryFlagText, timepoint0Text, timepoint1Text, googleAnalyticsID);
 
 				if (feature!=null && feature.equalsIgnoreCase("embed")) { // embedded chart
 					

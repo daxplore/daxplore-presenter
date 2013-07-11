@@ -18,7 +18,6 @@
  */
 package org.daxplore.presenter.admin.model;
 
-import java.util.Collections;
 import java.util.LinkedList;
 
 import org.daxplore.presenter.admin.event.PrefixListUpdateEvent;
@@ -26,11 +25,8 @@ import org.daxplore.presenter.admin.event.PrefixMetadata;
 import org.daxplore.presenter.admin.event.PrefixMetadataEvent;
 
 import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.http.client.URL;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.user.client.Window;
@@ -58,7 +54,7 @@ public class PrefixDataModelImpl implements PrefixDataModel {
 	 */
 	@Override
 	public void updatePrefixList() {
-		sendRequest("list", new ListResponseReciever());
+		ServerPost.send(href + "list", new ListResponseReciever());
 	}
 
 	/**
@@ -66,7 +62,7 @@ public class PrefixDataModelImpl implements PrefixDataModel {
 	 */
 	@Override
 	public void addPrefix(String prefix) {
-		sendRequest("add&prefix="+prefix, new ListResponseReciever());
+		ServerPost.send(href + "add&prefix="+prefix, new ListResponseReciever());
 	}
 
 	/**
@@ -74,7 +70,7 @@ public class PrefixDataModelImpl implements PrefixDataModel {
 	 */
 	@Override
 	public void deletePrefix(String prefix) {
-		sendRequest("delete&prefix="+prefix, new ListResponseReciever());
+		ServerPost.send(href + "delete&prefix="+prefix, new ListResponseReciever());
 	}
 	
 	/**
@@ -82,18 +78,9 @@ public class PrefixDataModelImpl implements PrefixDataModel {
 	 */
 	@Override
 	public void updatePrefixMetadata(String prefix) {
-		sendRequest("metadata&prefix="+prefix, new MetadataResponseReciever());
+		ServerPost.send(href + "metadata&prefix="+prefix, new MetadataResponseReciever());
 	}
 	
-	private void sendRequest(String arguments, RequestCallback requestCallback) {
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, URL.encode(href + arguments));
-		builder.setTimeoutMillis(10000); // TODO use reattempts with increasing times?
-		try {
-			builder.sendRequest(null, requestCallback);
-		} catch (RequestException e) {
-			e.printStackTrace(); //TODO handle exception
-		}
-	}
 	
 	private class ListResponseReciever implements RequestCallback {
 		/**
@@ -108,7 +95,7 @@ public class PrefixDataModelImpl implements PrefixDataModel {
 				for (int i=0; i<array.size(); i++) {
 					prefixes.add(array.get(i).isString().stringValue());
 				}
-				eventBus.fireEvent(new PrefixListUpdateEvent(Collections.unmodifiableList(prefixes)));
+				eventBus.fireEvent(new PrefixListUpdateEvent(prefixes));
 			}
 		}
 	

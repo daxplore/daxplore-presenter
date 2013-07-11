@@ -58,7 +58,7 @@
 			height: 150px;
 			margin-top: 10px;
 		}
-		.inlinelabel {
+		.inline {
 			display: inline;
 		}
 		.inlinelabel-header {
@@ -79,18 +79,31 @@
 			</g:FlowPanel>
 			<g:FlowPanel>
 				<g:Label styleName="{style.inlinelabel-header}">StatDataItem count:&nbsp;</g:Label>
-				<g:Label ui:field='something' styleName="{style.inlinelabel}"></g:Label>
+				<g:Label ui:field='something' styleName="{style.inline}"></g:Label>
 			</g:FlowPanel>
+			
+			<g:FormPanel ui:field='settingsForm' styleName="{style.formpanel}">
+				<g:VerticalPanel styleName="{style.maxwidth}">
+					<g:Label styleName="{style.header}">Settings</g:Label>
+					<g:VerticalPanel styleName="{style.bubble}">
+						<g:Hidden name='action' value='put'/>
+						<g:Hidden ui:field='settingsPrefix' name='prefix'/>
+						<g:Label>Google Analytics Code (optional)</g:Label>
+						<g:TextBox ui:field='gaIDField' name='gaID'/>
+						<g:Button ui:field="settingsButton" styleName="{style.bubble-button}">Update settings</g:Button>
+					</g:VerticalPanel>
+				</g:VerticalPanel>
+			</g:FormPanel>
 			
 			<g:FormPanel ui:field='uploadForm' styleName="{style.formpanel}">
 				<g:VerticalPanel styleName="{style.maxwidth}">
 					<g:Label styleName="{style.header}">Upload a new Daxplore file</g:Label>
 					<g:Label styleName="{style.header-subtext}">Upload a file created with Daxplore Producer. This will completely replace all the current content on this prefix.</g:Label>
-					<g:FlowPanel styleName="{style.bubble}">
+					<g:VerticalPanel styleName="{style.bubble}">
 						<g:FileUpload ui:field='uploadWidget' name='dataUpload'/>
-						<g:Hidden name='prefix' ui:field='uploadPrefix'></g:Hidden>
+						<g:Hidden ui:field='uploadPrefix' name='prefix' ></g:Hidden>
 						<g:Button ui:field='uploadButton' styleName="{style.bubble-button}">Upload</g:Button>
-					</g:FlowPanel>
+					</g:VerticalPanel>
 				</g:VerticalPanel>		
 			</g:FormPanel>
 			

@@ -41,6 +41,7 @@ import org.json.simple.JSONObject;
 public class AdminPrefixServlet extends HttpServlet {
 	protected static Logger logger = Logger.getLogger(AdminPrefixServlet.class.getName());
 
+	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 		doPost(request, response);
 	}
@@ -51,7 +52,11 @@ public class AdminPrefixServlet extends HttpServlet {
 		try {
 			
 			String responseText = ""; 
-			switch(request.getParameter("action")) {
+			String action = request.getParameter("action");
+			if(action==null) {
+				throw new BadReqException("No action requested");
+			}
+			switch(action) {
 			case "list":
 				responseText = getPrefixListJson(pm);
 				break;

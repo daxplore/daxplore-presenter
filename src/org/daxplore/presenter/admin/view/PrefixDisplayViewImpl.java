@@ -36,6 +36,7 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayView {
@@ -45,27 +46,44 @@ public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayVie
 	
 	@UiField protected Anchor prefixHeader;
 	@UiField protected Anchor mainlink;
-	@UiField protected Label something;
+	@UiField protected Label something; //TODO add relevant statistics
+	
+	@UiField protected FormPanel settingsForm;
+	@UiField protected Hidden settingsPrefix;
+	@UiField protected TextBox gaIDField;
+	@UiField protected Button settingsButton;
+	
 	@UiField protected FormPanel uploadForm;
 	@UiField protected FileUpload uploadWidget;
+	@UiField protected Hidden uploadPrefix;
 	@UiField protected Button uploadButton;
-	@UiField protected TextArea serverMessageArea;
+	
 	@UiField protected Label deletePrefixLabel;
 	@UiField protected Button deleteButton;
-	@UiField protected Hidden uploadPrefix;
+
+	@UiField protected TextArea serverMessageArea;
 	
 	public PrefixDisplayViewImpl() {
 		initWidget(uiBinder.createAndBindUi(this));
 		
 		mainlink.setTarget("_blank");
 		
+		settingsForm.setAction("/admin/settings");
+		settingsForm.setEncoding(FormPanel.ENCODING_URLENCODED);
+		settingsForm.setMethod(FormPanel.METHOD_POST);
+		
 		uploadForm.setAction("/admin/upload");
 		uploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
 		uploadForm.setMethod(FormPanel.METHOD_POST);
 	}
 	
+	@UiHandler("settingsButton")
+	protected void settingsClick(ClickEvent e) {
+		settingsForm.submit();
+	}
+
 	@UiHandler("uploadButton")
-	protected void handleClick(ClickEvent e) {
+	protected void uploadClick(ClickEvent e) {
 		boolean doUpload = Window.confirm("Are you sure you want to upload a new file, replacing all old data?");
 		if (doUpload) {
 			uploadForm.submit();
@@ -73,11 +91,11 @@ public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayVie
 	}
 
 	@UiHandler("uploadForm")
-	protected void handleSubmit(SubmitEvent event) {
+	protected void uploadSubmit(SubmitEvent event) {
 	}
 
 	@UiHandler("uploadForm")
-	protected void handleSubmitComplete(SubmitCompleteEvent event) {
+	protected void uploadSubmitComplete(SubmitCompleteEvent event) {
 	}
 	
 	/**
@@ -89,6 +107,7 @@ public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayVie
 		deletePrefixLabel.setText("Delete prefix " + prefix + ":");
 		deleteButton.setText("Delete " + prefix);
 		uploadPrefix.setValue(prefix);
+		settingsPrefix.setValue(prefix);
 	}
 
 	/**
@@ -133,5 +152,13 @@ public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayVie
 	public boolean promptDeleteConfirmation(String prefix) {
 		return Window.confirm("Are you sure you want to delete the prefix '"
 				+ prefix + "'.\n\nThis will also remove all data and information that belongs to it.");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setGoogleAnalyticsID(String gaID) {
+		gaIDField.setText(gaID);
 	}
 }

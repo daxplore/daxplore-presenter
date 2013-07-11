@@ -20,6 +20,7 @@ package org.daxplore.presenter.server.storage;
 
 import java.util.Locale;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -45,7 +46,7 @@ public class SettingItemStore {
 	 * Creates a new settings item to hold a setting uploaded by an administrator
 	 * using the admin console.
 	 * 
-	 * <p>The key should be on the format "prefix/name_locale". The prefix defines
+	 * <p>The key should be on the format "prefix#filename[_locale]/propertyname" The prefix defines
 	 * which presenter the setting belongs to, the name is the name of the
 	 * setting and locale is a Locale.toLanguageTag.</p>
 	 * 
@@ -71,13 +72,12 @@ public class SettingItemStore {
 		return key;
 	}
 
-	/**
-	 * Get the setting value.
-	 * 
-	 * @return the value
-	 */
 	public String getValue() {
 		return value;
+	}
+	
+	public void setValue(String value) {
+		this.value = value;
 	}
 	
 	public static String getProperty(PersistenceManager pm, String prefix,
@@ -85,7 +85,7 @@ public class SettingItemStore {
 		String statStoreKey = prefix + "#" + fileName + "/" + propertyName;
 		try {
 			return pm.getObjectById(SettingItemStore.class, statStoreKey).getValue();
-		} catch (Exception e) {
+		} catch (JDOObjectNotFoundException e) {
 			throw new BadReqException("Could not read property '" + statStoreKey + "'", e);
 		}
 	}
@@ -95,7 +95,7 @@ public class SettingItemStore {
 		String statStoreKey = prefix + "#" + fileName + "_" + locale.toLanguageTag() + "/" + propertyName;
 		try {
 			return pm.getObjectById(SettingItemStore.class, statStoreKey).getValue();
-		} catch (Exception e) {
+		} catch (JDOObjectNotFoundException e) {
 			throw new BadReqException("Could not read localized property '" + statStoreKey + "'", e);
 		}
 	}
