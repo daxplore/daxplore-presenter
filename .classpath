@@ -17,7 +17,6 @@
 	<classpathentry kind="lib" path="lib/commons-codec-1.6.jar" sourcepath="lib/sources/commons-codec-1.6-sources.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-fileupload-1.2.2.jar" sourcepath="lib/sources/commons-fileupload-1.2.2-src"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-io-2.4.jar" sourcepath="lib/sources/commons-io-2.4-sources.jar"/>
-	<classpathentry kind="lib" path="lib/gwt-gae-channel-0.4-alpha.jar"/>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>

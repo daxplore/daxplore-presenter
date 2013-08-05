@@ -35,7 +35,6 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -61,8 +60,6 @@ public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayVie
 	@UiField protected Label deletePrefixLabel;
 	@UiField protected Button deleteButton;
 
-	@UiField protected TextArea serverMessageArea;
-	
 	public PrefixDisplayViewImpl() {
 		initWidget(uiBinder.createAndBindUi(this));
 		
@@ -128,15 +125,6 @@ public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayVie
 		this.something.setText(something);
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void addServerMessage(String message) {
-		String text = serverMessageArea.getText() + "\n" + message;
-		serverMessageArea.setText(text);
-	}
-
 	/**
 	 * {@inheritDoc}
 	 */

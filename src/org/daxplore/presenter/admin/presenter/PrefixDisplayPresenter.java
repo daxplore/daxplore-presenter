@@ -21,8 +21,6 @@ package org.daxplore.presenter.admin.presenter;
 import org.daxplore.presenter.admin.event.PrefixMetadata;
 import org.daxplore.presenter.admin.event.PrefixMetadataEvent;
 import org.daxplore.presenter.admin.event.PrefixMetadataHandler;
-import org.daxplore.presenter.admin.event.ServerChannelEvent;
-import org.daxplore.presenter.admin.event.ServerChannelHandler;
 import org.daxplore.presenter.admin.event.SettingsUpdateEvent;
 import org.daxplore.presenter.admin.event.SettingsUpdateHandler;
 import org.daxplore.presenter.admin.model.PrefixDataModel;
@@ -78,16 +76,6 @@ public class PrefixDisplayPresenter implements Presenter {
 				if(metadata.getPrefix().equals(prefix)) {
 					prefixDisplayView.setStatDataItemCount(metadata.getStatDataItemCount());
 				}
-			}
-		});
-		
-		ServerChannelEvent.register(eventBus, new ServerChannelHandler() {
-			@Override
-			public void onServerStatus(ServerChannelEvent event) {
-				//TODO give better feedback than plain text messages
-				prefixDisplayView.addServerMessage(
-						event.getServerStatus().toString().toLowerCase()
-						+ ": " + event.getServerStatusMessage());
 			}
 		});
 		

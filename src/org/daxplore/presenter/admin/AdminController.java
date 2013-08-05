@@ -20,23 +20,10 @@ package org.daxplore.presenter.admin;
 
 import org.daxplore.presenter.admin.event.SelectPrefixEvent;
 import org.daxplore.presenter.admin.event.SelectPrefixHandler;
-import org.daxplore.presenter.admin.event.ServerChannelEvent;
-import org.daxplore.presenter.admin.event.ServerChannelEvent.ServerStatus;
-import org.daxplore.presenter.admin.event.ServerMessageEvent;
 import org.daxplore.presenter.admin.presenter.AdminPresenter;
 import org.daxplore.presenter.admin.presenter.PrefixListPresenter;
 import org.daxplore.presenter.admin.presenter.Presenter;
-import org.daxplore.presenter.admin.presenter.ServerMessage;
 
-import com.google.gwt.appengine.channel.client.Channel;
-import com.google.gwt.appengine.channel.client.ChannelFactory;
-import com.google.gwt.appengine.channel.client.ChannelFactory.ChannelCreatedCallback;
-import com.google.gwt.appengine.channel.client.SocketError;
-import com.google.gwt.appengine.channel.client.SocketListener;
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.MetaElement;
-import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.History;
@@ -55,52 +42,9 @@ public class AdminController implements Presenter, ValueChangeHandler<String> {
 		this.eventBus = eventBus;
 		this.adminPresenter = adminPresenter;
 		this.prefixListPresenter = prefixListPresenter;
-		setupServerCommunication();
 		bind();
 	}
 
-	private void setupServerCommunication() {
-		// Extract the Google AppEngine ServerChannel token that was embedded in the HTML by the server.
-		String token = null;
-		NodeList<Element> nodes = Document.get().getElementsByTagName("meta");
-	    for (int i = 0; i < nodes.getLength(); i++) {
-	        MetaElement meta = MetaElement.as(nodes.getItem(i));
-	        if (meta.getName().equals("channelToken")) {
-	            token = meta.getContent();
-	            break;
-	        }
-	    }
-
-	    ChannelFactory.createChannel(token, new ChannelCreatedCallback() {
-			@Override
-			public void onChannelCreated(Channel channel) {
-				channel.open(new SocketListener() {
-					@Override
-					public void onOpen() {
-						eventBus.fireEvent(new ServerChannelEvent(ServerStatus.OPEN, "Server channel is open"));
-						
-					}
-					
-					@Override
-					public void onMessage(String message) {
-						ServerMessage serverMessage = new ServerMessage(message);
-						eventBus.fireEvent(new ServerMessageEvent(serverMessage));
-					}
-					
-					@Override
-					public void onError(SocketError error) {
-						eventBus.fireEvent(new ServerChannelEvent(ServerStatus.ERROR, error.getDescription()));
-					}
-					
-					@Override
-					public void onClose() {
-						eventBus.fireEvent(new ServerChannelEvent(ServerStatus.CLOSED, "Server channel was closed"));
-					}
-				});
-			}
-		});
-	}
-	
 	private void bind() {
 		History.addValueChangeHandler(this);
 

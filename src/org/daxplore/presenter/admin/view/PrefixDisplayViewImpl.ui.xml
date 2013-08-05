@@ -113,10 +113,6 @@
 				<g:Label ui:field='deletePrefixLabel' styleName='{style.inlinelabel-header}'>Delete prefix ?:</g:Label>
 				<g:Button ui:field='deleteButton' addStyleNames="{style.bubble-button} {style.delete-button}">Delete ?</g:Button>
 			</g:FlowPanel>
-			
-			<g:Label styleName="{style.header}">Server updates</g:Label>
-			<g:Label styleName="{style.header-subtext}">Status updates sent from the server when uploading new data.</g:Label>
-			<g:TextArea styleName="{style.messagearea}" ui:field='serverMessageArea'/>
 		</g:VerticalPanel>
 	</g:ScrollPanel>
 </ui:UiBinder> 

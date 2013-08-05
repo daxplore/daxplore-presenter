@@ -24,11 +24,10 @@ import com.google.appengine.api.taskqueue.TaskOptions;
 
 public class UnpackQueue {
 	
-	protected String prefix, channelToken;
+	protected String prefix;
 	
-	public UnpackQueue(String prefix, String channelToken) {
+	public UnpackQueue(String prefix) {
 		this.prefix = prefix;
-		this.channelToken = channelToken;
 	}
 
 	public void addTask(UnpackType type, String blobKey) {
@@ -38,8 +37,7 @@ public class UnpackQueue {
 				.method(TaskOptions.Method.GET)
 				.param("prefix", prefix)
 				.param("key", blobKey)
-				.param("type", type.toString())
-				.param("channel", channelToken);
+				.param("type", type.toString());
 		queue.add(task);
 	}
 

@@ -31,19 +31,14 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
-import org.daxplore.presenter.server.admin.ClientMessageSender;
 import org.daxplore.presenter.server.admin.UnpackQueue;
 import org.daxplore.presenter.server.servlets.DataUnpackServlet.UnpackType;
 import org.daxplore.presenter.server.storage.StaticFileItemStore;
 import org.daxplore.presenter.server.throwable.BadReqException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
-import org.daxplore.presenter.shared.ClientServerMessage.MessageType;
 import org.daxplore.shared.SharedResourceTools;
 
 import com.google.appengine.api.blobstore.BlobKey;
-import com.google.appengine.api.users.User;
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
 
 /**
  * A servlet for uploading data to the Daxplore Presenter.
@@ -67,14 +62,6 @@ public class DataUploadServlet extends HttpServlet {
 		
 	    ServletFileUpload upload = new ServletFileUpload();
 	    try {
-	    	UserService userService = UserServiceFactory.getUserService();
-			User user = userService.getCurrentUser();
-			if(user==null) {
-				throw new BadReqException("User not logged in");
-			}
-			String channelToken = user.getUserId(); //TODO something better
-			ClientMessageSender messageSender = new ClientMessageSender(channelToken);
-			
 			FileItemIterator fileIterator = upload.getItemIterator(req);
 			String fileName = "";
 			byte[] fileData = null;
@@ -96,9 +83,8 @@ public class DataUploadServlet extends HttpServlet {
 			if(SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
 				if(fileData!=null && !fileName.equals("")) {
 					BlobKey blobKey = StaticFileItemStore.writeBlob(fileName, fileData);
-					UnpackQueue unpackQueue = new UnpackQueue(prefix, channelToken);
+					UnpackQueue unpackQueue = new UnpackQueue(prefix);
 					unpackQueue.addTask(UnpackType.UNZIP_ALL, blobKey.getKeyString());
-					messageSender.send(MessageType.PROGRESS_UPDATE, "User is uploading a new file with presenter data");
 				} else {
 					throw new BadReqException("No file uploaded");
 				}

@@ -35,9 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.daxplore.presenter.server.ClientMessage;
 import org.daxplore.presenter.server.ServerTools;
-import org.daxplore.presenter.server.admin.ClientMessageSender;
 import org.daxplore.presenter.server.admin.UnpackQueue;
 import org.daxplore.presenter.server.admin.UploadFileManifest;
 import org.daxplore.presenter.server.storage.DeleteData;
@@ -49,7 +47,6 @@ import org.daxplore.presenter.server.storage.StatDataItemStore;
 import org.daxplore.presenter.server.storage.StaticFileItemStore;
 import org.daxplore.presenter.server.throwable.BadReqException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
-import org.daxplore.presenter.shared.ClientServerMessage.MessageType;
 import org.daxplore.presenter.shared.SharedTools;
 import org.daxplore.shared.SharedResourceTools;
 import org.json.simple.JSONArray;
@@ -73,32 +70,28 @@ public class DataUnpackServlet extends HttpServlet {
 		UnpackType type = UnpackType.valueOf(req.getParameter("type").toUpperCase());
 		String blobKeyString = req.getParameter("key");
 		BlobKey blobKey = new BlobKey(blobKeyString);
-		String channelToken = req.getParameter("channel");
 		
 		try {
 			res.setStatus(HttpServletResponse.SC_OK);
 			
-			ClientMessageSender messageSender = new ClientMessageSender(channelToken);
-			
 			//the filename always starts with prefix#, except for the original uploadfile
 			String fileName = new BlobInfoFactory().loadBlobInfo(blobKey).getFilename(); 
-			messageSender.send(new ClientMessage(MessageType.PROGRESS_UPDATE, "Unpacking: " + fileName));
 
 			switch(type) {
 			case UNZIP_ALL:
 				byte[] fileData = StaticFileItemStore.readBlob(blobKey);
-				unzipAll(prefix, fileData, messageSender);
+				unzipAll(prefix, fileData);
 				break;
 			case PROPERTIES:
 				fileData = StaticFileItemStore.readBlob(blobKey);
-				unpackPropertyFile(fileName, fileData, messageSender);
+				unpackPropertyFile(fileName, fileData);
 				break;
 			case STATIC_FILE:
-				unpackStaticFile(fileName, blobKeyString, messageSender);
+				unpackStaticFile(fileName, blobKeyString);
 				break;
 			case STATISTICAL_DATA:
 				fileData = StaticFileItemStore.readBlob(blobKey);
-				unpackStatisticalDataFile(prefix, fileData, messageSender);
+				unpackStatisticalDataFile(prefix, fileData);
 				break;
 			}
 		
@@ -133,7 +126,7 @@ public class DataUnpackServlet extends HttpServlet {
 		}
 	}
 	
-	protected void unzipAll(String prefix, byte[] fileData, ClientMessageSender messageSender)
+	protected void unzipAll(String prefix, byte[] fileData)
 					throws BadReqException, InternalServerException {
 		LinkedHashMap<String, byte[]> fileMap = new LinkedHashMap<String, byte[]>();
 		
@@ -185,19 +178,17 @@ public class DataUnpackServlet extends HttpServlet {
 		
 		// Purge all existing data that uses this prefix
 		String deleteResult = DeleteData.deleteForPrefix(pm, prefix);
-		messageSender.send(MessageType.PROGRESS_UPDATE, deleteResult);
-		
+		logger.log(Level.INFO, deleteResult);
 		
 		// Since we just deleted the prefix and all it's data, we have to add it again
 		pm.makePersistent(new PrefixStore(prefix));
 		logger.log(Level.INFO, "Added prefix to system: " + prefix);
-		messageSender.send(MessageType.PROGRESS_UPDATE, "Added prefix to system: " + prefix);
 		
 		LocaleStore localeStore = new LocaleStore(prefix, manifest.getSupportedLocales(), manifest.getDefaultLocale());
 		pm.makePersistent(localeStore);
 		
 		pm.close();
-		UnpackQueue unpackQueue = new UnpackQueue(prefix, messageSender.getChannelToken());
+		UnpackQueue unpackQueue = new UnpackQueue(prefix);
 		for (String fileName : fileMap.keySet()) {
 			BlobKey blobKey = StaticFileItemStore.writeBlob(prefix + "#" + fileName, fileMap.get(fileName));
 			enqueueForUnpacking(unpackQueue, fileName, blobKey);
@@ -205,7 +196,7 @@ public class DataUnpackServlet extends HttpServlet {
 	}
 	
 	
-	protected void unpackPropertyFile(String fileName, byte[] fileData, ClientMessageSender messageSender)
+	protected void unpackPropertyFile(String fileName, byte[] fileData)
 			throws InternalServerException, BadReqException {
 		String[] propertiesWhitelist = {"page_title", "secondary_flag", "timepoint_0", "timepoint_1"};
 		long time = System.currentTimeMillis();
@@ -225,10 +216,9 @@ public class DataUnpackServlet extends HttpServlet {
 		time = System.currentTimeMillis()-time;
 		String message = "Set " + propertiesWhitelist.length + " properties in " + (time/Math.pow(10, 6)) + " seconds";
 		logger.log(Level.INFO, message);
-		messageSender.send(MessageType.PROGRESS_UPDATE, message);
 	}
 
-	protected void unpackStaticFile(String fileName, String blobKey, ClientMessageSender messageSender)
+	protected void unpackStaticFile(String fileName, String blobKey)
 			throws InternalServerException {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		String datstoreKey = fileName;
@@ -237,10 +227,9 @@ public class DataUnpackServlet extends HttpServlet {
 		pm.close();
 		String message = "Stored the static file " + fileName;
 		logger.log(Level.INFO, message);
-		messageSender.send(MessageType.PROGRESS_UPDATE, message);
 	}
 	
-	protected void unpackStatisticalDataFile(String prefix, byte[] fileData, ClientMessageSender messageSender)
+	protected void unpackStatisticalDataFile(String prefix, byte[] fileData)
 			throws InternalServerException {
 		long time = System.currentTimeMillis();
 		BufferedReader reader = ServerTools.getAsBufferedReader(fileData);
@@ -257,6 +246,5 @@ public class DataUnpackServlet extends HttpServlet {
 		time = System.currentTimeMillis()-time;
 		String message = "Unpacked " + items.size() + " statistical data items in " + (time/Math.pow(10, 6)) + " seconds";
 		logger.log(Level.INFO, message);
-		messageSender.send(MessageType.PROGRESS_UPDATE, message);
 	}
 }

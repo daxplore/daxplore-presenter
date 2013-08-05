@@ -11,7 +11,6 @@
 	<inherits name="com.google.gwt.http.HTTP" />
 	<inherits name="com.google.gwt.resources.Resources" />
 	<inherits name="com.google.gwt.inject.Inject" />
-	<inherits name='com.google.gwt.appengine.channel.Channel'/> 
 	<inherits name="com.google.gwt.json.JSON"/>
 
 	<!-- Specify the app entry point class. -->

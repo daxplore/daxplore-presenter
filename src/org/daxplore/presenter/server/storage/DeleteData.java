@@ -19,8 +19,6 @@
 package org.daxplore.presenter.server.storage;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -30,7 +28,6 @@ import org.daxplore.presenter.server.servlets.GetCsvServlet;
 import com.google.appengine.api.blobstore.BlobKey;
 
 public class DeleteData {
-	protected static Logger logger = Logger.getLogger(DeleteData.class.getName());
 	
 	public static String deleteForPrefix(PersistenceManager pm, String prefix) {
 		long time = System.currentTimeMillis();
@@ -91,7 +88,6 @@ public class DeleteData {
 		resultMessage.append(" (" + totalDeleted + " items in " +  timeSeconds + " seconds)");
 		
 		String result = resultMessage.toString();
-		logger.log(Level.INFO, result);
 		return result;
 	}
 }

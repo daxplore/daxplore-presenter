@@ -29,12 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 
-import com.google.appengine.api.channel.ChannelService;
-import com.google.appengine.api.channel.ChannelServiceFactory;
-import com.google.appengine.api.users.User;
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
-
 @SuppressWarnings("serial")
 public class AdminServlet extends HttpServlet {
 	protected static Logger logger = Logger.getLogger(AdminServlet.class.getName());
@@ -45,10 +39,6 @@ public class AdminServlet extends HttpServlet {
 			// Get input from URL
 			
 			Locale locale = new Locale("en");
-			UserService userService = UserServiceFactory.getUserService();
-			User user = userService.getCurrentUser();
-			ChannelService channelService = ChannelServiceFactory.getChannelService();
-			String channelToken = channelService.createChannel(user.getUserId());
 			
 			String pageTitle = "Daxplore Admin";
 			
@@ -66,8 +56,7 @@ public class AdminServlet extends HttpServlet {
 			
 			String[] arguments = {
 					locale.toLanguageTag(), // {0}
-					channelToken, 			// {1}
-					pageTitle,				// {2}
+					pageTitle,				// {1}
 					};
 			
 		try {

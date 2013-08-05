@@ -74,8 +74,8 @@ public class AdminPrefixServlet extends HttpServlet {
 				if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)){
 					throw new BadReqException("Not a syntactically valid prefix: '" + prefix + "'");
 				}
-				/*String result =*/ DeleteData.deleteForPrefix(pm, prefix); // Logs it's own action
-				//TODO send result over server channel?
+				String result = DeleteData.deleteForPrefix(pm, prefix);
+				logger.log(Level.INFO, result);
 				responseText = getPrefixListJson(pm);
 				break;
 			case "metadata":

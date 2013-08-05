@@ -26,7 +26,6 @@ public interface PrefixDisplayView {
 	public void setPrefixHref(String href);
 	public void setGoogleAnalyticsID(String gaID);
 	public void setStatDataItemCount(String something);
-	public void addServerMessage(String message);
 	public void addDeletePrefixClickHandler(ClickHandler handler);
 	public boolean promptDeleteConfirmation(String prefix);
 	public Widget asWidget();
