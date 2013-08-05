@@ -25,8 +25,6 @@ import javax.jdo.Query;
 
 import org.daxplore.presenter.server.servlets.GetCsvServlet;
 
-import com.google.appengine.api.blobstore.BlobKey;
-
 public class DeleteData {
 	
 	public static String deleteForPrefix(PersistenceManager pm, String prefix) {
@@ -71,7 +69,7 @@ public class DeleteData {
 		@SuppressWarnings("unchecked")
 		List<StaticFileItemStore> fileItems = (List<StaticFileItemStore>)query.execute(prefix);
 		for (StaticFileItemStore item : fileItems) {
-			StaticFileItemStore.deleteBlob(new BlobKey(item.getBlobKey()));
+			StaticFileItemStore.deleteBlob(item.getBlobKey());
 		}
 		pm.deletePersistentAll(fileItems);
 		int deletedBlobs = fileItems.size();

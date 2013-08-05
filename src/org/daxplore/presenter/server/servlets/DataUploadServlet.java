@@ -38,8 +38,6 @@ import org.daxplore.presenter.server.throwable.BadReqException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.shared.SharedResourceTools;
 
-import com.google.appengine.api.blobstore.BlobKey;
-
 /**
  * A servlet for uploading data to the Daxplore Presenter.
  * 
@@ -82,9 +80,9 @@ public class DataUploadServlet extends HttpServlet {
 			}
 			if(SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
 				if(fileData!=null && !fileName.equals("")) {
-					BlobKey blobKey = StaticFileItemStore.writeBlob(fileName, fileData);
+					String blobKey = StaticFileItemStore.writeBlob(fileName, fileData);
 					UnpackQueue unpackQueue = new UnpackQueue(prefix);
-					unpackQueue.addTask(UnpackType.UNZIP_ALL, blobKey.getKeyString());
+					unpackQueue.addTask(UnpackType.UNZIP_ALL, blobKey);
 				} else {
 					throw new BadReqException("No file uploaded");
 				}

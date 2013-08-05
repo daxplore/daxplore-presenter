@@ -28,7 +28,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.tools.development.testing.LocalBlobstoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalFileServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
@@ -64,14 +63,12 @@ public class UploadBlobManagerTest {
 			data[i+3] = (byte)(r>>0);
 		}
 		
-		BlobKey key = StaticFileItemStore.writeBlob("foo", data);
-		
-		String keyString = key.getKeyString();
-		byte[] dataCopy = StaticFileItemStore.readBlob(new BlobKey(keyString));
+		String keyString = StaticFileItemStore.writeBlob("foo", data);
+		byte[] dataCopy = StaticFileItemStore.readBlob(keyString);
 		
 		assertArrayEquals(data, dataCopy);
 		
-		StaticFileItemStore.deleteBlob(key);
+		StaticFileItemStore.deleteBlob(keyString);
 	}
 
 }

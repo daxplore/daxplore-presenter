@@ -42,6 +42,7 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.daxplore.presenter.server.throwable.BadReqException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 
+import com.google.appengine.api.blobstore.BlobInfoFactory;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
@@ -51,6 +52,7 @@ import com.google.appengine.api.files.FileService;
 import com.google.appengine.api.files.FileServiceFactory;
 import com.google.appengine.api.files.FileWriteChannel;
 
+@SuppressWarnings("deprecation") //TODO replace deprechated code
 @PersistenceCapable
 public class StaticFileItemStore {
 	@PrimaryKey
@@ -99,9 +101,9 @@ public class StaticFileItemStore {
 		return blobKey;
 	}
 	
-	public static byte[] readBlob(BlobKey blobKey) throws BadReqException {
+	public static byte[] readBlob(String blobKey) throws BadReqException {
 			FileService fileService = FileServiceFactory.getFileService();
-			AppEngineFile file = fileService.getBlobFile(blobKey);
+			AppEngineFile file = fileService.getBlobFile(new BlobKey(blobKey));
 			FileReadChannel readChannel = null;
 			try {
 				readChannel = fileService.openReadChannel(file, false);
@@ -125,7 +127,7 @@ public class StaticFileItemStore {
 			}
 	}
 	
-	public static BlobKey writeBlob(String fileName, byte[] data) throws InternalServerException {
+	public static String writeBlob(String fileName, byte[] data) throws InternalServerException {
 		try {
 			FileService fileService = FileServiceFactory.getFileService();
 			AppEngineFile file = fileService.createNewBlobFile("application/octet-stream", fileName);
@@ -137,14 +139,14 @@ public class StaticFileItemStore {
 		        writeChannel.write(ByteBuffer.wrap(buffer, 0, read));
 		    }
 			writeChannel.closeFinally();
-		    return fileService.getBlobKey(file);
+		    return fileService.getBlobKey(file).getKeyString();
 		} catch (Exception e) {
 			throw new InternalServerException("Failed to write blobstore file", e);
 		}
 	}
 	
-	public static void deleteBlob(BlobKey blobKey) {
-		BlobstoreServiceFactory.getBlobstoreService().delete(blobKey);
+	public static void deleteBlob(String blobKey) {
+		BlobstoreServiceFactory.getBlobstoreService().delete(new BlobKey(blobKey));
 	}
 	
 	public static Reader getStaticFileReader(PersistenceManager pm, String prefix,
@@ -159,7 +161,7 @@ public class StaticFileItemStore {
 			return staticFileCache.get(statStoreKey);
 		} else {
 			StaticFileItemStore item = pm.getObjectById(StaticFileItemStore.class, statStoreKey);
-			byte[] data = readBlob(new BlobKey(item.getBlobKey()));
+			byte[] data = readBlob(item.getBlobKey());
 			try {
 				String fileAsString = new String(data, "UTF-8");
 				staticFileCache.put(statStoreKey, fileAsString);
@@ -172,5 +174,12 @@ public class StaticFileItemStore {
 
 	public static void clearStaticFileCache() {
 		staticFileCache.clear();
+	}
+	
+	/**
+	 * the filename always starts with prefix#, except for the original uploadfile
+	 */
+	public static String getFilename(String blobKey) {			
+		return new BlobInfoFactory().loadBlobInfo(new BlobKey(blobKey)).getFilename();
 	}
 }

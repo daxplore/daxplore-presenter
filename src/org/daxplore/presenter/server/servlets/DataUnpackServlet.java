@@ -53,9 +53,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import com.google.appengine.api.blobstore.BlobInfoFactory;
-import com.google.appengine.api.blobstore.BlobKey;
-
 @SuppressWarnings("serial")
 public class DataUnpackServlet extends HttpServlet {
 	protected static Logger logger = Logger.getLogger(DataUnpackServlet.class.getName());
@@ -68,15 +65,12 @@ public class DataUnpackServlet extends HttpServlet {
 	public void doGet(HttpServletRequest req, HttpServletResponse res) {
 		String prefix = req.getParameter("prefix");
 		UnpackType type = UnpackType.valueOf(req.getParameter("type").toUpperCase());
-		String blobKeyString = req.getParameter("key");
-		BlobKey blobKey = new BlobKey(blobKeyString);
+		String blobKey = req.getParameter("key");
+		String filename = StaticFileItemStore.getFilename(blobKey);
 		
 		try {
 			res.setStatus(HttpServletResponse.SC_OK);
 			
-			//the filename always starts with prefix#, except for the original uploadfile
-			String fileName = new BlobInfoFactory().loadBlobInfo(blobKey).getFilename(); 
-
 			switch(type) {
 			case UNZIP_ALL:
 				byte[] fileData = StaticFileItemStore.readBlob(blobKey);
@@ -84,10 +78,10 @@ public class DataUnpackServlet extends HttpServlet {
 				break;
 			case PROPERTIES:
 				fileData = StaticFileItemStore.readBlob(blobKey);
-				unpackPropertyFile(fileName, fileData);
+				unpackPropertyFile(filename, fileData);
 				break;
 			case STATIC_FILE:
-				unpackStaticFile(fileName, blobKeyString);
+				unpackStaticFile(filename, blobKey);
 				break;
 			case STATISTICAL_DATA:
 				fileData = StaticFileItemStore.readBlob(blobKey);
@@ -116,13 +110,13 @@ public class DataUnpackServlet extends HttpServlet {
 		}
 	}
 	
-	protected void enqueueForUnpacking(UnpackQueue unpackQueue, String fileName, BlobKey blobKey) {
+	protected void enqueueForUnpacking(UnpackQueue unpackQueue, String fileName, String blobKey) {
 		if(fileName.startsWith("properties/")){
-			unpackQueue.addTask(UnpackType.PROPERTIES, blobKey.getKeyString());
+			unpackQueue.addTask(UnpackType.PROPERTIES, blobKey);
 		} else if(fileName.startsWith("data/")) {
-			unpackQueue.addTask(UnpackType.STATISTICAL_DATA, blobKey.getKeyString());
+			unpackQueue.addTask(UnpackType.STATISTICAL_DATA, blobKey);
 		} else if(fileName.startsWith("meta/")) {
-			unpackQueue.addTask(UnpackType.STATIC_FILE, blobKey.getKeyString());
+			unpackQueue.addTask(UnpackType.STATIC_FILE, blobKey);
 		}
 	}
 	
@@ -190,7 +184,7 @@ public class DataUnpackServlet extends HttpServlet {
 		pm.close();
 		UnpackQueue unpackQueue = new UnpackQueue(prefix);
 		for (String fileName : fileMap.keySet()) {
-			BlobKey blobKey = StaticFileItemStore.writeBlob(prefix + "#" + fileName, fileMap.get(fileName));
+			String blobKey = StaticFileItemStore.writeBlob(prefix + "#" + fileName, fileMap.get(fileName));
 			enqueueForUnpacking(unpackQueue, fileName, blobKey);
 		}
 	}
