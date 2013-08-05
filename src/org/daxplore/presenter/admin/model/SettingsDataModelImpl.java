@@ -41,7 +41,7 @@ public class SettingsDataModelImpl implements SettingsDataModel {
 	protected SettingsDataModelImpl(EventBus eventBus) {
 		this.eventBus = eventBus;
 		// assume that path ends with /admin/settings
-		href = Window.Location.getProtocol() + "//" + Window.Location.getHost() + Window.Location.getPath() + "/settings?action=";
+		href = Window.Location.getProtocol() + "//" + Window.Location.getHost() + Window.Location.getPath() + "/settings";
 	}
 
 	/**
@@ -49,7 +49,7 @@ public class SettingsDataModelImpl implements SettingsDataModel {
 	 */
 	@Override
 	public void fetchSettings(String prefix) {
-		ServerPost.send(href + "get&prefix="+prefix, new SettingsResponseReciever(prefix));
+		ServerPost.send(href + "?action=get&prefix="+prefix, new SettingsResponseReciever(prefix));
 	}
 	
 	private class SettingsResponseReciever implements RequestCallback {

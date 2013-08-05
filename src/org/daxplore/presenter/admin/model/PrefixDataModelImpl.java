@@ -46,15 +46,15 @@ public class PrefixDataModelImpl implements PrefixDataModel {
 	protected PrefixDataModelImpl(EventBus eventBus) {
 		this.eventBus = eventBus;
 		// assume that path ends with /admin so that we get /admin/prefix
-		href = Window.Location.getProtocol() + "//" + Window.Location.getHost() + Window.Location.getPath() + "/prefix?action=";
+		href = Window.Location.getProtocol() + "//" + Window.Location.getHost() + Window.Location.getPath() + "/prefix";
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void updatePrefixList() {
-		ServerPost.send(href + "list", new ListResponseReciever());
+	public void getPrefixList() {
+		ServerPost.send(href + "?action=list", new ListResponseReciever());
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class PrefixDataModelImpl implements PrefixDataModel {
 	 */
 	@Override
 	public void addPrefix(String prefix) {
-		ServerPost.send(href + "add&prefix="+prefix, new ListResponseReciever());
+		ServerPost.send(href + "?action=add&prefix="+prefix, new ListResponseReciever());
 	}
 
 	/**
@@ -70,15 +70,15 @@ public class PrefixDataModelImpl implements PrefixDataModel {
 	 */
 	@Override
 	public void deletePrefix(String prefix) {
-		ServerPost.send(href + "delete&prefix="+prefix, new ListResponseReciever());
+		ServerPost.send(href + "?action=delete&prefix="+prefix, new ListResponseReciever());
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void updatePrefixMetadata(String prefix) {
-		ServerPost.send(href + "metadata&prefix="+prefix, new MetadataResponseReciever());
+	public void getPrefixMetadata(String prefix) {
+		ServerPost.send(href + "?action=metadata&prefix="+prefix, new MetadataResponseReciever());
 	}
 	
 	

@@ -24,11 +24,11 @@ package org.daxplore.presenter.admin.model;
  * and fetching existing prefixes.
  */
 public interface PrefixDataModel {
-	public void updatePrefixList();
+	public void getPrefixList();
 
 	public void addPrefix(String prefix);
 
 	public void deletePrefix(String prefix);
 	
-	public void updatePrefixMetadata(String prefix);
+	public void getPrefixMetadata(String prefix);
 }

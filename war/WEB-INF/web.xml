@@ -97,6 +97,15 @@
 		<servlet-name>adminPrefix</servlet-name>
 		<url-pattern>/admin/prefix</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>adminSettings</servlet-name>
+		<servlet-class>org.daxplore.presenter.server.servlets.AdminSettingsServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>adminSettings</servlet-name>
+		<url-pattern>/admin/settings</url-pattern>
+	</servlet-mapping>
 
 
 	<!-- Administrator security constraints -->

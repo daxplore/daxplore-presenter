@@ -56,7 +56,7 @@ public class PrefixDisplayPresenter implements Presenter {
 		prefixDisplayView.setPrefixHref(href + "/p/" + prefix);
 		bind();
 		settingsDataModel.fetchSettings(prefix);
-		prefixDataModel.updatePrefixMetadata(prefix);
+		prefixDataModel.getPrefixMetadata(prefix);
 	}
 	
 	private void bind() {

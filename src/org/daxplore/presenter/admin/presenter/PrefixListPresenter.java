@@ -106,7 +106,7 @@ public class PrefixListPresenter implements Presenter {
 		container.clear();
 	    container.add(display.asWidget());
 	    
-	    model.updatePrefixList(); // This will eventually fire a PrefixListUpdateEvent
+	    model.getPrefixList(); // This will eventually fire a PrefixListUpdateEvent
 	}
 
 	public void selectPrefix(String prefix) {
@@ -114,7 +114,7 @@ public class PrefixListPresenter implements Presenter {
 			display.selectPrefix(prefix); // This will fire a SelectionChangeEvent
 		} else {
 			prefixToBeSelected = prefix;
-			model.updatePrefixList(); // This will eventually fire a PrefixListUpdateEvent
+			model.getPrefixList(); // This will eventually fire a PrefixListUpdateEvent
 		}
 	}
 }
