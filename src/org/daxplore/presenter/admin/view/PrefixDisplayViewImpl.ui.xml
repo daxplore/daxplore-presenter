@@ -47,9 +47,6 @@
 		.bubble-button {
 			float: right;
 		}
-		.delete-button {
-			margin-top: -5px;
-		}
 		.maxwidth {
 			width: 100%;
 		}
@@ -107,12 +104,14 @@
 				</g:VerticalPanel>		
 			</g:FormPanel>
 			
-			<g:Label styleName="{style.header}">Delete prefix</g:Label>
-			<g:Label styleName="{style.header-subtext}">Delete the prefix and all data, texts and information that belongs to it.</g:Label>
-			<g:FlowPanel styleName="{style.bubble}">
-				<g:Label ui:field='deletePrefixLabel' styleName='{style.inlinelabel-header}'>Delete prefix ?:</g:Label>
-				<g:Button ui:field='deleteButton' addStyleNames="{style.bubble-button} {style.delete-button}">Delete ?</g:Button>
-			</g:FlowPanel>
+			<g:VerticalPanel styleName="{style.maxwidth}">
+				<g:Label styleName="{style.header}">Delete prefix</g:Label>
+				<g:Label styleName="{style.header-subtext}">Delete the prefix and all data, texts and information that belongs to it.</g:Label>
+				<g:VerticalPanel styleName="{style.bubble}">
+					<g:Label ui:field='deletePrefixLabel' styleName='{style.inlinelabel-header}'>Delete prefix ?:</g:Label>
+					<g:Button ui:field='deleteButton' styleName="{style.bubble-button}">Delete ?</g:Button>
+				</g:VerticalPanel>
+			</g:VerticalPanel>
 		</g:VerticalPanel>
 	</g:ScrollPanel>
 </ui:UiBinder> 
