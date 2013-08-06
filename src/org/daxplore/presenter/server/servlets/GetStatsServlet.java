@@ -19,6 +19,9 @@
 package org.daxplore.presenter.server.servlets;
 
 import java.io.PrintWriter;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,50 +31,70 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.daxplore.presenter.server.storage.LocaleStore;
 import org.daxplore.presenter.server.storage.PMF;
+import org.daxplore.presenter.server.storage.QuestionMetadataServerImpl;
 import org.daxplore.presenter.server.storage.StatDataItemStore;
+import org.daxplore.presenter.server.storage.StaticFileItemStore;
 import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.throwable.InternalServerException;
+import org.daxplore.presenter.shared.QueryDefinition;
+import org.daxplore.presenter.shared.QuestionMetadata;
 import org.daxplore.shared.SharedResourceTools;
 
 /**
- * The GetStatsServlet serves StatDataItem data at the URL /getStats.
+ * The {@linkplain GetStatsServlet} serves StatDataItem data.
  * 
- * <p>Data is requested by Daxplore web pages, based on their needs. The data is sent
- * as a single json-serialized StatDataItem.</p>
+ * <p>The data is sent on requests made by Daxplore clients. The data is sent
+ * as a json-serialized StatDataItem.</p>
  * 
  * <p>The servlet takes the arguments:
  * <ul>
+ * <li>q, which is a queryString that defines the query for which data
+ * should be returned</li>
  * <li>prefix, which defines which prefix to read the data from</li>
- * <li>q, which is the questionID of the question to use</li>
- * <li>p, which is the perspectiveID of the perspective to use</li>
  * </ul>
  * </p>
  */
 @SuppressWarnings("serial")
 public class GetStatsServlet extends HttpServlet {
 	private static Logger logger = Logger.getLogger(GetStatsServlet.class.getName());
+	private static Map<String, QuestionMetadata> metadataPrefixMap = new HashMap<>();
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, java.io.IOException {
 		PrintWriter respWriter = response.getWriter();
 		try {
-			String questionID = request.getParameter("q"); //TODO check input
-			String perspectiveID = request.getParameter("p"); //TODO check input
-			
 			PersistenceManager pm = PMF.get().getPersistenceManager();
 			String prefix = request.getParameter("prefix");
 			if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)){
 				throw new BadReqException("Request made with syntactically invalid prefix: '" + prefix + "'");
 			}
+			String queryString = request.getParameter("q"); //TODO check input
+			if (!metadataPrefixMap.containsKey(prefix)) { // TODO clear on new upload (and in other similar places)
+				LocaleStore localeStore = pm.getObjectById(LocaleStore.class, prefix);
+				//it shouldn't matter what locale we use here, as we don't read any localized data
+				String questionText = StaticFileItemStore.readStaticFile(pm, prefix, "meta/questions", localeStore.getDefaultLocale(), ".json");
+				metadataPrefixMap.put(prefix, new QuestionMetadataServerImpl(new StringReader(questionText)));
+			}
+			
+			QueryDefinition queryDefinition = new QueryDefinition(metadataPrefixMap.get(prefix), queryString);
 			
 			response.setContentType("text/html; charset=UTF-8");
-			respWriter.write(StatDataItemStore.getStats(pm, prefix, questionID, perspectiveID));
+			respWriter.write(StatDataItemStore.getStats(pm, prefix, queryDefinition));
 			response.setStatus(HttpServletResponse.SC_OK);
 		} catch (BadReqException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		} catch (InternalServerException e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} finally {
 			respWriter.close();
 		}
+	}
+	
+	public static void clearServletCache(String prefix) {
+		metadataPrefixMap.remove(prefix);
 	}
 }

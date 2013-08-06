@@ -24,6 +24,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.daxplore.presenter.server.servlets.GetCsvServlet;
+import org.daxplore.presenter.server.servlets.GetStatsServlet;
 
 public class DeleteData {
 	
@@ -78,6 +79,7 @@ public class DeleteData {
 		resultMessage.append(deletedStaticFileItems).append(" static file pointers ");
 		
 		//Clear caches in different places
+		GetStatsServlet.clearServletCache(prefix);
 		GetCsvServlet.clearServletCache();
 		StaticFileItemStore.clearStaticFileCache();
 		

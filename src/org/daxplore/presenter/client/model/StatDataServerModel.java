@@ -86,8 +86,7 @@ public class StatDataServerModel {
 	}
 	
 	private String getRequestString(QueryDefinition queryDefinition) {
-		return "q=" + queryDefinition.getQuestionID() + 
-				"&p=" + queryDefinition.getPerspectiveID();
+		return "q=" + queryDefinition.getAsString();
 	}
 	
 	/**
