@@ -18,6 +18,8 @@
  */
 package org.daxplore.presenter.server.storage;
 
+import java.util.LinkedList;
+
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -25,8 +27,7 @@ import javax.jdo.annotations.PrimaryKey;
 
 import org.daxplore.presenter.server.throwable.BadReqException;
 import org.daxplore.presenter.shared.QueryDefinition;
-
-import com.google.appengine.api.datastore.Text;
+import org.daxplore.presenter.shared.SharedTools;
 
 /**
  * A representation of a StatDataItem and it's key that can be
@@ -41,7 +42,7 @@ public class StatDataItemStore {
 	@PrimaryKey
 	private String key;
 	@Persistent
-	private Text json;
+	private LinkedList<String> jsonList;
 	@Persistent
 	private String prefix;
 
@@ -60,8 +61,16 @@ public class StatDataItemStore {
 	 */
 	public StatDataItemStore(String key, String json) {
 		this.key = key;
-		this.json = new Text(json);
+		jsonList = new LinkedList<>();
 		this.prefix = key.substring(0, key.indexOf('#'));
+		String text = json;
+		while(text.length()>500) {
+			jsonList.add(text.substring(0, 500));
+			text = text.substring(500);
+		}
+		if(text.length()>0) {
+			jsonList.add(text);
+		}
 	}
 
 	/**
@@ -79,7 +88,7 @@ public class StatDataItemStore {
 	 * @return the data
 	 */
 	public String getJson() {
-		return json.getValue();
+		return SharedTools.join(jsonList, "");
 	}
 	
 	public static String getStats(PersistenceManager pm, String prefix, QueryDefinition queryDefinition) throws BadReqException {
