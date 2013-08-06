@@ -19,6 +19,8 @@
 package org.daxplore.presenter.server.storage;
 
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -38,6 +40,7 @@ import org.daxplore.presenter.server.throwable.BadReqException;
  */
 @PersistenceCapable
 public class SettingItemStore {
+	private static Logger logger = Logger.getLogger(SettingItemStore.class.getName());
 	@Persistent private String prefix;
 	@PrimaryKey private String key;
 	@Persistent private String value;
@@ -86,7 +89,8 @@ public class SettingItemStore {
 		try {
 			return pm.getObjectById(SettingItemStore.class, statStoreKey).getValue();
 		} catch (JDOObjectNotFoundException e) {
-			throw new BadReqException("Could not read property '" + statStoreKey + "'", e);
+			logger.log(Level.WARNING, "Property '" + statStoreKey + "' not found");
+			return "";
 		}
 	}
 	

@@ -85,6 +85,7 @@ public class AdminSettingsServlet extends HttpServlet {
 						setting = new SettingItemStore(statStoreKey, value);
 					}
 					pm.makePersistent(setting);
+					logger.log(Level.INFO, "Set property '" + statStoreKey + "' to '" + value + "'");
 				}
 				break;
 			default:
