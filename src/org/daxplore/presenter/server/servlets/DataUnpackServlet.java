@@ -170,8 +170,11 @@ public class DataUnpackServlet extends HttpServlet {
 		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		
-		// Purge all existing data that uses this prefix
+		// Purge all existing data that uses this prefix, but save gaID
+		String gaID = SettingItemStore.getProperty(pm, prefix, "adminpanel", "gaID");
+		String statStoreKey = prefix + "#adminpanel/gaID";
 		String deleteResult = DeleteData.deleteForPrefix(pm, prefix);
+		pm.makePersistent(new SettingItemStore(statStoreKey, gaID));
 		logger.log(Level.INFO, deleteResult);
 		
 		// Since we just deleted the prefix and all it's data, we have to add it again
