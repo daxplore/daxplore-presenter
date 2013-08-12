@@ -30,8 +30,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 
 @SuppressWarnings("serial")
-public class AdminServlet extends HttpServlet {
-	protected static Logger logger = Logger.getLogger(AdminServlet.class.getName());
+public class AdminPanelServlet extends HttpServlet {
+	protected static Logger logger = Logger.getLogger(AdminPanelServlet.class.getName());
 	protected static String adminHtmlTemplate = null;
 	
 	@Override

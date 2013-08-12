@@ -64,7 +64,7 @@
 	
 	<servlet>
 		<servlet-name>admin</servlet-name>
-		<servlet-class>org.daxplore.presenter.server.servlets.AdminServlet</servlet-class>
+		<servlet-class>org.daxplore.presenter.server.servlets.AdminPanelServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>admin</servlet-name>
@@ -73,22 +73,13 @@
 
 	<servlet>
 		<servlet-name>upload</servlet-name>
-		<servlet-class>org.daxplore.presenter.server.servlets.DataUploadServlet</servlet-class>
+		<servlet-class>org.daxplore.presenter.server.servlets.AdminUploadServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>upload</servlet-name>
 		<url-pattern>/admin/upload</url-pattern>
 	</servlet-mapping>
 
-	<servlet>
-		<servlet-name>uploadUnpack</servlet-name>
-		<servlet-class>org.daxplore.presenter.server.servlets.DataUnpackServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>uploadUnpack</servlet-name>
-		<url-pattern>/admin/uploadUnpack</url-pattern>
-	</servlet-mapping>
-	
 	<servlet>
 		<servlet-name>adminPrefix</servlet-name>
 		<servlet-class>org.daxplore.presenter.server.servlets.AdminPrefixServlet</servlet-class>
