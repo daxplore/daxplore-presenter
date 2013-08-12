@@ -18,7 +18,7 @@
  */
 package org.daxplore.presenter.server.storage;
 
-import java.util.LinkedList;
+import java.util.List;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.PersistenceCapable;
@@ -42,7 +42,7 @@ public class StatDataItemStore {
 	@PrimaryKey
 	private String key;
 	@Persistent
-	private LinkedList<String> jsonList;
+	private List<String> jsonList;
 	@Persistent
 	private String prefix;
 
@@ -61,16 +61,7 @@ public class StatDataItemStore {
 	 */
 	public StatDataItemStore(String key, String json) {
 		this.key = key;
-		jsonList = new LinkedList<>();
-		this.prefix = key.substring(0, key.indexOf('#'));
-		String text = json;
-		while(text.length()>500) {
-			jsonList.add(text.substring(0, 500));
-			text = text.substring(500);
-		}
-		if(text.length()>0) {
-			jsonList.add(text);
-		}
+		jsonList = SharedTools.splitString(json, 500); //JDO has a String length limit of 500
 	}
 
 	/**
@@ -83,7 +74,7 @@ public class StatDataItemStore {
 	}
 
 	/**
-	 * Get the stat data item json.
+	 * Get the stat data item as a json string.
 	 * 
 	 * @return the data
 	 */

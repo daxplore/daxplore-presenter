@@ -18,8 +18,10 @@
  */
 package org.daxplore.presenter.shared;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * Static helper methods that can be used both on the client side (GWT) and
@@ -490,5 +492,23 @@ public class SharedTools {
 			equals = equals || in.equals(compareToList[i]);
 		}
 		return equals;
+	}
+	
+	/**
+	 * Split a String into equal length String chunks.
+	 * 
+	 * <p>The last part will contain the remainder.</p>
+	 * 
+	 * @param string The String to be split
+	 * @param chunkLength The length of the resulting chunks
+	 * @return A List containing the String chunks
+	 */
+	public static List<String> splitString(String string, int chunkLength) {
+	    List<String> chunkList = new ArrayList<String>((string.length() + chunkLength - 1) / chunkLength);
+
+	    for (int start = 0; start < string.length(); start += chunkLength) {
+	        chunkList.add(string.substring(start, Math.min(string.length(), start + chunkLength)));
+	    }
+	    return chunkList;
 	}
 }
