@@ -18,6 +18,8 @@
  */
 package org.daxplore.presenter.admin.view;
 
+import javax.servlet.http.HttpServletResponse;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -29,6 +31,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
@@ -56,6 +59,9 @@ public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayVie
 	@UiField protected FileUpload uploadWidget;
 	@UiField protected Hidden uploadPrefix;
 	@UiField protected Button uploadButton;
+	@UiField protected DialogBox uploadDialog;
+	@UiField protected Label uploadDialogText;
+	@UiField protected Button uploadDialogButton;
 	
 	@UiField protected Label deletePrefixLabel;
 	@UiField protected Button deleteButton;
@@ -72,6 +78,10 @@ public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayVie
 		uploadForm.setAction("/admin/upload");
 		uploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
 		uploadForm.setMethod(FormPanel.METHOD_POST);
+		
+		uploadDialog.setVisible(false);
+		uploadDialog.setModal(true);
+		uploadDialog.setGlassEnabled(true);
 	}
 	
 	@UiHandler("settingsButton")
@@ -93,6 +103,20 @@ public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayVie
 
 	@UiHandler("uploadForm")
 	protected void uploadSubmitComplete(SubmitCompleteEvent event) {
+		int status = -1;
+		if(event.getResults() != null) {
+			status = Integer.parseInt(event.getResults());
+		}
+		
+		if(status!=HttpServletResponse.SC_OK){
+			uploadDialogText.setText("Error code given by server: " + status + ". Please try again.");
+			uploadDialog.center();
+		}
+	}
+	
+	@UiHandler("uploadDialogButton")
+	protected void onClick(ClickEvent event) {
+		uploadDialog.setVisible(false);
 	}
 	
 	/**

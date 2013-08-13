@@ -112,6 +112,16 @@
 					<g:Button ui:field='deleteButton' styleName="{style.bubble-button}">Delete ?</g:Button>
 				</g:VerticalPanel>
 			</g:VerticalPanel>
+			
+			<g:DialogBox ui:field='uploadDialog' modal="true">
+				<g:caption>
+					<b>Error while uploading</b>
+				</g:caption>
+				<g:FlowPanel>
+					<g:Label ui:field='uploadDialogText'></g:Label>
+					<g:Button ui:field='uploadDialogButton'>Okay</g:Button>
+				</g:FlowPanel>
+			</g:DialogBox>
 		</g:VerticalPanel>
 	</g:ScrollPanel>
 </ui:UiBinder> 

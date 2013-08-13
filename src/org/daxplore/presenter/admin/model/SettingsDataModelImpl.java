@@ -18,6 +18,8 @@
  */
 package org.daxplore.presenter.admin.model;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.daxplore.presenter.admin.event.SettingsUpdateEvent;
 
 import com.google.gwt.http.client.Request;
@@ -64,12 +66,16 @@ public class SettingsDataModelImpl implements SettingsDataModel {
 		 */
 		@Override
 		public void onResponseReceived(Request request, Response response) {
-			String responseText = response.getText();
-			if(responseText!=null && responseText.length()>0) {
-				JSONObject jsonMap = JSONParser.parseStrict(responseText).isObject();
-				if (jsonMap!=null) {
-					eventBus.fireEvent(new SettingsUpdateEvent(prefix, jsonMap));
+			if(response.getStatusCode() == HttpServletResponse.SC_OK) {
+				String responseText = response.getText();
+				if(responseText!=null && responseText.length()>0) {
+					JSONObject jsonMap = JSONParser.parseStrict(responseText).isObject();
+					if (jsonMap!=null) {
+						eventBus.fireEvent(new SettingsUpdateEvent(prefix, jsonMap));
+					}
 				}
+			} else {
+				// TODO Reattempt? Depends on why it failed and number of attempts.
 			}
 		}
 	

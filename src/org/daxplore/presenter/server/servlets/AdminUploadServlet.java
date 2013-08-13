@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -57,6 +58,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import com.google.apphosting.api.DeadlineExceededException;
+
 /**
  * A servlet for uploading data to the Daxplore Presenter.
  * 
@@ -75,15 +78,22 @@ public class AdminUploadServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse res) {
 		long time = System.nanoTime();
-		res.setStatus(HttpServletResponse.SC_OK);
+		int statusCode = HttpServletResponse.SC_OK;
+		res.setContentType("text/html");
 		
 	    ServletFileUpload upload = new ServletFileUpload();
 	    PersistenceManager pm = null;
+	    String prefix = null;
+	    PrintWriter resWriter = null;
 	    try {
+	    	try {
+	    		resWriter = res.getWriter();
+	    	} catch (IOException e1) {
+	    		throw new InternalServerException(e1);
+	    	}
 			FileItemIterator fileIterator = upload.getItemIterator(req);
 			String fileName = "";
 			byte[] fileData = null;
-			String prefix = null;
 			while(fileIterator.hasNext()) {
 				FileItemStream item = fileIterator.next();
 				InputStream stream = item.openStream();
@@ -111,17 +121,28 @@ public class AdminUploadServlet extends HttpServlet {
 			logger.log(Level.INFO, "Unpacked new data for prefix '" + prefix + "' in " + ((System.nanoTime()-time)/1000000000.0) + " seconds"); //TODO tmp
 		} catch (FileUploadException | IOException | BadReqException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
-			res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			statusCode = HttpServletResponse.SC_BAD_REQUEST;
 			// TODO give user feedback on invalid file
 		} catch (InternalServerException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
-			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 			//TODO communicate error to user
+		} catch (DeadlineExceededException e) {
+			logger.log(Level.SEVERE, "Timeout when uploading new data for prefix '" + prefix + "'", e);
+			// the server is currently unavailable because it is overloaded (hopefully)
+			statusCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE;
 		} finally {
 			if(pm!=null) {
 				pm.close();
 			}
 		}
+	    statusCode = 418;
+	    res.setStatus(statusCode);
+	    if(resWriter != null) {
+		    resWriter.write(Integer.toString(statusCode));
+		    resWriter.flush();
+		    resWriter.close();
+	    }
 	}
 	
 	private void unzipAll(PersistenceManager pm, String prefix, byte[] fileData) throws BadReqException, InternalServerException {

@@ -19,6 +19,8 @@ package org.daxplore.presenter.client.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.daxplore.presenter.client.event.QueryReadyEvent;
 import org.daxplore.presenter.client.json.shared.QueryData;
 import org.daxplore.presenter.shared.PrefixProperties;
@@ -103,18 +105,8 @@ public class StatDataServerModel {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void onError(Request request, Throwable exception) {
-			// TODO Couldn't connect to server (could be timeout, SOP violation, etc.)
-			System.out.println("StatsRequest onError: " + exception.getMessage());
-			exception.printStackTrace();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
 		public void onResponseReceived(Request request, Response response) {
-			if (200 == response.getStatusCode()) {
+			if (response.getStatusCode() == HttpServletResponse.SC_OK) {
 				System.out.println("Server Data: " + response.getText());
 				QueryData data = QueryData.parseStatDataItem(response.getText());
 				String requestString = getRequestString(queryDefinition);
@@ -126,6 +118,16 @@ public class StatDataServerModel {
 				// TODO Handle the error.
 				System.out.println("StatsRequest bad response status: " + response.getStatusText());
 			}
+		}
+		
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void onError(Request request, Throwable exception) {
+			// TODO Couldn't connect to server (could be timeout, SOP violation, etc.)
+			System.out.println("StatsRequest onError: " + exception.getMessage());
+			exception.printStackTrace();
 		}
 	}
 }

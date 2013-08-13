@@ -20,6 +20,8 @@ package org.daxplore.presenter.admin.model;
 
 import java.util.LinkedList;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.daxplore.presenter.admin.event.PrefixListUpdateEvent;
 import org.daxplore.presenter.admin.event.PrefixMetadata;
 import org.daxplore.presenter.admin.event.PrefixMetadataEvent;
@@ -88,14 +90,18 @@ public class PrefixDataModelImpl implements PrefixDataModel {
 		 */
 		@Override
 		public void onResponseReceived(Request request, Response response) {
-			LinkedList<String> prefixes = new LinkedList<String>();
-			String responseText = response.getText();
-			if(responseText!=null && responseText.length()>0) {
-				JSONArray array = JSONParser.parseStrict(responseText).isArray();
-				for (int i=0; i<array.size(); i++) {
-					prefixes.add(array.get(i).isString().stringValue());
+			if(response.getStatusCode() == HttpServletResponse.SC_OK) {
+				LinkedList<String> prefixes = new LinkedList<String>();
+				String responseText = response.getText();
+				if(responseText!=null && responseText.length()>0) {
+					JSONArray array = JSONParser.parseStrict(responseText).isArray();
+					for (int i=0; i<array.size(); i++) {
+						prefixes.add(array.get(i).isString().stringValue());
+					}
+					eventBus.fireEvent(new PrefixListUpdateEvent(prefixes));
 				}
-				eventBus.fireEvent(new PrefixListUpdateEvent(prefixes));
+			} else {
+				// TODO Reattempt? Depends on why it failed and number of attempts.
 			}
 		}
 	
@@ -114,8 +120,12 @@ public class PrefixDataModelImpl implements PrefixDataModel {
 		 */
 		@Override
 		public void onResponseReceived(Request request, Response response) {
-			PrefixMetadata prefixMetadata = new PrefixMetadata(response.getText());
-			eventBus.fireEvent(new PrefixMetadataEvent(prefixMetadata));
+			if(response.getStatusCode() == HttpServletResponse.SC_OK) {
+				PrefixMetadata prefixMetadata = new PrefixMetadata(response.getText());
+				eventBus.fireEvent(new PrefixMetadataEvent(prefixMetadata));
+			} else {
+				// TODO Reattempt? Depends on why it failed and number of attempts.
+			}
 		}
 
 		/**
