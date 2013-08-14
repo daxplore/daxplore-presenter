@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.daxplore.presenter.server.servlets.png.OnePixel;
 import org.daxplore.presenter.server.servlets.png.PngWriter;
-import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.throwable.BadRequestException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 
 
@@ -73,7 +73,7 @@ public class GetPixelServlet extends HttpServlet {
 				}
 				// System.out.println("filetype: " + m.group(3));
 			} else {
-				throw new BadReqException("Bad pixel request");
+				throw new BadRequestException("Bad pixel request");
 			}
 	
 			response.setContentType("image/png");
@@ -99,7 +99,7 @@ public class GetPixelServlet extends HttpServlet {
 			} catch (IOException e) {
 				throw new InternalServerException("Failed to generate a pixel", e);
 			}
-		} catch (BadReqException e) {
+		} catch (BadRequestException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		} catch (InternalServerException e) {

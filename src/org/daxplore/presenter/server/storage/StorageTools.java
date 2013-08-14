@@ -16,7 +16,8 @@
  */
 package org.daxplore.presenter.server.storage;
 
-import java.io.BufferedReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,7 +26,7 @@ import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 
-import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.throwable.BadRequestException;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.ContainerFactory;
 import org.json.simple.parser.JSONParser;
@@ -40,7 +41,7 @@ public class StorageTools {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static String getQuestionDefinitions(PersistenceManager pm, String prefix,
-			List<String> questionIDs, Locale locale) throws BadReqException {
+			List<String> questionIDs, Locale locale) throws BadRequestException {
 		try {
 			JSONArray definitions = new JSONArray();
 			ContainerFactory containerFactory = new ContainerFactory() {
@@ -54,8 +55,7 @@ public class StorageTools {
 				}
 			};
 			
-			BufferedReader reader = new BufferedReader(
-					StaticFileItemStore.getStaticFileReader(pm, prefix, "meta/questions", locale, ".json"));
+			Reader reader = new StringReader(TextFileStore.getFile(pm, prefix, "meta/questions", locale, ".json"));
 			
 			JSONParser parser = new JSONParser();
 			List<Map> questionList = (List<Map>)parser.parse(reader, containerFactory);
@@ -70,7 +70,7 @@ public class StorageTools {
 			
 			return definitions.toJSONString();
 		} catch (Exception e) {
-			throw new BadReqException("Failed to read question definitions", e);
+			throw new BadRequestException("Failed to read question definitions", e);
 		}
 	}
 }

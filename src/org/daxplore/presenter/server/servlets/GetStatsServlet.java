@@ -35,8 +35,8 @@ import org.daxplore.presenter.server.storage.LocaleStore;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.QuestionMetadataServerImpl;
 import org.daxplore.presenter.server.storage.StatDataItemStore;
-import org.daxplore.presenter.server.storage.StaticFileItemStore;
-import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.storage.TextFileStore;
+import org.daxplore.presenter.server.throwable.BadRequestException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QuestionMetadata;
@@ -70,13 +70,13 @@ public class GetStatsServlet extends HttpServlet {
 			pm = PMF.get().getPersistenceManager();
 			String prefix = request.getParameter("prefix");
 			if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)){
-				throw new BadReqException("Request made with syntactically invalid prefix: '" + prefix + "'");
+				throw new BadRequestException("Request made with syntactically invalid prefix: '" + prefix + "'");
 			}
 			String queryString = request.getParameter("q"); //TODO check input
 			if (!metadataPrefixMap.containsKey(prefix)) { // TODO clear on new upload (and in other similar places)
 				LocaleStore localeStore = pm.getObjectById(LocaleStore.class, prefix);
 				//it shouldn't matter what locale we use here, as we don't read any localized data
-				String questionText = StaticFileItemStore.readStaticFile(pm, prefix, "meta/questions", localeStore.getDefaultLocale(), ".json");
+				String questionText = TextFileStore.getFile(pm, prefix, "meta/questions", localeStore.getDefaultLocale(), ".json");
 				metadataPrefixMap.put(prefix, new QuestionMetadataServerImpl(new StringReader(questionText)));
 			}
 			
@@ -92,7 +92,7 @@ public class GetStatsServlet extends HttpServlet {
 			respWriter.write(StatDataItemStore.getStats(pm, prefix, queryDefinition));
 			respWriter.close();
 			response.setStatus(HttpServletResponse.SC_OK);
-		} catch (BadReqException e) {
+		} catch (BadRequestException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		} catch (InternalServerException e) {

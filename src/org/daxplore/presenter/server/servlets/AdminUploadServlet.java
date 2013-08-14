@@ -21,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,8 +50,8 @@ import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.PrefixStore;
 import org.daxplore.presenter.server.storage.SettingItemStore;
 import org.daxplore.presenter.server.storage.StatDataItemStore;
-import org.daxplore.presenter.server.storage.StaticFileItemStore;
-import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.storage.TextFileStore;
+import org.daxplore.presenter.server.throwable.BadRequestException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.SharedTools;
 import org.daxplore.shared.SharedResourceTools;
@@ -102,7 +103,7 @@ public class AdminUploadServlet extends HttpServlet {
 						if(item.getFieldName().equals("prefix")) {
 							prefix = Streams.asString(stream);
 						} else {
-							throw new BadReqException("Form contains extra fields");
+							throw new BadRequestException("Form contains extra fields");
 						}
 					} else {
 						fileName = item.getName();
@@ -114,13 +115,13 @@ public class AdminUploadServlet extends HttpServlet {
 						 pm = PMF.get().getPersistenceManager();
 						unzipAll(pm, prefix, fileData);
 					} else {
-						throw new BadReqException("No file uploaded");
+						throw new BadRequestException("No file uploaded");
 					}
 				} else {
-					throw new BadReqException("Request made with invalid prefix: '" + prefix + "'");
+					throw new BadRequestException("Request made with invalid prefix: '" + prefix + "'");
 				}
 				logger.log(Level.INFO, "Unpacked new data for prefix '" + prefix + "' in " + ((System.nanoTime()-time)/1000000000.0) + " seconds"); //TODO tmp
-			} catch (FileUploadException | IOException | BadReqException e) {
+			} catch (FileUploadException | IOException | BadRequestException e) {
 				logger.log(Level.WARNING, e.getMessage(), e);
 				statusCode = HttpServletResponse.SC_BAD_REQUEST;
 			} catch (InternalServerException e) {
@@ -135,6 +136,7 @@ public class AdminUploadServlet extends HttpServlet {
 					pm.close();
 				}
 			}
+		    
 		    response.setStatus(statusCode);
 		    if(resWriter != null) {
 			    resWriter.write(Integer.toString(statusCode));
@@ -146,7 +148,7 @@ public class AdminUploadServlet extends HttpServlet {
 		}
 	}
 	
-	private void unzipAll(PersistenceManager pm, String prefix, byte[] fileData) throws BadReqException, InternalServerException {
+	private void unzipAll(PersistenceManager pm, String prefix, byte[] fileData) throws BadRequestException, InternalServerException {
 		LinkedHashMap<String, byte[]> fileMap = new LinkedHashMap<String, byte[]>();
 
 		ZipInputStream zipIn = ServerTools.getAsZipInputStream(fileData);
@@ -160,12 +162,12 @@ public class AdminUploadServlet extends HttpServlet {
 				}
 			}
 		} catch (IOException e) {
-			throw new BadReqException("Error when reading uploaded file (invalid file?)");
+			throw new BadRequestException("Error when reading uploaded file (invalid file?)");
 		}
 
 		// Read the file manifest to get metadata about the file
 		if (!fileMap.containsKey("manifest.xml")) {
-			throw new BadReqException("No manifest.xml found in uploaded file");
+			throw new BadRequestException("No manifest.xml found in uploaded file");
 		}
 		InputStream manifestStream = new ByteArrayInputStream(fileMap.get("manifest.xml"));
 		UploadFileManifest manifest = new UploadFileManifest(manifestStream);
@@ -173,26 +175,26 @@ public class AdminUploadServlet extends HttpServlet {
 		// Check manifest content and make sure that the file is in proper order
 
 		if (!ServerTools.isSupportedUploadFileVersion(manifest.getVersionMajor(), manifest.getVersionMinor())) {
-			throw new BadReqException("Unsupported file version");
+			throw new BadRequestException("Unsupported file version");
 		}
 
 		for (Locale locale : manifest.getSupportedLocales()) {
 			if (!ServerTools.isSupportedLocale(locale)) {
-				throw new BadReqException("Unsupported language: " + locale.toLanguageTag());
+				throw new BadRequestException("Unsupported language: " + locale.toLanguageTag());
 			}
 		}
 
 		List<String> missingUploadFiles = SharedResourceTools.findMissingUploadFiles(fileMap.keySet(),
 				manifest.getSupportedLocales());
 		if (!missingUploadFiles.isEmpty()) {
-			throw new BadReqException("Uploaded doesn't contain required files: "
+			throw new BadRequestException("Uploaded doesn't contain required files: "
 					+ SharedTools.join(missingUploadFiles, ", "));
 		}
 
 		List<String> unwantedUploadFiles = SharedResourceTools.findUnwantedUploadFiles(fileMap.keySet(),
 				manifest.getSupportedLocales());
 		if (!unwantedUploadFiles.isEmpty()) {
-			throw new BadReqException("Uploaded file contains extra files: "
+			throw new BadRequestException("Uploaded file contains extra files: "
 					+ SharedTools.join(unwantedUploadFiles, ", "));
 		}
 
@@ -217,14 +219,14 @@ public class AdminUploadServlet extends HttpServlet {
 			if(fileName.startsWith("properties/")){
 				unpackPropertyFile(pm, storeName, fileMap.get(fileName));
 			} else if(fileName.startsWith("data/")) {
-				unpackStatisticalDataFile(pm, storeName, fileMap.get(fileName));
+				unpackStatisticalDataFile(pm, prefix, fileMap.get(fileName));
 			} else if(fileName.startsWith("meta/")) {
 				unpackStaticFile(pm, storeName, fileMap.get(fileName));
 			}
 		}
 	}
 
-	private void unpackPropertyFile(PersistenceManager pm, String fileName, byte[] fileData) throws InternalServerException, BadReqException {
+	private void unpackPropertyFile(PersistenceManager pm, String fileName, byte[] fileData) throws InternalServerException, BadRequestException {
 		String[] propertiesWhitelist = { "page_title", "secondary_flag", "timepoint_0", "timepoint_1" };
 		BufferedReader reader = ServerTools.getAsBufferedReader(fileData);
 		List<SettingItemStore> items = new LinkedList<SettingItemStore>();
@@ -233,7 +235,7 @@ public class AdminUploadServlet extends HttpServlet {
 			String key = fileName.substring(0, fileName.lastIndexOf('.')) + "/" + prop;
 			String value = (String) dataMap.get(prop);
 			if (value == null) {
-				throw new BadReqException("Missing property '" + key + "' in upload file");
+				throw new BadRequestException("Missing property '" + key + "' in upload file");
 			}
 			items.add(new SettingItemStore(key, value));
 		}
@@ -242,10 +244,14 @@ public class AdminUploadServlet extends HttpServlet {
 	}
 
 	private void unpackStaticFile(PersistenceManager pm, String fileName, byte[] fileData) throws InternalServerException {
-		String blobKey = StaticFileItemStore.writeBlob(fileName, fileData);
-		StaticFileItemStore item = new StaticFileItemStore(fileName, blobKey);
-		pm.makePersistent(item);
-		logger.log(Level.INFO, "Stored the static file '" + fileName + "'");
+		TextFileStore item;
+		try {
+			item = new TextFileStore(fileName, new String(fileData, "UTF-8"));
+			pm.makePersistent(item);
+			logger.log(Level.INFO, "Stored the static file '" + fileName + "'");
+		} catch (UnsupportedEncodingException e) {
+			throw new InternalServerException("UTF-8 not supported by server", e);
+		}
 	}
 
 	private void unpackStatisticalDataFile(PersistenceManager pm, String prefix, byte[] fileData) throws InternalServerException {

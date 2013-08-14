@@ -39,9 +39,9 @@ import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.QuestionMetadataServerImpl;
 import org.daxplore.presenter.server.storage.SettingItemStore;
 import org.daxplore.presenter.server.storage.StatDataItemStore;
-import org.daxplore.presenter.server.storage.StaticFileItemStore;
+import org.daxplore.presenter.server.storage.TextFileStore;
 import org.daxplore.presenter.server.storage.StorageTools;
-import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.throwable.BadRequestException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.EmbedDefinition;
 import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
@@ -83,7 +83,7 @@ public class PresenterServlet extends HttpServlet {
 			
 			// Clean user input
 			if(prefix==null || !SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
-				throw new BadReqException("Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
+				throw new BadRequestException("Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
 			}
 			
 			boolean browserSupported = true;
@@ -149,7 +149,7 @@ public class PresenterServlet extends HttpServlet {
 			} catch (IOException e) {
 				throw new InternalServerException("Failed to display presenter servlet", e);
 			}
-		} catch (BadReqException e) {
+		} catch (BadRequestException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		} catch (InternalServerException e) {
@@ -182,12 +182,12 @@ public class PresenterServlet extends HttpServlet {
 	}
 	
 	private String getPresenterHTML(PersistenceManager pm, String prefix, Locale locale, String baseurl, ServerPrefixProperties properties)
-			throws InternalServerException, BadReqException {
+			throws InternalServerException, BadRequestException {
 		
 		String perspectives = "", groups = "", questions = "";
-		perspectives = StaticFileItemStore.readStaticFile(pm, prefix, "meta/perspectives", locale, ".json");
-		questions = StaticFileItemStore.readStaticFile(pm, prefix, "meta/questions", locale, ".json");
-		groups = StaticFileItemStore.readStaticFile(pm, prefix, "meta/groups", locale, ".json");
+		perspectives = TextFileStore.getFile(pm, prefix, "meta/perspectives", locale, ".json");
+		questions = TextFileStore.getFile(pm, prefix, "meta/questions", locale, ".json");
+		groups = TextFileStore.getFile(pm, prefix, "meta/groups", locale, ".json");
 		String prefixProperties = properties.toJson().toJSONString();
 		
 		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "page_title");
@@ -214,14 +214,14 @@ public class PresenterServlet extends HttpServlet {
 	}
 	
 	private String getEmbedHTML(PersistenceManager pm, String prefix, Locale locale,
-			String queryString, String baseurl, ServerPrefixProperties properties) throws BadReqException, InternalServerException {
+			String queryString, String baseurl, ServerPrefixProperties properties) throws BadRequestException, InternalServerException {
 		
 		QuestionMetadata questionMetadata;
 		String key = prefix + "_" + locale.toLanguageTag();
 		if(metadataMap.containsKey(key)) {
 			questionMetadata = metadataMap.get(key);
 		} else {
-			String questionText = StaticFileItemStore.readStaticFile(pm, prefix, "meta/questions", locale, ".json");
+			String questionText = TextFileStore.getFile(pm, prefix, "meta/questions", locale, ".json");
 			questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
 			metadataMap.put(key, questionMetadata);
 		}
@@ -261,7 +261,7 @@ public class PresenterServlet extends HttpServlet {
 	}
 	
 	private String getPrintHTML(PersistenceManager pm, String prefix, Locale locale,
-			String serverPath, String queryString, String baseurl) throws InternalServerException, BadReqException {
+			String serverPath, String queryString, String baseurl) throws InternalServerException, BadRequestException {
 		
 		LinkedList<EmbedFlag> flags = new LinkedList<EmbedFlag>();
 		flags.add(EmbedFlag.LEGEND);

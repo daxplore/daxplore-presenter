@@ -16,13 +16,12 @@
  */
 package org.daxplore.presenter.server.upload;
 
-import static org.junit.Assert.assertArrayEquals;
 
 import java.io.IOException;
 import java.util.Random;
 
-import org.daxplore.presenter.server.storage.StaticFileItemStore;
-import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.storage.TextFileStore;
+import org.daxplore.presenter.server.throwable.BadRequestException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.junit.After;
 import org.junit.Before;
@@ -51,7 +50,7 @@ public class UploadBlobManagerTest {
 
 	    
 	@Test
-	public void test() throws IOException, InternalServerException, BadReqException {
+	public void test() throws IOException, InternalServerException, BadRequestException {
 		int dataSize = (int)Math.pow(2, 21)+123456;
 		byte[] data = new byte[dataSize];
 		Random random = new Random(0x556a347f);
@@ -63,12 +62,10 @@ public class UploadBlobManagerTest {
 			data[i+3] = (byte)(r>>0);
 		}
 		
-		String keyString = StaticFileItemStore.writeBlob("foo", data);
-		byte[] dataCopy = StaticFileItemStore.readBlob(keyString);
+		String s = new String(data, "UTF-8");
 		
-		assertArrayEquals(data, dataCopy);
-		
-		StaticFileItemStore.deleteBlob(keyString);
+		TextFileStore textFileStore = new TextFileStore("foo", s);
+		//TODO test store
 	}
 
 }

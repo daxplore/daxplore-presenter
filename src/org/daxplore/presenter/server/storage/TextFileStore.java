@@ -18,7 +18,10 @@
  */
 package org.daxplore.presenter.server.storage;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.PersistenceCapable;
@@ -26,71 +29,66 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import org.daxplore.presenter.server.throwable.BadRequestException;
-import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.SharedTools;
 
-/**
- * A representation of a StatDataItem and it's key that can be
- * persisted (stored) using a {@link PersistenceManager}.
- * 
- * <p>This acts like an item in a hash table (represented by the
- * {@linkplain PersistenceManager}), making it possible to fetch data items
- * with a specific key.</p>
- */
 @PersistenceCapable
-public class StatDataItemStore {
+public class TextFileStore {
 	@PrimaryKey
 	private String key;
 	@Persistent
-	private List<String> jsonChunks;
+	private List<String> fileChunks;
 	@Persistent
 	private String prefix;
+	
+	private static Map<String, String> textFileCache = new HashMap<>();
 
 	/**
-	 * Instantiate a new stat data item, which is a piece of anonymized
-	 * statistical data that can be presented to users.
+	 * Instantiate a new text file item.
 	 * 
-	 * <p>The key should be on the format "prefix#name". The prefix defines
+	 * <p>The files are stored as-is and are assumed to be final. New uploads
+	 * should delete and replace old files.</p>
+	 * 
+	 * <p>The key should be in the format "prefix#name". The prefix defines
 	 * which presenter the setting belongs to and the name is the name
-	 * of the data item.</p>
+	 * of the file.</p>
 	 * 
 	 * @param key
-	 *            a key on the format "prefix#name"
-	 * @param json
-	 *            the data item as json
+	 *            a key in the format "prefix#name"
+	 * @param file
+	 *            the text file as a string
 	 */
-	public StatDataItemStore(String key, String json) {
+	public TextFileStore(String key, String file) {
 		this.key = key;
-		jsonChunks = SharedTools.splitString(json, 500); //JDO has a String length limit of 500
+		fileChunks = SharedTools.splitString(file, 500); //JDO has a String length limit of 500
 		this.prefix = key.substring(0, key.indexOf('#'));
 	}
-
-	/**
-	 * Get the key.
-	 * 
-	 * @return the key
-	 */
-	public String getKey() {
-		return key;
-	}
-
-	/**
-	 * Get the stat data item as a json string.
-	 * 
-	 * @return the data
-	 */
-	public String getJson() {
-		return SharedTools.join(jsonChunks, "");
-	}
 	
-	public static String getStats(PersistenceManager pm, String prefix, QueryDefinition queryDefinition) throws BadRequestException {
-		String questionID = queryDefinition.getQuestionID();
-		String perspectiveID = queryDefinition.getPerspectiveID();
-		String key = String.format("%s#Q=%s&P=%s", prefix, questionID.toUpperCase(), perspectiveID.toUpperCase());
+	/**
+	 * Get the file as a text string.
+	 * 
+	 * @return the file
+	 */
+	private String getFile() {
+		return SharedTools.join(fileChunks, "");
+	}
+
+	public static String getFile(PersistenceManager pm, String prefix, String name, Locale locale, String suffix) throws BadRequestException {
+		String key = prefix + "#" + name + "_" + locale.getLanguage() + suffix;
 		try {
-			return pm.getObjectById(StatDataItemStore.class, key).getJson();
+			if(!textFileCache.containsKey(key)) {
+				String file = pm.getObjectById(TextFileStore.class, key).getFile();
+				textFileCache.put(key, file);
+				return file;
+			} else {
+				return textFileCache.get(key);
+			}
 		} catch (Exception e) {
+			// This could also be an internal server exception, but we have no way of finding out
 			throw new BadRequestException("Could not read data item '" + key + "'", e);
 		}
+	}
+	
+	public static void clearTextFileCache() {
+		textFileCache.clear();
 	}
 }

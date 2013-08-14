@@ -17,25 +17,24 @@
 package org.daxplore.presenter.server.throwable;
 
 /**
- * A replacement for BadRequestException, needed because the standard AppEngine
- * BadRequestException was missing two constructors.
+ * A bad request exception for servlets.
  */
 @SuppressWarnings("serial")
-public class BadReqException extends Exception {
+public class BadRequestException extends Exception {
 	
-	public BadReqException() {
+	public BadRequestException() {
 		super();
 	}
 
-	public BadReqException(String message) {
+	public BadRequestException(String message) {
 		super(message);
 	}
 
-	public BadReqException(Throwable cause) {
+	public BadRequestException(Throwable cause) {
 		super(cause);
 	}
 	
-	public BadReqException(String message, Throwable cause) {
+	public BadRequestException(String message, Throwable cause) {
 		super(message, cause);
 	}
 }

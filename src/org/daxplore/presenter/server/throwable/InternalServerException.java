@@ -17,8 +17,7 @@
 package org.daxplore.presenter.server.throwable;
 
 /**
- * A replacement for InternalServerErrorException, needed because the standard AppEngine
- * InternalServerErrorException was missing two constructors.
+ * An internal server error exception for servlets.
  */
 @SuppressWarnings("serial")
 public class InternalServerException extends Exception {

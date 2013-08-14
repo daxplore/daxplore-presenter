@@ -28,7 +28,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
 
-import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.throwable.BadRequestException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.shared.SharedResourceTools;
 import org.w3c.dom.Document;
@@ -43,7 +43,7 @@ public class UploadFileManifest {
 	protected List<Locale> locales = new LinkedList<Locale>();
 	protected Locale defaultLocale; 
 	
-	public UploadFileManifest(InputStream manifestInputStream) throws InternalServerException, BadReqException {
+	public UploadFileManifest(InputStream manifestInputStream) throws InternalServerException, BadRequestException {
 		DocumentBuilder documentBuilder = null;
 		try {
 			Schema schema = SharedResourceTools.getUploadFileManifestSchema();
@@ -90,9 +90,9 @@ public class UploadFileManifest {
 				}
 			}
 		} catch (SAXException e) {
-			throw new BadReqException("Manifest doesn't comply with the upload file schema", e);
+			throw new BadRequestException("Manifest doesn't comply with the upload file schema", e);
 		} catch (IOException e) {
-			throw new BadReqException("Failed to read the uploaded file's manifest", e);
+			throw new BadRequestException("Failed to read the uploaded file's manifest", e);
 		}
 	}
 	

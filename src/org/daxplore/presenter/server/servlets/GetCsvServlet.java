@@ -38,8 +38,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.QuestionMetadataServerImpl;
 import org.daxplore.presenter.server.storage.StatDataItemStore;
-import org.daxplore.presenter.server.storage.StaticFileItemStore;
-import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.storage.TextFileStore;
+import org.daxplore.presenter.server.throwable.BadRequestException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
@@ -82,7 +82,7 @@ public class GetCsvServlet extends HttpServlet {
 			
 			// Clean user input
 			if(prefix==null || !SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
-				throw new BadReqException("Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
+				throw new BadRequestException("Someone tried to access a syntactically invalid prefix: '" + prefix + "'");
 			}
 			
 			if (localeString==null) {
@@ -105,7 +105,7 @@ public class GetCsvServlet extends HttpServlet {
 			if(metadataMap.containsKey(key)) {
 				questionMetadata = metadataMap.get(key);
 			} else {
-				String questionText = StaticFileItemStore.readStaticFile(pm, prefix, "meta/questions", locale, ".json");
+				String questionText = TextFileStore.getFile(pm, prefix, "meta/questions", locale, ".json");
 				questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
 				metadataMap.put(key, questionMetadata);
 			}
@@ -160,7 +160,7 @@ public class GetCsvServlet extends HttpServlet {
 			csvWriter.close();
 			response.setStatus(HttpServletResponse.SC_OK);
 			
-		} catch (BadReqException e) {
+		} catch (BadRequestException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		} catch (InternalServerException e) {

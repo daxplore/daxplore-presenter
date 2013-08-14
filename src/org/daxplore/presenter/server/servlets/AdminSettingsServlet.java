@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.SettingItemStore;
-import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.throwable.BadRequestException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.shared.SharedResourceTools;
 import org.json.simple.JSONObject;
@@ -52,11 +52,11 @@ public class AdminSettingsServlet extends HttpServlet {
 			pm = PMF.get().getPersistenceManager();
 			String prefix = request.getParameter("prefix");
 			if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)){
-				throw new BadReqException("Not a syntactically valid prefix: '" + prefix + "'");
+				throw new BadRequestException("Not a syntactically valid prefix: '" + prefix + "'");
 			}
 			String action = request.getParameter("action");
 			if(action==null) {
-				throw new BadReqException("No action requested");
+				throw new BadRequestException("No action requested");
 			}
 			switch(action) {
 			case "get":
@@ -65,7 +65,7 @@ public class AdminSettingsServlet extends HttpServlet {
 					try {
 						String value = SettingItemStore.getProperty(pm, prefix, "adminpanel", key);
 						json.put(key, value);
-					} catch (BadReqException e) {}
+					} catch (BadRequestException e) {}
 				}
 				try {
 					response.getWriter().write(json.toJSONString());
@@ -89,10 +89,10 @@ public class AdminSettingsServlet extends HttpServlet {
 				}
 				break;
 			default:
-				throw new BadReqException("Invalid action '" + request.getParameter("action") + "' requested");
+				throw new BadRequestException("Invalid action '" + request.getParameter("action") + "' requested");
 			}
 			
-		} catch (BadReqException e) {
+		} catch (BadRequestException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		} catch (InternalServerException e) {

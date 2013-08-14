@@ -28,7 +28,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
-import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.throwable.BadRequestException;
 
 /**
  * A representation of a StatDataItem and it's key that can be
@@ -84,7 +84,7 @@ public class SettingItemStore {
 	}
 	
 	public static String getProperty(PersistenceManager pm, String prefix,
-			String fileName, String propertyName) throws BadReqException {
+			String fileName, String propertyName) throws BadRequestException {
 		String statStoreKey = prefix + "#" + fileName + "/" + propertyName;
 		try {
 			return pm.getObjectById(SettingItemStore.class, statStoreKey).getValue();
@@ -95,12 +95,12 @@ public class SettingItemStore {
 	}
 	
 	public static String getLocalizedProperty(PersistenceManager pm, String prefix,
-			String fileName, Locale locale, String propertyName) throws BadReqException {
+			String fileName, Locale locale, String propertyName) throws BadRequestException {
 		String statStoreKey = prefix + "#" + fileName + "_" + locale.toLanguageTag() + "/" + propertyName;
 		try {
 			return pm.getObjectById(SettingItemStore.class, statStoreKey).getValue();
 		} catch (JDOObjectNotFoundException e) {
-			throw new BadReqException("Could not read localized property '" + statStoreKey + "'", e);
+			throw new BadRequestException("Could not read localized property '" + statStoreKey + "'", e);
 		}
 	}
 }

@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.daxplore.presenter.server.storage.DeleteData;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.PrefixStore;
-import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.throwable.BadRequestException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.shared.SharedResourceTools;
 import org.json.simple.JSONArray;
@@ -54,7 +54,7 @@ public class AdminPrefixServlet extends HttpServlet {
 			String responseText = ""; 
 			String action = request.getParameter("action");
 			if(action==null) {
-				throw new BadReqException("No action requested");
+				throw new BadRequestException("No action requested");
 			}
 			switch(action) {
 			case "list":
@@ -63,7 +63,7 @@ public class AdminPrefixServlet extends HttpServlet {
 			case "add":
 				String prefix = request.getParameter("prefix");
 				if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)){
-					throw new BadReqException("Not a syntactically valid prefix: '" + prefix + "'");
+					throw new BadRequestException("Not a syntactically valid prefix: '" + prefix + "'");
 				}
 				pm.makePersistent(new PrefixStore(prefix));
 				logger.log(Level.INFO, "Added prefix to system: " + prefix);
@@ -72,7 +72,7 @@ public class AdminPrefixServlet extends HttpServlet {
 			case "delete":
 				prefix = request.getParameter("prefix");
 				if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)){
-					throw new BadReqException("Not a syntactically valid prefix: '" + prefix + "'");
+					throw new BadRequestException("Not a syntactically valid prefix: '" + prefix + "'");
 				}
 				String result = DeleteData.deleteForPrefix(pm, prefix);
 				logger.log(Level.INFO, result);
@@ -81,12 +81,12 @@ public class AdminPrefixServlet extends HttpServlet {
 			case "metadata":
 				prefix = request.getParameter("prefix");
 				if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)){
-					throw new BadReqException("Not a syntactically valid prefix: '" + prefix + "'");
+					throw new BadRequestException("Not a syntactically valid prefix: '" + prefix + "'");
 				}
 				responseText = getPrefixMetadata(pm, prefix);
 				break;
 			default:
-				throw new BadReqException("Invalid action '" + request.getParameter("action") + "' requested");
+				throw new BadRequestException("Invalid action '" + request.getParameter("action") + "' requested");
 			}
 			
 			try {
@@ -95,7 +95,7 @@ public class AdminPrefixServlet extends HttpServlet {
 				throw new InternalServerException("Failed to write prefix list", e);
 			}
 			
-		} catch (BadReqException e) {
+		} catch (BadRequestException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		} catch (InternalServerException e) {

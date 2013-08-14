@@ -64,14 +64,11 @@ public class DeleteData {
 		resultMessage.append(deletedStatDataItems).append(" statistical data items, ");
 		
 		// Delete all the blobstore-stored files
-		query = pm.newQuery(StaticFileItemStore.class);
+		query = pm.newQuery(TextFileStore.class);
 		query.declareParameters("String specificPrefix");
 		query.setFilter("prefix == specificPrefix");
 		@SuppressWarnings("unchecked")
-		List<StaticFileItemStore> fileItems = (List<StaticFileItemStore>)query.execute(prefix);
-		for (StaticFileItemStore item : fileItems) {
-			StaticFileItemStore.deleteBlob(item.getBlobKey());
-		}
+		List<TextFileStore> fileItems = (List<TextFileStore>)query.execute(prefix);
 		pm.deletePersistentAll(fileItems);
 		int deletedBlobs = fileItems.size();
 		int deletedStaticFileItems = fileItems.size();
@@ -81,7 +78,7 @@ public class DeleteData {
 		//Clear caches in different places
 		GetStatsServlet.clearServletCache(prefix);
 		GetCsvServlet.clearServletCache();
-		StaticFileItemStore.clearStaticFileCache();
+		TextFileStore.clearTextFileCache();
 		
 		long totalDeleted = deletedPrefixItems + deletedLocaleItems + deletedStatDataItems + deletedSettingItems + deletedStaticFileItems;
 		double timeSeconds = ((System.currentTimeMillis()-time)/Math.pow(10, 6));

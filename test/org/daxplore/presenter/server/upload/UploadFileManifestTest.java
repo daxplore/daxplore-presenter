@@ -22,7 +22,7 @@ import java.io.InputStream;
 import java.util.Locale;
 
 import org.daxplore.presenter.server.admin.UploadFileManifest;
-import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.throwable.BadRequestException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.junit.Test;
 
@@ -30,7 +30,7 @@ import org.junit.Test;
 public class UploadFileManifestTest {
 
 	@Test
-	public void testUploadFileManifestParsing() throws InternalServerException, BadReqException {
+	public void testUploadFileManifestParsing() throws InternalServerException, BadRequestException {
 		InputStream manifestInputStream = getClass().getResourceAsStream("manifest.xml");
 		UploadFileManifest manifest = new UploadFileManifest(manifestInputStream);
 		
