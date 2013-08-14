@@ -76,73 +76,74 @@ public class AdminUploadServlet extends HttpServlet {
 	protected static Logger logger = Logger.getLogger(AdminUploadServlet.class.getName());
 	
 	@Override
-	public void doPost(HttpServletRequest req, HttpServletResponse res) {
-		long time = System.nanoTime();
-		int statusCode = HttpServletResponse.SC_OK;
-		res.setContentType("text/html");
-		
-	    ServletFileUpload upload = new ServletFileUpload();
-	    PersistenceManager pm = null;
-	    String prefix = null;
-	    PrintWriter resWriter = null;
-	    try {
-	    	try {
-	    		resWriter = res.getWriter();
-	    	} catch (IOException e1) {
-	    		throw new InternalServerException(e1);
-	    	}
-			FileItemIterator fileIterator = upload.getItemIterator(req);
-			String fileName = "";
-			byte[] fileData = null;
-			while(fileIterator.hasNext()) {
-				FileItemStream item = fileIterator.next();
-				InputStream stream = item.openStream();
-				if(item.isFormField()) {
-					if(item.getFieldName().equals("prefix")) {
-						prefix = Streams.asString(stream);
+	public void doPost(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			long time = System.nanoTime();
+			int statusCode = HttpServletResponse.SC_OK;
+			response.setContentType("text/html; charset=UTF-8");
+			
+		    ServletFileUpload upload = new ServletFileUpload();
+		    PersistenceManager pm = null;
+		    String prefix = null;
+		    PrintWriter resWriter = null;
+		    try {
+		    	try {
+		    		resWriter = response.getWriter();
+		    	} catch (IOException e1) {
+		    		throw new InternalServerException(e1);
+		    	}
+				FileItemIterator fileIterator = upload.getItemIterator(request);
+				String fileName = "";
+				byte[] fileData = null;
+				while(fileIterator.hasNext()) {
+					FileItemStream item = fileIterator.next();
+					InputStream stream = item.openStream();
+					if(item.isFormField()) {
+						if(item.getFieldName().equals("prefix")) {
+							prefix = Streams.asString(stream);
+						} else {
+							throw new BadReqException("Form contains extra fields");
+						}
 					} else {
-						throw new BadReqException("Form contains extra fields");
+						fileName = item.getName();
+						fileData = IOUtils.toByteArray(stream);
+					}
+				}
+				if(SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
+					if(fileData!=null && !fileName.equals("")) {
+						 pm = PMF.get().getPersistenceManager();
+						unzipAll(pm, prefix, fileData);
+					} else {
+						throw new BadReqException("No file uploaded");
 					}
 				} else {
-					fileName = item.getName();
-					fileData = IOUtils.toByteArray(stream);
+					throw new BadReqException("Request made with invalid prefix: '" + prefix + "'");
+				}
+				logger.log(Level.INFO, "Unpacked new data for prefix '" + prefix + "' in " + ((System.nanoTime()-time)/1000000000.0) + " seconds"); //TODO tmp
+			} catch (FileUploadException | IOException | BadReqException e) {
+				logger.log(Level.WARNING, e.getMessage(), e);
+				statusCode = HttpServletResponse.SC_BAD_REQUEST;
+			} catch (InternalServerException e) {
+				logger.log(Level.SEVERE, e.getMessage(), e);
+				statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+			} catch (DeadlineExceededException e) {
+				logger.log(Level.SEVERE, "Timeout when uploading new data for prefix '" + prefix + "'", e);
+				// the server is currently unavailable because it is overloaded (hopefully)
+				statusCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE;
+			} finally {
+				if(pm!=null) {
+					pm.close();
 				}
 			}
-			if(SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
-				if(fileData!=null && !fileName.equals("")) {
-					 pm = PMF.get().getPersistenceManager();
-					unzipAll(pm, prefix, fileData);
-				} else {
-					throw new BadReqException("No file uploaded");
-				}
-			} else {
-				throw new BadReqException("Request made with invalid prefix: '" + prefix + "'");
-			}
-			logger.log(Level.INFO, "Unpacked new data for prefix '" + prefix + "' in " + ((System.nanoTime()-time)/1000000000.0) + " seconds"); //TODO tmp
-		} catch (FileUploadException | IOException | BadReqException e) {
-			logger.log(Level.WARNING, e.getMessage(), e);
-			statusCode = HttpServletResponse.SC_BAD_REQUEST;
-			// TODO give user feedback on invalid file
-		} catch (InternalServerException e) {
-			logger.log(Level.SEVERE, e.getMessage(), e);
-			statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-			//TODO communicate error to user
-		} catch (DeadlineExceededException e) {
-			logger.log(Level.SEVERE, "Timeout when uploading new data for prefix '" + prefix + "'", e);
-			// the server is currently unavailable because it is overloaded (hopefully)
-			statusCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE;
-		} finally {
-			if(pm!=null) {
-				pm.close();
-			}
+		    response.setStatus(statusCode);
+		    if(resWriter != null) {
+			    resWriter.write(Integer.toString(statusCode));
+			    resWriter.close();
+		    }
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Unexpected exception: " + e.getMessage(), e);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
-	    statusCode = 418;
-	    res.setStatus(statusCode);
-	    if(resWriter != null) {
-		    resWriter.write(Integer.toString(statusCode));
-		    resWriter.flush();
-		    resWriter.close();
-	    }
 	}
 	
 	private void unzipAll(PersistenceManager pm, String prefix, byte[] fileData) throws BadReqException, InternalServerException {

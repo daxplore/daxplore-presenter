@@ -157,20 +157,19 @@ public class GetCsvServlet extends HttpServlet {
 			
 			// write response
 			csvWriter.writeAll(csvOutput);
+			csvWriter.close();
 			response.setStatus(HttpServletResponse.SC_OK);
 			
 		} catch (BadReqException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-		} catch (Exception e) {
+		} catch (InternalServerException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Unexpected exception: " + e.getMessage(), e);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} finally {
-			if (csvWriter != null) {
-				try {
-					csvWriter.close();
-				} catch (IOException e1) {}
-			}
 			if (pm!=null) {
 				pm.close();
 			}

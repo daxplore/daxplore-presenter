@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.daxplore.presenter.server.throwable.InternalServerException;
 
 @SuppressWarnings("serial")
 public class AdminPanelServlet extends HttpServlet {
@@ -36,35 +37,35 @@ public class AdminPanelServlet extends HttpServlet {
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-			// Get input from URL
-			
-			Locale locale = new Locale("en");
-			
-			String pageTitle = "Daxplore Admin";
-			
-			if (adminHtmlTemplate == null) {
-				try {
-					adminHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/admin.html"));
-				} catch (IOException e) {
-					logger.log(Level.SEVERE, "Failed to load the html embed template", e);
-					try {
-						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-					} catch (IOException e1) {}
-					return;
-				}
-			}
-			
-			String[] arguments = {
-					locale.toLanguageTag(), // {0}
-					pageTitle,				// {1}
-					};
-			
 		try {
-			Writer writer = response.getWriter();
-			writer.write(MessageFormat.format(adminHtmlTemplate, (Object[])arguments));
-			writer.close();
-		} catch (IOException e) {
+				Locale locale = new Locale("en");
+				String pageTitle = "Daxplore Admin";
+				
+				if (adminHtmlTemplate == null) {
+					try {
+						adminHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/admin.html"));
+					} catch (IOException e) {
+						throw new InternalServerException("Failed to load the html admin template", e);
+					}
+				}
+				
+				String[] arguments = {
+						locale.toLanguageTag(), // {0}
+						pageTitle,				// {1}
+						};
+				
+			try {
+				Writer writer = response.getWriter();
+				writer.write(MessageFormat.format(adminHtmlTemplate, (Object[])arguments));
+				writer.close();
+			} catch (IOException e) {
+				throw new InternalServerException(e);
+			}
+		} catch (InternalServerException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Unexpected exception: " + e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 	}

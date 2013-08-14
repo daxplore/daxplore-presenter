@@ -47,9 +47,9 @@ public class AdminSettingsServlet extends HttpServlet {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		
+		PersistenceManager pm = null;
 		try {
+			pm = PMF.get().getPersistenceManager();
 			String prefix = request.getParameter("prefix");
 			if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)){
 				throw new BadReqException("Not a syntactically valid prefix: '" + prefix + "'");
@@ -95,11 +95,16 @@ public class AdminSettingsServlet extends HttpServlet {
 		} catch (BadReqException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-		} catch (Exception e) {
+		} catch (InternalServerException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Unexpected exception: " + e.getMessage(), e);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} finally {
-			pm.close();
+			if (pm!=null) {
+				pm.close();
+			}
 		}
 	}
 }

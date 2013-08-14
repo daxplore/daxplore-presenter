@@ -32,6 +32,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.daxplore.presenter.server.servlets.png.OnePixel;
 import org.daxplore.presenter.server.servlets.png.PngWriter;
+import org.daxplore.presenter.server.throwable.BadReqException;
+import org.daxplore.presenter.server.throwable.InternalServerException;
 
 
 /**
@@ -49,60 +51,63 @@ public class GetPixelServlet extends HttpServlet {
 	private final long CACHE_DURATION_IN_MS = CACHE_DURATION_IN_SECOND * 1000;
 
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
-
-		boolean hasalpha = false;
-
-		String uri = req.getRequestURI().substring(7); // "/pixel/".length
-		// ([0-9a-fA-F]{6})((?:[0-9a-fA-F]{2})?)[.](png|gif|jpg|jpeg) with alpha
-		// ([0-9a-fA-F]{6})[.](png|gif|jpg|jpeg) without alpha
-		Pattern p = Pattern.compile("([0-9a-fA-F]{6})((?:[0-9a-fA-F]{2})?)[.](png)");
-
-		String color = "000000";
-		String alpha = "00";
-		Matcher m = p.matcher(uri);
-		if (m.matches()) {
-			// System.out.println("color: " + m.group(1));
-			color = m.group(1);
-			if (!m.group(2).equals("")) {
-				alpha = m.group(2);
-				hasalpha = true;
-				// System.out.println("alpha: " + m.group(2));
-			}
-			// System.out.println("filetype: " + m.group(3));
-		} else {
-			logger.log(Level.WARNING, "Bad pixel request");
-			try {
-				resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
-			} catch (IOException e1) {}
-			return;
-		}
-
-		resp.setContentType("image/png");
-
-		long now = System.currentTimeMillis();
-		resp.addHeader("Cache-Control", "max-age=" + CACHE_DURATION_IN_SECOND);
-		Date created = new Date(1000 * 1306274400L); // Wed May 25 00:00:00 CEST 2011 as Unix Epoch in millis
-		resp.setDateHeader("Last-Modified", created.getTime());
-		resp.setDateHeader("Expires", now + CACHE_DURATION_IN_MS);
-		OnePixel pixel;
-		if (hasalpha) {
-			pixel = new OnePixel(color, alpha);
-		} else {
-			pixel = new OnePixel(color);
-		}
-		PngWriter pngw = new PngWriter(hasalpha);
-		
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 		try {
-			byte[] bytes = pngw.generateImage(pixel);
-			OutputStream respWriter = resp.getOutputStream();
-			respWriter.write(bytes);
-		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Failed to generate a pixel", e);
+			boolean hasalpha = false;
+	
+			String uri = request.getRequestURI().substring(7); // "/pixel/".length
+			// ([0-9a-fA-F]{6})((?:[0-9a-fA-F]{2})?)[.](png|gif|jpg|jpeg) with alpha
+			// ([0-9a-fA-F]{6})[.](png|gif|jpg|jpeg) without alpha
+			Pattern p = Pattern.compile("([0-9a-fA-F]{6})((?:[0-9a-fA-F]{2})?)[.](png)");
+	
+			String color = "000000";
+			String alpha = "00";
+			Matcher m = p.matcher(uri);
+			if (m.matches()) {
+				// System.out.println("color: " + m.group(1));
+				color = m.group(1);
+				if (!m.group(2).equals("")) {
+					alpha = m.group(2);
+					hasalpha = true;
+					// System.out.println("alpha: " + m.group(2));
+				}
+				// System.out.println("filetype: " + m.group(3));
+			} else {
+				throw new BadReqException("Bad pixel request");
+			}
+	
+			response.setContentType("image/png");
+	
+			long now = System.currentTimeMillis();
+			response.addHeader("Cache-Control", "max-age=" + CACHE_DURATION_IN_SECOND);
+			Date created = new Date(1000 * 1306274400L); // Wed May 25 00:00:00 CEST 2011 as Unix Epoch in millis
+			response.setDateHeader("Last-Modified", created.getTime());
+			response.setDateHeader("Expires", now + CACHE_DURATION_IN_MS);
+			OnePixel pixel;
+			if (hasalpha) {
+				pixel = new OnePixel(color, alpha);
+			} else {
+				pixel = new OnePixel(color);
+			}
+			PngWriter pngw = new PngWriter(hasalpha);
+			
 			try {
-				resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			} catch (IOException e1) {}
-			return;
+				byte[] bytes = pngw.generateImage(pixel);
+				OutputStream respWriter = response.getOutputStream();
+				respWriter.write(bytes);
+				respWriter.close();
+			} catch (IOException e) {
+				throw new InternalServerException("Failed to generate a pixel", e);
+			}
+		} catch (BadReqException e) {
+			logger.log(Level.WARNING, e.getMessage(), e);
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		} catch (InternalServerException e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Unexpected exception: " + e.getMessage(), e);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 	}
 }

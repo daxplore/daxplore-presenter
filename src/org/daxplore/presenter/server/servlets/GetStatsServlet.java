@@ -18,6 +18,7 @@
  */
 package org.daxplore.presenter.server.servlets;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.HashMap;
@@ -26,7 +27,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -62,10 +62,12 @@ public class GetStatsServlet extends HttpServlet {
 	private static Map<String, QuestionMetadata> metadataPrefixMap = new HashMap<>();
 	
 	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, java.io.IOException {
-		PrintWriter respWriter = response.getWriter();
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+		PrintWriter respWriter = null;
+		PersistenceManager pm = null;
 		try {
-			PersistenceManager pm = PMF.get().getPersistenceManager();
+			
+			pm = PMF.get().getPersistenceManager();
 			String prefix = request.getParameter("prefix");
 			if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)){
 				throw new BadReqException("Request made with syntactically invalid prefix: '" + prefix + "'");
@@ -80,8 +82,15 @@ public class GetStatsServlet extends HttpServlet {
 			
 			QueryDefinition queryDefinition = new QueryDefinition(metadataPrefixMap.get(prefix), queryString);
 			
+			try {
+				respWriter = response.getWriter();
+			} catch (IOException e) {
+				throw new InternalServerException(e);
+			}
+			
 			response.setContentType("text/html; charset=UTF-8");
 			respWriter.write(StatDataItemStore.getStats(pm, prefix, queryDefinition));
+			respWriter.close();
 			response.setStatus(HttpServletResponse.SC_OK);
 		} catch (BadReqException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
@@ -89,8 +98,16 @@ public class GetStatsServlet extends HttpServlet {
 		} catch (InternalServerException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Unexpected exception: " + e.getMessage(), e);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} finally {
-			respWriter.close();
+			if(respWriter!=null) {
+				respWriter.close();
+			}
+			if (pm!=null) {
+				pm.close();
+			}
 		}
 	}
 	

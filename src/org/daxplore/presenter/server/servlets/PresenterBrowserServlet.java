@@ -48,9 +48,11 @@ public class PresenterBrowserServlet extends HttpServlet {
 			} catch (IOException e) {
 				throw new InternalServerException("Failed to display presenter browser servlet", e);
 			}
-
 		} catch (InternalServerException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Unexpected exception: " + e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 	}
