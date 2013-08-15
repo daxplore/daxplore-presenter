@@ -27,6 +27,7 @@ import org.daxplore.presenter.admin.model.PrefixDataModel;
 import org.daxplore.presenter.admin.model.SettingsDataModel;
 import org.daxplore.presenter.admin.view.PrefixDisplayView;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
@@ -53,7 +54,14 @@ public class PrefixDisplayPresenter implements Presenter {
 			href = Window.Location.getHref();
 			href = href.substring(0, href.lastIndexOf('/'));
 		}
-		prefixDisplayView.setPrefixHref(href + "/p/" + prefix);
+		
+		String presenterHref = href + "/p/" + prefix;
+		if(!GWT.isScript()) {
+			// TODO write code that doesn't make that assumption that the gwt codeserver uses the default local setup
+			presenterHref += "?gwt.codesvr=127.0.1.1:9997"; 
+		}
+		prefixDisplayView.setPrefixHref(presenterHref);
+
 		bind();
 		settingsDataModel.fetchSettings(prefix);
 		prefixDataModel.getPrefixMetadata(prefix);

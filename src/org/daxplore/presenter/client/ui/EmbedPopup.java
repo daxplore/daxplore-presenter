@@ -207,6 +207,7 @@ public class EmbedPopup extends PopupPanel implements EmbedSizeHandler, QueryUpd
 			address += "&l=" + LocaleInfo.getCurrentLocale().getLocaleName();
 
 			if (!GWT.isScript()) {
+				// TODO write code that doesn't make that assumption that the gwt codeserver uses the default local setup
 				address += "&gwt.codesvr=127.0.0.1:9997";
 			}
 
