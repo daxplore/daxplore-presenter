@@ -156,13 +156,13 @@ public class AdminUploadServlet extends HttpServlet {
 		try {
 			ZipEntry entry;
 			while ((entry = zipIn.getNextEntry()) != null) {
-				if (entry.getSize() > 0 && !entry.isDirectory()) {
+				if (!entry.isDirectory()) {
 					byte[] data = IOUtils.toByteArray(zipIn);
 					fileMap.put(entry.getName(), data);
 				}
 			}
 		} catch (IOException e) {
-			throw new BadRequestException("Error when reading uploaded file (invalid file?)");
+			throw new BadRequestException("Error when reading uploaded file (invalid file?)", e);
 		}
 
 		// Read the file manifest to get metadata about the file
