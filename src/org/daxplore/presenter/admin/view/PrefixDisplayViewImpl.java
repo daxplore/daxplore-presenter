@@ -116,7 +116,7 @@ public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayVie
 	
 	@UiHandler("uploadDialogButton")
 	protected void onClick(ClickEvent event) {
-		uploadDialog.setVisible(false);
+		uploadDialog.hide();
 	}
 	
 	/**
