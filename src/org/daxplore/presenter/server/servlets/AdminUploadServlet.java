@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -184,14 +185,14 @@ public class AdminUploadServlet extends HttpServlet {
 			}
 		}
 
-		List<String> missingUploadFiles = SharedResourceTools.findMissingUploadFiles(fileMap.keySet(),
+		Set<String> missingUploadFiles = SharedResourceTools.findMissingUploadFiles(fileMap.keySet(),
 				manifest.getSupportedLocales());
 		if (!missingUploadFiles.isEmpty()) {
 			throw new BadRequestException("Uploaded doesn't contain required files: "
 					+ SharedTools.join(missingUploadFiles, ", "));
 		}
 
-		List<String> unwantedUploadFiles = SharedResourceTools.findUnwantedUploadFiles(fileMap.keySet(),
+		Set<String> unwantedUploadFiles = SharedResourceTools.findUnwantedUploadFiles(fileMap.keySet(),
 				manifest.getSupportedLocales());
 		if (!unwantedUploadFiles.isEmpty()) {
 			throw new BadRequestException("Uploaded file contains extra files: "
