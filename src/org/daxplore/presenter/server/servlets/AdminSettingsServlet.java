@@ -75,17 +75,34 @@ public class AdminSettingsServlet extends HttpServlet {
 				break;
 			case "put":
 				for(String key : settings) {
-					String value = request.getParameter(key); //TODO clean input
-					SettingItemStore setting;
-					String statStoreKey = prefix + "#adminpanel/" + key;
-					try {
-						setting = pm.getObjectById(SettingItemStore.class, key);
-						setting.setValue(value);
-					} catch (JDOObjectNotFoundException e) {
-						setting = new SettingItemStore(statStoreKey, value);
+					String value = request.getParameter(key);
+					boolean isValid = false;
+					if(value != null) {
+						switch (key) {
+						case "gaID":
+							// regex to validate Google Analytics UA Number
+							// http://stackoverflow.com/questions/2497294/regular-expression-to-validate-a-google-analytics-ua-number
+							isValid = value.matches("\\bUA-\\d{4,10}-\\d{1,4}\\b");
+							break;
+						default:
+							throw new InternalServerException("Setting '" + key + "' not properly implemented");
+						}
 					}
-					pm.makePersistent(setting);
-					logger.log(Level.INFO, "Set property '" + statStoreKey + "' to '" + value + "'");
+					
+					if(isValid) {
+						String statStoreKey = prefix + "#adminpanel/" + key;
+						SettingItemStore setting = null;
+						try {
+							setting = pm.getObjectById(SettingItemStore.class, key);
+							setting.setValue(value);
+						} catch (JDOObjectNotFoundException e) {
+							setting = new SettingItemStore(statStoreKey, value);
+						}
+						pm.makePersistent(setting);
+						logger.log(Level.INFO, "Set property '" + statStoreKey + "' to '" + value + "'");
+					} else {
+						throw new BadRequestException("Invalid value for setting '" + key + "': '" + value + "'");
+					}
 				}
 				break;
 			default:
