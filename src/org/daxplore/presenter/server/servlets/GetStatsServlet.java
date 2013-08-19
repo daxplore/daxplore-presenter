@@ -72,7 +72,7 @@ public class GetStatsServlet extends HttpServlet {
 			if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)){
 				throw new BadRequestException("Request made with syntactically invalid prefix: '" + prefix + "'");
 			}
-			if (!metadataPrefixMap.containsKey(prefix)) { // TODO clear on new upload (and in other similar places)
+			if (!metadataPrefixMap.containsKey(prefix)) {
 				LocaleStore localeStore = pm.getObjectById(LocaleStore.class, prefix);
 				//it shouldn't matter what locale we use here, as we don't read any localized data
 				String questionText = TextFileStore.getFile(pm, prefix, "meta/questions", localeStore.getDefaultLocale(), ".json");
