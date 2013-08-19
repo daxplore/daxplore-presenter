@@ -195,18 +195,4 @@ public class ServerTools {
 		
 		throw new InternalServerException("Default locale is not a supported locale for prefix '" + prefix + "'");
 	}
-
-	/**
-	 * Check if a query string is syntactically valid.
-	 * 
-	 * <p>This can be used to make sure that the input from the users aren't
-	 * evil.</p>
-	 * 
-	 * @param queryString the query definition string to check
-	 * @return true, if the format is correct
-	 */
-	public static boolean isSyntacticallyValidQueryString(String queryString) {
-		// TODO Write validation of query string
-		return true;
-	}
 }
