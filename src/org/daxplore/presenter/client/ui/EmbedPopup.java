@@ -46,6 +46,7 @@ import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.DisclosurePanel;
@@ -201,16 +202,12 @@ public class EmbedPopup extends PopupPanel implements EmbedSizeHandler, QueryUpd
 			
 			// get base address, e.g. http://127.0.0.1/p/myprefix
 			String address = GWT.getHostPageBaseURL() + prefixProperties.getPrefix();
-			
 			address += "?f=embed&q=" + queryDefinition.getAsString();
-
 			address += "&l=" + LocaleInfo.getCurrentLocale().getLocaleName();
-
-			if (!GWT.isScript()) {
-				// TODO write code that doesn't make that assumption that the gwt codeserver uses the default local setup
-				address += "&gwt.codesvr=127.0.0.1:9997";
+			if(!GWT.isScript() && Window.Location.getParameter("gwt.codesvr") != null) {
+				address += "&gwt.codesvr=" + Window.Location.getParameter("gwt.codesvr"); 
 			}
-
+			
 			List<EmbedFlag> flags = new LinkedList<EmbedFlag>();
 
 			String transparency = "";

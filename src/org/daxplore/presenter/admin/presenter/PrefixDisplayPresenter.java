@@ -56,9 +56,8 @@ public class PrefixDisplayPresenter implements Presenter {
 		}
 		
 		String presenterHref = href + "/p/" + prefix;
-		if(!GWT.isScript()) {
-			// TODO write code that doesn't make that assumption that the gwt codeserver uses the default local setup
-			presenterHref += "?gwt.codesvr=127.0.1.1:9997"; 
+		if(!GWT.isScript() && Window.Location.getParameter("gwt.codesvr") != null) {
+			presenterHref += "?gwt.codesvr=" + Window.Location.getParameter("gwt.codesvr"); 
 		}
 		prefixDisplayView.setPrefixHref(presenterHref);
 
