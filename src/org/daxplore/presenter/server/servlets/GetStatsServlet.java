@@ -72,7 +72,6 @@ public class GetStatsServlet extends HttpServlet {
 			if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)){
 				throw new BadRequestException("Request made with syntactically invalid prefix: '" + prefix + "'");
 			}
-			String queryString = request.getParameter("q"); //TODO check input
 			if (!metadataPrefixMap.containsKey(prefix)) { // TODO clear on new upload (and in other similar places)
 				LocaleStore localeStore = pm.getObjectById(LocaleStore.class, prefix);
 				//it shouldn't matter what locale we use here, as we don't read any localized data
@@ -80,6 +79,7 @@ public class GetStatsServlet extends HttpServlet {
 				metadataPrefixMap.put(prefix, new QuestionMetadataServerImpl(new StringReader(questionText)));
 			}
 			
+			String queryString = request.getParameter("q");
 			QueryDefinition queryDefinition = new QueryDefinition(metadataPrefixMap.get(prefix), queryString);
 			
 			try {
