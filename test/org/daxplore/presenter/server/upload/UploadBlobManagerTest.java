@@ -64,7 +64,7 @@ public class UploadBlobManagerTest {
 		
 		String s = new String(data, "UTF-8");
 		
-		TextFileStore textFileStore = new TextFileStore("foo", s);
+		//TextFileStore textFileStore = new TextFileStore("foo", s);
 		//TODO test store
 	}
 
