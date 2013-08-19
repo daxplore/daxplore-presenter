@@ -120,7 +120,7 @@ public class AdminUploadServlet extends HttpServlet {
 				} else {
 					throw new BadRequestException("Request made with invalid prefix: '" + prefix + "'");
 				}
-				logger.log(Level.INFO, "Unpacked new data for prefix '" + prefix + "' in " + ((System.nanoTime()-time)/1000000000.0) + " seconds"); //TODO tmp
+				logger.log(Level.INFO, "Unpacked new data for prefix '" + prefix + "' in " + ((System.nanoTime()-time)/1000000000.0) + " seconds");
 			} catch (FileUploadException | IOException | BadRequestException e) {
 				logger.log(Level.WARNING, e.getMessage(), e);
 				statusCode = HttpServletResponse.SC_BAD_REQUEST;
