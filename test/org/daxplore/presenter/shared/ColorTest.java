@@ -18,7 +18,7 @@
  */
 package org.daxplore.presenter.shared;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.daxplore.presenter.shared.Color.Model;
 import org.junit.Test;

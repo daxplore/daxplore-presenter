@@ -20,7 +20,6 @@ package org.daxplore.presenter.server.upload;
 import java.io.IOException;
 import java.util.Random;
 
-import org.daxplore.presenter.server.storage.TextFileStore;
 import org.daxplore.presenter.server.throwable.BadRequestException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.junit.After;
@@ -62,10 +61,9 @@ public class UploadBlobManagerTest {
 			data[i+3] = (byte)(r>>0);
 		}
 		
-		String s = new String(data, "UTF-8");
-		
-		//TextFileStore textFileStore = new TextFileStore("foo", s);
-		//TODO test store
+//		String s = new String(data, "UTF-8");
+//		TextFileStore textFileStore = new TextFileStore("foo", s);
+//		TODO test store
 	}
 
 }

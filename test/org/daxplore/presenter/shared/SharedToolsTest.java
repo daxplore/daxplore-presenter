@@ -18,13 +18,17 @@
  */
 package org.daxplore.presenter.shared;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.daxplore.presenter.shared.SharedTools;
 import org.junit.Test;
 
 public class SharedToolsTest {

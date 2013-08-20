@@ -18,7 +18,6 @@
  */
 package org.daxplore.presenter.chart;
 
-import org.daxplore.presenter.chart.ChartTools;
 import org.daxplore.presenter.BrowserUserStringTestData;
 import org.junit.Test;
 
