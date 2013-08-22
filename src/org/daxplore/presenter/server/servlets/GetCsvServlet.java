@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringReader;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.QuestionMetadataServerImpl;
+import org.daxplore.presenter.server.storage.SettingItemStore;
 import org.daxplore.presenter.server.storage.StatDataItemStore;
 import org.daxplore.presenter.server.storage.TextFileStore;
 import org.daxplore.presenter.server.throwable.BadRequestException;
@@ -98,6 +100,7 @@ public class GetCsvServlet extends HttpServlet {
 			}
 			
 			pm = PMF.get().getPersistenceManager();
+			List<String[]> csvTable = new LinkedList<>();
 			
 			Locale locale = new Locale(localeString);
 			QuestionMetadata questionMetadata;
@@ -115,40 +118,57 @@ public class GetCsvServlet extends HttpServlet {
 			List<String> perspectiveOptionTexts = queryDefinition.getPerspectiveOptionTexts();
 			List<Integer> usedPerspectiveOptions = queryDefinition.getUsedPerspectiveOptions();
 			
-			List<String[]> csvOutput = new LinkedList<String[]>();
 			questionOptionTexts.add(0,  queryDefinition.getPerspectiveShortText() + " \\ " + queryDefinition.getQuestionShortText());
-			csvOutput.add(questionOptionTexts.toArray(new String[0]));
+			
+			//TODO handle timepoints properly
+			String timepoint0Text = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "timepoint_0");
+			String timepoint1Text = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "timepoint_1");
 			
 			String statString = StatDataItemStore.getStats(pm, prefix, queryDefinition);
 			JSONObject statJsonObject = (JSONObject)JSONValue.parse(statString);
 			JSONObject valueJsonObject = (JSONObject)statJsonObject.get("values");
+			int columnCount = 4 + queryDefinition.getQuestionOptionCount();
+			int rowCount = 0;
+			csvTable.add(questionOptionTexts.toArray(new String[columnCount]));
 			if(queryDefinition.getPerspectiveOptionCount()>0){
 				JSONObject timepoint1 = (JSONObject)valueJsonObject.get("0"); //TODO: check what to do here
 				for(int i=0; i<usedPerspectiveOptions.size(); i++) {
-					String[] row = new String[1 + queryDefinition.getQuestionOptionCount()];
+					String[] row = new String[columnCount];
 					int perspectiveOption = usedPerspectiveOptions.get(i);
-					if (queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
-						row[0] = perspectiveOptionTexts.get(perspectiveOption) + " (1)"; //TODO mark primary (1) in some better way?
-					} else {
-						row[0] = perspectiveOptionTexts.get(perspectiveOption);
-					}
+					row[0] = MessageFormat.format("{0} ({1})", perspectiveOptionTexts.get(perspectiveOption), timepoint0Text);
 					JSONArray questionData = (JSONArray)timepoint1.get(Integer.toString(perspectiveOption));
-					for (int j=1; j<row.length; j++) {
+					for (int j=1; j<=queryDefinition.getQuestionOptionCount(); j++) {
 						row[j] = questionData.get(j-1).toString();
 					}
-					csvOutput.add(row);
-
+					csvTable.add(row);
+					rowCount++;
+				}
+				
+				for(int i=0; i<usedPerspectiveOptions.size(); i++) {
 					if (queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
 						JSONObject timepoint2 = (JSONObject)valueJsonObject.get("1");
-						row = new String[1 + queryDefinition.getQuestionOptionCount()];
-						row[0] = perspectiveOptionTexts.get(perspectiveOption) + " (2)"; //TODO mark primary (1) in some better way?
-						questionData = (JSONArray)timepoint2.get(Integer.toString(perspectiveOption));
-						for (int j=1; j<row.length; j++) {
+						String[] row = new String[columnCount];
+						int perspectiveOption = usedPerspectiveOptions.get(i);
+						row[0] = MessageFormat.format("{0} ({1})", perspectiveOptionTexts.get(perspectiveOption), timepoint1Text);
+						JSONArray questionData = (JSONArray)timepoint2.get(Integer.toString(perspectiveOption));
+						for (int j=1; j<=queryDefinition.getQuestionOptionCount(); j++) {
 							row[j] = questionData.get(j-1).toString();
 						}
-						csvOutput.add(row);
+						csvTable.add(row);
+						rowCount++;
 					}
 				}
+				
+				while(rowCount<3) {
+					csvTable.add(new String[columnCount]);
+				}
+				
+				int metaDataColumn = queryDefinition.getQuestionOptionCount() + 2;
+				csvTable.get(0)[metaDataColumn] = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "page_title");
+				csvTable.get(1)[metaDataColumn] = queryDefinition.getPerspectiveShortText() + ":";
+				csvTable.get(1)[metaDataColumn+1] = queryDefinition.getPerspectiveFullText();
+				csvTable.get(2)[metaDataColumn] = queryDefinition.getQuestionShortText() + ":";
+				csvTable.get(2)[metaDataColumn+1] = queryDefinition.getQuestionFullText();
 			}
 			
 			if(queryDefinition.hasFlag(QueryFlag.TOTAL) || queryDefinition.getPerspectiveOptionCount()>0){
@@ -156,7 +176,7 @@ public class GetCsvServlet extends HttpServlet {
 			}
 			
 			// write response
-			csvWriter.writeAll(csvOutput);
+			csvWriter.writeAll(csvTable);
 			csvWriter.close();
 			response.setStatus(HttpServletResponse.SC_OK);
 			

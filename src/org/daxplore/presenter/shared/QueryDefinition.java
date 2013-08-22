@@ -368,6 +368,15 @@ public class QueryDefinition {
 	}
 	
 	/**
+	 * Get a long text that describes the question.
+	 * 
+	 * @return the full text
+	 */
+	public String getPerspectiveFullText() {
+		return questionMetadata.getFullText(perspectiveID);
+	}
+	
+	/**
 	 * Get the perspective option texts.
 	 * 
 	 * @return the perspective option texts
