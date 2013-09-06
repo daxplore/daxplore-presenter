@@ -140,7 +140,7 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		if (setHistory) {
 			SharedTools.println("History set: " + historyString);
 			History.newItem(historyString, false);
-			googleAnalyticsTrack(queryDefinition.getQuestionID(), queryDefinition.getPerspectiveID());
+			Tracking.googleAnalyticsTrack(queryDefinition.getAsString());
 			iFrameTrack(historyString);
 		}
 	}
@@ -158,7 +158,7 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		QueryDefinition queryDefinition;
 		try {
 			queryDefinition = new QueryDefinition(questionMetadata, storeString);
-			googleAnalyticsTrack(queryDefinition.getQuestionID(), queryDefinition.getPerspectiveID());
+			Tracking.googleAnalyticsTrack(queryDefinition.getAsString());
 			iFrameTrack(queryDefinition.getAsString());
 		} catch (IllegalArgumentException e) {
 			try {
@@ -186,21 +186,6 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		if (req != null) {
 			restore(req, false);
 		}
-	}
-
-	/**
-	 * Use Google Analytics to track the current web page.
-	 * 
-	 * <p>Only the selected question and perspective is tracked.</p>
-	 * 
-	 * @param questionID
-	 *            the question ID
-	 * @param perspectiveID
-	 *            the perspective ID
-	 */
-	private void googleAnalyticsTrack(String questionID, String perspectiveID) {
-		Tracking.track(prefixProperties.getGoogleAnalyticsID(), prefixProperties.getPrefix(),
-				"q=" + questionID + "&p=" + perspectiveID);
 	}
 	
 	private final native void iFrameTrack(String historyToken) /*-{
