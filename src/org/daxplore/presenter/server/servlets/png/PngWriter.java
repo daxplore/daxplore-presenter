@@ -43,7 +43,7 @@ public class PngWriter implements ImageWriter {
 	private static final byte[] IEND = stringToBytes("IEND");
 	private static final byte[] IHDR = stringToBytes("IHDR");
 
-	private static final int BYTES_PER_PIXEL = 3;
+	//private static final int BYTES_PER_PIXEL = 3;
 	private static final String CONTENT_TYPE = "image/png";
 	private boolean usealpha;
 
@@ -93,8 +93,8 @@ public class PngWriter implements ImageWriter {
 		ByteArrayOutputStream zippedByteStream = new ByteArrayOutputStream(1024);
 		BufferedOutputStream zipStream = new BufferedOutputStream(new DeflaterOutputStream(zippedByteStream, deflator));
 
-		@SuppressWarnings("unused")
-		byte[] scanLines = new byte[width * height * BYTES_PER_PIXEL + height];
+		// optinally write to scanlines:
+		// byte[] scanLines = new byte[width * height * BYTES_PER_PIXEL + height];
 		for (int i = 0; i < width * height; i++) {
 			if (i % width == 0) {
 				zipStream.write(0); // filter
@@ -135,7 +135,7 @@ public class PngWriter implements ImageWriter {
 			return value.getBytes("US-ASCII");
 		} catch (UnsupportedEncodingException ex) {
 			// Should not happen.
-			throw new RuntimeException(ex);
+			throw new AssertionError(ex);
 		}
 	}
 
