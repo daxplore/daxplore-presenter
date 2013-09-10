@@ -27,7 +27,6 @@ public class StatDataItemGWT implements StatInterface {
 		this.primaryData = primaryData;
 		this.secondaryData = secondaryData;
 		this.perspectiveOption = perspectiveOption;
-		this.isTotalItem = isTotalItem;
 	}
 	
 	/**
