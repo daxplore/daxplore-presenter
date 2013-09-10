@@ -51,6 +51,8 @@ import com.google.web.bindery.event.shared.EventBus;
  */
 public class ImageButtonPanel extends Composite implements QueryUpdateHandler, ImageButtonHandler {
 	
+	private String baseUrl;
+	
 	protected HorizontalPanel mainPanel;
 	protected EmbedPopup embedPopup;
 	protected QueryDefinition queryDefinition;
@@ -62,6 +64,9 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 	protected ImageButtonPanel(final EventBus eventBus, UITexts uiTexts, UIResources uiResources, EmbedPopup embedPopup, PrefixProperties prefixProperties) {
 		this.embedPopup = embedPopup;
 		this.prefixProperties = prefixProperties;
+		
+		baseUrl = GWT.getHostPageBaseURL();					// http://example.com/p/
+		baseUrl = baseUrl.substring(0, baseUrl.length()-2); // http://example.com/
 		
 //		Image buttonImage = new Image(uiResources.printButtonImage());
 //		ImageButton printButton = new ImageButton(buttonImage, uiTexts.printButtonTitle());
@@ -103,14 +108,9 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 	}
 	
 	protected String getCsvDownloadSrc() {
-		//TODO use better parsing
-		String address = GWT.getModuleBaseURL(); //get address with module, e.g. http://127.0.0.1/presentation/
-		address = address.substring(0, address.length()-1); //remove last slash
-		address = address.substring(0, address.lastIndexOf("/")+1); //remove module name
-		address += "getCsv/";
 		String fileName = queryDefinition.getPerspectiveShortText() + " - " + queryDefinition.getQuestionShortText() + ".csv";
 		fileName = URL.encodePathSegment(fileName);
-		return address + fileName
+		return baseUrl + "getCsv/" + fileName
 				+ "?q=" + queryDefinition.getAsString()
 				+ "&l=" + LocaleInfo.getCurrentLocale().getLocaleName()
 				+ "&prefix=" + prefixProperties.getPrefix();
@@ -118,17 +118,10 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 	
 	protected void openPrintPage(){
 		if(queryDefinition != null) {
-			//TODO use better parsing
-			String address = GWT.getModuleBaseURL(); //get address with module, e.g. http://127.0.0.1/presentation/
-			if (address.charAt(address.length()-1) == '/') {
-				address = address.substring(0, address.length()-1); //remove trailing slash
-			}
-			address = address.substring(0, address.lastIndexOf("/")+1); //remove module name
-			String locale = LocaleInfo.getCurrentLocale().getLocaleName();
-			address += "print?q=" + queryDefinition.getAsString() + "&l=" + locale;
+			String url = baseUrl + "print?q=" + queryDefinition.getAsString() + "&l=" + LocaleInfo.getCurrentLocale().getLocaleName();
 			String name = "_blank";
 			String features = "";
-			Window.open(address, name, features);
+			Window.open(url, name, features);
 		}
 	}
 	
