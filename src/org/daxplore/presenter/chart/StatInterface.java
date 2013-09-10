@@ -29,16 +29,6 @@ package org.daxplore.presenter.chart;
 public interface StatInterface {
 
 	/**
-	 * Checks if this item is matched to a specific perspective option.
-	 * 
-	 * <p>Otherwise it is the TotalDataItem that contains an aggregation of all
-	 * data.</p>
-	 * 
-	 * @return true, if it is matched to a perspective option
-	 */
-	public boolean isNotTotalItem(); //TODO don't use double negative form
-
-	/**
 	 * Gets the perspective option.
 	 * 
 	 * @return the perspective option

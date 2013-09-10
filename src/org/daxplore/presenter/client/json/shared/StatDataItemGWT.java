@@ -22,7 +22,6 @@ public class StatDataItemGWT implements StatInterface {
 	
 	private int[] primaryData, secondaryData;
 	private int perspectiveOption;
-	private boolean isTotalItem;
 	
 	public StatDataItemGWT(int[] primaryData, int[] secondaryData, int perspectiveOption, boolean isTotalItem) {
 		this.primaryData = primaryData;
@@ -31,14 +30,6 @@ public class StatDataItemGWT implements StatInterface {
 		this.isTotalItem = isTotalItem;
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean isNotTotalItem() {
-		return !isTotalItem;
-	}
-
 	/**
 	 * {@inheritDoc}
 	 */
