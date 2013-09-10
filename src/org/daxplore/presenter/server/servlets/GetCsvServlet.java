@@ -159,7 +159,7 @@ public class GetCsvServlet extends HttpServlet {
 					}
 				}
 				
-				while(rowCount<3) {
+				while(rowCount++ < 3) {
 					csvTable.add(new String[columnCount]);
 				}
 				
