@@ -20,8 +20,13 @@ package org.daxplore.presenter.client;
 
 public final class Tracking {
 
-	public final static native void googleAnalyticsTrack(String historyToken) /*-{
-	    $wnd._gaq.push('_trackEvent', 'Presenter Chart', historyToken);
+	//TODO only track when ga is loaded into the page
+	public final static native void googleAnalyticsEvent(String category, String action) /*-{
+	    $wnd.ga('send', 'event', category, action);
+	}-*/;
+	
+	public final static native void iFrameTrack(String historyToken) /*-{
+	    $wnd.parent.postMessage(historyToken, '*');
 	}-*/;
 
 }

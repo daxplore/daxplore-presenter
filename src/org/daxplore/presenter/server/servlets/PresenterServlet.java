@@ -52,6 +52,7 @@ import org.daxplore.shared.SharedResourceTools;
 @SuppressWarnings("serial")
 public class PresenterServlet extends HttpServlet {
 	private static Logger logger = Logger.getLogger(PresenterServlet.class.getName());
+	
 	private static String presenterHtmlTemplate = null;
 	private static String browserSuggestionTemplate = null;
 	private static String printHtmlTemplate = null;
@@ -105,12 +106,12 @@ public class PresenterServlet extends HttpServlet {
 			if(googleAnalyticsID!=null && !googleAnalyticsID.equals("")) {
 				if (googleAnalyticsTrackingTemplate == null) {
 					try {
-						googleAnalyticsTrackingTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/ga-tracking.js"));
+						googleAnalyticsTrackingTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/js/ga-tracking.js"));
 					} catch (IOException e) {
 						throw new InternalServerException("Failed to load the google analytics tracking template", e);
 					}
-					gaTemplate = MessageFormat.format(googleAnalyticsTrackingTemplate, googleAnalyticsID);
 				}
+				gaTemplate = MessageFormat.format(googleAnalyticsTrackingTemplate, googleAnalyticsID);
 			}
 			
 			String responseHTML = "";

@@ -18,8 +18,7 @@ package org.daxplore.presenter.server.servlets;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
-import java.util.Locale;
+import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,26 +26,43 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 
 @SuppressWarnings("serial")
 public class PresenterBrowserServlet extends HttpServlet {
-	protected static Logger logger = Logger.getLogger(PresenterBrowserServlet.class.getName());
-	protected static String presenterHtmlTemplate = null;
-	protected static String browserSuggestionTemplate = null;
+	private static Logger logger = Logger.getLogger(PresenterBrowserServlet.class.getName());
 	
-	protected static List<Locale> supportedLocales;
+	private static String welcomeTemplate = null;
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 		try {
+			if (welcomeTemplate == null) {
+				try {
+					welcomeTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/welcome.html"));
+				} catch (IOException e) {
+					throw new InternalServerException("Failed to load the welcome template", e);
+				}
+			}
+			
+			String baseurl = request.getRequestURL().toString();
+			baseurl = baseurl.substring(0, baseurl.lastIndexOf("/"));
+			baseurl = baseurl.substring(0, baseurl.lastIndexOf("/")+1);
+			
+			String[] arguments = {
+					baseurl
+				};
+			
+			String responseHTML = MessageFormat.format(welcomeTemplate, (Object[])arguments);
+			
 			response.setContentType("text/html; charset=UTF-8");
 			try {
 				Writer writer = response.getWriter();
-				writer.write("Pick a prefix and view it's presenter.");
+				writer.write(responseHTML);
 				writer.close();
 			} catch (IOException e) {
-				throw new InternalServerException("Failed to display presenter browser servlet", e);
+				throw new InternalServerException("Failed to display presenter servlet", e);
 			}
 		} catch (InternalServerException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
