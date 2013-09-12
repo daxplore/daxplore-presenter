@@ -42,11 +42,9 @@ import org.daxplore.presenter.client.ui.QuestionPanel;
 import org.daxplore.presenter.client.ui.StagePanel;
 import org.daxplore.presenter.client.ui.WarningBanner;
 import org.daxplore.presenter.client.ui.WarningBanner.WarningBannerFactory;
-import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 import org.daxplore.presenter.shared.QuestionMetadata;
-import org.daxplore.presenter.shared.SharedTools;
 
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -73,13 +71,12 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 	protected final EventBus eventBus;
 	protected DaxploreConfig config;
 	private StatDataServerModel statDataServerModel;
-	private PrefixProperties prefixProperties;
 
 	@Inject
 	protected Presenter(StagePanel stagePanel, PerspectivePanel perspectivePanel, QuestionPanel questionPanel,
 			ChartTypeOptionsPanel optionsPanel, EventBus eventBus, ChartPanelPresenter chartPanelPresenter,
 			QuestionMetadata questionMetadata, ImageButtonPanel imageButtonPanel, DaxploreConfig config, UITexts uiTexts,
-			WarningBannerFactory warningFactory, StatDataServerModel statDataServerModel, PrefixProperties prefixProperties) {
+			WarningBannerFactory warningFactory, StatDataServerModel statDataServerModel) {
 		this.perspectivePanel = perspectivePanel;
 		this.questionPanel = questionPanel;
 		this.optionsPanel = optionsPanel;
@@ -88,7 +85,6 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		this.eventBus = eventBus;
 		this.config = config;
 		this.statDataServerModel = statDataServerModel;
-		this.prefixProperties = prefixProperties;
 
 		List<Widget> actionWidgetList = new LinkedList<Widget>();
 		actionWidgetList.add(imageButtonPanel);
@@ -138,10 +134,9 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 
 		String historyString = queryDefinition.getAsString();
 		if (setHistory) {
-			SharedTools.println("History set: " + historyString);
 			History.newItem(historyString, false);
-			googleAnalyticsTrack(queryDefinition.getQuestionID(), queryDefinition.getPerspectiveID());
-			iFrameTrack(historyString);
+			Tracking.googleAnalyticsEvent("chart", queryDefinition.getAsHumanString());
+			Tracking.iFrameTrack(historyString);
 		}
 	}
 
@@ -158,8 +153,8 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		QueryDefinition queryDefinition;
 		try {
 			queryDefinition = new QueryDefinition(questionMetadata, storeString);
-			googleAnalyticsTrack(queryDefinition.getQuestionID(), queryDefinition.getPerspectiveID());
-			iFrameTrack(queryDefinition.getAsString());
+			Tracking.googleAnalyticsEvent("chart", queryDefinition.getAsHumanString());
+			Tracking.iFrameTrack(queryDefinition.getAsString());
 		} catch (IllegalArgumentException e) {
 			try {
 				queryDefinition = new QueryDefinition(questionMetadata, config.defaultQueryString());
@@ -172,7 +167,6 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 
 		if (setHistory) {
 			String historyString = queryDefinition.getAsString();
-			SharedTools.println("History set; " + historyString);
 			History.newItem(historyString, false);
 		}
 	}
@@ -187,26 +181,7 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 			restore(req, false);
 		}
 	}
-
-	/**
-	 * Use Google Analytics to track the current web page.
-	 * 
-	 * <p>Only the selected question and perspective is tracked.</p>
-	 * 
-	 * @param questionID
-	 *            the question ID
-	 * @param perspectiveID
-	 *            the perspective ID
-	 */
-	private void googleAnalyticsTrack(String questionID, String perspectiveID) {
-		Tracking.track(prefixProperties.getGoogleAnalyticsID(), prefixProperties.getPrefix(),
-				"q=" + questionID + "&p=" + perspectiveID);
-	}
 	
-	private final native void iFrameTrack(String historyToken) /*-{
-	    $wnd.parent.postMessage(historyToken, '*');
-	}-*/;
-
 	/**
 	 * {@inheritDoc}
 	 */

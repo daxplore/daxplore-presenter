@@ -52,10 +52,12 @@ import org.daxplore.shared.SharedResourceTools;
 @SuppressWarnings("serial")
 public class PresenterServlet extends HttpServlet {
 	private static Logger logger = Logger.getLogger(PresenterServlet.class.getName());
+	
 	private static String presenterHtmlTemplate = null;
 	private static String browserSuggestionTemplate = null;
 	private static String printHtmlTemplate = null;
 	private static String embedHtmlTemplate = null;
+	private static String googleAnalyticsTrackingTemplate = null;
 	
 	private HashMap<String, QuestionMetadata> metadataMap = new HashMap<String, QuestionMetadata>(); 
 	
@@ -98,27 +100,37 @@ public class PresenterServlet extends HttpServlet {
 			}
 			browserSupported |= ignoreBadBrowser;
 			
+			pm = PMF.get().getPersistenceManager();
+			String googleAnalyticsID = SettingItemStore.getProperty(pm, prefix, "adminpanel", "gaID");
+			String gaTemplate = "";
+			if(googleAnalyticsID!=null && !googleAnalyticsID.equals("")) {
+				if (googleAnalyticsTrackingTemplate == null) {
+					try {
+						googleAnalyticsTrackingTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/js/ga-tracking.js"));
+					} catch (IOException e) {
+						throw new InternalServerException("Failed to load the google analytics tracking template", e);
+					}
+				}
+				gaTemplate = MessageFormat.format(googleAnalyticsTrackingTemplate, googleAnalyticsID);
+			}
 			
 			String responseHTML = "";
 			if (!browserSupported) {
-				responseHTML = getUnsupportedBrowserHTML(baseurl);
+				responseHTML = getUnsupportedBrowserHTML(baseurl, gaTemplate);
 			} else {
 				Locale locale = ServerTools.selectLocale(request, prefix);
-				pm = PMF.get().getPersistenceManager();
-				
+
 				String secondaryFlagText = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "secondary_flag");
 				//TODO handle timepoints properly
 				String timepoint0Text = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "timepoint_0");
 				String timepoint1Text = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "timepoint_1");
-				String googleAnalyticsID = SettingItemStore.getProperty(pm, prefix, "adminpanel", "gaID");
-				ServerPrefixProperties prefixProperties = new ServerPrefixProperties(
-						prefix, secondaryFlagText, timepoint0Text, timepoint1Text, googleAnalyticsID);
+				ServerPrefixProperties prefixProperties = new ServerPrefixProperties(prefix, secondaryFlagText, timepoint0Text, timepoint1Text);
 
 				if (feature!=null && feature.equalsIgnoreCase("embed")) { // embedded chart
 					
 					// TODO clean query string
 					String queryString = request.getParameter("q");
-					responseHTML = getEmbedHTML(pm, prefix, locale, queryString, baseurl, prefixProperties);
+					responseHTML = getEmbedHTML(pm, prefix, locale, queryString, baseurl, prefixProperties, gaTemplate);
 					
 				} else if (feature!=null && feature.equalsIgnoreCase("print")) { // printer-friendly chart
 					
@@ -132,11 +144,11 @@ public class PresenterServlet extends HttpServlet {
 					
 					// TODO clean query string
 					String queryString = request.getParameter("q");
-					responseHTML = getPrintHTML(pm, prefix, locale, serverPath, queryString, baseurl);
+					responseHTML = getPrintHTML(pm, prefix, locale, serverPath, queryString, baseurl, gaTemplate);
 					
 				} else { // standard presenter
 					
-					responseHTML = getPresenterHTML(pm, prefix, locale, baseurl, prefixProperties);
+					responseHTML = getPresenterHTML(pm, prefix, locale, baseurl, prefixProperties, gaTemplate);
 					
 				}
 			}
@@ -165,7 +177,7 @@ public class PresenterServlet extends HttpServlet {
 		}
 	}
 	
-	private String getUnsupportedBrowserHTML(String baseurl) throws InternalServerException {
+	private String getUnsupportedBrowserHTML(String baseurl, String gaTemplate) throws InternalServerException {
 		if (browserSuggestionTemplate == null) {
 			try {
 				browserSuggestionTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/browser-suggestion.html"));
@@ -175,13 +187,14 @@ public class PresenterServlet extends HttpServlet {
 		}
 		
 		String[] arguments = {
-			baseurl					// {0}
+			baseurl,				// {0}
+			gaTemplate				// {1}
 		};
 		
 		return MessageFormat.format(browserSuggestionTemplate, (Object[])arguments);
 	}
 	
-	private String getPresenterHTML(PersistenceManager pm, String prefix, Locale locale, String baseurl, ServerPrefixProperties properties)
+	private String getPresenterHTML(PersistenceManager pm, String prefix, Locale locale, String baseurl, ServerPrefixProperties properties, String gaTemplate)
 			throws InternalServerException, BadRequestException {
 		
 		String perspectives = "", groups = "", questions = "";
@@ -199,7 +212,8 @@ public class PresenterServlet extends HttpServlet {
 			perspectives,			// {3}
 			questions,				// {4}
 			groups,					// {5}
-			prefixProperties		// {6}
+			prefixProperties,		// {6}
+			gaTemplate				// {7}
 		};
 		
 		if (presenterHtmlTemplate == null) {
@@ -214,7 +228,7 @@ public class PresenterServlet extends HttpServlet {
 	}
 	
 	private String getEmbedHTML(PersistenceManager pm, String prefix, Locale locale,
-			String queryString, String baseurl, ServerPrefixProperties properties) throws BadRequestException, InternalServerException {
+			String queryString, String baseurl, ServerPrefixProperties properties, String gaTemplate) throws BadRequestException, InternalServerException {
 		
 		QuestionMetadata questionMetadata;
 		String key = prefix + "_" + locale.toLanguageTag();
@@ -244,9 +258,10 @@ public class PresenterServlet extends HttpServlet {
 			locale.toLanguageTag(), // {1}
 			pageTitle,				// {2}
 			baseurl, 				// {3}
-			statItem, 				// {4}
-			questionString,			// {5}
-			prefixProperties		// {6}
+			gaTemplate,				// {4}
+			statItem, 				// {5}
+			questionString,			// {6}
+			prefixProperties		// {7}
 		};
 		
 		if (embedHtmlTemplate == null) {
@@ -261,7 +276,7 @@ public class PresenterServlet extends HttpServlet {
 	}
 	
 	private String getPrintHTML(PersistenceManager pm, String prefix, Locale locale,
-			String serverPath, String queryString, String baseurl) throws InternalServerException, BadRequestException {
+			String serverPath, String queryString, String baseurl, String gaTemplate) throws InternalServerException, BadRequestException {
 		
 		LinkedList<EmbedFlag> flags = new LinkedList<EmbedFlag>();
 		flags.add(EmbedFlag.LEGEND);
@@ -274,11 +289,13 @@ public class PresenterServlet extends HttpServlet {
 		String[] arguments = {
 			pageTitle,				// {0}
 			baseurl,				// {1}
-			serverPath,				// {2}
-			queryString,			// {3}
-			locale.toLanguageTag(),	// {4}
-			prefix,					// {5}
-			embedDefinition			// {6}
+			gaTemplate,				// {2}
+			serverPath,				// {3}
+			queryString,			// {4}
+			locale.toLanguageTag(),	// {5}
+			prefix,					// {6}
+			embedDefinition,		// {7}
+			
 		};
 		
 		if (printHtmlTemplate == null) {
