@@ -140,7 +140,7 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 			History.newItem(historyString, false);
 			String prefix = prefixProperties.getPrefix();
 			Tracking.googleAnalyticsEvent(prefix + " chart", queryDefinition.getAsHumanString(prefix));
-			Tracking.iFrameTrack(historyString);
+			Tracking.iFrame(historyString);
 		}
 	}
 
@@ -159,7 +159,7 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 			queryDefinition = new QueryDefinition(questionMetadata, storeString);
 			String prefix = prefixProperties.getPrefix();
 			Tracking.googleAnalyticsEvent(prefix + " chart", queryDefinition.getAsHumanString(prefix));
-			Tracking.iFrameTrack(queryDefinition.getAsString());
+			Tracking.iFrame(queryDefinition.getAsString());
 		} catch (IllegalArgumentException e) {
 			try {
 				queryDefinition = new QueryDefinition(questionMetadata, config.defaultQueryString());

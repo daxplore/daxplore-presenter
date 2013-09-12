@@ -20,12 +20,26 @@ package org.daxplore.presenter.client;
 
 public final class Tracking {
 
-	//TODO only track when ga is loaded into the page
+	/**
+	 * Send a user action event to Google Analytics.
+	 * 
+	 * @param category The event category
+	 * @param action The event action
+	 */
 	public final static native void googleAnalyticsEvent(String category, String action) /*-{
-	    $wnd.ga('send', 'event', category, action);
+		if(typeof($wnd.ga) != 'undefined') {
+	    	$wnd.ga('send', 'event', category, action);
+		}
 	}-*/;
 	
-	public final static native void iFrameTrack(String historyToken) /*-{
+	/**
+	 * Send a message that will be received by pages that contain an iframe
+	 * with this GWT app.
+	 * 
+	 * <p>This can, for example, allow the outer page to update the window url.</p>
+	 * @param historyToken
+	 */
+	public final static native void iFrame(String historyToken) /*-{
 	    $wnd.parent.postMessage(historyToken, '*');
 	}-*/;
 
