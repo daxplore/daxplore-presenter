@@ -138,7 +138,8 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		String historyString = queryDefinition.getAsString();
 		if (setHistory) {
 			History.newItem(historyString, false);
-			Tracking.googleAnalyticsEvent("chart", queryDefinition.getAsHumanString(prefixProperties.getPrefix()));
+			String prefix = prefixProperties.getPrefix();
+			Tracking.googleAnalyticsEvent(prefix + " chart", queryDefinition.getAsHumanString(prefix));
 			Tracking.iFrameTrack(historyString);
 		}
 	}
@@ -156,7 +157,8 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		QueryDefinition queryDefinition;
 		try {
 			queryDefinition = new QueryDefinition(questionMetadata, storeString);
-			Tracking.googleAnalyticsEvent("chart", queryDefinition.getAsHumanString(prefixProperties.getPrefix()));
+			String prefix = prefixProperties.getPrefix();
+			Tracking.googleAnalyticsEvent(prefix + " chart", queryDefinition.getAsHumanString(prefix));
 			Tracking.iFrameTrack(queryDefinition.getAsString());
 		} catch (IllegalArgumentException e) {
 			try {
