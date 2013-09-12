@@ -42,6 +42,7 @@ import org.daxplore.presenter.client.ui.QuestionPanel;
 import org.daxplore.presenter.client.ui.StagePanel;
 import org.daxplore.presenter.client.ui.WarningBanner;
 import org.daxplore.presenter.client.ui.WarningBanner.WarningBannerFactory;
+import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 import org.daxplore.presenter.shared.QuestionMetadata;
@@ -71,12 +72,13 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 	protected final EventBus eventBus;
 	protected DaxploreConfig config;
 	private StatDataServerModel statDataServerModel;
+	private PrefixProperties prefixProperties;
 
 	@Inject
 	protected Presenter(StagePanel stagePanel, PerspectivePanel perspectivePanel, QuestionPanel questionPanel,
 			ChartTypeOptionsPanel optionsPanel, EventBus eventBus, ChartPanelPresenter chartPanelPresenter,
 			QuestionMetadata questionMetadata, ImageButtonPanel imageButtonPanel, DaxploreConfig config, UITexts uiTexts,
-			WarningBannerFactory warningFactory, StatDataServerModel statDataServerModel) {
+			WarningBannerFactory warningFactory, StatDataServerModel statDataServerModel, PrefixProperties prefixProperties) {
 		this.perspectivePanel = perspectivePanel;
 		this.questionPanel = questionPanel;
 		this.optionsPanel = optionsPanel;
@@ -85,6 +87,7 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		this.eventBus = eventBus;
 		this.config = config;
 		this.statDataServerModel = statDataServerModel;
+		this.prefixProperties = prefixProperties;
 
 		List<Widget> actionWidgetList = new LinkedList<Widget>();
 		actionWidgetList.add(imageButtonPanel);
@@ -135,7 +138,7 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		String historyString = queryDefinition.getAsString();
 		if (setHistory) {
 			History.newItem(historyString, false);
-			Tracking.googleAnalyticsEvent("chart", queryDefinition.getAsHumanString());
+			Tracking.googleAnalyticsEvent("chart", queryDefinition.getAsHumanString(prefixProperties.getPrefix()));
 			Tracking.iFrameTrack(historyString);
 		}
 	}
@@ -153,7 +156,7 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		QueryDefinition queryDefinition;
 		try {
 			queryDefinition = new QueryDefinition(questionMetadata, storeString);
-			Tracking.googleAnalyticsEvent("chart", queryDefinition.getAsHumanString());
+			Tracking.googleAnalyticsEvent("chart", queryDefinition.getAsHumanString(prefixProperties.getPrefix()));
 			Tracking.iFrameTrack(queryDefinition.getAsString());
 		} catch (IllegalArgumentException e) {
 			try {

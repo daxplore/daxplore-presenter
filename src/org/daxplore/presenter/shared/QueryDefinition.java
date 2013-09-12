@@ -284,9 +284,9 @@ public class QueryDefinition {
 	 * 
 	 * @return The query definition as a human-readable string
 	 */
-	public String getAsHumanString() {
+	public String getAsHumanString(String prefix) {
 		String query = serialize();
-		return query + " (#" + getAsString() + ")";
+		return query + " (" + prefix + "#" + getAsString() + ")";
 	}
 
 	/**
