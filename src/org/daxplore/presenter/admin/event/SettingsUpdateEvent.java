@@ -26,7 +26,7 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
 
 public class SettingsUpdateEvent extends Event<SettingsUpdateHandler> {
 
-	protected static final Type<SettingsUpdateHandler> TYPE = new Type<SettingsUpdateHandler>();
+	private static final Type<SettingsUpdateHandler> TYPE = new Type<SettingsUpdateHandler>();
 
 	private final String prefix;
 	private final JSONObject jsonMap;

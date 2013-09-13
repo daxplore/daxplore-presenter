@@ -24,7 +24,7 @@ public class ClientPrefixProperties implements PrefixProperties {
 
 	private NativePrefixProperties properties;
 	
-	protected ClientPrefixProperties() {
+	private ClientPrefixProperties() {
 		properties = NativePrefixProperties.getPrefixProperties();
 	}
 	

@@ -60,20 +60,20 @@ public class EmbedView extends Composite {
 	protected final SimplePanel chartContainerPanel = new SimplePanel();
 	
 	@UiField
-	EmbedStyle style;
+	protected EmbedStyle style;
 	
-	protected final GChartChart chart;
+	private final GChartChart chart;
 	
 	/**
 	 * Fields used to figure out and adjust the size of the chart and chartPanel.
 	 */
-	protected int resizeRecursions;
-	protected int maxWidth, maxHeight;
+	private int resizeRecursions;
+	private int maxWidth, maxHeight;
 	private ScrollPanel chartScrollPanel = new ScrollPanel();
-	protected boolean scrolling = false, forceScrolling = false;
+	private boolean scrolling = false, forceScrolling = false;
 	
 	
-	interface EmbedStyle extends CssResource {
+	private interface EmbedStyle extends CssResource {
 		String transparent();
 		String opaque();
 	}
@@ -137,7 +137,7 @@ public class EmbedView extends Composite {
 	 * <p>Tries to adjust the size of the chart so that it will fit properly.
 	 * The chart will be wrapped in a scrollpanel if necessary.</p>
 	 */
-	protected void addChart() {
+	private void addChart() {
 		int width = maxWidth - chart.getExternalLegend().getOffsetWidth() - 30;
 		int height = maxHeight - chart.getExternalHeader().getOffsetHeight() - 30;
 		if (width < chart.getMinWidth()) {

@@ -35,7 +35,7 @@ import org.json.simple.JSONObject;
 
 @SuppressWarnings("serial")
 public class AdminSettingsServlet extends HttpServlet {
-	protected static Logger logger = Logger.getLogger(AdminSettingsServlet.class.getName());
+	private static Logger logger = Logger.getLogger(AdminSettingsServlet.class.getName());
 	
 	private final static String[] settings = {"gaID"};
 	

@@ -44,15 +44,15 @@ import com.google.inject.Inject;
  */
 public class PerspectiveQuestionsPanel extends FlowPanel implements HasSelectionHandlers<TreeItem> {
 
-	protected Tree perspectiveList;
+	private Tree perspectiveList;
 
 	/**
 	 * A factory for creating PerspectiveQuestions objects.
 	 */
 	public static class PerspectiveQuestionsFactory {
-		protected final QuestionMetadata questions;
-		protected final Perspectives perspectives;
-		protected final UITexts uiTexts;
+		private final QuestionMetadata questions;
+		private final Perspectives perspectives;
+		private final UITexts uiTexts;
 		private final PrefixProperties prefixProperties;
 
 		@Inject
@@ -84,7 +84,7 @@ public class PerspectiveQuestionsPanel extends FlowPanel implements HasSelection
 		return item.getQuestionID();
 	}
 	
-	protected PerspectiveQuestionsPanel(QuestionMetadata questions, Perspectives perspectives,
+	private PerspectiveQuestionsPanel(QuestionMetadata questions, Perspectives perspectives,
 			UITexts uiTexts, PrefixProperties prefixProperties) {
 		Label header = new Label(uiTexts.pickSelectionGroupHeader());
 		header.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
@@ -108,7 +108,7 @@ public class PerspectiveQuestionsPanel extends FlowPanel implements HasSelection
 		setWidth("100%");
 	}
 
-	protected void setPerspective(String questionID, boolean fireEvent) {
+	void setPerspective(String questionID, boolean fireEvent) {
 		for (int i = 0; i < perspectiveList.getItemCount(); i++) {
 			QuestionTreeItem item = (QuestionTreeItem) perspectiveList.getItem(i);
 			if (item.getQuestionID().equals(questionID)) {

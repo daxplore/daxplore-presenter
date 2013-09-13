@@ -75,7 +75,7 @@ import com.google.apphosting.api.DeadlineExceededException;
  */
 @SuppressWarnings("serial")
 public class AdminUploadServlet extends HttpServlet {
-	protected static Logger logger = Logger.getLogger(AdminUploadServlet.class.getName());
+	private static Logger logger = Logger.getLogger(AdminUploadServlet.class.getName());
 	
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) {

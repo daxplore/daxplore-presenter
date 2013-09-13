@@ -53,9 +53,9 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 	
 	private String baseUrl;
 	
-	protected HorizontalPanel mainPanel;
-	protected EmbedPopup embedPopup;
-	protected QueryDefinition queryDefinition;
+	private HorizontalPanel mainPanel;
+	private EmbedPopup embedPopup;
+	private QueryDefinition queryDefinition;
 	private PrefixProperties prefixProperties;
 	
 	private WidgetAnchor csvWidgetAnchor;
@@ -107,7 +107,7 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 		ImageButtonEvent.register(eventBus, this);
 	}
 	
-	protected String getCsvDownloadSrc() {
+	private String getCsvDownloadSrc() {
 		String fileName = queryDefinition.getPerspectiveShortText() + " - " + queryDefinition.getQuestionShortText() + ".csv";
 		fileName = URL.encodePathSegment(fileName);
 		return baseUrl + "getCsv/" + fileName
@@ -116,7 +116,7 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 				+ "&prefix=" + prefixProperties.getPrefix();
 	}
 	
-	protected void openPrintPage(){
+	private void openPrintPage(){
 		if(queryDefinition != null) {
 			String url = baseUrl + "print?q=" + queryDefinition.getAsString() + "&l=" + LocaleInfo.getCurrentLocale().getLocaleName();
 			String name = "_blank";

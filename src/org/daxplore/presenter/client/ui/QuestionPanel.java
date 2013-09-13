@@ -55,8 +55,8 @@ import com.google.web.bindery.event.shared.EventBus;
  */
 public class QuestionPanel extends Composite implements QueryUpdateHandler{
 	
-	protected final QuestionMetadata questions;
-	protected final EventBus eventBus;
+	private final QuestionMetadata questions;
+	private final EventBus eventBus;
 	
 	private Tree treeRoot;
 	private QuestionTreeItem selected;
@@ -164,7 +164,7 @@ public class QuestionPanel extends Composite implements QueryUpdateHandler{
 	/**
 	 * A handler that manages the automatic closing of groups.
 	 */
-	protected class GroupOpenHandler implements OpenHandler<TreeItem> {
+	private class GroupOpenHandler implements OpenHandler<TreeItem> {
 
 		@Override
 		public void onOpen(OpenEvent<TreeItem> event) {
@@ -187,7 +187,7 @@ public class QuestionPanel extends Composite implements QueryUpdateHandler{
 	 * A handler that manages what happens when questions are selected,
 	 * including firing events on the system's eventbus. 
 	 */
-	protected class QuestionSelectionHandler implements SelectionHandler<TreeItem> {
+	private class QuestionSelectionHandler implements SelectionHandler<TreeItem> {
 
 		GroupItem prev;
 

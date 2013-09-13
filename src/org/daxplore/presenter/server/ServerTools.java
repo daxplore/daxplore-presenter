@@ -43,7 +43,7 @@ import org.daxplore.presenter.server.throwable.InternalServerException;
  * Static helper methods used on the server.
  */
 public class ServerTools {
-	protected static Logger logger = Logger.getLogger(ServerTools.class.getName());
+	private static Logger logger = Logger.getLogger(ServerTools.class.getName());
 	
 	/**
 	 * Get the user's Internet Explorer version.

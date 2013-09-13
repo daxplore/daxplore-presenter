@@ -37,11 +37,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class UploadFileManifest {
-	protected static Logger logger = Logger.getLogger(UploadFileManifest.class.getName());
+	private static Logger logger = Logger.getLogger(UploadFileManifest.class.getName());
 	
-	protected int versionMajor, versionMinor;
-	protected List<Locale> locales = new LinkedList<Locale>();
-	protected Locale defaultLocale; 
+	private int versionMajor, versionMinor;
+	private List<Locale> locales = new LinkedList<Locale>();
+	private Locale defaultLocale; 
 	
 	public UploadFileManifest(InputStream manifestInputStream) throws InternalServerException, BadRequestException {
 		DocumentBuilder documentBuilder = null;

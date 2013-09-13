@@ -29,9 +29,9 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
  */
 public class PrefixMetadataEvent extends Event<PrefixMetadataHandler> {
 
-	protected static final Type<PrefixMetadataHandler> TYPE = new Type<PrefixMetadataHandler>();
+	private static final Type<PrefixMetadataHandler> TYPE = new Type<PrefixMetadataHandler>();
 
-	protected PrefixMetadata prefixMetadata;
+	private PrefixMetadata prefixMetadata;
 
 	/**
 	 * Instantiates a new query update event.

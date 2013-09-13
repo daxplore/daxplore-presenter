@@ -24,7 +24,7 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
 
 public class SelectPrefixEvent extends Event<SelectPrefixHandler> {
 
-	protected static final Type<SelectPrefixHandler> TYPE = new Type<SelectPrefixHandler>();
+	private static final Type<SelectPrefixHandler> TYPE = new Type<SelectPrefixHandler>();
 
 	private final String prefix;
 	

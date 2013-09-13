@@ -32,10 +32,10 @@ import com.google.gwt.user.client.ui.SimplePanel;
  */
 public class ImageButton extends Composite implements HasClickHandlers {
 	
-	protected SimplePanel mainPanel;
-	protected Image buttonImage;
+	private SimplePanel mainPanel;
+	private Image buttonImage;
 	
-	protected boolean isPressed = false;
+	private boolean isPressed = false;
 	
 	/**
 	 * Instantiates a new image button.

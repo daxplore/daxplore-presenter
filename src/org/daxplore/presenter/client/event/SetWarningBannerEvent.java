@@ -31,9 +31,9 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
  */
 public class SetWarningBannerEvent extends Event<SetWarningBannerHandler> {
 
-	protected static final Type<SetWarningBannerHandler> TYPE = new Type<SetWarningBannerHandler>();
+	private static final Type<SetWarningBannerHandler> TYPE = new Type<SetWarningBannerHandler>();
 
-	protected final WarningBanner warningBanner;
+	private final WarningBanner warningBanner;
 
 	/**
 	 * Instantiates a new warning banner event.

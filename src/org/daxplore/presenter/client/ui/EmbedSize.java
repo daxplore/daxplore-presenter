@@ -27,7 +27,7 @@ import org.daxplore.presenter.client.resources.UITexts;
 public enum EmbedSize {
 	SMALL(0), MEDIUM(1), LARGE(2);
 
-	protected int textIndex, width = Integer.MIN_VALUE,	height = Integer.MIN_VALUE;
+	private int textIndex, width = Integer.MIN_VALUE,	height = Integer.MIN_VALUE;
 
 	/**
 	 * Instantiates a new embed size.

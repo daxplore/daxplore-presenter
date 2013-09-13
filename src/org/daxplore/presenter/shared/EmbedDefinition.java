@@ -84,7 +84,7 @@ public class EmbedDefinition {
 		/**
 		 * The value of the bit-position used when encoding this flag in a long.
 		 */
-		protected final long bitValue;
+		final long bitValue;
 		
 		/**
 		 * Instantiates a new embed flag.
@@ -104,7 +104,7 @@ public class EmbedDefinition {
 		 * 				a long defining the flags
 		 * @return an array of the defined flags
 		 */
-		protected static EmbedFlag[] decodeFlags(long flaglong){
+		static EmbedFlag[] decodeFlags(long flaglong){
 			if(flaglong == 0) return new EmbedFlag[0];
 			ArrayList<EmbedFlag> flags = new ArrayList<EmbedFlag>();
 			for(EmbedFlag f: EmbedFlag.values()){
@@ -121,7 +121,7 @@ public class EmbedDefinition {
 		 *            the flags
 		 * @return a long representing the flags
 		 */
-		protected static long encodeFlags(EmbedFlag[] flags) {
+		static long encodeFlags(EmbedFlag[] flags) {
 			long flaglong = 0;
 			for(EmbedFlag f : flags){
 				flaglong = flaglong | f.bitValue;
@@ -130,7 +130,7 @@ public class EmbedDefinition {
 		}
 	}
 	
-	protected EmbedFlag[] flags;
+	private EmbedFlag[] flags;
 	
 	/**
 	 * Instantiates a new embed definition from a base64-encoded string

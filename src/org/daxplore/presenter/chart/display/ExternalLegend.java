@@ -31,7 +31,7 @@ import com.google.gwt.user.client.ui.HTML;
  * area.
  */
 public class ExternalLegend extends Composite {
-	protected HTML content;
+	private HTML content;
 
 	/**
 	 * Instantiates a new external legend.
@@ -75,7 +75,7 @@ public class ExternalLegend extends Composite {
 		initWidget(content);
 	}
 
-	protected static String legendRow(String text, String boxColorHex, boolean printerMode) {
+	private static String legendRow(String text, String boxColorHex, boolean printerMode) {
 		StringBuilder legendRow = new StringBuilder();
 		legendRow.append("<tr><td>");
 		if (printerMode) {

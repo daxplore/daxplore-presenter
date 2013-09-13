@@ -94,10 +94,10 @@ public class StatDataServerModel {
 	/**
 	 * Internal class for requesting data from server.
 	 */
-	protected class StatsRequest implements RequestCallback {
+	private class StatsRequest implements RequestCallback {
 		private QueryDefinition queryDefinition;
 		
-		protected StatsRequest(QueryDefinition queryDefinition) {
+		private StatsRequest(QueryDefinition queryDefinition) {
 			this.queryDefinition = queryDefinition;
 		}
 

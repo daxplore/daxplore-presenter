@@ -29,7 +29,7 @@ import com.google.gwt.user.client.Window.Navigator;
 public class ChartTools {
 	
 	// TODO I18n number format, right now a dot is always used
-	protected static final NumberFormat decimalFormat = NumberFormat.getFormat("0.0");
+	private static final NumberFormat decimalFormat = NumberFormat.getFormat("0.0");
 	
 	/**
 	 * Format as two digits according to the current internationalization.
@@ -60,7 +60,7 @@ public class ChartTools {
 	}
 
 	
-	protected static double ieVersion = 0.0;
+	private static double ieVersion = 0.0;
 	
 	/**
 	 * Get the user's Internet Explorer version.
@@ -77,7 +77,7 @@ public class ChartTools {
 		return (int) ieVersion;
 	}
 	
-	protected static double getInternetExplorerVersion(String useragent) {
+	static double getInternetExplorerVersion(String useragent) {
 		double rv = -1.0; // Return value assumes failure.
 		if (useragent != null) {
 			Pattern re = new Pattern("MSIE ([0-9]{1,}[.0-9]{0,})");

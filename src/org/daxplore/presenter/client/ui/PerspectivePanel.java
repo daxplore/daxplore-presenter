@@ -56,13 +56,13 @@ import com.google.web.bindery.event.shared.EventBus;
 public class PerspectivePanel extends HorizontalPanel 
 			implements QueryUpdateHandler, SelectionHandler<TreeItem>, ValueChangeHandler<Boolean> {
 
-	protected final EventBus eventBus;
-	protected final PerspectiveCheckboxPanelFactory checkPanelFactory;
-	protected final PerspectiveQuestionsFactory questionListFactory;
-	protected PerspectiveQuestionsPanel perspectiveQuestionList;
-	protected PerspectiveCheckboxPanel perspectiveCheckboxes;
-	protected SimplePanel perspectiveQuestionsContainer = new SimplePanel();
-	protected SimplePanel checkboxContainer = new SimplePanel();
+	private final EventBus eventBus;
+	private final PerspectiveCheckboxPanelFactory checkPanelFactory;
+	private final PerspectiveQuestionsFactory questionListFactory;
+	private PerspectiveQuestionsPanel perspectiveQuestionList;
+	private PerspectiveCheckboxPanel perspectiveCheckboxes;
+	private SimplePanel perspectiveQuestionsContainer = new SimplePanel();
+	private SimplePanel checkboxContainer = new SimplePanel();
 
 	@Inject
 	PerspectivePanel(QuestionMetadata questions, PerspectiveCheckboxPanelFactory checkPanelFactory,

@@ -344,7 +344,7 @@ public class BarChart extends GChartChart {
 	/**
 	 * Add mouse handlers, to keep track what bars are hovered and unhovered.
 	 */
-	protected void setupMouseHandlers() {
+	private void setupMouseHandlers() {
 		addMouseMoveHandler(new MouseMoveHandler() {
 			@Override
 			public void onMouseMove(MouseMoveEvent event) {

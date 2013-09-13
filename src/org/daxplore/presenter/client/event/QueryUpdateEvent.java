@@ -35,9 +35,9 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
  */
 public class QueryUpdateEvent extends Event<QueryUpdateHandler> {
 
-	protected static final Type<QueryUpdateHandler> TYPE = new Type<QueryUpdateHandler>();
+	private static final Type<QueryUpdateHandler> TYPE = new Type<QueryUpdateHandler>();
 
-	protected QueryDefinition queryDefinition;
+	private QueryDefinition queryDefinition;
 
 	/**
 	 * Instantiates a new query update event.

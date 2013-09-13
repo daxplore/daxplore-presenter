@@ -32,8 +32,8 @@ import org.daxplore.presenter.server.throwable.InternalServerException;
 
 @SuppressWarnings("serial")
 public class AdminPanelServlet extends HttpServlet {
-	protected static Logger logger = Logger.getLogger(AdminPanelServlet.class.getName());
-	protected static String adminHtmlTemplate = null;
+	private static Logger logger = Logger.getLogger(AdminPanelServlet.class.getName());
+	private static String adminHtmlTemplate = null;
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {

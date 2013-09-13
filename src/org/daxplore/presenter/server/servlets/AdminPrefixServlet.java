@@ -39,7 +39,7 @@ import org.json.simple.JSONObject;
 
 @SuppressWarnings("serial")
 public class AdminPrefixServlet extends HttpServlet {
-	protected static Logger logger = Logger.getLogger(AdminPrefixServlet.class.getName());
+	private static Logger logger = Logger.getLogger(AdminPrefixServlet.class.getName());
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {

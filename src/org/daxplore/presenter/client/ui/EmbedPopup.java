@@ -75,25 +75,25 @@ import com.google.web.bindery.event.shared.EventBus;
 public class EmbedPopup extends PopupPanel implements EmbedSizeHandler, QueryUpdateHandler, ImageButtonHandler,
 		MouseUpHandler, ChangeHandler, ValueChangeHandler<Boolean> {
 
-	protected EventBus eventBus;
-	protected UITexts uiTexts;
-	protected DaxploreConfig config;
+	private EventBus eventBus;
+	private UITexts uiTexts;
+	private DaxploreConfig config;
 	private PrefixProperties prefixProperties;
 
-	protected VerticalPanel mainPanel;
+	private VerticalPanel mainPanel;
 
-	protected Frame iframeSpot = new Frame();
+	private Frame iframeSpot = new Frame();
 
-	protected final TextArea linkTextArea;
-	protected String currentEmbedText = "";
+	private final TextArea linkTextArea;
+	private String currentEmbedText = "";
 
-	protected CheckBox transparencyCheckbox, legendCheckbox;
+	private CheckBox transparencyCheckbox, legendCheckbox;
 
-	protected EmbedSize currentEmbedSize = EmbedSize.MEDIUM;
+	private EmbedSize currentEmbedSize = EmbedSize.MEDIUM;
 
-	protected boolean needCodeUpdate = false;
+	private boolean needCodeUpdate = false;
 
-	protected QueryDefinition queryDefinition;
+	private QueryDefinition queryDefinition;
 
 	/**
 	 * Instantiates a new embed popup panel.
@@ -195,7 +195,7 @@ public class EmbedPopup extends PopupPanel implements EmbedSizeHandler, QueryUpd
 		updateEmbedCode();
 	}
 
-	protected void updateEmbedCode() {
+	private void updateEmbedCode() {
 		if (queryDefinition != null) {
 			int width = currentEmbedSize.getWidth(config);
 			int height = currentEmbedSize.getHeight(config);

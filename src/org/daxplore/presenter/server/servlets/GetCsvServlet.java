@@ -69,7 +69,7 @@ import au.com.bytecode.opencsv.CSVWriter;
  */
 @SuppressWarnings("serial")
 public class GetCsvServlet extends HttpServlet {
-	Logger logger = Logger.getLogger(GetCsvServlet.class.getName());
+	private Logger logger = Logger.getLogger(GetCsvServlet.class.getName());
 	private static Map<String, QuestionMetadata> metadataMap = new HashMap<>();
 	
 	@Override

@@ -44,8 +44,8 @@ public class WarningBanner extends Composite {
 	 * A factory for creating WarningBanner objects.
 	 */
 	public static class WarningBannerFactory {
-		protected final UITexts uiTexts;
-		protected final EventBus eventBus;
+		private final UITexts uiTexts;
+		private final EventBus eventBus;
 
 		/**
 		 * Instantiates a new warning banner factory.
@@ -73,7 +73,7 @@ public class WarningBanner extends Composite {
 		}
 	}
 
-	protected WarningBanner(UITexts uiTexts, final EventBus eventBus, String warningText) {
+	private WarningBanner(UITexts uiTexts, final EventBus eventBus, String warningText) {
 
 		AbsolutePanel basePanel = new AbsolutePanel();
 

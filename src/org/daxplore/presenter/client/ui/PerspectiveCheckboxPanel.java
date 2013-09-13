@@ -49,18 +49,18 @@ import com.google.inject.Inject;
 public class PerspectiveCheckboxPanel extends FlowPanel implements ValueChangeHandler<Boolean>,
 		HasValueChangeHandlers<Boolean> {
 
-	protected List<CheckBox> checkboxList = new LinkedList<CheckBox>();
-	protected CheckBox total;
-	protected final QuestionMetadata questions;
+	private List<CheckBox> checkboxList = new LinkedList<CheckBox>();
+	private CheckBox total;
+	private final QuestionMetadata questions;
 
-	protected boolean selectionChangedHandlersInitialized;
+	private boolean selectionChangedHandlersInitialized;
 	
 	/**
 	 * A factory for creating new PerspectiveCheckboxPanels.
 	 */
 	public static class PerspectiveCheckboxPanelFactory {
-		protected final QuestionMetadata questions;
-		protected final UITexts uiTexts;
+		private final QuestionMetadata questions;
+		private final UITexts uiTexts;
 
 		@Inject
 		protected PerspectiveCheckboxPanelFactory(QuestionMetadata questions, UITexts uiTexts) {
@@ -93,7 +93,7 @@ public class PerspectiveCheckboxPanel extends FlowPanel implements ValueChangeHa
 		}
 	}
 
-	protected PerspectiveCheckboxPanel(QuestionMetadata questions, UITexts uiTexts, String questionID, List<Integer> checked,
+	private PerspectiveCheckboxPanel(QuestionMetadata questions, UITexts uiTexts, String questionID, List<Integer> checked,
 			boolean checkTotal) {
 		this.questions = questions;
 
@@ -168,7 +168,7 @@ public class PerspectiveCheckboxPanel extends FlowPanel implements ValueChangeHa
 	 * 
 	 * @return number of checked boxes
 	 */
-	protected int getCheckedCount() {
+	private int getCheckedCount() {
 		int count = 0;
 		for (CheckBox c : checkboxList) {
 			if (c.getValue()) {

@@ -71,10 +71,10 @@ public class ChartPanelView extends Composite {
 	 * Fields used to figure out and adjust the size of the chart and
 	 * chartPanel.
 	 */
-	protected int resizeRecursions;
+	private int resizeRecursions;
 	protected int maxWidth, maxHeight, chartWidth, chartHeight;
 	private ScrollPanel chartScrollPanel = new ScrollPanel();
-	protected boolean scrolling = false, forceScrolling = false;
+	private boolean scrolling = false, forceScrolling = false;
 
 	@Inject
 	protected ChartPanelView(QueryActiveAnimation queryActiveAnimation, ChartConfig chartConfig) {
@@ -148,7 +148,7 @@ public class ChartPanelView extends Composite {
 	 * iterations. This is needed because the browser must draw the panel before
 	 * its size can be calculated.</p>
 	 */
-	protected void adjustSizeRecursively() {
+	private void adjustSizeRecursively() {
 		resizeRecursions = 0;
 		forceScrolling = false;
 		adjustSizeRecursivelySub();
@@ -165,7 +165,7 @@ public class ChartPanelView extends Composite {
 	 * <p>The method calls itself repeatedly until a correct size has been
 	 * found.</p>
 	 */
-	protected void adjustSizeRecursivelySub() {
+	private void adjustSizeRecursivelySub() {
 		int actualWidth = getOffsetWidth();
 		int actualHeight = chartContainerPanel.getOffsetHeight() + headerPanel.getOffsetHeight();
 		int diffWidth = maxWidth - actualWidth;

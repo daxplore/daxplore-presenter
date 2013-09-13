@@ -55,9 +55,9 @@ import com.google.web.bindery.event.shared.EventBus;
  */
 public class ChartTypeOptionsPanel extends Composite implements QueryUpdateHandler, ValueChangeHandler<Boolean> {
 
-	protected EventBus eventBus;
+	private EventBus eventBus;
 	
-	protected QueryDefinition queryDefinition;
+	private QueryDefinition queryDefinition;
 	
 	private VerticalPanel mainPanel;
 	private TitleToggleButton dontShowSecondaryButton, showSecondaryButton, useAverageButton, useMeanButton;

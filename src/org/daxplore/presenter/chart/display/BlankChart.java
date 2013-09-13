@@ -30,8 +30,8 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class BlankChart extends Composite implements Chart {
 
-	protected ChartPanelView callbackPanel;
-	protected SimplePanel mainPanel = new SimplePanel();
+	private ChartPanelView callbackPanel;
+	private SimplePanel mainPanel = new SimplePanel();
 
 	/**
 	 * Instantiates a new blank chart.

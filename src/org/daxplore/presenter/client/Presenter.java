@@ -64,13 +64,13 @@ import com.google.web.bindery.event.shared.EventBus;
 public class Presenter implements ValueChangeHandler<String>, SelectionUpdateHandler,
 SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryReadyHandler {
 
-	protected final PerspectivePanel perspectivePanel;
-	protected final QuestionPanel questionPanel;
-	protected final ChartTypeOptionsPanel optionsPanel;
-	protected final ChartPanelPresenter chartPanelPresenter;
-	protected QuestionMetadata questionMetadata;
-	protected final EventBus eventBus;
-	protected DaxploreConfig config;
+	private final PerspectivePanel perspectivePanel;
+	private final QuestionPanel questionPanel;
+	private final ChartTypeOptionsPanel optionsPanel;
+	private final ChartPanelPresenter chartPanelPresenter;
+	private QuestionMetadata questionMetadata;
+	private final EventBus eventBus;
+	private DaxploreConfig config;
 	private StatDataServerModel statDataServerModel;
 	private PrefixProperties prefixProperties;
 
@@ -211,9 +211,9 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		removeWarningBanner();
 	}
 
-	protected WarningBanner currentWarning = null;
+	private WarningBanner currentWarning = null;
 
-	protected void setWarningBanner(WarningBanner warning) {
+	private void setWarningBanner(WarningBanner warning) {
 		RootPanel warningSection = RootPanel.get("ID-general-warning");
 		if (currentWarning != null) {
 			warningSection.remove(currentWarning);
@@ -222,7 +222,7 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		warningSection.add(warning);
 	}
 
-	protected void removeWarningBanner() {
+	private void removeWarningBanner() {
 		RootPanel warningSection = RootPanel.get("ID-general-warning");
 		if (currentWarning != null) {
 			warningSection.remove(currentWarning);

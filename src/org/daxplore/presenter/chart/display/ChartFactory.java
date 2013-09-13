@@ -29,9 +29,9 @@ import com.google.inject.Inject;
  * A factory for creating Chart objects.
  */
 public class ChartFactory {
-	protected final ChartTexts chartTexts;
-	protected final ChartConfig chartConfig;
-	protected final PrefixProperties prefixProperties;
+	private final ChartTexts chartTexts;
+	private final ChartConfig chartConfig;
+	private final PrefixProperties prefixProperties;
 
 	/**
 	 * Instantiates a new chart factory.

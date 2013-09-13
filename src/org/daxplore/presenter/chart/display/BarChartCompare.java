@@ -140,7 +140,7 @@ public class BarChartCompare extends BarChart {
 	 * @param bar
 	 *            The bar to be stored in the chart
 	 */
-	protected void addSecondaryBar(BarChartBarSecondary bar) {
+	private void addSecondaryBar(BarChartBarSecondary bar) {
 		barListSecondary.add(bar);
 	}
 
@@ -156,7 +156,7 @@ public class BarChartCompare extends BarChart {
 	 * 
 	 * @see getBarSecondary
 	 */
-	protected ChartBar getBarSecondary(int index) {
+	private ChartBar getBarSecondary(int index) {
 		return barListSecondary.get(index);
 	}
 

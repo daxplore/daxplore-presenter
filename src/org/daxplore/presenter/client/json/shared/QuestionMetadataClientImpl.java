@@ -54,7 +54,7 @@ public class QuestionMetadataClientImpl implements QuestionMetadata {
 		}
 	}
 
-	protected QuestionJson getQuestion(String questionID) {
+	private QuestionJson getQuestion(String questionID) {
 		return questionMap.get(questionID);
 	}
 

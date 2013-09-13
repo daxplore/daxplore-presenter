@@ -36,9 +36,9 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
  */
 public class EmbedSizeEvent extends Event<EmbedSizeHandler> {
 
-	protected static final Type<EmbedSizeHandler> TYPE = new Type<EmbedSizeHandler>();
+	private static final Type<EmbedSizeHandler> TYPE = new Type<EmbedSizeHandler>();
 
-	protected EmbedSize embedSize;
+	private EmbedSize embedSize;
 
 	/**
 	 * Instantiates a new embed size event.

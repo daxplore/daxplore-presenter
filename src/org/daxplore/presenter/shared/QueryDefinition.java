@@ -56,7 +56,8 @@ import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
  * embedded charts should be displayed.</p>
  */
 public class QueryDefinition {
-
+	//TODO modify JUnit tests to allow us to change protected/default fields to private
+	
 	/**
 	 * The Enum QueryFlag.
 	 */

@@ -39,7 +39,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
  */
 public class ButtonWithPopup extends Composite implements HasClickHandlers {
 
-	protected HasClickHandlers button;
+	private HasClickHandlers button;
 
 	/**
 	 * Instantiates a new button with a popup panel.

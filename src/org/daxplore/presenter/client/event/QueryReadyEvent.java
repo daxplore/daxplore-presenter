@@ -32,7 +32,7 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
  */
 public class QueryReadyEvent extends Event<QueryReadyHandler> {
 
-	protected static final Type<QueryReadyHandler> TYPE = new Type<QueryReadyHandler>();
+	private static final Type<QueryReadyHandler> TYPE = new Type<QueryReadyHandler>();
 
 	private final QueryDefinition queryDefinition;
 	private final QueryData queryData;

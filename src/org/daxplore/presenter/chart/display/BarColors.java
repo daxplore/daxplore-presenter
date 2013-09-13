@@ -32,22 +32,22 @@ class BarColors {
 	/**
 	 * The generated CSS strings for the primary colors.
 	 */
-	protected final String primary, primaryHover, primaryDeviation;
+	private final String primary, primaryHover, primaryDeviation;
 
 	/**
 	 * The generated CSS strings for the secondary colors.
 	 */
-	protected final String secondary, secondaryHover, secondaryDeviation;
+	private final String secondary, secondaryHover, secondaryDeviation;
 
 	/**
 	 * The generated CSS string used for the mouseover annotation.
 	 */
-	protected final String annotation;
+	private final String annotation;
 
 	/**
 	 * Defines the default chart color set.
 	 */
-	protected static final BarColors[] chartColorSet = {
+	private static final BarColors[] chartColorSet = {
 		new BarColors(95.0),
 		new BarColors(200.0),
 		new BarColors(240.0, 0.0, 0.03),

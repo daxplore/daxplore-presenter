@@ -45,7 +45,7 @@ import org.daxplore.presenter.server.throwable.InternalServerException;
  */
 @SuppressWarnings("serial")
 public class GetPixelServlet extends HttpServlet {
-	protected static Logger logger = Logger.getLogger(GetPixelServlet.class.getName());
+	private static Logger logger = Logger.getLogger(GetPixelServlet.class.getName());
 	
 	private final int CACHE_DURATION_IN_SECOND = 60 * 60 * 24 * 14; // 14 days
 	private final long CACHE_DURATION_IN_MS = CACHE_DURATION_IN_SECOND * 1000;

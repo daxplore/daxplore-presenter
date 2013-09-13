@@ -42,14 +42,14 @@ public abstract class QueryResult {
 	/**
 	 * A list containing all the standard data items.
 	 */
-	protected LinkedList<StatInterface> itemList;
+	private LinkedList<StatInterface> itemList;
 
 	/**
 	 * If there is a total data item, it is stored here.
 	 * 
 	 * The total data item contains the total of all groups.
 	 */
-	protected StatInterface totalItem;
+	private StatInterface totalItem;
 
 	/**
 	 * Build a new result item.
