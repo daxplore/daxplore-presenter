@@ -236,15 +236,10 @@ public class QueryDefinition {
 	}
 	
 	/**
-	 * Get the query definition as a Base64 encoded string that can be
-	 * sent put in the URL or sent between client and server.
-	 * 
-	 * <p>Use in the {@link #QueryDefinition(QuestionMetadata, String)}
-	 * constructor to create a new identical query definition instance.</p>
-	 * 
-	 * @return a string representation of the query
+	 * Generate a serialized version of the query
+	 * @return The query as a string
 	 */
-	public String getAsString(){
+	private String serialize() {
 		ArrayList<String> out = new ArrayList<String>();
 		
 		if (questionID != null && !questionID.equals("")) {
@@ -267,7 +262,31 @@ public class QueryDefinition {
 			out.add("f=" + QueryFlag.encodeFlags(flags));
 		}
 		
-		return Base64.encodeString(SharedTools.join(out, "&"));
+		return SharedTools.join(out, "&");
+	}
+	
+	/**
+	 * Get the query definition as a Base64 encoded string that can be
+	 * sent put in the URL or sent between client and server.
+	 * 
+	 * <p>Use in the {@link #QueryDefinition(QuestionMetadata, String)}
+	 * constructor to create a new identical query definition instance.</p>
+	 * 
+	 * @return a string representation of the query
+	 */
+	public String getAsString() {
+		return Base64.encodeString(serialize());
+	}
+	
+	/**
+	 * Get the query definition as a human-readable string,
+	 * including the encoded version.
+	 * 
+	 * @return The query definition as a human-readable string
+	 */
+	public String getAsHumanString(String prefix) {
+		String query = serialize();
+		return query + " (" + prefix + "#" + getAsString() + ")";
 	}
 
 	/**

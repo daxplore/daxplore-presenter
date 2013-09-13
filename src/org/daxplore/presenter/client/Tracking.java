@@ -18,57 +18,29 @@
  */
 package org.daxplore.presenter.client;
 
-import org.daxplore.presenter.shared.SharedTools;
-
 public final class Tracking {
 
 	/**
-	 * Track an event.
+	 * Send a user action event to Google Analytics.
 	 * 
-	 * <p>Normally triggered by the user viewing a new chart.</p>
-	 * 
-	 * @param googleAnalyticsID
-	 *            The GoogleAnalyticsID the tracking data is sent to
-	 * @param historyToken
-	 *            The text token that is sent to the server
+	 * @param category The event category
+	 * @param action The event action
 	 */
-	public static void track(String googleAnalyticsID, String prefix, String historyToken) {
-
-		if (historyToken == null) {
-			historyToken = "historyToken_null";
+	public final static native void googleAnalyticsEvent(String category, String action) /*-{
+		if(typeof($wnd.ga) != 'undefined') {
+	    	$wnd.ga('send', 'event', category, action);
 		}
-
-		historyToken = "/" + prefix + "#" + historyToken;
-
-		trackGoogleAnalytics(googleAnalyticsID, historyToken);
-		SharedTools.println("Tracking: " + historyToken);
-	}
-
+	}-*/;
+	
 	/**
-	 * trigger google analytic native js - included in the build CHECK -
-	 * DemoGoogleAnalytics.gwt.xml for -> &lt;script src="../ga.js"\&gt;
+	 * Send a message that will be received by pages that contain an iframe
+	 * with this GWT app.
 	 * 
-	 * <p>See: <a href=http://code.google.com/intl/en-US/apis/analytics/docs/gaJS/
-	 * gaJSApiEventTracking.html>http://code.google.com/intl/en-US/apis/analytics/docs/gaJS/
-	 * gaJSApiEventTracking.html</a></p>
-	 * 
+	 * <p>This can, for example, allow the outer page to update the window url.</p>
 	 * @param historyToken
 	 */
-	public static native void trackGoogleAnalytics(String googleAnalyticsID, String historyToken) /*-{
-		try {
-			// setup tracking object with account
-			var pageTracker = $wnd._gat._createTracker(googleAnalyticsID);
-
-			// turn on anchor observing
-			pageTracker._setAllowAnchor(true)
-
-			// send event to google server
-			pageTracker._trackPageview(historyToken);
-			//alert("Track " + historyToken);
-		} catch (err) {
-			// debug
-			//alert('FAILURE: to send in event to google analytics: ' + err);
-		}
+	public final static native void iFrame(String historyToken) /*-{
+	    $wnd.parent.postMessage(historyToken, '*');
 	}-*/;
 
 }

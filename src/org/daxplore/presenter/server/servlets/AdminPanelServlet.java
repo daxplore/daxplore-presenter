@@ -49,9 +49,14 @@ public class AdminPanelServlet extends HttpServlet {
 					}
 				}
 				
+				String baseurl = request.getRequestURL().toString();
+				baseurl = baseurl.substring(0, baseurl.lastIndexOf("/"));
+				baseurl = baseurl.substring(0, baseurl.lastIndexOf("/")+1);
+				
 				String[] arguments = {
 						locale.toLanguageTag(), // {0}
 						pageTitle,				// {1}
+						baseurl					// {2}
 						};
 				
 			try {

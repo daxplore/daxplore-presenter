@@ -51,7 +51,7 @@ public class AdminPrefixServlet extends HttpServlet {
 		PersistenceManager pm = null;
 		try {
 			pm = PMF.get().getPersistenceManager();
-			String responseText = ""; 
+			String responseText = "";
 			String action = request.getParameter("action");
 			if(action==null) {
 				throw new BadRequestException("No action requested");

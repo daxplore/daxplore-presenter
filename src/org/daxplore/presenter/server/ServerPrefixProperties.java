@@ -22,15 +22,14 @@ import org.json.simple.JSONObject;
 
 public class ServerPrefixProperties implements PrefixProperties {
 
-	private String prefix, secondaryFlagText, timepoint0Text, timepoint1Text, googleAnalyticsID;
+	private String prefix, secondaryFlagText, timepoint0Text, timepoint1Text;
 	
 	public ServerPrefixProperties(String prefix, String secondaryFlagText,
-			String timepoint0Text, String timepoint1Text, String googleAnalyticsID) {
+			String timepoint0Text, String timepoint1Text) {
 		this.prefix = prefix;
 		this.secondaryFlagText = secondaryFlagText;
 		this.timepoint0Text = timepoint0Text;
 		this.timepoint1Text = timepoint1Text;
-		this.googleAnalyticsID = googleAnalyticsID;
 	}
 
 	/**
@@ -65,15 +64,6 @@ public class ServerPrefixProperties implements PrefixProperties {
 		return timepoint1Text;
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getGoogleAnalyticsID() {
-		return googleAnalyticsID;
-	}
-	
-
 	@SuppressWarnings("unchecked")
 	public JSONAware toJson() {
 		JSONObject obj = new JSONObject();
@@ -81,7 +71,6 @@ public class ServerPrefixProperties implements PrefixProperties {
 		obj.put("secondary_flag", secondaryFlagText);
 		obj.put("timepoint_0", timepoint0Text);
 		obj.put("timepoint_1", timepoint1Text);
-		obj.put("gaID", googleAnalyticsID);
 		return obj;
 	}
 
