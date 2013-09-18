@@ -32,7 +32,7 @@ import org.daxplore.presenter.server.throwable.InternalServerException;
 
 @SuppressWarnings("serial")
 public class AdminPanelServlet extends HttpServlet {
-	private static Logger logger = Logger.getLogger(AdminPanelServlet.class.getName());
+	private static final Logger logger = Logger.getLogger(AdminPanelServlet.class.getName());
 	private static String adminHtmlTemplate = null;
 	
 	@Override
@@ -58,8 +58,7 @@ public class AdminPanelServlet extends HttpServlet {
 						baseurl					// {2}
 						};
 				
-			try {
-				Writer writer = response.getWriter();
+			try (Writer writer = response.getWriter()) {
 				writer.write(MessageFormat.format(adminHtmlTemplate, (Object[])arguments));
 				writer.close();
 			} catch (IOException e) {

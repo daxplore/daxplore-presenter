@@ -67,7 +67,6 @@ public class DeleteData {
 		query = pm.newQuery(TextFileStore.class);
 		query.declareParameters("String specificPrefix");
 		query.setFilter("prefix == specificPrefix");
-		@SuppressWarnings("unchecked")
 		List<TextFileStore> fileItems = (List<TextFileStore>)query.execute(prefix);
 		pm.deletePersistentAll(fileItems);
 		int deletedBlobs = fileItems.size();

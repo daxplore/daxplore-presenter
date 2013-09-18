@@ -18,8 +18,6 @@
  */
 package org.daxplore.presenter.chart.display;
 
-import org.daxplore.presenter.chart.ChartPanelView;
-
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -30,7 +28,6 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class BlankChart extends Composite implements Chart {
 
-	private ChartPanelView callbackPanel;
 	private SimplePanel mainPanel = new SimplePanel();
 
 	/**

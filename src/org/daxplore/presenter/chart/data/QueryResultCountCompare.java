@@ -91,11 +91,7 @@ public class QueryResultCountCompare extends QueryResultCount {
 	 * @return The secondary count data for the group.
 	 */
 	public int[] getCountDataSecondary(int perspectiveOption) {
-		StatInterface item = getItem(perspectiveOption);
-		if (item != null) {
-			return item.getCountDataSecondary();
-		}
-		throw new Error("No such perspective option: " + perspectiveOption);
+		return getItem(perspectiveOption).getCountDataSecondary();
 	}
 
 	/**
@@ -113,11 +109,7 @@ public class QueryResultCountCompare extends QueryResultCount {
 	 * @return The secondary percentage count data for the group.
 	 */
 	public double[] getCountDataPercentagesSecondary(int perspectiveOption) {
-		StatInterface item = getItem(perspectiveOption);
-		if (item != null) {
-			return item.getCountDataPercentagesSecondary();
-		}
-		throw new Error("No such perspective option: " + perspectiveOption);
+		return getItem(perspectiveOption).getCountDataPercentagesSecondary();
 	}
 
 	/**
@@ -129,11 +121,7 @@ public class QueryResultCountCompare extends QueryResultCount {
 	 * @return The number of subjects in this secondary group.
 	 */
 	public int getPopulationSecondary(int perspectiveOption) {
-		StatInterface item = getItem(perspectiveOption);
-		if (item != null) {
-			return item.getPopulationCountSecondary();
-		}
-		throw new Error("No such perspective option: " + perspectiveOption);
+		return getItem(perspectiveOption).getPopulationCountSecondary();
 	}
 
 	/*

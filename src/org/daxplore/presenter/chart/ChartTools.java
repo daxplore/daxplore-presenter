@@ -41,10 +41,9 @@ public class ChartTools {
 	public static String formatAsTwoDigits(double number) {
 		if (-10 < number && number < 10) {
 			return decimalFormat.format(number);
-		} else {
-			long i = Math.round(number);
-			return Long.toString(i);
 		}
+		long i = Math.round(number);
+		return Long.toString(i);
 	}
 
 	/**

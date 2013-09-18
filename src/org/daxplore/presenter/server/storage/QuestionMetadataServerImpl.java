@@ -42,7 +42,7 @@ import org.json.simple.parser.ParseException;
  * as well as "perspectives". This is because they are all originally questions
  * in a survey.</p>
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"rawtypes"})
 public class QuestionMetadataServerImpl implements QuestionMetadata {
 	
 	List<JSONObject> questionList;
@@ -59,11 +59,13 @@ public class QuestionMetadataServerImpl implements QuestionMetadata {
 		JSONParser parser = new JSONParser();
 		
 	  ContainerFactory containerFactory = new ContainerFactory(){
-		    public List creatArrayContainer() {
+		    @Override
+			public List creatArrayContainer() {
 		      return new LinkedList();
 		    }
 
-		    public Map createObjectContainer() {
+		    @Override
+			public Map createObjectContainer() {
 		      return null;
 		    }
 		  };
@@ -116,7 +118,7 @@ public class QuestionMetadataServerImpl implements QuestionMetadata {
 	@Override
 	public List<String> getOptionTexts(String column) {
 		JSONObject question = getQuestion(column);
-		List<String> options = new LinkedList<String>();
+		List<String> options = new LinkedList<>();
 		List opts = (List) question.get("options");
 
 		Iterator iter = opts.iterator();

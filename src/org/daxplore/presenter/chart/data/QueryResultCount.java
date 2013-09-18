@@ -83,11 +83,7 @@ public class QueryResultCount extends QueryResult {
 	 * @return The count data for the group.
 	 */
 	public int[] getCountData(int perspectiveOption) {
-		StatInterface item = getItem(perspectiveOption);
-		if (item != null) {
-			return item.getCountData();
-		}
-		throw new Error("No such perspective option " + perspectiveOption);
+		return getItem(perspectiveOption).getCountData();
 	}
 
 	/**
@@ -105,11 +101,7 @@ public class QueryResultCount extends QueryResult {
 	 * @return The percentage count data for the group.
 	 */
 	public double[] getCountDataPercentages(int perspectiveOption) {
-		StatInterface item = getItem(perspectiveOption);
-		if (item != null) {
-			return item.getCountDataPercentages();
-		}
-		throw new Error("No such perspective option: " + perspectiveOption);
+		return getItem(perspectiveOption).getCountDataPercentages();
 	}
 
 	/**
@@ -125,7 +117,7 @@ public class QueryResultCount extends QueryResult {
 		if (item != null) {
 			return item.getPopulationCount();
 		}
-		throw new Error("No such perspective option");
+		throw new RuntimeException("No such perspective option");
 	}
 
 	/*
@@ -147,7 +139,7 @@ public class QueryResultCount extends QueryResult {
 		if (totalItem != null) {
 			return totalItem.getCountData();
 		}
-		throw new Error("No data exists");
+		throw new RuntimeException("No data exists");
 	}
 
 	/**
@@ -166,7 +158,7 @@ public class QueryResultCount extends QueryResult {
 		if (totalItem != null) {
 			return totalItem.getCountDataPercentages();
 		}
-		throw new Error("No data exists");
+		throw new RuntimeException("No data exists");
 	}
 
 	/**
@@ -179,6 +171,6 @@ public class QueryResultCount extends QueryResult {
 		if (totalItem != null) {
 			return totalItem.getPopulationCount();
 		}
-		throw new Error("No data exists");
+		throw new RuntimeException("No data exists");
 	}
 }

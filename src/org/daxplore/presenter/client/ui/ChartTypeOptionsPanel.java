@@ -183,7 +183,7 @@ public class ChartTypeOptionsPanel extends Composite implements QueryUpdateHandl
 	/**
 	 * A ToggleButton with a title text that is dependent on its Enabled state.
 	 */
-	private class TitleToggleButton extends ToggleButton {
+	private static class TitleToggleButton extends ToggleButton {
 		private String titleEnabled, titleDisabled;
 
 		public TitleToggleButton(String text, String titleEnabled, String titleDisabled) {

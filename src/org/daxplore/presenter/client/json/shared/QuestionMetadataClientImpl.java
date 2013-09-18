@@ -72,7 +72,7 @@ public class QuestionMetadataClientImpl implements QuestionMetadata {
 	@Override
 	public String getFullText(String questionID) {
 		return getQuestion(questionID).getFullText();
-	};
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -80,7 +80,7 @@ public class QuestionMetadataClientImpl implements QuestionMetadata {
 	@Override
 	public String getShortText(String questionID) {
 		return getQuestion(questionID).getShortText();
-	};
+	}
 
 	/**
 	 * {@inheritDoc}

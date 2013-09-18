@@ -23,7 +23,7 @@ public class StatDataItemGWT implements StatInterface {
 	private int[] primaryData, secondaryData;
 	private int perspectiveOption;
 	
-	public StatDataItemGWT(int[] primaryData, int[] secondaryData, int perspectiveOption, boolean isTotalItem) {
+	public StatDataItemGWT(int[] primaryData, int[] secondaryData, int perspectiveOption) {
 		this.primaryData = primaryData;
 		this.secondaryData = secondaryData;
 		this.perspectiveOption = perspectiveOption;

@@ -41,12 +41,13 @@ public class SharedResourceTools {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public static Schema getUploadFileManifestSchema() throws SAXException, IOException {
-		InputStream stream = SharedResourceTools.class.getResourceAsStream("UploadFileManifest.xsd");
-		SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-		Schema schema = sf.newSchema(new StreamSource(stream));
-		stream.close();
-		return schema;
+	public static Schema getUploadFileManifestSchema() throws IOException, SAXException  {
+		try (InputStream stream = SharedResourceTools.class.getResourceAsStream("UploadFileManifest.xsd")) {
+			SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+			Schema schema = sf.newSchema(new StreamSource(stream));
+			stream.close();
+			return schema;
+		}
 	}
 
 	private static String[] expectedFiles = {

@@ -21,7 +21,6 @@ package org.daxplore.presenter.client.ui;
 import org.daxplore.presenter.chart.ChartPanelPresenter;
 import org.daxplore.presenter.chart.ChartPanelView;
 import org.daxplore.presenter.client.resources.DaxploreConfig;
-import org.daxplore.presenter.client.resources.UIResources;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
@@ -42,7 +41,7 @@ import com.google.inject.Inject;
  * it's sub-widgets if the window is resized.</p>
  */
 public class StagePanel extends Composite implements ResizeHandler {
-	interface StageUiBinder extends UiBinder<Widget, StagePanel> {}
+	interface StageUiBinder extends UiBinder<Widget, StagePanel> {/* Empty UiTemplate interface */}
 	private static StageUiBinder uiBinder = GWT.create(StageUiBinder.class);
 
 	@UiField(provided = true)
@@ -57,8 +56,8 @@ public class StagePanel extends Composite implements ResizeHandler {
 	protected int minWidth;
 	
 	@Inject
-	protected StagePanel(PerspectivePanel perspectivePanel, QuestionPanel questionPanel, ChartPanelPresenter chartPanelPresenter,
-			UIResources uiResources, DaxploreConfig config) {
+	protected StagePanel(PerspectivePanel perspectivePanel, QuestionPanel questionPanel,
+			ChartPanelPresenter chartPanelPresenter, DaxploreConfig config) {
 		this.perspectivePanel = perspectivePanel;
 		this.questionPanel = questionPanel;
 		this.chartPanel = chartPanelPresenter.getView();

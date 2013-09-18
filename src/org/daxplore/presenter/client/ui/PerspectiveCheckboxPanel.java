@@ -51,9 +51,6 @@ public class PerspectiveCheckboxPanel extends FlowPanel implements ValueChangeHa
 
 	private List<CheckBox> checkboxList = new LinkedList<CheckBox>();
 	private CheckBox total;
-	private final QuestionMetadata questions;
-
-	private boolean selectionChangedHandlersInitialized;
 	
 	/**
 	 * A factory for creating new PerspectiveCheckboxPanels.
@@ -95,7 +92,6 @@ public class PerspectiveCheckboxPanel extends FlowPanel implements ValueChangeHa
 
 	private PerspectiveCheckboxPanel(QuestionMetadata questions, UITexts uiTexts, String questionID, List<Integer> checked,
 			boolean checkTotal) {
-		this.questions = questions;
 
 		Label header = new Label(uiTexts.pickSelectionAlternativesHeader());
 		header.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
@@ -144,7 +140,7 @@ public class PerspectiveCheckboxPanel extends FlowPanel implements ValueChangeHa
 		for (CheckBox c : checkboxList) {
 			if (c.getValue()) {
 				try {
-					altList.add(java.lang.Integer.parseInt(c.getFormValue()));
+					altList.add(Integer.parseInt(c.getFormValue()));
 				} catch (NumberFormatException e) {
 					e.printStackTrace();
 				}
@@ -161,24 +157,6 @@ public class PerspectiveCheckboxPanel extends FlowPanel implements ValueChangeHa
 	 */
 	public boolean isTotalSet() {
 		return total.getValue();
-	}
-
-	/**
-	 * Get the number of checkboxes that are set.
-	 * 
-	 * @return number of checked boxes
-	 */
-	private int getCheckedCount() {
-		int count = 0;
-		for (CheckBox c : checkboxList) {
-			if (c.getValue()) {
-				count++;
-			}
-		}
-		if (total.getValue()) {
-			count++;
-		}
-		return count;
 	}
 
 	/**

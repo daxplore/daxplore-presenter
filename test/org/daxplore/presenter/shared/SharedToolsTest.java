@@ -44,10 +44,11 @@ public class SharedToolsTest {
 	
 	@Test
 	public void testJoinGenericArray() {
-		Object[] join = {new Integer(3), new Double(1.1), "foo", new Object() {
+		Object[] join = {Integer.valueOf(3), Double.valueOf(1.1), "foo", new Object() {
+			@Override
 			public String toString() {
 				return "bar";
-			};
+			}
 		}};
 		assertEquals(3+" "+1.1+" foo bar", SharedTools.join(join, " "));
 	}
@@ -59,9 +60,10 @@ public class SharedToolsTest {
 		join.add(1.1);
 		join.add("foo");
 		join.add(new Object() {
+			@Override
 			public String toString() {
 				return "BAR!";
-			};
+			}
 		});
 		assertEquals(3+" ! "+1.1+" ! foo ! BAR!", SharedTools.join(join, " ! "));
 	}

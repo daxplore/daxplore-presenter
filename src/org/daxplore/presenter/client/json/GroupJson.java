@@ -33,7 +33,7 @@ import com.google.gwt.core.client.JsArrayString;
  */
 class GroupJson extends JavaScriptObject {
 	protected GroupJson() {
-	};
+	}
 
 	/**
 	 * Get the group name.

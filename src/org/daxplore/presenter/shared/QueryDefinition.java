@@ -84,7 +84,7 @@ public class QueryDefinition {
 		/**
 		 * The value of the bit-position used when encoding this flag in a long.
 		 */
-		protected final long bitValue;
+		private final long bitValue;
 		
 		/**
 		 * Instantiates a new query flag.
@@ -110,7 +110,7 @@ public class QueryDefinition {
 			for(QueryFlag f: QueryFlag.values()){
 				if((flaglong & f.bitValue) != 0) flags.add(f);
 			}
-			return flags.toArray(new QueryFlag[0]);
+			return flags.toArray(new QueryFlag[flags.size()]);
 		}
 		
 		/**
@@ -159,7 +159,7 @@ public class QueryDefinition {
 		this.questionID = questionID;
 		this.usedPerspectiveOptions = usedPerspectiveOptions;
 		this.questionMetadata = questionMetadata;
-		this.flags = flags.toArray(new QueryFlag[0]);
+		this.flags = flags.toArray(new QueryFlag[flags.size()]);
 		
 		if (questionID == null || !questionMetadata.hasQuestion(questionID)) {
 			throw new IllegalArgumentException("Illegal questionID: " + questionID);
@@ -190,7 +190,7 @@ public class QueryDefinition {
 	 */
 	public QueryDefinition(QuestionMetadata questionMetadata, String restoreString)
 			throws IllegalArgumentException {
-		if(restoreString == null || restoreString == "") {throw new IllegalArgumentException("No string to restore from");}
+		if(restoreString == null || restoreString.isEmpty()) {throw new IllegalArgumentException("No string to restore from");}
 		this.questionMetadata = questionMetadata;
 		LinkedHashMap<String, String> tokens = SharedTools.parseTokens(Base64.decodeString(restoreString));
 		usedPerspectiveOptions = new LinkedList<Integer>();

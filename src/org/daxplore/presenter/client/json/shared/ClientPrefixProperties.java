@@ -19,12 +19,14 @@ package org.daxplore.presenter.client.json.shared;
 import org.daxplore.presenter.shared.PrefixProperties;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.inject.Inject;
 
 public class ClientPrefixProperties implements PrefixProperties {
 
 	private NativePrefixProperties properties;
 	
-	private ClientPrefixProperties() {
+	@Inject
+	protected ClientPrefixProperties() {
 		properties = NativePrefixProperties.getPrefixProperties();
 	}
 	

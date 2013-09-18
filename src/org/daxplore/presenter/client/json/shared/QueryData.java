@@ -102,7 +102,7 @@ public class QueryData extends JavaScriptObject {
 			if(timepoints.length==2) { //TODO invalid assumptions about timepoints
 				secondaryData = JsonTools.jsArrayAsArray(getData(timepoints[1], Integer.toString(i)));
 			}
-			list.add(new StatDataItemGWT(primaryData, secondaryData, i, false));
+			list.add(new StatDataItemGWT(primaryData, secondaryData, i));
 		}
 		
 		return list;
@@ -115,6 +115,6 @@ public class QueryData extends JavaScriptObject {
 		if(timepoints.length==2) { //TODO invalid assumptions about timepoints
 			secondaryData = JsonTools.jsArrayAsArray(getData(timepoints[1], "all"));
 		}
-		return new StatDataItemGWT(primaryData, secondaryData, -1, true);
+		return new StatDataItemGWT(primaryData, secondaryData, -1);
 	}
 }

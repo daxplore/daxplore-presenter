@@ -26,7 +26,6 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipInputStream;
@@ -43,7 +42,6 @@ import org.daxplore.presenter.server.throwable.InternalServerException;
  * Static helper methods used on the server.
  */
 public class ServerTools {
-	private static Logger logger = Logger.getLogger(ServerTools.class.getName());
 	
 	/**
 	 * Get the user's Internet Explorer version.
@@ -148,8 +146,7 @@ public class ServerTools {
 		// Get locale data from request
 		Cookie[] cookies = request.getCookies();
 		String queryLocale = request.getParameter("l");
-		@SuppressWarnings("unchecked")
-		Enumeration<Locale> locales = (Enumeration<Locale>)request.getLocales();
+		Enumeration<Locale> locales = request.getLocales();
 
 		
 		// Set up supported locales:
@@ -159,7 +156,7 @@ public class ServerTools {
 		pm.close();
 		
 		//Build a queue of desired locales, enqueue the most desired ones first
-		List<Locale> desiredLocales = new LinkedList<Locale>();
+		List<Locale> desiredLocales = new LinkedList<>();
 		
 		// 1. Add browser request string locale
 		if(queryLocale!=null) {

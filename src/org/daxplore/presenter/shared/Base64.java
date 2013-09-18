@@ -72,7 +72,11 @@ public class Base64 {
 	 * @return A String containing the Base64 encoded data.
 	 */
 	public static String encodeString(String s) {
-		return new String(encode(s.getBytes()));
+		try {
+			return new String(encode(s.getBytes("UTF-8")));
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException("UTF-8 not supported");
+		}
 	}
 
 	/**
@@ -253,23 +257,24 @@ public class Base64 {
 	 * 
 	 * @param in
 	 *            A character array containing the Base64 encoded data.
-	 * @param iOff
+	 * @param inOffset
 	 *            Offset of the first character in <code>in</code> to be
 	 *            processed.
-	 * @param iLen
+	 * @param inLength
 	 *            Number of characters to process in <code>in</code>, starting
 	 *            at <code>iOff</code>.
 	 * @return An array containing the decoded data bytes.
 	 */
-	public static byte[] decode(char[] in, int iOff, int iLen) {
+	public static byte[] decode(char[] in, int inOffset, int inLength) {
+		int iLen = inLength;
 		if (iLen % 4 != 0)
 			throw new IllegalArgumentException("Length of Base64 encoded input string is not a multiple of 4.");
-		while (iLen > 0 && in[iOff + iLen - 1] == '=')
+		while (iLen > 0 && in[inOffset + iLen - 1] == '=')
 			iLen--;
 		int oLen = (iLen * 3) / 4;
 		byte[] out = new byte[oLen];
-		int ip = iOff;
-		int iEnd = iOff + iLen;
+		int ip = inOffset;
+		int iEnd = inOffset + iLen;
 		int op = 0;
 		while (ip < iEnd) {
 			int i0 = in[ip++];
@@ -306,10 +311,11 @@ public class Base64 {
 	 * @return A String containing the Base64 encoded data.
 	 */
 	public static String encodeLong(long in) {
-		byte[] result = new byte[8 - Long.numberOfLeadingZeros(in) / 8];
+		long remainingBits = in;
+		byte[] result = new byte[8 - Long.numberOfLeadingZeros(remainingBits) / 8];
 		for (int i = result.length - 1; i >= 0; i--) {
-			result[i] = (byte) in;
-			in >>= 8;
+			result[i] = (byte) remainingBits;
+			remainingBits >>= 8;
 		}
 		return new String(encode(result));
 	}

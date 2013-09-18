@@ -87,28 +87,23 @@ public class AdminUploadServlet extends HttpServlet {
 		    ServletFileUpload upload = new ServletFileUpload();
 		    PersistenceManager pm = null;
 		    String prefix = null;
-		    PrintWriter resWriter = null;
 		    try {
-		    	try {
-		    		resWriter = response.getWriter();
-		    	} catch (IOException e1) {
-		    		throw new InternalServerException(e1);
-		    	}
 				FileItemIterator fileIterator = upload.getItemIterator(request);
 				String fileName = "";
 				byte[] fileData = null;
 				while(fileIterator.hasNext()) {
 					FileItemStream item = fileIterator.next();
-					InputStream stream = item.openStream();
-					if(item.isFormField()) {
-						if(item.getFieldName().equals("prefix")) {
-							prefix = Streams.asString(stream);
+					try (InputStream stream = item.openStream()) {
+						if(item.isFormField()) {
+							if(item.getFieldName().equals("prefix")) {
+								prefix = Streams.asString(stream);
+							} else {
+								throw new BadRequestException("Form contains extra fields");
+							}
 						} else {
-							throw new BadRequestException("Form contains extra fields");
+							fileName = item.getName();
+							fileData = IOUtils.toByteArray(stream);
 						}
-					} else {
-						fileName = item.getName();
-						fileData = IOUtils.toByteArray(stream);
 					}
 				}
 				if(SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
@@ -139,112 +134,129 @@ public class AdminUploadServlet extends HttpServlet {
 			}
 		    
 		    response.setStatus(statusCode);
-		    if(resWriter != null) {
-			    resWriter.write(Integer.toString(statusCode));
-			    resWriter.close();
+		    try (PrintWriter resWriter = response.getWriter()) {
+			    if(resWriter != null) {
+				    resWriter.write(Integer.toString(statusCode));
+				    resWriter.close();
+			    }
 		    }
-		} catch (Exception e) {
+		} catch (IOException | RuntimeException e) {
 			logger.log(Level.SEVERE, "Unexpected exception: " + e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 	}
 	
-	private void unzipAll(PersistenceManager pm, String prefix, byte[] fileData) throws BadRequestException, InternalServerException {
-		LinkedHashMap<String, byte[]> fileMap = new LinkedHashMap<String, byte[]>();
+	private static void unzipAll(PersistenceManager pm, String prefix, byte[] fileData) throws BadRequestException, InternalServerException {
+		LinkedHashMap<String, byte[]> fileMap = new LinkedHashMap<>();
 
-		ZipInputStream zipIn = ServerTools.getAsZipInputStream(fileData);
-		// Unzip all the files and put them in a map
-		try {
-			ZipEntry entry;
-			while ((entry = zipIn.getNextEntry()) != null) {
-				if (!entry.isDirectory()) {
-					byte[] data = IOUtils.toByteArray(zipIn);
-					fileMap.put(entry.getName(), data);
+		try(ZipInputStream zipIn = ServerTools.getAsZipInputStream(fileData)) {
+			// Unzip all the files and put them in a map
+			try {
+				ZipEntry entry;
+				while ((entry = zipIn.getNextEntry()) != null) {
+					if (!entry.isDirectory()) {
+						byte[] data = IOUtils.toByteArray(zipIn);
+						fileMap.put(entry.getName(), data);
+					}
 				}
+			} catch (IOException e) {
+				throw new BadRequestException("Error when reading uploaded file (invalid file?)", e);
+			}
+	
+			// Read the file manifest to get metadata about the file
+			if (!fileMap.containsKey("manifest.xml")) {
+				throw new BadRequestException("No manifest.xml found in uploaded file");
+			}
+			
+			try (InputStream manifestStream = new ByteArrayInputStream(fileMap.get("manifest.xml"))) {
+				UploadFileManifest manifest = new UploadFileManifest(manifestStream);
+						
+				// Check manifest content and make sure that the file is in proper order
+		
+				if (!ServerTools.isSupportedUploadFileVersion(manifest.getVersionMajor(), manifest.getVersionMinor())) {
+					throw new BadRequestException("Unsupported file version");
+				}
+		
+				Locale unsupportedLocale = null;
+				for (Locale locale : manifest.getSupportedLocales()) {
+					if (!ServerTools.isSupportedLocale(locale)) {
+						unsupportedLocale = locale;
+						break;
+					}
+				}
+				if(unsupportedLocale!=null) {
+					//TODO move exception into the for-loop above if Eclipse/Java stops warning about it
+					throw new BadRequestException("Unsupported language: " + unsupportedLocale.toLanguageTag());
+				}
+				Set<String> missingUploadFiles = SharedResourceTools.findMissingUploadFiles(fileMap.keySet(),
+						manifest.getSupportedLocales());
+				if (!missingUploadFiles.isEmpty()) {
+					throw new BadRequestException("Uploaded doesn't contain required files: "
+							+ SharedTools.join(missingUploadFiles, ", "));
+				}
+		
+				Set<String> unwantedUploadFiles = SharedResourceTools.findUnwantedUploadFiles(fileMap.keySet(),
+						manifest.getSupportedLocales());
+				if (!unwantedUploadFiles.isEmpty()) {
+					throw new BadRequestException("Uploaded file contains extra files: "
+							+ SharedTools.join(unwantedUploadFiles, ", "));
+				}
+		
+				// Purge all existing data that uses this prefix, but save gaID
+				String gaID = SettingItemStore.getProperty(pm, prefix, "adminpanel", "gaID");
+				String statStoreKey = prefix + "#adminpanel/gaID";
+				String deleteResult = DeleteData.deleteForPrefix(pm, prefix);
+				pm.makePersistent(new SettingItemStore(statStoreKey, gaID));
+				logger.log(Level.INFO, deleteResult);
+		
+				// Since we just deleted the prefix and all it's data, we have to add it
+				// again
+				pm.makePersistent(new PrefixStore(prefix));
+				logger.log(Level.INFO, "Added prefix to system: '" + prefix + "'");
+		
+				LocaleStore localeStore = new LocaleStore(prefix, manifest.getSupportedLocales(), manifest.getDefaultLocale());
+				pm.makePersistent(localeStore);
+				logger.log(Level.INFO, "Added locale settings for prefix '" + prefix + "'");
+		
+				for (String fileName : fileMap.keySet()) {
+					String storeName = prefix + "#" + fileName;
+					if(fileName.startsWith("properties/")){
+						unpackPropertyFile(pm, storeName, fileMap.get(fileName));
+					} else if(fileName.startsWith("data/")) {
+						unpackStatisticalDataFile(pm, prefix, fileMap.get(fileName));
+					} else if(fileName.startsWith("meta/")) {
+						unpackStaticFile(pm, storeName, fileMap.get(fileName));
+					}
+				}
+			} catch (BadRequestException e) {
+				throw e;
 			}
 		} catch (IOException e) {
-			throw new BadRequestException("Error when reading uploaded file (invalid file?)", e);
-		}
-
-		// Read the file manifest to get metadata about the file
-		if (!fileMap.containsKey("manifest.xml")) {
-			throw new BadRequestException("No manifest.xml found in uploaded file");
-		}
-		InputStream manifestStream = new ByteArrayInputStream(fileMap.get("manifest.xml"));
-		UploadFileManifest manifest = new UploadFileManifest(manifestStream);
-
-		// Check manifest content and make sure that the file is in proper order
-
-		if (!ServerTools.isSupportedUploadFileVersion(manifest.getVersionMajor(), manifest.getVersionMinor())) {
-			throw new BadRequestException("Unsupported file version");
-		}
-
-		for (Locale locale : manifest.getSupportedLocales()) {
-			if (!ServerTools.isSupportedLocale(locale)) {
-				throw new BadRequestException("Unsupported language: " + locale.toLanguageTag());
-			}
-		}
-
-		Set<String> missingUploadFiles = SharedResourceTools.findMissingUploadFiles(fileMap.keySet(),
-				manifest.getSupportedLocales());
-		if (!missingUploadFiles.isEmpty()) {
-			throw new BadRequestException("Uploaded doesn't contain required files: "
-					+ SharedTools.join(missingUploadFiles, ", "));
-		}
-
-		Set<String> unwantedUploadFiles = SharedResourceTools.findUnwantedUploadFiles(fileMap.keySet(),
-				manifest.getSupportedLocales());
-		if (!unwantedUploadFiles.isEmpty()) {
-			throw new BadRequestException("Uploaded file contains extra files: "
-					+ SharedTools.join(unwantedUploadFiles, ", "));
-		}
-
-		// Purge all existing data that uses this prefix, but save gaID
-		String gaID = SettingItemStore.getProperty(pm, prefix, "adminpanel", "gaID");
-		String statStoreKey = prefix + "#adminpanel/gaID";
-		String deleteResult = DeleteData.deleteForPrefix(pm, prefix);
-		pm.makePersistent(new SettingItemStore(statStoreKey, gaID));
-		logger.log(Level.INFO, deleteResult);
-
-		// Since we just deleted the prefix and all it's data, we have to add it
-		// again
-		pm.makePersistent(new PrefixStore(prefix));
-		logger.log(Level.INFO, "Added prefix to system: '" + prefix + "'");
-
-		LocaleStore localeStore = new LocaleStore(prefix, manifest.getSupportedLocales(), manifest.getDefaultLocale());
-		pm.makePersistent(localeStore);
-		logger.log(Level.INFO, "Added locale settings for prefix '" + prefix + "'");
-
-		for (String fileName : fileMap.keySet()) {
-			String storeName = prefix + "#" + fileName;
-			if(fileName.startsWith("properties/")){
-				unpackPropertyFile(pm, storeName, fileMap.get(fileName));
-			} else if(fileName.startsWith("data/")) {
-				unpackStatisticalDataFile(pm, prefix, fileMap.get(fileName));
-			} else if(fileName.startsWith("meta/")) {
-				unpackStaticFile(pm, storeName, fileMap.get(fileName));
-			}
+			throw new InternalServerException("Failed to close unzip file", e);
 		}
 	}
 
-	private void unpackPropertyFile(PersistenceManager pm, String fileName, byte[] fileData) throws InternalServerException, BadRequestException {
+	private static void unpackPropertyFile(PersistenceManager pm, String fileName, byte[] fileData) throws InternalServerException, BadRequestException {
 		String[] propertiesWhitelist = { "page_title", "secondary_flag", "timepoint_0", "timepoint_1" };
-		BufferedReader reader = ServerTools.getAsBufferedReader(fileData);
-		List<SettingItemStore> items = new LinkedList<SettingItemStore>();
-		JSONObject dataMap = (JSONObject) JSONValue.parse(reader);
-		for (String prop : propertiesWhitelist) {
-			String key = fileName.substring(0, fileName.lastIndexOf('.')) + "/" + prop;
-			String value = (String) dataMap.get(prop);
-			if (value == null) {
-				throw new BadRequestException("Missing property '" + key + "' in upload file");
+		try(BufferedReader reader = ServerTools.getAsBufferedReader(fileData)) {
+			List<SettingItemStore> items = new LinkedList<>();
+			JSONObject dataMap = (JSONObject) JSONValue.parse(reader);
+			for (String prop : propertiesWhitelist) {
+				String key = fileName.substring(0, fileName.lastIndexOf('.')) + "/" + prop;
+				String value = (String) dataMap.get(prop);
+				if (value == null) {
+					throw new BadRequestException("Missing property '" + key + "' in upload file");
+				}
+				items.add(new SettingItemStore(key, value));
 			}
-			items.add(new SettingItemStore(key, value));
+			pm.makePersistentAll(items);
+			logger.log(Level.INFO, "Set " + propertiesWhitelist.length + " properties from the file '" + fileName + "'");
+		} catch(IOException e) {
+			throw new InternalServerException("Failed to close unpack property file", e);
 		}
-		pm.makePersistentAll(items);
-		logger.log(Level.INFO, "Set " + propertiesWhitelist.length + " properties from the file '" + fileName + "'");
 	}
 
-	private void unpackStaticFile(PersistenceManager pm, String fileName, byte[] fileData) throws InternalServerException {
+	private static void unpackStaticFile(PersistenceManager pm, String fileName, byte[] fileData) throws InternalServerException {
 		TextFileStore item;
 		try {
 			item = new TextFileStore(fileName, new String(fileData, "UTF-8"));
@@ -255,17 +267,20 @@ public class AdminUploadServlet extends HttpServlet {
 		}
 	}
 
-	private void unpackStatisticalDataFile(PersistenceManager pm, String prefix, byte[] fileData) throws InternalServerException {
-		BufferedReader reader = ServerTools.getAsBufferedReader(fileData);
-		List<StatDataItemStore> items = new LinkedList<StatDataItemStore>();
-		JSONArray dataArray = (JSONArray) JSONValue.parse(reader);
-		for (Object v : dataArray) {
-			JSONObject entry = (JSONObject) v;
-			String key = String.format("%s#Q=%s&P=%s", prefix, entry.get("q"), entry.get("p"));
-			String value = entry.toJSONString();
-			items.add(new StatDataItemStore(key, value));
+	private static void unpackStatisticalDataFile(PersistenceManager pm, String prefix, byte[] fileData) throws InternalServerException {
+		try (BufferedReader reader = ServerTools.getAsBufferedReader(fileData)) {
+			List<StatDataItemStore> items = new LinkedList<>();
+			JSONArray dataArray = (JSONArray) JSONValue.parse(reader);
+			for (Object v : dataArray) {
+				JSONObject entry = (JSONObject) v;
+				String key = String.format("%s#Q=%s&P=%s", prefix, entry.get("q"), entry.get("p"));
+				String value = entry.toJSONString();
+				items.add(new StatDataItemStore(key, value));
+			}
+			pm.makePersistentAll(items);
+			logger.log(Level.INFO, "Stored " + items.size() + " statistical data items for prefix '" + prefix + "'");
+		} catch (IOException e) {
+			throw new InternalServerException("Failed to close statistical data file", e);
 		}
-		pm.makePersistentAll(items);
-		logger.log(Level.INFO, "Stored " + items.size() + " statistical data items for prefix '" + prefix + "'");
 	}
 }

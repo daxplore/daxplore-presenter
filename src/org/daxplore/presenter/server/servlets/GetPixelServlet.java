@@ -91,11 +91,9 @@ public class GetPixelServlet extends HttpServlet {
 			}
 			PngWriter pngw = new PngWriter(hasalpha);
 			
-			try {
+			try (OutputStream respWriter = response.getOutputStream()){
 				byte[] bytes = pngw.generateImage(pixel);
-				OutputStream respWriter = response.getOutputStream();
 				respWriter.write(bytes);
-				respWriter.close();
 			} catch (IOException e) {
 				throw new InternalServerException("Failed to generate a pixel", e);
 			}

@@ -34,7 +34,7 @@ import com.google.inject.Inject;
  */
 public class AdminViewImpl extends Composite implements AdminView {
 	@UiTemplate("AdminViewImpl.ui.xml")
-	interface AdminViewPanel extends UiBinder<Widget, AdminViewImpl> {}
+	interface AdminViewPanel extends UiBinder<Widget, AdminViewImpl> {/* Empty UiTemplate interface */ }
 	private static AdminViewPanel uiBinder = GWT.create(AdminViewPanel.class);
 	
 	@UiField protected SimplePanel mainContentSlot;

@@ -44,7 +44,7 @@ public class JsonTools {
 			javaArray[i] = jsArray.get(i);
 		}
 		return javaArray;
-	};
+	}
 
 	/**
 	 * Convert a {@link JsArrayInteger} to an int array.
@@ -59,7 +59,7 @@ public class JsonTools {
 			javaArray[i] = jsArray.get(i);
 		}
 		return javaArray;
-	};
+	}
 
 	/**
 	 * Convert a {@link JsArrayNumber} to a double array.
@@ -74,7 +74,7 @@ public class JsonTools {
 			javaArray[i] = jsArray.get(i);
 		}
 		return javaArray;
-	};
+	}
 
 	/**
 	 * Convert a {@link JsArrayBoolean} to a boolean array.
@@ -89,7 +89,7 @@ public class JsonTools {
 			javaArray[i] = jsArray.get(i);
 		}
 		return javaArray;
-	};
+	}
 
 	/**
 	 * Convert a {@link JsArrayString} to a List<String>.

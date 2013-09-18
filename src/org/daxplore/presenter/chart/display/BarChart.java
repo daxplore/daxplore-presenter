@@ -181,7 +181,7 @@ public class BarChart extends GChartChart {
 	 */
 	protected BarChart(ChartTexts chartTexts, ChartConfig chartConfig, PrefixProperties prefixProperties,
 			QueryDefinition queryDefinition, boolean printerMode) {
-		super(chartTexts, chartConfig, prefixProperties, queryDefinition);
+		super(chartTexts, prefixProperties, queryDefinition);
 		this.chartConfig = chartConfig;
 
 		externalLegend = new ExternalLegend(chartTexts, queryDefinition, chartConfig.externalLegendItemLimit(), printerMode);
@@ -291,9 +291,9 @@ public class BarChart extends GChartChart {
 	 *            The height of the heighest bar.
 	 */
 	protected void setYAxis(double maxValue) {
-		maxValue = (double) Math.round(maxValue * 10 + 0.49) / 10;
-		getYAxis().setAxisMax(maxValue);
-		getYAxis().setTickCount((int) (Math.round(maxValue * 10) + 1));
+		double maxRoundUp = (double) Math.round(maxValue * 10 + 0.49) / 10;
+		getYAxis().setAxisMax(maxRoundUp);
+		getYAxis().setTickCount((int) (Math.round(maxRoundUp * 10) + 1));
 	}
 
 	/**
@@ -498,7 +498,7 @@ public class BarChart extends GChartChart {
 	 */
 	@Override
 	public int getMinWidth() {
-		double groupWidth = Math.max(xTickMaxCharacterCount * 7.5, questionOptionCount * 20);
-		return (int) (80 + groupWidth * groupCount);
+		double groupMinWidth = Math.max(xTickMaxCharacterCount * 7.5, questionOptionCount * 20);
+		return (int) (80 + groupMinWidth * groupCount);
 	}
 }

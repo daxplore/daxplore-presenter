@@ -59,7 +59,7 @@ public class PresenterServlet extends HttpServlet {
 	private static String embedHtmlTemplate = null;
 	private static String googleAnalyticsTrackingTemplate = null;
 	
-	private HashMap<String, QuestionMetadata> metadataMap = new HashMap<String, QuestionMetadata>(); 
+	private HashMap<String, QuestionMetadata> metadataMap = new HashMap<>(); 
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -154,10 +154,8 @@ public class PresenterServlet extends HttpServlet {
 			}
 			
 			response.setContentType("text/html; charset=UTF-8");
-			try {
-				Writer writer = response.getWriter();
+			try (Writer writer = response.getWriter()){
 				writer.write(responseHTML);
-				writer.close();
 			} catch (IOException e) {
 				throw new InternalServerException("Failed to display presenter servlet", e);
 			}
@@ -167,7 +165,7 @@ public class PresenterServlet extends HttpServlet {
 		} catch (InternalServerException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
 			logger.log(Level.SEVERE, "Unexpected exception: " + e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} finally {
@@ -243,7 +241,7 @@ public class PresenterServlet extends HttpServlet {
 		QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, queryString);
 		String statItem = StatDataItemStore.getStats(pm, prefix, queryDefinition);
 
-		LinkedList<String> questions = new LinkedList<String>();
+		LinkedList<String> questions = new LinkedList<>();
 		questions.add(queryDefinition.getQuestionID());
 		questions.add(queryDefinition.getPerspectiveID());
 		
@@ -278,7 +276,7 @@ public class PresenterServlet extends HttpServlet {
 	private String getPrintHTML(PersistenceManager pm, String prefix, Locale locale,
 			String serverPath, String queryString, String baseurl, String gaTemplate) throws InternalServerException, BadRequestException {
 		
-		LinkedList<EmbedFlag> flags = new LinkedList<EmbedFlag>();
+		LinkedList<EmbedFlag> flags = new LinkedList<>();
 		flags.add(EmbedFlag.LEGEND);
 		flags.add(EmbedFlag.TRANSPARENT);
 		flags.add(EmbedFlag.PRINT);

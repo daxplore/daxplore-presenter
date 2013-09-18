@@ -35,8 +35,6 @@ public class ImageButton extends Composite implements HasClickHandlers {
 	private SimplePanel mainPanel;
 	private Image buttonImage;
 	
-	private boolean isPressed = false;
-	
 	/**
 	 * Instantiates a new image button.
 	 * 

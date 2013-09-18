@@ -27,7 +27,6 @@ import org.daxplore.presenter.client.event.SelectionUpdateEvent;
 import org.daxplore.presenter.client.ui.PerspectiveCheckboxPanel.PerspectiveCheckboxPanelFactory;
 import org.daxplore.presenter.client.ui.PerspectiveQuestionsPanel.PerspectiveQuestionsFactory;
 import org.daxplore.presenter.shared.QueryDefinition;
-import org.daxplore.presenter.shared.QuestionMetadata;
 
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -65,7 +64,7 @@ public class PerspectivePanel extends HorizontalPanel
 	private SimplePanel checkboxContainer = new SimplePanel();
 
 	@Inject
-	PerspectivePanel(QuestionMetadata questions, PerspectiveCheckboxPanelFactory checkPanelFactory,
+	protected PerspectivePanel(PerspectiveCheckboxPanelFactory checkPanelFactory,
 			EventBus eventBus, PerspectiveQuestionsFactory perspectivePanelFactory) {
 		this.checkPanelFactory = checkPanelFactory;
 		this.eventBus = eventBus;
@@ -110,9 +109,8 @@ public class PerspectivePanel extends HorizontalPanel
 	public List<Integer> getPerspectiveOptions() {
 		if (perspectiveCheckboxes != null) {
 			return perspectiveCheckboxes.getPerspectiveOptions();
-		} else {
-			return new LinkedList<Integer>();
 		}
+		return new LinkedList<Integer>();
 	}
 
 	/**

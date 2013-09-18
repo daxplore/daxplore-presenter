@@ -19,6 +19,7 @@ package org.daxplore.presenter.server.upload;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 
@@ -31,20 +32,20 @@ import org.junit.Test;
 public class UploadFileManifestTest {
 
 	@Test
-	public void testUploadFileManifestParsing() throws InternalServerException, BadRequestException {
-		InputStream manifestInputStream = getClass().getResourceAsStream("manifest.xml");
-		UploadFileManifest manifest = new UploadFileManifest(manifestInputStream);
-		
-		assertEquals(9, manifest.getVersionMajor());
-		assertEquals(32, manifest.getVersionMinor());
-		
-		Locale en = new Locale("en");
-		Locale sv = new Locale("sv");
-		for (Locale locale : manifest.getSupportedLocales()) {
-			assertTrue(locale.equals(en) || locale.equals(sv));
+	public void testUploadFileManifestParsing() throws InternalServerException, BadRequestException, IOException {
+		try (InputStream manifestInputStream = UploadFileManifestTest.class.getResourceAsStream("manifest.xml")) {
+			UploadFileManifest manifest = new UploadFileManifest(manifestInputStream);
+			
+			assertEquals(9, manifest.getVersionMajor());
+			assertEquals(32, manifest.getVersionMinor());
+			
+			Locale en = new Locale("en");
+			Locale sv = new Locale("sv");
+			for (Locale locale : manifest.getSupportedLocales()) {
+				assertTrue(locale.equals(en) || locale.equals(sv));
+			}
+			System.out.println("default locale: " + manifest.getDefaultLocale());
+			assertTrue(manifest.getDefaultLocale().equals(en));
 		}
-		System.out.println("default locale: " + manifest.getDefaultLocale());
-		assertTrue(manifest.getDefaultLocale().equals(en));
 	}
-
 }

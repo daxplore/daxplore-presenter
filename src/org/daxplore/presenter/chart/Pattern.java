@@ -95,11 +95,11 @@ public class Pattern {
 	 * @return
 	 */
 	public static String quote(String input) {
-		String output = "";
+		StringBuilder output = new StringBuilder("");
 		for (int i = 0; i < input.length(); i++) {
-			output += "\\" + input.charAt(i);
+			output.append("\\").append(input.charAt(i));
 		}
-		return output;
+		return output.toString();
 	}
 
 	/**

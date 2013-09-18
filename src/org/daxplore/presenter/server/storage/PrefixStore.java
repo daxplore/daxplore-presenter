@@ -40,11 +40,10 @@ public class PrefixStore {
 	}
 	
 	public static LinkedList<String> getPrefixes(PersistenceManager pm) {
-		LinkedList<String> prefixes = new LinkedList<String>();
+		LinkedList<String> prefixes = new LinkedList<>();
 		Query q = pm.newQuery(PrefixStore.class);
 
 		try {
-			@SuppressWarnings("unchecked")
 			List<PrefixStore> results = (List<PrefixStore>) q.execute();
 			for (PrefixStore prefixStore : results) {
 				prefixes.add(prefixStore.getPrefix());

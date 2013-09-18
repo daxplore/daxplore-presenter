@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Random;
@@ -69,10 +70,10 @@ public class Base64Test {
 			byte[] b0 = new byte[len];
 			rnd.nextBytes(b0);
 			String e1 = new String(Base64.encode(b0));
-			String e2 = new String(apacheCoder.encode(b0));
+			String e2 = new String(apacheCoder.encode(b0), "UTF-8");
 			assertEquals(e2, e1);
 			byte[] b1 = Base64.decode(e1);
-			byte[] b2 = apacheCoder.decode(e2.getBytes());
+			byte[] b2 = apacheCoder.decode(e2.getBytes("UTF-8"));
 			assertArrayEquals(b0, b1);
 			assertArrayEquals(b0, b2);
 		}
@@ -98,7 +99,7 @@ public class Base64Test {
 			rnd.nextBytes(b0);
 			String e1 = Base64.encodeLines(b0);
 			
-			String e2 = new String(apacheCoder.encode(b0));
+			String e2 = new String(apacheCoder.encode(b0), "UTF-8");
 			StringBuilder e2Lines= new StringBuilder();
 			for (int j=0; j<e2.length(); j+=lineLength) {
 				e2Lines.append(e2.substring(j, Math.min(j+lineLength, e2.length())));
@@ -108,7 +109,7 @@ public class Base64Test {
 			
 			assertEquals(e2, e1);
 			byte[] b1 = Base64.decodeLines(e1);
-			byte[] b2 = apacheCoder.decode(e2.replace("\n", "").getBytes());
+			byte[] b2 = apacheCoder.decode(e2.replace("\n", "").getBytes("UTF-8"));
 			
 			assertArrayEquals(b0, b1);
 			assertArrayEquals(b0, b2);
@@ -118,9 +119,10 @@ public class Base64Test {
 	/**
 	 * Test encoding and decoding of longs, which was added for the Daxplore
 	 * project.
+	 * @throws UnsupportedEncodingException 
 	 */
 	@Test
-	public void testLongRandom() {
+	public void testLongRandom() throws UnsupportedEncodingException {
 		org.apache.commons.codec.binary.Base64 apacheCoder =
 				new org.apache.commons.codec.binary.Base64();
 		
@@ -142,11 +144,12 @@ public class Base64Test {
 			byte[] bytes = ByteBuffer.allocate(8).putLong(testLong).array();
 			int firstRelevantByte = 0;
 			for (; firstRelevantByte<bytes.length && bytes[firstRelevantByte]==0; firstRelevantByte++) {
+				// increase firstRelevantByte to reach non-zero byte or end 
 			}
 			bytes = Arrays.copyOfRange(bytes, firstRelevantByte, bytes.length);
-			String e2 = new String(apacheCoder.encode(bytes));
+			String e2 = new String(apacheCoder.encode(bytes), "UTF-8");
 			
-			bytes = apacheCoder.decode(e2.getBytes());
+			bytes = apacheCoder.decode(e2.getBytes("UTF-8"));
 			ByteBuffer bb = ByteBuffer.allocate(8);
 			bb.position(8-bytes.length);
 			bb.put(bytes);

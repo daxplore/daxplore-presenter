@@ -60,8 +60,7 @@ public class AdminController implements Presenter, ValueChangeHandler<String> {
 	public void go(final HasWidgets container) {
 		adminPresenter.go(container);
 		String token = History.getToken();
-		if (token==null || token.isEmpty()) {
-		} else {
+		if (token!=null && !token.isEmpty()) {
 			History.newItem(token, false);
 			if (token.startsWith("prefix=")) {
 				String prefix = token.split("=", 2)[1];

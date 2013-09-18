@@ -87,7 +87,7 @@ public class StatDataServerModel {
 		}
 	}
 	
-	private String getRequestString(QueryDefinition queryDefinition) {
+	private static String getRequestString(QueryDefinition queryDefinition) {
 		return "q=" + queryDefinition.getAsString();
 	}
 	

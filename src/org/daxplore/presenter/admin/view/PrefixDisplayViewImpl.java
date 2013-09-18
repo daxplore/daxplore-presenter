@@ -35,7 +35,6 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
-import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
@@ -43,7 +42,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayView {
 	@UiTemplate("PrefixDisplayViewImpl.ui.xml")
-	interface PrefixDisplayViewPanel extends UiBinder<Widget, PrefixDisplayViewImpl> {}
+	interface PrefixDisplayViewPanel extends UiBinder<Widget, PrefixDisplayViewImpl> {/* Empty UiTemplate interface */}
 	private static PrefixDisplayViewPanel uiBinder = GWT.create(PrefixDisplayViewPanel.class);
 	
 	@UiField protected Anchor prefixHeader;
@@ -95,10 +94,6 @@ public class PrefixDisplayViewImpl extends Composite implements PrefixDisplayVie
 		if (doUpload) {
 			uploadForm.submit();
 		}
-	}
-
-	@UiHandler("uploadForm")
-	protected void uploadSubmit(SubmitEvent event) {
 	}
 
 	@UiHandler("uploadForm")

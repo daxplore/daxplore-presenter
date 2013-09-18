@@ -54,7 +54,6 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 	private String baseUrl;
 	
 	private HorizontalPanel mainPanel;
-	private EmbedPopup embedPopup;
 	private QueryDefinition queryDefinition;
 	private PrefixProperties prefixProperties;
 	
@@ -62,7 +61,6 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 	
 	@Inject
 	protected ImageButtonPanel(final EventBus eventBus, UITexts uiTexts, UIResources uiResources, EmbedPopup embedPopup, PrefixProperties prefixProperties) {
-		this.embedPopup = embedPopup;
 		this.prefixProperties = prefixProperties;
 		
 		baseUrl = GWT.getHostPageBaseURL();					// http://example.com/p/

@@ -16,6 +16,7 @@
  */
 package org.daxplore.presenter.server.storage;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.LinkedHashMap;
@@ -30,6 +31,7 @@ import org.daxplore.presenter.server.throwable.BadRequestException;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.ContainerFactory;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class StorageTools {
 	/**
@@ -69,7 +71,7 @@ public class StorageTools {
 			}
 			
 			return definitions.toJSONString();
-		} catch (Exception e) {
+		} catch (IOException | ParseException e) {
 			throw new BadRequestException("Failed to read question definitions", e);
 		}
 	}

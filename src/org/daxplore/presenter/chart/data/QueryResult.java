@@ -100,11 +100,7 @@ public abstract class QueryResult {
 	 * @return True if there is data, otherwise false.
 	 */
 	public boolean hasData(int perspectiveOption) {
-		StatInterface item = getItem(perspectiveOption);
-		if (item != null) {
-			return item.hasData();
-		}
-		throw new IndexOutOfBoundsException("No such perspective option: " + perspectiveOption);
+		return getItem(perspectiveOption).hasData();
 	}
 
 	/*

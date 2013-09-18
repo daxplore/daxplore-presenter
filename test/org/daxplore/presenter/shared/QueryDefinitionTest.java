@@ -31,15 +31,6 @@ import org.junit.Test;
 public class QueryDefinitionTest {
 
 	@Test
-	public void testQueryFlagBitValues() {
-		QueryFlag[] values = QueryDefinition.QueryFlag.values();
-		for (int i=0; i<values.length; i++) {
-			long bitValue = i==0 ? 0 : Math.round(Math.pow(2, i-1));
-			assertEquals(bitValue, values[i].bitValue);
-		}
-	}
-	
-	@Test
 	public void testQueryFlagEncodeDecode() {
 		Random rnd = new Random(0x7de3ff09);
 		QueryFlag[] values = QueryDefinition.QueryFlag.values();
@@ -51,7 +42,7 @@ public class QueryDefinitionTest {
 					flags.add(values[j]);
 				}
 			}
-			QueryFlag[] flagArray = flags.toArray(new QueryFlag[0]);
+			QueryFlag[] flagArray = flags.toArray(new QueryFlag[flags.size()]);
 			long encoded = QueryFlag.encodeFlags(flagArray);
 			assertArrayEquals(flagArray, QueryFlag.decodeFlags(encoded));
 		}

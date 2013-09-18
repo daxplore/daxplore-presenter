@@ -75,8 +75,6 @@ import com.google.web.bindery.event.shared.EventBus;
 public class EmbedPopup extends PopupPanel implements EmbedSizeHandler, QueryUpdateHandler, ImageButtonHandler,
 		MouseUpHandler, ChangeHandler, ValueChangeHandler<Boolean> {
 
-	private EventBus eventBus;
-	private UITexts uiTexts;
 	private DaxploreConfig config;
 	private PrefixProperties prefixProperties;
 
@@ -108,8 +106,6 @@ public class EmbedPopup extends PopupPanel implements EmbedSizeHandler, QueryUpd
 	@Inject
 	public EmbedPopup(final EventBus eventBus, UITexts uiTexts, DaxploreConfig config, PrefixProperties prefixProperties) {
 		super(true);
-		this.eventBus = eventBus;
-		this.uiTexts = uiTexts;
 		this.prefixProperties = prefixProperties;
 		
 		mainPanel = new VerticalPanel();

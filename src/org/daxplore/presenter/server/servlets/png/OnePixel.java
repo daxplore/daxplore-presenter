@@ -46,10 +46,7 @@ public class OnePixel implements PixelSource {
 	public int getPixel(int x, int y) {
 		if (hasalpha) {
 			return (intcolor << 8) | (intalpha & 0xFF);
-		} else {
-			return intcolor;
 		}
-
+		return intcolor;
 	}
-
 }

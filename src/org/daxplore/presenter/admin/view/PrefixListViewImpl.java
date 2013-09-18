@@ -42,7 +42,7 @@ import com.google.inject.Inject;
 public class PrefixListViewImpl extends Composite implements PrefixListView {
 	
 	@UiTemplate("PrefixListViewImpl.ui.xml")
-	interface PrefixListViewPanel extends UiBinder<Widget, PrefixListViewImpl> {}
+	interface PrefixListViewPanel extends UiBinder<Widget, PrefixListViewImpl> {/* Empty UiTemplate interface */}
 	private static PrefixListViewPanel uiBinder = GWT.create(PrefixListViewPanel.class);
 	
 	@UiField(provided=true)

@@ -310,7 +310,7 @@ public class BarChartCompare extends BarChart {
 	 */
 	@Override
 	public int getMinWidth() {
-		double groupWidth = Math.max(xTickMaxCharacterCount * 7.5, questionOptionCount * 30);
-		return (int) (80 + groupWidth * groupCount);
+		double groupMinWidth = Math.max(xTickMaxCharacterCount * 7.5, questionOptionCount * 30);
+		return (int) (80 + groupMinWidth * groupCount);
 	}
 }

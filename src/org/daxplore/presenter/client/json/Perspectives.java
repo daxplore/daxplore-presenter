@@ -75,7 +75,7 @@ public class Perspectives {
 
 	private static class NativePerspectives extends JavaScriptObject {
 		protected NativePerspectives() {
-		};
+		}
 
 		public final native int perspectiveCount()/*-{
 			return this.length;

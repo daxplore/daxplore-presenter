@@ -63,7 +63,7 @@ public class GetStatsServlet extends HttpServlet {
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-		PrintWriter respWriter = null;
+		
 		PersistenceManager pm = null;
 		try {
 			
@@ -82,16 +82,15 @@ public class GetStatsServlet extends HttpServlet {
 			String queryString = request.getParameter("q");
 			QueryDefinition queryDefinition = new QueryDefinition(metadataPrefixMap.get(prefix), queryString);
 			
-			try {
-				respWriter = response.getWriter();
-			} catch (IOException e) {
-				throw new InternalServerException(e);
-			}
-			
 			response.setContentType("text/html; charset=UTF-8");
-			respWriter.write(StatDataItemStore.getStats(pm, prefix, queryDefinition));
-			respWriter.close();
+			try (PrintWriter respWriter = response.getWriter()) {
+				respWriter.write(StatDataItemStore.getStats(pm, prefix, queryDefinition));
+				respWriter.close();
+			} catch (IOException e) {
+				throw new InternalServerException("Failed to write response", e);
+			}
 			response.setStatus(HttpServletResponse.SC_OK);
+			
 		} catch (BadRequestException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -102,9 +101,6 @@ public class GetStatsServlet extends HttpServlet {
 			logger.log(Level.SEVERE, "Unexpected exception: " + e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} finally {
-			if(respWriter!=null) {
-				respWriter.close();
-			}
 			if (pm!=null) {
 				pm.close();
 			}

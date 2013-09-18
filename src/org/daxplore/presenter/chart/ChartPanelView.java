@@ -43,8 +43,7 @@ import com.google.inject.Inject;
  * display the new chart, once that chart is loaded.</p>
  */
 public class ChartPanelView extends Composite {
-	interface ChartUiBinder extends UiBinder<Widget, ChartPanelView> {
-	}
+	interface ChartUiBinder extends UiBinder<Widget, ChartPanelView> { /* Empty UiTemplate interface */	}
 
 	private static ChartUiBinder uiBinder = GWT.create(ChartUiBinder.class);
 

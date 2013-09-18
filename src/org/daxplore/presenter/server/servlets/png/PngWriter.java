@@ -91,25 +91,23 @@ public class PngWriter implements ImageWriter {
 
 		Deflater deflator = new Deflater(5);
 		ByteArrayOutputStream zippedByteStream = new ByteArrayOutputStream(1024);
-		BufferedOutputStream zipStream = new BufferedOutputStream(new DeflaterOutputStream(zippedByteStream, deflator));
-
-		// optinally write to scanlines:
-		// byte[] scanLines = new byte[width * height * BYTES_PER_PIXEL + height];
-		for (int i = 0; i < width * height; i++) {
-			if (i % width == 0) {
-				zipStream.write(0); // filter
+		try(BufferedOutputStream zipStream = new BufferedOutputStream(new DeflaterOutputStream(zippedByteStream, deflator))) {
+			// optinally write to scanlines:
+			// byte[] scanLines = new byte[width * height * BYTES_PER_PIXEL + height];
+			for (int i = 0; i < width * height; i++) {
+				if (i % width == 0) {
+					zipStream.write(0); // filter
+				}
+	
+				int pixel = source.getPixel(i % width, i / width);
+				if (usealpha) {
+					zipStream.write((pixel >> 24) & 0xff);
+				}
+				zipStream.write((pixel >> 16) & 0xff);
+				zipStream.write(pixel >> 8 & 0xff);
+				zipStream.write(pixel & 0xff);
 			}
-
-			int pixel = source.getPixel(i % width, i / width);
-			if (usealpha) {
-				zipStream.write((pixel >> 24) & 0xff);
-			}
-			zipStream.write((pixel >> 16) & 0xff);
-			zipStream.write(pixel >> 8 & 0xff);
-			zipStream.write(pixel & 0xff);
 		}
-
-		zipStream.close();
 
 		byte[] zippedBytes = zippedByteStream.toByteArray();
 		writeUnsignedInt(out, zippedBytes.length);
@@ -139,7 +137,7 @@ public class PngWriter implements ImageWriter {
 		}
 	}
 
-	private void writeUnsignedInt(OutputStream out, long value) throws IOException {
+	private static void writeUnsignedInt(OutputStream out, long value) throws IOException {
 		out.write((int) ((value >> 24) & 0xff));
 		out.write((int) ((value >> 16) & 0xff));
 		out.write((int) ((value >> 8) & 0xff));

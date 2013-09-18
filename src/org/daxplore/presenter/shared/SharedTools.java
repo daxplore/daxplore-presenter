@@ -435,9 +435,9 @@ public class SharedTools {
 	 * @return the string
 	 */
 	public static String justifyHTML(String text, int width) {
-		text = text.replace("<br>","\n").replace("<br />", "\n");
-		text = justifyLeft(text, width);
-		return text.replace("\n", "<br>");
+		String justified = text.replace("<br>","\n").replace("<br />", "\n");
+		justified = justifyLeft(justified, width);
+		return justified.replace("\n", "<br>");
 	}
 
 	/**

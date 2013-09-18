@@ -120,6 +120,7 @@ public class PerspectiveQuestionsPanel extends FlowPanel implements HasSelection
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public HandlerRegistration addSelectionHandler(SelectionHandler<TreeItem> handler) {
 		return perspectiveList.addSelectionHandler(handler);
 	}

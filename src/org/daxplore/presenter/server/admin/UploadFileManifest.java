@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -37,10 +36,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class UploadFileManifest {
-	private static Logger logger = Logger.getLogger(UploadFileManifest.class.getName());
 	
 	private int versionMajor, versionMinor;
-	private List<Locale> locales = new LinkedList<Locale>();
+	private List<Locale> locales = new LinkedList<>();
 	private Locale defaultLocale; 
 	
 	public UploadFileManifest(InputStream manifestInputStream) throws InternalServerException, BadRequestException {
@@ -74,7 +72,7 @@ public class UploadFileManifest {
 			NodeList languageNodes = node.getChildNodes();
 			for (int i=0; i<languageNodes.getLength(); i++) {
 				String text = languageNodes.item(i).getTextContent().trim();
-				if (text!=null && !text.equals("")) { // buggy parsing requires this test
+				if (!text.isEmpty()) { // buggy parsing requires this test
 					locales.add(new Locale(text));
 				}
 			}
@@ -84,7 +82,7 @@ public class UploadFileManifest {
 			// strange parsing requires this work-around
 			for (int i=0; i<languageNodes.getLength(); i++) {
 				String text = languageNodes.item(i).getTextContent().trim();
-				if (text!=null && !text.equals("")) { 
+				if (!text.isEmpty()) { 
 					defaultLocale = new Locale(text);
 					break;
 				}

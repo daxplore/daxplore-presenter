@@ -62,10 +62,8 @@ public class AdminSettingsServlet extends HttpServlet {
 			case "get":
 				JSONObject json = new JSONObject();
 				for(String key : settings) {
-					try {
-						String value = SettingItemStore.getProperty(pm, prefix, "adminpanel", key);
-						json.put(key, value);
-					} catch (BadRequestException e) {}
+					String value = SettingItemStore.getProperty(pm, prefix, "adminpanel", key);
+					json.put(key, value);
 				}
 				try {
 					response.getWriter().write(json.toJSONString());
@@ -115,7 +113,7 @@ public class AdminSettingsServlet extends HttpServlet {
 		} catch (InternalServerException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
 			logger.log(Level.SEVERE, "Unexpected exception: " + e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} finally {

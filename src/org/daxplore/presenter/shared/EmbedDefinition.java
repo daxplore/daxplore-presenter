@@ -110,7 +110,7 @@ public class EmbedDefinition {
 			for(EmbedFlag f: EmbedFlag.values()){
 				if((flaglong & f.bitValue) != 0) flags.add(f);
 			}
-			return flags.toArray(new EmbedFlag[0]);
+			return flags.toArray(new EmbedFlag[flags.size()]);
 		}
 		
 		/**
@@ -161,7 +161,7 @@ public class EmbedDefinition {
 	 *            the flags that should be set
 	 */
 	public EmbedDefinition(List<EmbedFlag> flags){
-		this.flags = flags.toArray(new EmbedFlag[0]);
+		this.flags = flags.toArray(new EmbedFlag[flags.size()]);
 	}
 	
 	/**

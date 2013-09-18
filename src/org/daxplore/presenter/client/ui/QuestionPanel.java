@@ -55,7 +55,6 @@ import com.google.web.bindery.event.shared.EventBus;
  */
 public class QuestionPanel extends Composite implements QueryUpdateHandler{
 	
-	private final QuestionMetadata questions;
 	private final EventBus eventBus;
 	
 	private Tree treeRoot;
@@ -64,8 +63,7 @@ public class QuestionPanel extends Composite implements QueryUpdateHandler{
 	private VerticalPanel vp = new VerticalPanel();
 
 	@Inject
-	QuestionPanel(QuestionMetadata questions, Groups groups, EventBus eventBus, UITexts uiTexts, UIResources uiResources, PrefixProperties prefixProperties) {
-		this.questions = questions;
+	protected QuestionPanel(QuestionMetadata questions, Groups groups, EventBus eventBus, UITexts uiTexts, UIResources uiResources, PrefixProperties prefixProperties) {
 		this.eventBus = eventBus;
 		
 		treeRoot = new Tree(uiResources, false);
@@ -155,10 +153,8 @@ public class QuestionPanel extends Composite implements QueryUpdateHandler{
 	public String getQuestionID() {
 		if (selected != null) {
 			return selected.getQuestionID();
-		} else {
-			return "";
 		}
-
+		return "";
 	}
 
 	/**
@@ -241,13 +237,13 @@ public class QuestionPanel extends Composite implements QueryUpdateHandler{
 	/**
 	 * A class that defines a group as displayed in the question tree.
 	 */
-	private class GroupItem extends TreeItem {
+	private static class GroupItem extends TreeItem {
 
 		GroupItem(SafeHtml html) {
 			super(html);
 		}
 
-		public boolean hasSelectedChild() {
+		boolean hasSelectedChild() {
 			boolean out = false;
 			for (int i = 0; i < getChildCount(); i++) {
 				out = out || getChild(i).isSelected();

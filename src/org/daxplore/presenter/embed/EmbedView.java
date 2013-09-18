@@ -46,7 +46,7 @@ import com.google.gwt.user.client.ui.Widget;
  * it's sub-widgets if the window is resized.</p>
  */
 public class EmbedView extends Composite {
-	interface EmbedBinderUiBinder extends UiBinder<Widget, EmbedView> {}
+	interface EmbedBinderUiBinder extends UiBinder<Widget, EmbedView> {/* Empty UiTemplate interface */}
 	private static EmbedBinderUiBinder uiBinder = GWT.create(EmbedBinderUiBinder.class);
 	
 	@UiField(provided=true)
@@ -67,10 +67,8 @@ public class EmbedView extends Composite {
 	/**
 	 * Fields used to figure out and adjust the size of the chart and chartPanel.
 	 */
-	private int resizeRecursions;
 	private int maxWidth, maxHeight;
 	private ScrollPanel chartScrollPanel = new ScrollPanel();
-	private boolean scrolling = false, forceScrolling = false;
 	
 	
 	private interface EmbedStyle extends CssResource {

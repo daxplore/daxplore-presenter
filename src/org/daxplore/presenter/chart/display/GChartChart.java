@@ -18,7 +18,6 @@
  */
 package org.daxplore.presenter.chart.display;
 
-import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.chart.resources.ChartTexts;
 import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QueryDefinition;
@@ -54,7 +53,7 @@ public abstract class GChartChart extends GChart implements Chart {
 	 * @param titleDetail
 	 *            The explanatory text, that is shown under the header.
 	 */
-	protected GChartChart(ChartTexts chartTexts, ChartConfig chartConfig, PrefixProperties prefixProperties, QueryDefinition queryDefinition) {
+	protected GChartChart(ChartTexts chartTexts, PrefixProperties prefixProperties, QueryDefinition queryDefinition) {
 		this.queryDefinition = queryDefinition;
 		this.prefixProperties = prefixProperties;
 		this.chartTexts = chartTexts;
@@ -79,6 +78,7 @@ public abstract class GChartChart extends GChart implements Chart {
 	 * @param height
 	 *            The wanted height of the chart.
 	 */
+	@Override
 	public void setChartSizeSmart(int width, int height) {
 		setChartSize(width, height);
 		setChartSize(Math.max(2 * width - getXChartSizeDecorated() - 5, 0), Math.max(2 * height - getYChartSizeDecorated(), 0));
@@ -104,18 +104,12 @@ public abstract class GChartChart extends GChart implements Chart {
 	}
 
 	/**
-	 * Get the minimum pixel width a chart can have.
-	 * 
-	 * @return the minimum pixel width a chart can have.
-	 */
-	public abstract int getMinWidth();
-
-	/**
 	 * Get a widget containing a legend for the chart, that can be placed
 	 * anywhere.
 	 * 
 	 * @return a widget containing a legend for the chart
 	 */
+	@Override
 	public ExternalLegend getExternalLegend() {
 		return externalLegend;
 	}
@@ -126,6 +120,7 @@ public abstract class GChartChart extends GChart implements Chart {
 	 * 
 	 * @return a widget containing a header for the chart
 	 */
+	@Override
 	public ExternalHeader getExternalHeader() {
 		return externalHeader;
 	}

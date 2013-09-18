@@ -20,26 +20,27 @@ package org.daxplore.presenter.client.resources;
 
 import org.daxplore.presenter.client.ui.ImageButtonPanel;
 
-import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.Tree;
 
 /**
  * An interface that supplies resources, like images, to the Daxplore Client.
  */
-public interface UIResources extends ClientBundle, Tree.Resources {
+public interface UIResources extends Tree.Resources {
 
 	// Tree.Resources:
 
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	@Source("img/open.gif")
 	public ImageResource treeOpen();
 
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	@Source("img/closed.gif")
 	public ImageResource treeClosed();
 

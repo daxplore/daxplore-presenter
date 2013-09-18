@@ -39,7 +39,7 @@ import org.json.simple.JSONObject;
 
 @SuppressWarnings("serial")
 public class AdminPrefixServlet extends HttpServlet {
-	private static Logger logger = Logger.getLogger(AdminPrefixServlet.class.getName());
+	private static final Logger logger = Logger.getLogger(AdminPrefixServlet.class.getName());
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -83,7 +83,7 @@ public class AdminPrefixServlet extends HttpServlet {
 				if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)){
 					throw new BadRequestException("Not a syntactically valid prefix: '" + prefix + "'");
 				}
-				responseText = getPrefixMetadata(pm, prefix);
+				responseText = getPrefixMetadata(prefix);
 				break;
 			default:
 				throw new BadRequestException("Invalid action '" + request.getParameter("action") + "' requested");
@@ -101,7 +101,7 @@ public class AdminPrefixServlet extends HttpServlet {
 		} catch (InternalServerException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
 			logger.log(Level.SEVERE, "Unexpected exception: " + e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} finally {
@@ -112,7 +112,7 @@ public class AdminPrefixServlet extends HttpServlet {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private String getPrefixListJson(PersistenceManager pm) {
+	private static String getPrefixListJson(PersistenceManager pm) {
 		List<String> prefixes = PrefixStore.getPrefixes(pm);
 		JSONArray jsonArray = new JSONArray();
 		jsonArray.addAll(prefixes);
@@ -121,7 +121,7 @@ public class AdminPrefixServlet extends HttpServlet {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private String getPrefixMetadata(PersistenceManager pm, String prefix) {
+	private static String getPrefixMetadata(String prefix) {
 		JSONObject metaMap = new JSONObject();
 		metaMap.put("prefix", prefix);
 		

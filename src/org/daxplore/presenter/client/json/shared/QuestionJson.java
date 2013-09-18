@@ -30,7 +30,7 @@ import com.google.gwt.core.client.JsArrayString;
  */
 public class QuestionJson extends JavaScriptObject {
 	protected QuestionJson() {
-	};
+	}
 
 	/**
 	 * Gets the question's ID.

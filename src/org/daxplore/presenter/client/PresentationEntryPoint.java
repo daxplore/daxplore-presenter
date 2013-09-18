@@ -25,7 +25,6 @@ import org.daxplore.presenter.client.ui.StagePanel;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 
 /**
@@ -41,7 +40,6 @@ import com.google.gwt.user.client.ui.RootPanel;
 public class PresentationEntryPoint implements EntryPoint {
 
 	private final PresentationInjector injector = GWT.create(PresentationInjector.class);
-	DockLayoutPanel rootLayoutPanel;
 
 	/**
 	 * This is the entry point method. It is automatically called by GWT to

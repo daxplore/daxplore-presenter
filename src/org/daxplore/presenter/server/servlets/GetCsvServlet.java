@@ -75,7 +75,6 @@ public class GetCsvServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 		PersistenceManager pm = null;
-		CSVWriter csvWriter = null;
 		try {
 			// Get input from URL
 			String prefix = request.getParameter("prefix");
@@ -89,14 +88,6 @@ public class GetCsvServlet extends HttpServlet {
 			
 			if (localeString==null) {
 				localeString = "";
-			}
-			
-			try {
-				PrintWriter respWriter = new PrintWriter(new OutputStreamWriter(response.getOutputStream(), "UTF8"), true);
-				response.setContentType("text/csv; charset=UTF-8");
-				csvWriter =  new CSVWriter(respWriter);
-			} catch (IOException e) {
-				throw new InternalServerException("Failed to write csv response", e);
 			}
 			
 			pm = PMF.get().getPersistenceManager();
@@ -176,9 +167,17 @@ public class GetCsvServlet extends HttpServlet {
 			}
 			
 			// write response
-			csvWriter.writeAll(csvTable);
-			csvWriter.close();
-			response.setStatus(HttpServletResponse.SC_OK);
+			try (PrintWriter respWriter = new PrintWriter(new OutputStreamWriter(response.getOutputStream(), "UTF8"), true);
+					CSVWriter csvWriter = new CSVWriter(respWriter);) {
+				
+				response.setContentType("text/csv; charset=UTF-8");
+				
+				csvWriter.writeAll(csvTable);
+				csvWriter.close();
+				response.setStatus(HttpServletResponse.SC_OK);
+			} catch (IOException e) {
+				throw new InternalServerException("Failed to write csv response", e);
+			}
 			
 		} catch (BadRequestException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
@@ -186,7 +185,7 @@ public class GetCsvServlet extends HttpServlet {
 		} catch (InternalServerException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
 			logger.log(Level.SEVERE, "Unexpected exception: " + e.getMessage(), e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} finally {

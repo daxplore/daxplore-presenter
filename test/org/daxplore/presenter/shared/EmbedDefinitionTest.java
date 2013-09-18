@@ -50,7 +50,7 @@ public class EmbedDefinitionTest {
 					flags.add(values[j]);
 				}
 			}
-			EmbedFlag[] flagArray = flags.toArray(new EmbedFlag[0]);
+			EmbedFlag[] flagArray = flags.toArray(new EmbedFlag[flags.size()]);
 			long encoded = EmbedFlag.encodeFlags(flagArray);
 			assertArrayEquals(flagArray, EmbedFlag.decodeFlags(encoded));
 		}

@@ -34,14 +34,11 @@ import org.daxplore.presenter.client.event.SetWarningBannerEvent;
 import org.daxplore.presenter.client.event.SetWarningBannerHandler;
 import org.daxplore.presenter.client.model.StatDataServerModel;
 import org.daxplore.presenter.client.resources.DaxploreConfig;
-import org.daxplore.presenter.client.resources.UITexts;
 import org.daxplore.presenter.client.ui.ChartTypeOptionsPanel;
 import org.daxplore.presenter.client.ui.ImageButtonPanel;
 import org.daxplore.presenter.client.ui.PerspectivePanel;
 import org.daxplore.presenter.client.ui.QuestionPanel;
-import org.daxplore.presenter.client.ui.StagePanel;
 import org.daxplore.presenter.client.ui.WarningBanner;
-import org.daxplore.presenter.client.ui.WarningBanner.WarningBannerFactory;
 import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
@@ -75,10 +72,10 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 	private PrefixProperties prefixProperties;
 
 	@Inject
-	protected Presenter(StagePanel stagePanel, PerspectivePanel perspectivePanel, QuestionPanel questionPanel,
+	protected Presenter(PerspectivePanel perspectivePanel, QuestionPanel questionPanel,
 			ChartTypeOptionsPanel optionsPanel, EventBus eventBus, ChartPanelPresenter chartPanelPresenter,
-			QuestionMetadata questionMetadata, ImageButtonPanel imageButtonPanel, DaxploreConfig config, UITexts uiTexts,
-			WarningBannerFactory warningFactory, StatDataServerModel statDataServerModel, PrefixProperties prefixProperties) {
+			QuestionMetadata questionMetadata, ImageButtonPanel imageButtonPanel, DaxploreConfig config,
+			StatDataServerModel statDataServerModel, PrefixProperties prefixProperties) {
 		this.perspectivePanel = perspectivePanel;
 		this.questionPanel = questionPanel;
 		this.optionsPanel = optionsPanel;

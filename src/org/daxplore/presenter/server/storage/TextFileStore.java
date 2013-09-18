@@ -79,9 +79,8 @@ public class TextFileStore {
 				String file = pm.getObjectById(TextFileStore.class, key).getFile();
 				textFileCache.put(key, file);
 				return file;
-			} else {
-				return textFileCache.get(key);
 			}
+			return textFileCache.get(key);
 		} catch (Exception e) {
 			// This could also be an internal server exception, but we have no way of finding out
 			throw new BadRequestException("Could not read data item '" + key + "'", e);

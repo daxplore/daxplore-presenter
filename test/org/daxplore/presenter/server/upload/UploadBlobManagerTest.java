@@ -17,11 +17,8 @@
 package org.daxplore.presenter.server.upload;
 
 
-import java.io.IOException;
 import java.util.Random;
 
-import org.daxplore.presenter.server.throwable.BadRequestException;
-import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,7 +46,7 @@ public class UploadBlobManagerTest {
 
 	    
 	@Test
-	public void test() throws IOException, InternalServerException, BadRequestException {
+	public void test() {
 		int dataSize = (int)Math.pow(2, 21)+123456;
 		byte[] data = new byte[dataSize];
 		Random random = new Random(0x556a347f);

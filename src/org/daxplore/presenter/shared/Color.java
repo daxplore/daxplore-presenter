@@ -68,20 +68,23 @@ public class Color {
 	 * @param model
 	 *            the color model used to interpret the lightnessOrValue argument
 	 */
-	public Color(double h, double s, double lightnessOrValue, Model model) {
-		double r = 0, g = 0, b = 0;
+	public Color(double hue, double saturation, double lightnessOrValue, Model model) {
+		double red = 0, green = 0, blue = 0;
 		
-		h = h%360;
+		double h = hue%360;
 		
+		double s = saturation;
 		if (s < 0) {
 			s = 0;
 		} else if (s > 1) {
 			s = 1.0;
 		}
-		if (lightnessOrValue < 0) {
-			lightnessOrValue = 0.0;
-		} else if (lightnessOrValue > 1) {
-			lightnessOrValue = 1.0;
+		
+		double lov = lightnessOrValue;
+		if (lov < 0) {
+			lov = 0.0;
+		} else if (lov > 1) {
+			lov = 1.0;
 		}
 		
 		double C = 0, hprim = 0, X = 0, m = 0;
@@ -90,67 +93,66 @@ public class Color {
 		case HSL:
 			hslh = h;
 			hsls = s;
-			hsll = lightnessOrValue;
+			hsll = lov;
 
 			// Code based on math from http://en.wikipedia.org/wiki/HSL_and_HSV#From_HSL
-			C = (1 - Math.abs(2 * lightnessOrValue - 1)) * s;
+			C = (1 - Math.abs(2 * lov - 1)) * s;
 			hprim = h / 60;
 			X = C * (1 - Math.abs(hprim % 2 - 1));
-			m = lightnessOrValue - 0.5 * C;
+			m = lov - 0.5 * C;
 			break;
 		case HSV:
 			hsvh = h;
 			hsvs = s;
-			hsvv = lightnessOrValue;
+			hsvv = lov;
 			
 			// Code based on math from http://en.wikipedia.org/wiki/HSL_and_HSV#From_HSV
-			C = lightnessOrValue * s;
+			C = lov * s;
 			hprim = h / 60;
 			X = C * (1 - Math.abs(hprim % 2 - 1));
-			m = lightnessOrValue - C;
+			m = lov - C;
 			break;
-		case RGB:
-			throw new Error("RGB model used in the HSL/HSV constructor");
+		default: throw new IllegalArgumentException("Illegal model in hsl/hsv method: " + model.toString());
 		}
 		
 		if (hprim < 1) {
-			r = C;
-			g = X;
-			b = 0;
+			red = C;
+			green = X;
+			blue = 0;
 		} else if (hprim < 2) {
-			r = X;
-			g = C;
-			b = 0;
+			red = X;
+			green = C;
+			blue = 0;
 		} else if (hprim < 3) {
-			r = 0;
-			g = C;
-			b = X;
+			red = 0;
+			green = C;
+			blue = X;
 		} else if (hprim < 4) {
-			r = 0;
-			g = X;
-			b = C;
+			red = 0;
+			green = X;
+			blue = C;
 		} else if (hprim < 5) {
-			r = X;
-			g = 0;
-			b = C;
+			red = X;
+			green = 0;
+			blue = C;
 		} else if (hprim < 6) {
-			r = C;
-			g = 0;
-			b = X;
+			red = C;
+			green = 0;
+			blue = X;
 		}
 		
-		r += m;
-		g += m;
-		b += m;
+		red += m;
+		green += m;
+		blue += m;
 		
-		this.r = r * 255;
-		this.g = g * 255;
-		this.b = b * 255;
+		this.r = red * 255;
+		this.g = green * 255;
+		this.b = blue * 255;
 		
 		switch (model) {
 		case HSL: calcHSV(); break;
 		case HSV: calcHSL(); break;
-		case RGB: throw new AssertionError();
+		default: throw new IllegalArgumentException("Illegal model in hsl/hsv method: " + model.toString());
 		}
 	}
 
@@ -349,7 +351,7 @@ public class Color {
 	}
 	
 
-	private String pad(String in) {
+	private static String pad(String in) {
 		if (in.length() == 0) {
 			return "00";
 		}
@@ -396,10 +398,10 @@ public class Color {
 		double nr = r / 255.0, ng = g / 255.0, nb = b / 255.0;
 		double max = Math.max(nr, Math.max(ng, nb));
 		double min = Math.min(nr, Math.min(ng, nb));
-		double h = max, s = max, v = max;
+		double h = max, s, v = max;
 
 		double d = max - min;
-		s = max == 0 ? 0 : d / max;
+		s = (max == 0) ? 0 : d / max;
 
 		if (max == min) {
 			h = 0; // achromatic

@@ -39,7 +39,7 @@ public class LocaleStore {
 	
 	public LocaleStore(String prefix, List<Locale> supportedLocales, Locale defaultLocale) {
 		this.prefix = prefix;
-		this.supportedLocales = new LinkedList<String>();
+		this.supportedLocales = new LinkedList<>();
 		for (Locale l : supportedLocales) {
 			this.supportedLocales.add(l.toLanguageTag());
 		}
@@ -51,7 +51,7 @@ public class LocaleStore {
 	}
 	
 	public List<Locale> getSupportedLocales() {
-		LinkedList<Locale> locales = new LinkedList<Locale>();
+		LinkedList<Locale> locales = new LinkedList<>();
 		for (String l : supportedLocales) {
 			locales.add(new Locale(l));
 		}

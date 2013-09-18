@@ -27,14 +27,13 @@ import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
 import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.EventBus;
 
 public class ChartPanelPresenter  {
 	private ChartFactory chartFactory;
 	private ChartPanelView view;
 	
 	@Inject
-	public ChartPanelPresenter(EventBus eventBus, ChartFactory chartFactory, ChartPanelView view) {
+	public ChartPanelPresenter(ChartFactory chartFactory, ChartPanelView view) {
 		this.chartFactory = chartFactory;
 		this.view = view;
 		view.setChart(new BlankChart());

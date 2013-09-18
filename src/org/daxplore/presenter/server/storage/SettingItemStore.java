@@ -84,7 +84,7 @@ public class SettingItemStore {
 	}
 	
 	public static String getProperty(PersistenceManager pm, String prefix,
-			String fileName, String propertyName) throws BadRequestException {
+			String fileName, String propertyName) {
 		String statStoreKey = prefix + "#" + fileName + "/" + propertyName;
 		try {
 			return pm.getObjectById(SettingItemStore.class, statStoreKey).getValue();

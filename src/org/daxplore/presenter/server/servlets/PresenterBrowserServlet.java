@@ -57,10 +57,8 @@ public class PresenterBrowserServlet extends HttpServlet {
 			String responseHTML = MessageFormat.format(welcomeTemplate, (Object[])arguments);
 			
 			response.setContentType("text/html; charset=UTF-8");
-			try {
-				Writer writer = response.getWriter();
+			try (Writer writer = response.getWriter()) {
 				writer.write(responseHTML);
-				writer.close();
 			} catch (IOException e) {
 				throw new InternalServerException("Failed to display presenter servlet", e);
 			}
