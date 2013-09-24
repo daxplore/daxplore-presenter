@@ -71,7 +71,7 @@ public class ChartTools {
 	public static int ieVersion() {
 		if (ieVersion == 0.0) {
 			ieVersion = getInternetExplorerVersion(Navigator.getUserAgent());
-			SharedTools.println("### ieVersion = " + ieVersion);
+			System.out.println("### ieVersion = " + ieVersion);
 		}
 		return (int) ieVersion;
 	}
