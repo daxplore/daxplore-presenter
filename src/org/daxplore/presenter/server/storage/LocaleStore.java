@@ -32,10 +32,10 @@ public class LocaleStore {
 	private String prefix;
 	
 	@Persistent
-	List<String> supportedLocales;
+	private List<String> supportedLocales;
 
 	@Persistent
-	String defaultLocale;
+	private String defaultLocale;
 	
 	public LocaleStore(String prefix, List<Locale> supportedLocales, Locale defaultLocale) {
 		this.prefix = prefix;

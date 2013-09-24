@@ -29,7 +29,7 @@ import com.google.gwt.user.client.ui.TreeItem;
  */
 class QuestionTreeItem extends TreeItem {
 
-	String questionID;
+	private String questionID;
 
 	QuestionTreeItem(SafeHtml html, String questionID) {
 		super(html);

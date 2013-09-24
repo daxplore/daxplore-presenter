@@ -111,7 +111,7 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 	 * @param setHistory
 	 *            true, if the browser history should be set
 	 */
-	public void makeQuery(boolean setHistory) {
+	private void makeQuery(boolean setHistory) {
 		List<QueryFlag> flags = new LinkedList<QueryFlag>();
 		String questionID = questionPanel.getQuestionID();
 		String perspectiveID = perspectivePanel.getQuestionID();

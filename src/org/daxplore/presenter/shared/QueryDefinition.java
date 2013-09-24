@@ -130,10 +130,10 @@ public class QueryDefinition {
 		}
 	}
 	
-	protected String perspectiveID, questionID;
-	protected List<Integer> usedPerspectiveOptions;
-	protected QueryFlag[] flags;
-	protected QuestionMetadata questionMetadata;
+	private String perspectiveID, questionID;
+	private List<Integer> usedPerspectiveOptions;
+	private QueryFlag[] flags;
+	private QuestionMetadata questionMetadata;
 	
 	
 	/**

@@ -73,7 +73,7 @@ public class PrefixListPresenter implements Presenter {
 		});
 	}
 	
-	public void doAddPrefixName() {
+	private void doAddPrefixName() {
 		String prefix = display.promptForPrefixName();
 		
 		// Validate user input
@@ -90,7 +90,7 @@ public class PrefixListPresenter implements Presenter {
 		prefixToBeSelected = prefix;
 	}
 	
-	public void doUpdatePrefixList(List<String> prefixList) {
+	private void doUpdatePrefixList(List<String> prefixList) {
 		display.setPrefixes(prefixList);
 	    if (prefixToBeSelected!=null && display.containsPrefix(prefixToBeSelected)) {
 	    	display.selectPrefix(prefixToBeSelected); // This will fire a SelectionChangeEvent

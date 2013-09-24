@@ -112,7 +112,7 @@ public abstract class QueryResult {
 	 * 
 	 * @return True if there is a total data item, otherwise false.
 	 */
-	public boolean hasTotalDataItem() {
+	private boolean hasTotalDataItem() {
 		return totalItem != null;
 	}
 

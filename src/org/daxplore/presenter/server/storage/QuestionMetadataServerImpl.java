@@ -45,7 +45,7 @@ import org.json.simple.parser.ParseException;
 @SuppressWarnings({"rawtypes"})
 public class QuestionMetadataServerImpl implements QuestionMetadata {
 	
-	List<JSONObject> questionList;
+	private List<JSONObject> questionList;
 	
 	/**
 	 * Instantiates a new question metadata instance by reading in and parsing

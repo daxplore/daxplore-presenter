@@ -20,7 +20,7 @@ public class OnePixel implements PixelSource {
 	private int size = 1;
 	private int intcolor;
 	private int intalpha = 0x00;
-	boolean hasalpha = false;
+	private boolean hasalpha = false;
 
 	public OnePixel(String color) {
 		intcolor = Integer.parseInt(color, 16);
