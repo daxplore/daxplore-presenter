@@ -71,7 +71,7 @@ public class EmbedView extends Composite {
 	private ScrollPanel chartScrollPanel = new ScrollPanel();
 	
 	
-	private interface EmbedStyle extends CssResource {
+	interface EmbedStyle extends CssResource {
 		String transparent();
 		String opaque();
 	}
