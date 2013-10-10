@@ -97,10 +97,10 @@ public class QueryData extends JavaScriptObject {
 		List<StatInterface> list = new ArrayList<StatInterface>(perspectiveCount);
 		
 		for(int i = 0; i < perspectiveCount; i++){
-			int[] primaryData = JsonTools.jsArrayAsArray(getData(timepoints[0], Integer.toString(i)));
+			int[] primaryData = JsonTools.jsArrayAsArray(getData(0, Integer.toString(i)));
 			int[] secondaryData = null;
 			if(timepoints.length==2) { //TODO invalid assumptions about timepoints
-				secondaryData = JsonTools.jsArrayAsArray(getData(timepoints[1], Integer.toString(i)));
+				secondaryData = JsonTools.jsArrayAsArray(getData(1, Integer.toString(i)));
 			}
 			list.add(new StatDataItemGWT(primaryData, secondaryData, i));
 		}
