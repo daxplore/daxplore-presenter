@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.daxplore.presenter.server.ChartDataParserServer;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.QuestionMetadataServerImpl;
 import org.daxplore.presenter.server.storage.SettingItemStore;
@@ -43,13 +44,11 @@ import org.daxplore.presenter.server.storage.StatDataItemStore;
 import org.daxplore.presenter.server.storage.TextFileStore;
 import org.daxplore.presenter.server.throwable.BadRequestException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
+import org.daxplore.presenter.shared.ChartDataItem;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 import org.daxplore.presenter.shared.QuestionMetadata;
 import org.daxplore.shared.SharedResourceTools;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 import au.com.bytecode.opencsv.CSVWriter;
 
@@ -58,7 +57,7 @@ import au.com.bytecode.opencsv.CSVWriter;
  * 
  * <p>This servlet is used by the client to generate and serve a downloadable
  * csv-file to the user. The content of the file matches the data as defined
- * by a singe {@link QueryDefinition}.</p>
+ * by a single {@link QueryDefinition}.</p>
  * 
  * <p>The servlet takes the arguments:
  * <ul>
@@ -116,55 +115,75 @@ public class GetCsvServlet extends HttpServlet {
 			String timepoint1Text = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "timepoint_1");
 			
 			String statString = StatDataItemStore.getStats(pm, prefix, queryDefinition);
-			JSONObject statJsonObject = (JSONObject)JSONValue.parse(statString);
-			JSONObject valueJsonObject = (JSONObject)statJsonObject.get("values");
+			ChartDataParserServer data = new ChartDataParserServer(statString);
+			List<ChartDataItem> dataItems = data.getDataItems();
+			
 			int columnCount = 4 + queryDefinition.getQuestionOptionCount();
 			int rowCount = 0;
 			csvTable.add(questionOptionTexts.toArray(new String[columnCount]));
+			
 			if(queryDefinition.getPerspectiveOptionCount()>0){
-				JSONObject timepoint1 = (JSONObject)valueJsonObject.get("0"); //TODO: check what to do here
-				for(int i=0; i<usedPerspectiveOptions.size(); i++) {
+				for(int perspectiveOption : usedPerspectiveOptions) {
 					String[] row = new String[columnCount];
-					int perspectiveOption = usedPerspectiveOptions.get(i);
 					row[0] = MessageFormat.format("{0} ({1})", perspectiveOptionTexts.get(perspectiveOption), timepoint0Text);
-					JSONArray questionData = (JSONArray)timepoint1.get(Integer.toString(perspectiveOption));
-					for (int j=1; j<=queryDefinition.getQuestionOptionCount(); j++) {
-						row[j] = questionData.get(j-1).toString();
+					int[] primaryData = dataItems.get(perspectiveOption).getCountData();
+					for (int i=1; i<=queryDefinition.getQuestionOptionCount(); i++) {
+						row[i] = Integer.toString(primaryData[i-1]);				
+					}
+					csvTable.add(row);
+					rowCount++;
+				}
+			} 
+			
+			if(queryDefinition.hasFlag(QueryFlag.TOTAL) || queryDefinition.getPerspectiveOptionCount()==0){
+				String[] row = new String[columnCount];
+				String allRespondents = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "all_respondents");
+				row[0] = MessageFormat.format("{0} ({1})", allRespondents, timepoint0Text);
+				int[] primaryData = data.getTotalDataItem().getCountData();
+				for (int i=1; i<=queryDefinition.getQuestionOptionCount(); i++) {
+					row[i] = Integer.toString(primaryData[i-1]);	
+				}
+				csvTable.add(row);
+				rowCount++;
+			}
+
+			
+			if (queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
+				for(int perspectiveOption : usedPerspectiveOptions) {
+					String[] row = new String[columnCount];
+					row[0] = MessageFormat.format("{0} ({1})", perspectiveOptionTexts.get(perspectiveOption), timepoint1Text);
+					int[] secondaryData = dataItems.get(perspectiveOption).getCountDataSecondary();
+					for(int i=1; i<=queryDefinition.getQuestionOptionCount(); i++) {
+						row[i] = Integer.toString(secondaryData[i-1]);
 					}
 					csvTable.add(row);
 					rowCount++;
 				}
 				
-				for(int i=0; i<usedPerspectiveOptions.size(); i++) {
-					if (queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
-						JSONObject timepoint2 = (JSONObject)valueJsonObject.get("1");
-						String[] row = new String[columnCount];
-						int perspectiveOption = usedPerspectiveOptions.get(i);
-						row[0] = MessageFormat.format("{0} ({1})", perspectiveOptionTexts.get(perspectiveOption), timepoint1Text);
-						JSONArray questionData = (JSONArray)timepoint2.get(Integer.toString(perspectiveOption));
-						for (int j=1; j<=queryDefinition.getQuestionOptionCount(); j++) {
-							row[j] = questionData.get(j-1).toString();
-						}
-						csvTable.add(row);
-						rowCount++;
+				if(queryDefinition.hasFlag(QueryFlag.TOTAL) || queryDefinition.getPerspectiveOptionCount()==0){
+					String[] row = new String[columnCount];
+					String allRespondents = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "all_respondents");
+					row[0] = MessageFormat.format("{0} ({1})", allRespondents, timepoint1Text);
+					int[] secondaryData = data.getTotalDataItem().getCountDataSecondary();
+					for (int i=1; i<=queryDefinition.getQuestionOptionCount(); i++) {
+						row[i] = Integer.toString(secondaryData[i-1]);	
 					}
+					csvTable.add(row);
+					rowCount++;
 				}
-				
-				while(rowCount++ < 3) {
-					csvTable.add(new String[columnCount]);
-				}
-				
-				int metaDataColumn = queryDefinition.getQuestionOptionCount() + 2;
-				csvTable.get(0)[metaDataColumn] = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "page_title");
-				csvTable.get(1)[metaDataColumn] = queryDefinition.getPerspectiveShortText() + ":";
-				csvTable.get(1)[metaDataColumn+1] = queryDefinition.getPerspectiveFullText();
-				csvTable.get(2)[metaDataColumn] = queryDefinition.getQuestionShortText() + ":";
-				csvTable.get(2)[metaDataColumn+1] = queryDefinition.getQuestionFullText();
 			}
 			
-			if(queryDefinition.hasFlag(QueryFlag.TOTAL) || queryDefinition.getPerspectiveOptionCount()>0){
-				//TODO add all item if requested or if nothing else is requested
+			while(rowCount++ < 3) {
+				csvTable.add(new String[columnCount]);
 			}
+			
+			int metaDataColumn = queryDefinition.getQuestionOptionCount() + 2;
+			csvTable.get(0)[metaDataColumn] = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "page_title");
+			csvTable.get(1)[metaDataColumn] = queryDefinition.getPerspectiveShortText() + ":";
+			csvTable.get(1)[metaDataColumn+1] = queryDefinition.getPerspectiveFullText();
+			csvTable.get(2)[metaDataColumn] = queryDefinition.getQuestionShortText() + ":";
+			csvTable.get(2)[metaDataColumn+1] = queryDefinition.getQuestionFullText();
+			
 			
 			// write response
 			try (PrintWriter respWriter = new PrintWriter(new OutputStreamWriter(response.getOutputStream(), "UTF8"), true);

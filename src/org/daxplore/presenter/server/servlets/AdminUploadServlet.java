@@ -237,7 +237,7 @@ public class AdminUploadServlet extends HttpServlet {
 	}
 
 	private static void unpackPropertyFile(PersistenceManager pm, String fileName, byte[] fileData) throws InternalServerException, BadRequestException {
-		String[] propertiesWhitelist = { "page_title", "secondary_flag", "timepoint_0", "timepoint_1" };
+		String[] propertiesWhitelist = { "page_title", "secondary_flag", "all_respondents", "timepoint_0", "timepoint_1" };
 		try(BufferedReader reader = ServerTools.getAsBufferedReader(fileData)) {
 			List<SettingItemStore> items = new LinkedList<>();
 			JSONObject dataMap = (JSONObject) JSONValue.parse(reader);

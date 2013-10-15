@@ -18,7 +18,7 @@
  */
 package org.daxplore.presenter.client.event;
 
-import org.daxplore.presenter.client.json.shared.QueryData;
+import org.daxplore.presenter.client.json.shared.ChartDataParserClient;
 import org.daxplore.presenter.shared.QueryDefinition;
 
 import com.google.web.bindery.event.shared.Event;
@@ -35,9 +35,9 @@ public class QueryReadyEvent extends Event<QueryReadyHandler> {
 	private static final Type<QueryReadyHandler> TYPE = new Type<QueryReadyHandler>();
 
 	private final QueryDefinition queryDefinition;
-	private final QueryData queryData;
+	private final ChartDataParserClient queryData;
 
-	public QueryReadyEvent(QueryDefinition queryDefinition, QueryData queryData) {
+	public QueryReadyEvent(QueryDefinition queryDefinition, ChartDataParserClient queryData) {
 		this.queryDefinition = queryDefinition;
 		this.queryData = queryData;
 	}
@@ -46,7 +46,7 @@ public class QueryReadyEvent extends Event<QueryReadyHandler> {
 		return queryDefinition;
 	}
 	
-	public QueryData getQueryData() {
+	public ChartDataParserClient getQueryData() {
 		return queryData;
 	}
 

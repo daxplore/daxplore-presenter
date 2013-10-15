@@ -21,18 +21,18 @@ package org.daxplore.presenter.client.json.shared;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.daxplore.presenter.chart.StatInterface;
+import org.daxplore.presenter.shared.ChartDataItem;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArrayInteger;
 
 /**
- * This class wraps a single StatData server response, which makes up the data
+ * This class wraps a single server response, which makes up the data
  * for a question/perspective combination.
  */
-public class QueryData extends JavaScriptObject {
+public class ChartDataParserClient extends JavaScriptObject {
 	
-	protected QueryData() {}
+	protected ChartDataParserClient() {}
 	
 	/**
 	 * Acts as a constructor for the class. Parses and wraps the json response.
@@ -40,7 +40,7 @@ public class QueryData extends JavaScriptObject {
 	 * @param json The json representation of the data
 	 * @return A new instance of this class
 	 */
-	public final static native QueryData parseStatDataItem(String json) /*-{
+	public final static native ChartDataParserClient parseJson(String json) /*-{
 		return eval('('+json+')');
 	}-*/;
 	
@@ -49,7 +49,7 @@ public class QueryData extends JavaScriptObject {
 	 * 
 	 * @return the native json data
 	 */
-	public final static native QueryData getEmbeddedData() /*-{
+	public final static native ChartDataParserClient getEmbeddedData() /*-{
 		return $wnd.jsondata;
 	}-*/;
 	
@@ -87,14 +87,14 @@ public class QueryData extends JavaScriptObject {
 	}-*/;
 	
 	/**
-	 * Get the {@link StatInterface} data as a list.
+	 * Get the {@link ChartDataInterface} data as a list.
 	 * 
 	 * @return the data
 	 */
-	public final List<StatInterface> getDataItems() {
+	public final List<ChartDataItem> getDataItems() {
 		int[] timepoints = JsonTools.jsArrayAsArray(getTimepoints());
 		int perspectiveCount = getPerspectiveCount(timepoints[0]);
-		List<StatInterface> list = new ArrayList<StatInterface>(perspectiveCount);
+		List<ChartDataItem> list = new ArrayList<ChartDataItem>(perspectiveCount);
 		
 		for(int i = 0; i < perspectiveCount; i++){
 			int[] primaryData = JsonTools.jsArrayAsArray(getData(0, Integer.toString(i)));
@@ -102,19 +102,19 @@ public class QueryData extends JavaScriptObject {
 			if(timepoints.length==2) { //TODO invalid assumptions about timepoints
 				secondaryData = JsonTools.jsArrayAsArray(getData(1, Integer.toString(i)));
 			}
-			list.add(new StatDataItemGWT(primaryData, secondaryData, i));
+			list.add(new ChartDataItem(primaryData, secondaryData, i));
 		}
 		
 		return list;
 	}
 	
-	public final StatInterface getTotalDataItem() {
+	public final ChartDataItem getTotalDataItem() {
 		int[] timepoints = JsonTools.jsArrayAsArray(getTimepoints());
 		int[] primaryData = JsonTools.jsArrayAsArray(getData(timepoints[0], "all"));
 		int[] secondaryData = null;
 		if(timepoints.length==2) { //TODO invalid assumptions about timepoints
 			secondaryData = JsonTools.jsArrayAsArray(getData(timepoints[1], "all"));
 		}
-		return new StatDataItemGWT(primaryData, secondaryData, -1);
+		return new ChartDataItem(primaryData, secondaryData, -1);
 	}
 }

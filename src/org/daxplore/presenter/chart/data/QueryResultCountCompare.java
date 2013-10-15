@@ -20,9 +20,9 @@ package org.daxplore.presenter.chart.data;
 
 import java.util.Collection;
 
-import org.daxplore.presenter.chart.StatInterface;
 import org.daxplore.presenter.chart.display.BarChart;
 import org.daxplore.presenter.chart.display.BarChartCompare;
+import org.daxplore.presenter.shared.ChartDataItem;
 
 /**
  * A class for storing and sending around the results from a query, that asks
@@ -65,7 +65,7 @@ public class QueryResultCountCompare extends QueryResultCount {
 	 * @param query
 	 *            the query
 	 */
-	public QueryResultCountCompare(Collection<? extends StatInterface> dataItems, StatInterface totalDataItem) {
+	public QueryResultCountCompare(Collection<? extends ChartDataItem> dataItems, ChartDataItem totalDataItem) {
 		super(dataItems, totalDataItem);
 	}
 
@@ -139,7 +139,7 @@ public class QueryResultCountCompare extends QueryResultCount {
 	 * @return The secondary count data for the total item group.
 	 */
 	public int[] getTotalCountDataSecondary() {
-		StatInterface totalItem = getTotalDataItem();
+		ChartDataItem totalItem = getTotalDataItem();
 		if (totalItem != null) {
 			return totalItem.getCountDataSecondary();
 		}
@@ -158,7 +158,7 @@ public class QueryResultCountCompare extends QueryResultCount {
 	 * @return The percentage count data for the total item group.
 	 */
 	public double[] getTotalCountDataPercentagesSecondary() {
-		StatInterface totalItem = getTotalDataItem();
+		ChartDataItem totalItem = getTotalDataItem();
 		if (totalItem != null) {
 			return totalItem.getCountDataPercentagesSecondary();
 		}
@@ -171,7 +171,7 @@ public class QueryResultCountCompare extends QueryResultCount {
 	 * @return The number of subjects in the total item group.
 	 */
 	public int getTotalPopulationSecondary() {
-		StatInterface totalItem = getTotalDataItem();
+		ChartDataItem totalItem = getTotalDataItem();
 		if (totalItem != null) {
 			return totalItem.getPopulationCountSecondary();
 		}

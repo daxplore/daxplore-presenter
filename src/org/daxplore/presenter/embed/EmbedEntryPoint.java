@@ -26,7 +26,7 @@ import org.daxplore.presenter.chart.display.BarChart;
 import org.daxplore.presenter.chart.display.BarChartCompare;
 import org.daxplore.presenter.chart.display.ChartFactory;
 import org.daxplore.presenter.chart.display.GChartChart;
-import org.daxplore.presenter.client.json.shared.QueryData;
+import org.daxplore.presenter.client.json.shared.ChartDataParserClient;
 import org.daxplore.presenter.embed.inject.EmbedInjector;
 import org.daxplore.presenter.shared.EmbedDefinition;
 import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
@@ -77,7 +77,7 @@ public class EmbedEntryPoint implements EntryPoint {
 		}
 
 		try {
-			QueryData queryData = QueryData.getEmbeddedData();
+			ChartDataParserClient queryData = ChartDataParserClient.getEmbeddedData();
 			GChartChart chart;
 			boolean printMode = embedDefinition.hasFlag(EmbedFlag.PRINT);
 			if (!queryDefinition.hasFlag(QueryFlag.SECONDARY)) {

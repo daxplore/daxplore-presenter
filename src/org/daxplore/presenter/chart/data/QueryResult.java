@@ -21,7 +21,7 @@ package org.daxplore.presenter.chart.data;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import org.daxplore.presenter.chart.StatInterface;
+import org.daxplore.presenter.shared.ChartDataItem;
 
 /**
  * Abstract class for storing and sending around the results from a query.
@@ -42,14 +42,14 @@ public abstract class QueryResult {
 	/**
 	 * A list containing all the standard data items.
 	 */
-	private LinkedList<StatInterface> itemList;
+	private LinkedList<ChartDataItem> itemList;
 
 	/**
 	 * If there is a total data item, it is stored here.
 	 * 
 	 * The total data item contains the total of all groups.
 	 */
-	private StatInterface totalItem;
+	private ChartDataItem totalItem;
 
 	/**
 	 * Build a new result item.
@@ -65,8 +65,8 @@ public abstract class QueryResult {
 	 * @param totalDataItem
 	 *            The total data item. Can be set to <i>null</i>.
 	 */
-	public QueryResult(Collection<? extends StatInterface> dataItems, StatInterface totalDataItem) {
-		itemList = new LinkedList<StatInterface>(dataItems);
+	public QueryResult(Collection<? extends ChartDataItem> dataItems, ChartDataItem totalDataItem) {
+		itemList = new LinkedList<ChartDataItem>(dataItems);
 		totalItem = totalDataItem;
 	}
 
@@ -78,8 +78,8 @@ public abstract class QueryResult {
 	 *            The perspective option of the group.
 	 * @return A data item representing the group.
 	 */
-	protected StatInterface getItem(int perspectiveOptionIndex) {
-		for (StatInterface item : itemList) {
+	protected ChartDataItem getItem(int perspectiveOptionIndex) {
+		for (ChartDataItem item : itemList) {
 			if (item.getPerspectiveOption() == perspectiveOptionIndex) {
 				return item;
 			}
@@ -138,7 +138,7 @@ public abstract class QueryResult {
 	 * 
 	 * @return The total data item.
 	 */
-	protected StatInterface getTotalDataItem() {
+	protected ChartDataItem getTotalDataItem() {
 		if (hasTotalDataItem()) {
 			return totalItem;
 		}

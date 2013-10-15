@@ -22,7 +22,7 @@ import org.daxplore.presenter.chart.display.BarChart;
 import org.daxplore.presenter.chart.display.BarChartCompare;
 import org.daxplore.presenter.chart.display.BlankChart;
 import org.daxplore.presenter.chart.display.ChartFactory;
-import org.daxplore.presenter.client.json.shared.QueryData;
+import org.daxplore.presenter.client.json.shared.ChartDataParserClient;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
@@ -39,7 +39,7 @@ public class ChartPanelPresenter  {
 		view.setChart(new BlankChart());
 	}
 
-	public void onQueryReady(QueryDefinition queryDefinition, QueryData queryData) {
+	public void onQueryReady(QueryDefinition queryDefinition, ChartDataParserClient queryData) {
 		if (!queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
 			BarChart chart = chartFactory.createBarChart(queryDefinition, false);
 			QueryResultCount result = new QueryResultCount(queryData.getDataItems(), queryData.getTotalDataItem());

@@ -20,8 +20,8 @@ package org.daxplore.presenter.chart.data;
 
 import java.util.Collection;
 
-import org.daxplore.presenter.chart.StatInterface;
 import org.daxplore.presenter.chart.display.BarChart;
+import org.daxplore.presenter.shared.ChartDataItem;
 
 /**
  * <p>A class for storing and sending around the results from a query, that
@@ -62,7 +62,7 @@ public class QueryResultCount extends QueryResult {
 	 * @param query
 	 *            the query
 	 */
-	public QueryResultCount(Collection<? extends StatInterface> dataItems, StatInterface totalDataItem) {
+	public QueryResultCount(Collection<? extends ChartDataItem> dataItems, ChartDataItem totalDataItem) {
 		super(dataItems, totalDataItem);
 	}
 
@@ -113,7 +113,7 @@ public class QueryResultCount extends QueryResult {
 	 * @return The number of subjects in this group.
 	 */
 	public int getPopulation(int perspectiveOption) {
-		StatInterface item = getItem(perspectiveOption);
+		ChartDataItem item = getItem(perspectiveOption);
 		if (item != null) {
 			return item.getPopulationCount();
 		}
@@ -135,7 +135,7 @@ public class QueryResultCount extends QueryResult {
 	 * @return The count data for the total item group.
 	 */
 	public int[] getTotalCountData() {
-		StatInterface totalItem = getTotalDataItem();
+		ChartDataItem totalItem = getTotalDataItem();
 		if (totalItem != null) {
 			return totalItem.getCountData();
 		}
@@ -154,7 +154,7 @@ public class QueryResultCount extends QueryResult {
 	 * @return The percentage count data for the total item group.
 	 */
 	public double[] getTotalCountDataPercentages() {
-		StatInterface totalItem = getTotalDataItem();
+		ChartDataItem totalItem = getTotalDataItem();
 		if (totalItem != null) {
 			return totalItem.getCountDataPercentages();
 		}
@@ -167,7 +167,7 @@ public class QueryResultCount extends QueryResult {
 	 * @return The number of subjects in the total item group.
 	 */
 	public int getTotalPopulation() {
-		StatInterface totalItem = getTotalDataItem();
+		ChartDataItem totalItem = getTotalDataItem();
 		if (totalItem != null) {
 			return totalItem.getPopulationCount();
 		}

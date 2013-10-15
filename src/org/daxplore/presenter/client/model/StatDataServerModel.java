@@ -22,7 +22,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.daxplore.presenter.client.event.QueryReadyEvent;
-import org.daxplore.presenter.client.json.shared.QueryData;
+import org.daxplore.presenter.client.json.shared.ChartDataParserClient;
 import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QueryDefinition;
 
@@ -40,7 +40,7 @@ public class StatDataServerModel {
 	
 	private EventBus eventBus;
 	
-	private Map<String, QueryData> queryDataCache = new HashMap<String, QueryData>();
+	private Map<String, ChartDataParserClient> queryDataCache = new HashMap<String, ChartDataParserClient>();
 	
 	private String href;
 	
@@ -81,7 +81,7 @@ public class StatDataServerModel {
 		String requestString = getRequestString(currentQuery);
 		// Make sure the newly loaded doesn't belong to an old request
 		if (currentQuery != null && queryDataCache.containsKey(requestString)) {
-			QueryData data = queryDataCache.get(requestString);
+			ChartDataParserClient data = queryDataCache.get(requestString);
 			eventBus.fireEvent(new QueryReadyEvent(currentQuery, data));
 			currentQuery = null;
 		}
@@ -108,7 +108,7 @@ public class StatDataServerModel {
 		public void onResponseReceived(Request request, Response response) {
 			if (response.getStatusCode() == HttpServletResponse.SC_OK) {
 				System.out.println("Server Data: " + response.getText());
-				QueryData data = QueryData.parseStatDataItem(response.getText());
+				ChartDataParserClient data = ChartDataParserClient.parseJson(response.getText());
 				String requestString = getRequestString(queryDefinition);
 				if(!queryDataCache.containsKey(requestString)){
 					queryDataCache.put(requestString, data);
