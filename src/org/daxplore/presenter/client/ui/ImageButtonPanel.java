@@ -106,7 +106,7 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 	}
 	
 	private String getCsvDownloadSrc() {
-		String fileName = queryDefinition.getPerspectiveShortText() + " - " + queryDefinition.getQuestionShortText() + ".csv";
+		String fileName = prefixProperties.getPageTitle() + " - " + queryDefinition.getPerspectiveShortText() + " - " + queryDefinition.getQuestionShortText() + ".csv";
 		fileName = URL.encodePathSegment(fileName);
 		return baseUrl + "getCsv/" + fileName
 				+ "?q=" + queryDefinition.getAsString()

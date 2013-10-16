@@ -22,4 +22,5 @@ public interface PrefixProperties {
 	public String getSecondaryFlagText();
 	public String getTimepointPrimaryText();
 	public String getTimepointSecondaryText();
+	public String getPageTitle();
 }

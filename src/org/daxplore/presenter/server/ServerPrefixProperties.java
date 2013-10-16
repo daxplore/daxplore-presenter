@@ -22,14 +22,15 @@ import org.json.simple.JSONObject;
 
 public class ServerPrefixProperties implements PrefixProperties {
 
-	private String prefix, secondaryFlagText, timepoint0Text, timepoint1Text;
+	private final String prefix, secondaryFlagText, timepoint0Text, timepoint1Text, pageTitle;
 	
 	public ServerPrefixProperties(String prefix, String secondaryFlagText,
-			String timepoint0Text, String timepoint1Text) {
+			String timepoint0Text, String timepoint1Text, String pageTitle) {
 		this.prefix = prefix;
 		this.secondaryFlagText = secondaryFlagText;
 		this.timepoint0Text = timepoint0Text;
 		this.timepoint1Text = timepoint1Text;
+		this.pageTitle = pageTitle;
 	}
 
 	/**
@@ -64,6 +65,14 @@ public class ServerPrefixProperties implements PrefixProperties {
 		return timepoint1Text;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getPageTitle() {
+		return pageTitle;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public JSONAware toJson() {
 		JSONObject obj = new JSONObject();
@@ -71,7 +80,7 @@ public class ServerPrefixProperties implements PrefixProperties {
 		obj.put("secondary_flag", secondaryFlagText);
 		obj.put("timepoint_0", timepoint0Text);
 		obj.put("timepoint_1", timepoint1Text);
+		obj.put("page_title", pageTitle);
 		return obj;
 	}
-
 }
