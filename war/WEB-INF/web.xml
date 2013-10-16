@@ -2,24 +2,8 @@
 
 <web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
 
-	<!-- Default page to serve -->
-	
-	<welcome-file-list>
-		<welcome-file>presentation-browser</welcome-file>
-	</welcome-file-list>
-
-
 	<!-- Public display servlet -->
 
-	<servlet>
-		<servlet-name>presentation-browser</servlet-name>
-		<servlet-class>org.daxplore.presenter.server.servlets.PresenterBrowserServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>presentation-browser</servlet-name>
-		<url-pattern>/presentations</url-pattern>
-	</servlet-mapping>
-	
 	<servlet>
 		<servlet-name>presentation</servlet-name>
 		<servlet-class>org.daxplore.presenter.server.servlets.PresenterServlet</servlet-class>
@@ -120,7 +104,7 @@
 	</security-constraint>
 	
 	
-	<!-- Google Remote API -->
+	<!-- Google Remote API for AppEngine deployment -->
 	
 	<servlet>
 		<servlet-name>remoteapi</servlet-name>
@@ -140,5 +124,19 @@
 			<role-name>admin</role-name>
 		</auth-constraint>
 	</security-constraint>
+	
+	
+	<!-- Error handling: no matching servlet found -->
+	<!-- TODO: use <error-page> when fully supported by appengine -->
+	<!-- TODO: use a general error page when servlet version 3.0 is supported -->
+
+	<servlet>
+		<servlet-name>presentation-browser</servlet-name>
+		<servlet-class>org.daxplore.presenter.server.servlets.PresenterBrowserServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>presentation-browser</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
 
 </web-app>

@@ -32,7 +32,6 @@ import org.daxplore.presenter.server.throwable.InternalServerException;
 @SuppressWarnings("serial")
 public class PresenterBrowserServlet extends HttpServlet {
 	private static Logger logger = Logger.getLogger(PresenterBrowserServlet.class.getName());
-	
 	private static String welcomeTemplate = null;
 	
 	@Override
@@ -46,9 +45,7 @@ public class PresenterBrowserServlet extends HttpServlet {
 				}
 			}
 			
-			String baseurl = request.getRequestURL().toString();
-			baseurl = baseurl.substring(0, baseurl.lastIndexOf("/"));
-			baseurl = baseurl.substring(0, baseurl.lastIndexOf("/")+1);
+			String baseurl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
 			
 			String[] arguments = {
 					baseurl

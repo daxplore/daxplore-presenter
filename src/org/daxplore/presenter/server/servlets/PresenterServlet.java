@@ -79,9 +79,7 @@ public class PresenterServlet extends HttpServlet {
 			String useragent = request.getHeader("user-agent");
 			Cookie[] cookies = request.getCookies();
 			String feature = request.getParameter("f");
-			String baseurl = request.getRequestURL().toString();
-			baseurl = baseurl.substring(0, baseurl.lastIndexOf("/"));
-			baseurl = baseurl.substring(0, baseurl.lastIndexOf("/")+1);
+			String baseurl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
 			
 			// Clean user input
 			if(prefix==null || !SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
