@@ -20,7 +20,7 @@ import org.daxplore.presenter.admin.inject.AdminInjector;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 
 public class AdminEntryPoint implements EntryPoint {
 	/**
@@ -31,6 +31,6 @@ public class AdminEntryPoint implements EntryPoint {
 	public void onModuleLoad() {
 		AdminInjector injector = GWT.create(AdminInjector.class);
 		AdminController adminController = injector.getAdminController();
-		adminController.go(RootPanel.get("ID-AdminPanel"));
+		adminController.go(RootLayoutPanel.get());
 	}
 }
