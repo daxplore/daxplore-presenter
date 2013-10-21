@@ -57,7 +57,7 @@ public class PresentationEntryPoint implements EntryPoint {
 			String base64 = href.substring(href.lastIndexOf("#") + 1, href.length());
 			presenter.restore(base64, true);
 		} else {
-			presenter.restore(config.defaultQueryString(), false);
+			presenter.showDefaultChart();
 		}
 	}
 }

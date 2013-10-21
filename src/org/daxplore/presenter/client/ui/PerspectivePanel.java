@@ -129,7 +129,7 @@ public class PerspectivePanel extends HorizontalPanel
 	 *            the new query definition
 	 */
 	public void setQueryDefinition(QueryDefinition queryDefinition) {
-		if(queryDefinition.getPerspectiveID() != null && !"".equals(queryDefinition.getPerspectiveID())){
+		if(queryDefinition.getPerspectiveID() != null && !queryDefinition.getPerspectiveID().isEmpty()){
 			perspectiveQuestionList = questionListFactory.createPerspectivePanel();
 			perspectiveQuestionList.setPerspective(queryDefinition.getPerspectiveID(), false);
 			perspectiveQuestionList.addSelectionHandler(this);

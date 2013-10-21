@@ -69,26 +69,11 @@ public interface DaxploreConfig extends Constants {
 	public int stagePanelMinWidth();
 	
 	/**
-	 * Get a pre-defined query definition string.
+	 * The max number of perspective check boxes that are checked when a new
+	 * perspective is selected.
 	 * 
-	 * <p>This is used to show a defualt chart when the site loads, if no user
-	 * input is provided.</p>
-	 * @return
+	 * @return The number of selected perspective options
 	 */
-	public String defaultQueryString();
-
-	/**
-	 * The Google Analytics ID that should be used to track statistics for your
-	 * site.
-	 * 
-	 * <p>Get your own web site statistics by signing up on <a
-	 * href="http://google.com/analytics">Google Analytics</a>.</p>
-	 * 
-	 * <p><b>Note:</b></p> The site works perfectly without tracking, so you
-	 * don't have to sign up for Google Statistics if you don't want to. But it
-	 * is a good way to measure how popular your site is and how it is used.</p>
-	 * 
-	 * @return the Google Analytics ID
-	 */
-	public String googleAnalyticsID();
+	public int defaultSelectedPerspectiveOptions();
+	
 }

@@ -189,7 +189,7 @@ public class BarChart extends GChartChart {
 		usedPerspectiveOptions = queryDefinition.getUsedPerspectiveOptions();
 		groupCount = usedPerspectiveOptions.size() + (queryDefinition.hasFlag(QueryFlag.TOTAL) ? 1 : 0);
 		if (groupCount <= 0) {
-			throw new Error("Group count = " + groupCount);
+			throw new IllegalArgumentException("Group count = " + groupCount);
 		}
 		questionOptionCount = queryDefinition.getQuestionOptionCount();
 		barCount = groupCount * questionOptionCount;

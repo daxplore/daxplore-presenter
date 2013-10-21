@@ -77,7 +77,7 @@ public class QuestionPanel extends Composite implements QueryUpdateHandler{
 
 		treeRoot.addSelectionHandler(new QuestionSelectionHandler());
 		treeRoot.addOpenHandler(new GroupOpenHandler());
-
+		
 		for (int i = 0; i < groups.getGroupCount(); i++) {
 			String txt = groups.getGroupName(i);
 			SafeHtmlBuilder html = new SafeHtmlBuilder();
@@ -102,7 +102,6 @@ public class QuestionPanel extends Composite implements QueryUpdateHandler{
 			}
 			treeRoot.addItem(gr);
 		}
-		treeRoot.ensureSelectedItemVisible();
 
 		vp.add(treeRoot);
 		vp.setCellVerticalAlignment(treeRoot, HasVerticalAlignment.ALIGN_TOP);

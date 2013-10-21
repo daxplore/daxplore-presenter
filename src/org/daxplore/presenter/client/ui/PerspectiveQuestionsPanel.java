@@ -103,9 +103,9 @@ public class PerspectiveQuestionsPanel extends FlowPanel implements HasSelection
 			QuestionTreeItem item = new QuestionTreeItem(html.toSafeHtml(), questionID);
 			perspectiveList.addItem(item);
 		}
-		setPerspective(perspectives.getQuestionIDs().get(0), false);
 		this.add(perspectiveList);
 		setWidth("100%");
+		setPerspective(perspectives.getQuestionIDs().get(0), false);
 	}
 
 	void setPerspective(String questionID, boolean fireEvent) {
