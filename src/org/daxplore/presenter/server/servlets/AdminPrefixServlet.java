@@ -58,7 +58,8 @@ public class AdminPrefixServlet extends HttpServlet {
 			}
 			switch(action) {
 			case "list":
-				responseText = getPrefixListJson(pm);
+				List<String> prefixes = PrefixStore.getPrefixes(pm);
+				responseText = listToJson(prefixes);
 				break;
 			case "add":
 				String prefix = request.getParameter("prefix");
@@ -67,7 +68,12 @@ public class AdminPrefixServlet extends HttpServlet {
 				}
 				pm.makePersistent(new PrefixStore(prefix));
 				logger.log(Level.INFO, "Added prefix to system: " + prefix);
-				responseText = getPrefixListJson(pm);
+				
+				prefixes = PrefixStore.getPrefixes(pm);
+				if(!prefixes.contains(prefix)) {
+					prefixes.add(prefix);
+				}
+				responseText = listToJson(prefixes);
 				break;
 			case "delete":
 				prefix = request.getParameter("prefix");
@@ -76,7 +82,10 @@ public class AdminPrefixServlet extends HttpServlet {
 				}
 				String result = DeleteData.deleteForPrefix(pm, prefix);
 				logger.log(Level.INFO, result);
-				responseText = getPrefixListJson(pm);
+				
+				prefixes = PrefixStore.getPrefixes(pm);
+				prefixes.remove(prefix);
+				responseText = listToJson(prefixes);
 				break;
 			case "metadata":
 				prefix = request.getParameter("prefix");
@@ -112,10 +121,9 @@ public class AdminPrefixServlet extends HttpServlet {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static String getPrefixListJson(PersistenceManager pm) {
-		List<String> prefixes = PrefixStore.getPrefixes(pm);
+	private static String listToJson(List<String> texts) {
 		JSONArray jsonArray = new JSONArray();
-		jsonArray.addAll(prefixes);
+		jsonArray.addAll(texts);
 		jsonArray.toJSONString();
 		return jsonArray.toJSONString();
 	}
