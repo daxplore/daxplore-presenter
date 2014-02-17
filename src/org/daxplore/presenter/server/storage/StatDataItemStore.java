@@ -86,7 +86,7 @@ public class StatDataItemStore {
 	public static String getStats(PersistenceManager pm, String prefix, QueryDefinition queryDefinition) throws BadRequestException {
 		String questionID = queryDefinition.getQuestionID();
 		String perspectiveID = queryDefinition.getPerspectiveID();
-		String key = String.format("%s#Q=%s&P=%s", prefix, questionID.toUpperCase(), perspectiveID.toUpperCase());
+		String key = String.format("%s#Q=%s&P=%s", prefix, questionID, perspectiveID);
 		try {
 			return pm.getObjectById(StatDataItemStore.class, key).getJson();
 		} catch (Exception e) {
