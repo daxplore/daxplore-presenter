@@ -35,6 +35,7 @@ import com.google.gwt.core.client.JavaScriptObject;
 public class ChartDataParserServer extends JavaScriptObject {
 
 	private JSONObject statJsonObject, valueObject, timepoint1, timepoint2;
+	
 	/**
 	 * Parses and wraps the json chart data.
 	 */ 

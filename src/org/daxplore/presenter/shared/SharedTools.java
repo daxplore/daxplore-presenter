@@ -28,13 +28,6 @@ import java.util.List;
  * on the server side (Java).
  */
 public class SharedTools {
-
-	/**
-	 * Set to true if the print methods should result in output or false
-	 * if that output should be ignored.
-	 */
-	private static boolean debugMode = true;
-	
 	/**
 	 * Combine a list of objects into a single string using a separator
 	 * between each object.
