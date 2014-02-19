@@ -6,31 +6,38 @@ Daxplore Presenter is an open source project under the [LGPL license](http://www
 
 The project is primarily financed by [AFA Försäkring](http://www.afaforsakring.se).
 
-Getting the project to build and run locally.
+Getting the project to build and run locally in Eclipse
 ----------------------------
-1. Install Eclipse, Java 7 (OpenJDK7) and the Google Plugin for Eclipse  
-http://code.google.com/eclipse/
+1. Install Eclipse, Java 7 (OpenJDK7)  
+http://www.eclipse.org/downloads/
 
-2. Clone the project into workspace  
+2. Install Eclipse plugins:
+Google plugin (AppEngine + GWT): http://code.google.com/eclipse/
+JST and/or WST Server Adapters from the Eclipse standard plugin repository
+
+3. Clone the project into workspace  
 $ git clone git@github.com:synthax/daxplore-presenter.git
 
-3. Import the project into Eclipse  
+4. Import the project into Eclipse  
 File -> New -> Project..  
 General -> Project
 
-4. Set location to match the folder of the cloned repository in your workspace (see step 2)
+5. Use the Eclipse server view  to create a new Tomcat 7 server
+Add the daxplore-presenter project to the server
 
-5. Synchronize the project with the plugin  
+6. Set location to match the folder of the cloned repository in your workspace (see step 2)
+
+7. Synchronize the project with the plugin  
 Open the Problem view  
 Look under Errors  
 Right click one of the items, like:  
 "The App Engine SDK JAR appengine-api-1.0-sdk-1.6.1.jar is missing in the WEB-INF/lib directory"  
 Select Quick Fix -> Synchronize <WAR>/WEB-INF/lib with SDK libraries  
 
-6. Compile&Run or debug the project  
+8. Compile&Run or debug the project  
 Right click project -> Debug as -> Web Application -> presentation.jsp  
 
-7. Use the project Daxplore Producer to generate and upload data and metadata to the local database.
+9. Use our sister project Daxplore Producer to generate and upload data and metadata to the local database.
 
 8. Open up and run the local web server (link provided by the Development Mode view in Eclipse)
 
