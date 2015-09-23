@@ -41,7 +41,7 @@ public class ChartDataParserServer extends JavaScriptObject {
 	 */ 
 	public ChartDataParserServer(String json) {
 		statJsonObject = (JSONObject)JSONValue.parse(json);
-		valueObject = (JSONObject)statJsonObject.get("values");
+		valueObject = (JSONObject)statJsonObject.get("freq");
 		timepoint1 = (JSONObject)valueObject.get("0");
 		timepoint2 = (JSONObject)valueObject.get("1");
 	}
