@@ -63,8 +63,8 @@ public class ChartDataParserClient extends JavaScriptObject {
 	
 	private final native JsArrayInteger getTimepoints() /*-{
 		var timepoints = [];
-		for(var key in this.values) {
-			if(this.values.hasOwnProperty(key)){
+		for(var key in this.freq) {
+			if(this.freq.hasOwnProperty(key)){
 				timepoints.push(parseInt(key));
 			}
 		}
@@ -73,7 +73,7 @@ public class ChartDataParserClient extends JavaScriptObject {
 
 	private final native int getPerspectiveCount(int timepointIndex) /*-{
 		var count = 0;
-		var timepoint = this.values[timepointIndex];
+		var timepoint = this.freq[timepointIndex];
 		for(var perspective in timepoint) {
 			if(timepoint.hasOwnProperty(perspective)){
 				count+=1;
@@ -83,7 +83,7 @@ public class ChartDataParserClient extends JavaScriptObject {
 	}-*/;
 	
 	private final native JsArrayInteger getData(int timepoint, String perspective) /*-{
-		return this.values[timepoint][perspective];
+		return this.freq[timepoint][perspective];
 	}-*/;
 	
 	/**
