@@ -245,7 +245,9 @@ public class AdminUploadServlet extends HttpServlet {
 				String key = fileName.substring(0, fileName.lastIndexOf('.')) + "/" + prop;
 				String value = (String) dataMap.get(prop);
 				if (value == null) {
-					throw new BadRequestException("Missing property '" + key + "' in upload file");
+					value = "{" + prop + "}";
+					logger.log(Level.WARNING, "Missing property '" + key + "'");
+					//TODO tell uploading user of missing property
 				}
 				items.add(new SettingItemStore(key, value));
 			}
