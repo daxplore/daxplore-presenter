@@ -18,9 +18,6 @@
  */
 package org.daxplore.presenter.chart;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.daxplore.presenter.chart.display.Chart;
 import org.daxplore.presenter.chart.resources.ChartConfig;
 
@@ -32,7 +29,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -52,20 +48,11 @@ public class ChartPanelView extends Composite {
 	@UiField(provided = true)
 	protected final SimplePanel chartContainerPanel = new SimplePanel();
 
-	@UiField(provided = true)
-	protected final VerticalPanel sidebarArea;
-	@UiField(provided = true)
-	protected final QueryActiveAnimation queryActiveAnimation;
-	@UiField(provided = true)
-	protected final SimplePanel legendPanel;
-
 	/**
 	 * The chart that belongs to this panel.
 	 */
 	private Chart chart;
 	
-	private List<Widget> actionWidgetList = new LinkedList<Widget>();
-
 	/**
 	 * Fields used to figure out and adjust the size of the chart and
 	 * chartPanel.
@@ -76,16 +63,11 @@ public class ChartPanelView extends Composite {
 	private boolean scrolling = false, forceScrolling = false;
 
 	@Inject
-	protected ChartPanelView(QueryActiveAnimation queryActiveAnimation, ChartConfig chartConfig) {
-		this.queryActiveAnimation = queryActiveAnimation;
-
-		this.sidebarArea = new VerticalPanel();
-
+	protected ChartPanelView(ChartConfig chartConfig) {
 		chartContainerPanel.setStylePrimaryName("daxplore-ChartContainerPanel");
 
 		headerPanel = new SimplePanel();
 
-		legendPanel = new SimplePanel();
 		initWidget(uiBinder.createAndBindUi(this));
 		setStylePrimaryName("daxplore-ChartPanel");
 
@@ -95,7 +77,6 @@ public class ChartPanelView extends Composite {
 
 	public void setChart(Chart chart) {
 		headerPanel.setWidget(chart.getExternalHeader());
-		legendPanel.setWidget(chart.getExternalLegend());
 		if (scrolling) {
 			chartScrollPanel.setWidget(chart);
 		} else {
@@ -105,26 +86,6 @@ public class ChartPanelView extends Composite {
 		adjustSizeRecursively();
 	}
 	
-	/**
-	 * Sets widgets used to interact with the chart.
-	 * 
-	 * @param actionWidgetList
-	 *            the new action widgets
-	 */
-	public void setActionWidgets(List<Widget> actionWidgetList) {
-		if (this.actionWidgetList != null) {
-			for (Widget actionWidget : this.actionWidgetList) {
-				sidebarArea.remove(actionWidget);
-			}
-		}
-		int i = 1;
-		for (Widget actionWidget : actionWidgetList) {
-			sidebarArea.insert(actionWidget, i);
-			i++;
-		}
-		this.actionWidgetList = actionWidgetList;
-	}
-
 	/**
 	 * Set the maximal allowed size of the chart panel, and in turn the chart.
 	 * 

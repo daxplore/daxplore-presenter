@@ -19,6 +19,7 @@
 package org.daxplore.presenter.embed.inject;
 
 import org.daxplore.presenter.chart.display.ChartFactory;
+import org.daxplore.presenter.chart.display.QueryActiveAnimation;
 import org.daxplore.presenter.embed.EmbedEntryPoint;
 import org.daxplore.presenter.shared.QuestionMetadata;
 
@@ -46,4 +47,6 @@ public interface EmbedInjector extends Ginjector {
 	
 	ChartFactory getChartFactory();
 	QuestionMetadata getQuestions();
+	
+	QueryActiveAnimation getQueryActiveAnimation();
 }

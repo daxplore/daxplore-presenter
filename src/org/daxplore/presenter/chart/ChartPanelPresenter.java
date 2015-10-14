@@ -21,16 +21,19 @@ import org.daxplore.presenter.chart.data.QueryResultCountCompare;
 import org.daxplore.presenter.chart.display.BarChart;
 import org.daxplore.presenter.chart.display.BarChartCompare;
 import org.daxplore.presenter.chart.display.BlankChart;
+import org.daxplore.presenter.chart.display.Chart;
 import org.daxplore.presenter.chart.display.ChartFactory;
 import org.daxplore.presenter.client.json.shared.ChartDataParserClient;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ChartPanelPresenter  {
 	private ChartFactory chartFactory;
 	private ChartPanelView view;
+	private Chart chart;
 	
 	@Inject
 	public ChartPanelPresenter(ChartFactory chartFactory, ChartPanelView view) {
@@ -41,19 +44,25 @@ public class ChartPanelPresenter  {
 
 	public void onQueryReady(QueryDefinition queryDefinition, ChartDataParserClient queryData) {
 		if (!queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
-			BarChart chart = chartFactory.createBarChart(queryDefinition, false);
+			BarChart newChart = chartFactory.createBarChart(queryDefinition, false);
 			QueryResultCount result = new QueryResultCount(queryData.getDataItems(), queryData.getTotalDataItem());
-			chart.addData(result);
-			view.setChart(chart);
+			newChart.addData(result);
+			view.setChart(newChart);
+			chart = newChart;
 		} else {
-			BarChartCompare chart = chartFactory.createBarChartCompare(queryDefinition, false);
+			BarChartCompare newChart = chartFactory.createBarChartCompare(queryDefinition, false);
 			QueryResultCountCompare result = new QueryResultCountCompare(queryData.getDataItems(), queryData.getTotalDataItem());
-			chart.addData(result);
-			view.setChart(chart);
+			newChart.addData(result);
+			view.setChart(newChart);
+			chart = newChart;
 		}
 	}
 	
 	public ChartPanelView getView() {
 		return view;
+	}
+	
+	public Widget getExternalLegend() {
+		return chart.getExternalLegend();
 	}
 }

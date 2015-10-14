@@ -38,21 +38,19 @@ import org.daxplore.presenter.client.json.Perspectives;
 import org.daxplore.presenter.client.model.StatDataServerModel;
 import org.daxplore.presenter.client.resources.DaxploreConfig;
 import org.daxplore.presenter.client.ui.ChartTypeOptionsPanel;
-import org.daxplore.presenter.client.ui.ImageButtonPanel;
 import org.daxplore.presenter.client.ui.PerspectivePanel;
 import org.daxplore.presenter.client.ui.QuestionPanel;
+import org.daxplore.presenter.client.ui.StagePanel;
 import org.daxplore.presenter.client.ui.WarningBanner;
 import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 import org.daxplore.presenter.shared.QuestionMetadata;
 
-import com.google.gwt.dev.util.collect.Lists;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
@@ -67,7 +65,6 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 
 	private final PerspectivePanel perspectivePanel;
 	private final QuestionPanel questionPanel;
-	private final ChartTypeOptionsPanel optionsPanel;
 	private final ChartPanelPresenter chartPanelPresenter;
 	private QuestionMetadata questionMetadata;
 	private final EventBus eventBus;
@@ -76,16 +73,18 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 	private PrefixProperties prefixProperties;
 	private Perspectives perspectives;
 	private Groups groups;
+	private ChartTypeOptionsPanel optionsPanel;
+	private StagePanel stagePanel;
 
 	@Inject
 	protected Presenter(PerspectivePanel perspectivePanel, QuestionPanel questionPanel,
-			ChartTypeOptionsPanel optionsPanel, EventBus eventBus, ChartPanelPresenter chartPanelPresenter,
-			QuestionMetadata questionMetadata, ImageButtonPanel imageButtonPanel, DaxploreConfig config,
-			StatDataServerModel statDataServerModel, PrefixProperties prefixProperties, Perspectives perspectives,
-			Groups groups) {
+			EventBus eventBus, ChartPanelPresenter chartPanelPresenter,
+			ChartTypeOptionsPanel optionsPanel, QuestionMetadata questionMetadata,
+			DaxploreConfig config, StatDataServerModel statDataServerModel,
+			PrefixProperties prefixProperties, Perspectives perspectives, Groups groups,
+			StagePanel stagePanel) {
 		this.perspectivePanel = perspectivePanel;
 		this.questionPanel = questionPanel;
-		this.optionsPanel = optionsPanel;
 		this.questionMetadata = questionMetadata;
 		this.chartPanelPresenter = chartPanelPresenter;
 		this.eventBus = eventBus;
@@ -94,11 +93,8 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		this.prefixProperties = prefixProperties;
 		this.perspectives = perspectives;
 		this.groups = groups;
-
-		List<Widget> actionWidgetList = new LinkedList<Widget>();
-		actionWidgetList.add(imageButtonPanel);
-		actionWidgetList.add(optionsPanel);
-		chartPanelPresenter.getView().setActionWidgets(actionWidgetList);
+		this.optionsPanel = optionsPanel;
+		this.stagePanel = stagePanel;
 
 		SelectionUpdateEvent.register(eventBus, this);
 		SetWarningBannerEvent.register(eventBus, this);
@@ -264,5 +260,6 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 	@Override
 	public void onQueryReady(QueryReadyEvent event) {
 		chartPanelPresenter.onQueryReady(event.getQueryDefinition(), event.getQueryData());
+		stagePanel.setLegend(chartPanelPresenter.getExternalLegend());
 	}
 }

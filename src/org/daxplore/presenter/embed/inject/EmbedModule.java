@@ -19,7 +19,10 @@
 package org.daxplore.presenter.embed.inject;
 
 import org.daxplore.presenter.chart.display.ChartFactory;
+import org.daxplore.presenter.chart.display.QueryActiveAnimation;
 import org.daxplore.presenter.chart.resources.ChartConfig;
+import org.daxplore.presenter.chart.resources.ChartResources;
+import org.daxplore.presenter.chart.resources.ChartTexts;
 import org.daxplore.presenter.client.json.shared.ClientPrefixProperties;
 import org.daxplore.presenter.client.json.shared.QuestionMetadataClientImpl;
 import org.daxplore.presenter.embed.EmbedEntryPoint;
@@ -50,12 +53,15 @@ public class EmbedModule extends AbstractGinModule {
 	protected void configure() {
 		/* client.chart.display */
 		bind(ChartFactory.class).in(Singleton.class);
+		bind(QueryActiveAnimation.class).in(Singleton.class);
 
 		/* client.json */
 		bind(QuestionMetadata.class).to(QuestionMetadataClientImpl.class).in(Singleton.class);
 		
-		/* client.resources */
+		/* chart.resources */
 		bind(ChartConfig.class).in(Singleton.class);
+		bind(ChartResources.class).in(Singleton.class);
+		bind(ChartTexts.class).in(Singleton.class);
 		
 		bind(PrefixProperties.class).to(ClientPrefixProperties.class).in(Singleton.class);
 

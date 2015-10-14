@@ -21,6 +21,7 @@ package org.daxplore.presenter.embed;
 import org.daxplore.presenter.chart.display.ExternalHeader;
 import org.daxplore.presenter.chart.display.ExternalLegend;
 import org.daxplore.presenter.chart.display.GChartChart;
+import org.daxplore.presenter.chart.display.QueryActiveAnimation;
 import org.daxplore.presenter.shared.EmbedDefinition;
 import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
 
@@ -62,6 +63,13 @@ public class EmbedView extends Composite {
 	@UiField
 	protected EmbedStyle style;
 	
+	@UiField(provided = true)
+	protected final VerticalPanel sidebarArea;
+	@UiField(provided = true)
+	protected final QueryActiveAnimation queryActiveAnimation;
+	@UiField(provided = true)
+	protected final SimplePanel legendPanel;
+	
 	private final GChartChart chart;
 	
 	/**
@@ -88,11 +96,18 @@ public class EmbedView extends Composite {
 	 * @param embedDefinition
 	 *            the embed definition
 	 */
-	public EmbedView(GChartChart chart, int width, int height, EmbedDefinition embedDefinition) {
+	public EmbedView(GChartChart chart, QueryActiveAnimation queryActiveAnimation,
+			int width, int height, EmbedDefinition embedDefinition) {
 		this.chart = chart;
+		this.queryActiveAnimation = queryActiveAnimation;
 		maxWidth = width;
 		maxHeight = height;
-		this.header = chart.getExternalHeader();
+		header = chart.getExternalHeader();
+		sidebarArea = new VerticalPanel();
+		legendPanel = new SimplePanel();
+		
+		legendPanel.setWidget(chart.getExternalLegend());
+		
 		initWidget(uiBinder.createAndBindUi(this));
 		
 		if(embedDefinition.hasFlag(EmbedFlag.LEGEND)){
@@ -151,5 +166,4 @@ public class EmbedView extends Composite {
 			chart.setChartSizeSmart(width, height);
 		}
 	}
-
 }

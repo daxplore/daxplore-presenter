@@ -18,8 +18,6 @@
  */
 package org.daxplore.presenter.chart;
 
-import org.daxplore.presenter.shared.SharedTools;
-
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Window.Navigator;
 

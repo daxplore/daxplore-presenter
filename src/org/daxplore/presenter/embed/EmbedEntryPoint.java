@@ -26,6 +26,7 @@ import org.daxplore.presenter.chart.display.BarChart;
 import org.daxplore.presenter.chart.display.BarChartCompare;
 import org.daxplore.presenter.chart.display.ChartFactory;
 import org.daxplore.presenter.chart.display.GChartChart;
+import org.daxplore.presenter.chart.display.QueryActiveAnimation;
 import org.daxplore.presenter.client.json.shared.ChartDataParserClient;
 import org.daxplore.presenter.embed.inject.EmbedInjector;
 import org.daxplore.presenter.shared.EmbedDefinition;
@@ -65,6 +66,7 @@ public class EmbedEntryPoint implements EntryPoint {
 		String queryString = Window.Location.getParameter("q");
 		QueryDefinition queryDefinition = new QueryDefinition(questions, queryString);
 		ChartFactory chartFactory = injector.getChartFactory();
+		QueryActiveAnimation queryActiveAnimation = injector.getQueryActiveAnimation();
 
 		String href = Window.Location.getHref();
 		EmbedDefinition embedDefinition;
@@ -87,8 +89,8 @@ public class EmbedEntryPoint implements EntryPoint {
 				chart = chartFactory.createBarChartCompare(queryDefinition, printMode);
 				((BarChartCompare)chart).addData(new QueryResultCountCompare(queryData.getDataItems(), queryData.getTotalDataItem()));
 			}
-			EmbedView embedView = new EmbedView(chart, Window.getClientWidth(),
-					Window.getClientHeight(), embedDefinition);
+			EmbedView embedView = new EmbedView(chart, queryActiveAnimation,
+					Window.getClientWidth(), Window.getClientHeight(), embedDefinition);
 			RootPanel.get().add(embedView);
 		} catch (Exception e) {
 			e.printStackTrace();
