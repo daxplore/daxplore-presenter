@@ -57,13 +57,30 @@ public class QuestionJson extends JavaScriptObject {
 	}-*/;
 
 	/**
-	 * Checks if this question can displayed as a mean, using for example
-	 * {@link MeanChart}.
+	 * Checks if this question contains frequency data
+	 * 
+	 * @return true, if it contains frequency data
+	 */
+	public final native boolean hasFrequencies() /*-{
+		for (var i=0; i<this.displaytypes.length; i++) {
+			if(this.displaytypes[i] == "FREQ") {
+				return true;
+			}	
+		}
+		return false;
+	}-*/;
+
+	/**
+	 * Checks if this question can displayed as a mean
 	 * 
 	 * @return true, if it can be shown as a mean
 	 */
 	public final native boolean hasMean() /*-{
-		// TODO add support for mean data when the producer supports it
+		for (var i=0; i<this.displaytypes.length; i++) {
+			if(this.displaytypes[i] == "MEAN") {
+				return true;
+			}	
+		}
 		return false;
 	}-*/;
 
