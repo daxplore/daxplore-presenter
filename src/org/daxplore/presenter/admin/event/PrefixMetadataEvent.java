@@ -29,7 +29,7 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
  */
 public class PrefixMetadataEvent extends Event<PrefixMetadataHandler> {
 
-	private static final Type<PrefixMetadataHandler> TYPE = new Type<PrefixMetadataHandler>();
+	private static final Type<PrefixMetadataHandler> TYPE = new Type<>();
 
 	private PrefixMetadata prefixMetadata;
 

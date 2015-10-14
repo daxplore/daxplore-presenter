@@ -204,7 +204,7 @@ public class EmbedPopup extends PopupPanel implements EmbedSizeHandler, QueryUpd
 				address += "&gwt.codesvr=" + Window.Location.getParameter("gwt.codesvr"); 
 			}
 			
-			List<EmbedFlag> flags = new LinkedList<EmbedFlag>();
+			List<EmbedFlag> flags = new LinkedList<>();
 
 			String transparency = "";
 			if (transparencyCheckbox.getValue()) {

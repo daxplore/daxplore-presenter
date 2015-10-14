@@ -50,7 +50,7 @@ public class Groups {
 	 */
 	@Inject
 	protected Groups() {
-		LinkedList<GroupJson> list = new LinkedList<GroupJson>();
+		LinkedList<GroupJson> list = new LinkedList<>();
 		NativeGroups groupsNative = getGroupsNative();
 		for (int i = 0; i < groupsNative.groupCount(); i++) {
 			GroupJson group = groupsNative.getGroup(i);

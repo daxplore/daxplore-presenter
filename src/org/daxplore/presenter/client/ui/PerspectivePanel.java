@@ -110,7 +110,7 @@ public class PerspectivePanel extends HorizontalPanel
 		if (perspectiveCheckboxes != null) {
 			return perspectiveCheckboxes.getPerspectiveOptions();
 		}
-		return new LinkedList<Integer>();
+		return new LinkedList<>();
 	}
 
 	/**

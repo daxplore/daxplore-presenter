@@ -74,7 +74,7 @@ public class EmbedEntryPoint implements EntryPoint {
 			String base64 = href.substring(href.lastIndexOf("#") + 1);
 			embedDefinition = new EmbedDefinition(base64);
 		} else {
-			LinkedList<EmbedFlag> emptyDefaultList = new LinkedList<EmbedFlag>();
+			LinkedList<EmbedFlag> emptyDefaultList = new LinkedList<>();
 			embedDefinition = new EmbedDefinition(emptyDefaultList);
 		}
 

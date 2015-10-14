@@ -46,7 +46,7 @@ public class QuestionMetadataClientImpl implements QuestionMetadata {
 
 	@Inject
 	protected QuestionMetadataClientImpl() {
-		questionMap = new TreeMap<String, QuestionJson>();
+		questionMap = new TreeMap<>();
 		NativeQuestions questionsNative = getQuestionsNative();
 		for (int i = 0; i < questionsNative.questionCount(); i++) {
 			QuestionJson question = questionsNative.getQuestion(i);

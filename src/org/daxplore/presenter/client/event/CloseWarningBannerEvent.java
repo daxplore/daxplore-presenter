@@ -31,7 +31,7 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
  */
 public class CloseWarningBannerEvent extends Event<CloseWarningBannerHandler> {
 
-	private static final Type<CloseWarningBannerHandler> TYPE = new Type<CloseWarningBannerHandler>();
+	private static final Type<CloseWarningBannerHandler> TYPE = new Type<>();
 
 	/**
 	 * Instantiates a new close warning banner event.

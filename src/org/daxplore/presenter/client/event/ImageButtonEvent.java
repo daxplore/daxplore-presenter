@@ -33,7 +33,7 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
  */
 public class ImageButtonEvent extends Event<ImageButtonHandler> {
 
-	private static final Type<ImageButtonHandler> TYPE = new Type<ImageButtonHandler>();
+	private static final Type<ImageButtonHandler> TYPE = new Type<>();
 
 	/**
 	 * An Enum which defines which button has been pressed and what action to

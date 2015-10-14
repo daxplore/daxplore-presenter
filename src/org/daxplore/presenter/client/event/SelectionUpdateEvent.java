@@ -30,7 +30,7 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
  */
 public class SelectionUpdateEvent extends Event<SelectionUpdateHandler> {
 
-	private static final Type<SelectionUpdateHandler> TYPE = new Type<SelectionUpdateHandler>();
+	private static final Type<SelectionUpdateHandler> TYPE = new Type<>();
 
 	/**
 	 * Instantiates a new selection update event.

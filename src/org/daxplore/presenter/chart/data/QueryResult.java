@@ -66,7 +66,7 @@ public abstract class QueryResult {
 	 *            The total data item. Can be set to <i>null</i>.
 	 */
 	public QueryResult(Collection<? extends ChartDataItem> dataItems, ChartDataItem totalDataItem) {
-		itemList = new LinkedList<ChartDataItem>(dataItems);
+		itemList = new LinkedList<>(dataItems);
 		totalItem = totalDataItem;
 	}
 

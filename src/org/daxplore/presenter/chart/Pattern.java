@@ -135,7 +135,7 @@ public class Pattern {
 	 *         array is returned.
 	 */
 	public String[] match(String text) {
-		List<?> matches = new ArrayList<Object>();
+		List<?> matches = new ArrayList<>();
 		_match(text, matches);
 		String arr[] = new String[matches.size()];
 		for (int i = 0; i < matches.size(); i++) {
@@ -179,7 +179,7 @@ public class Pattern {
 	 * @return Array of strings
 	 */
 	public String[] split(String input) {
-		List<?> results = new ArrayList<Object>();
+		List<?> results = new ArrayList<>();
 		_split(input, results);
 		String[] parts = new String[results.size()];
 		for (int i = 0; i < results.size(); i++) {

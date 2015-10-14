@@ -104,8 +104,8 @@ public class BarChartCompare extends BarChart {
 		 * super-constructor calls the overridden version of
 		 * createCurvesAndLegend.
 		 */
-		barListPrimary = new LinkedList<BarChartBarPrimary>();
-		barListSecondary = new LinkedList<BarChartBarSecondary>();
+		barListPrimary = new LinkedList<>();
+		barListSecondary = new LinkedList<>();
 
 		for (int groupIndex = 0; groupIndex < groupCount; groupIndex++) {
 			for (int questionIndex = 0; questionIndex < questionOptionCount; questionIndex++) {

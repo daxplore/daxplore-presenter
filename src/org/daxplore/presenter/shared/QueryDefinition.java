@@ -106,7 +106,7 @@ public class QueryDefinition {
 		 */
 		protected static QueryFlag[] decodeFlags(long flaglong){
 			if(flaglong == 0) return new QueryFlag[0];
-			ArrayList<QueryFlag> flags = new ArrayList<QueryFlag>();
+			ArrayList<QueryFlag> flags = new ArrayList<>();
 			for(QueryFlag f: QueryFlag.values()){
 				if((flaglong & f.bitValue) != 0) flags.add(f);
 			}
@@ -193,7 +193,7 @@ public class QueryDefinition {
 		if(restoreString == null || restoreString.isEmpty()) {throw new IllegalArgumentException("No string to restore from");}
 		this.questionMetadata = questionMetadata;
 		LinkedHashMap<String, String> tokens = SharedTools.parseTokens(Base64.decodeString(restoreString));
-		usedPerspectiveOptions = new LinkedList<Integer>();
+		usedPerspectiveOptions = new LinkedList<>();
 		flags = new QueryFlag[0];
 		Collection<String> keys = tokens.keySet();
 		for (String k : keys) {
@@ -241,7 +241,7 @@ public class QueryDefinition {
 	 * @return The query as a string
 	 */
 	private String serialize() {
-		ArrayList<String> out = new ArrayList<String>();
+		ArrayList<String> out = new ArrayList<>();
 		
 		if (questionID != null && !questionID.equals("")) {
 			out.add("q=" + questionID);
@@ -251,7 +251,7 @@ public class QueryDefinition {
 			out.add("p=" + perspectiveID);
 			
 			if (usedPerspectiveOptions.size() > 0) {
-				List<Integer> tempUsedPerspectiveOptions = new LinkedList<Integer>();
+				List<Integer> tempUsedPerspectiveOptions = new LinkedList<>();
 				for (int i = 0; i < usedPerspectiveOptions.size(); i++) {
 					tempUsedPerspectiveOptions.add(usedPerspectiveOptions.get(i));
 				}
@@ -367,7 +367,7 @@ public class QueryDefinition {
 	 * @return the question option texts
 	 */
 	public List<String> getQuestionOptionTexts() {
-		List<String> texts = new LinkedList<String>();
+		List<String> texts = new LinkedList<>();
 		for (String s : questionMetadata.getOptionTexts(questionID)) {
 			texts.add(s);
 		}
@@ -402,7 +402,7 @@ public class QueryDefinition {
 	 * @return the perspective option texts
 	 */
 	public List<String> getPerspectiveOptionTexts() {
-		List<String> texts = new LinkedList<String>();
+		List<String> texts = new LinkedList<>();
 		for (String s : questionMetadata.getOptionTexts(perspectiveID)) {
 			texts.add(s);
 		}

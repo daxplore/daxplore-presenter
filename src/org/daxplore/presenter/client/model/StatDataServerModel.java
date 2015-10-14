@@ -40,7 +40,7 @@ public class StatDataServerModel {
 	
 	private EventBus eventBus;
 	
-	private Map<String, ChartDataParserClient> queryDataCache = new HashMap<String, ChartDataParserClient>();
+	private Map<String, ChartDataParserClient> queryDataCache = new HashMap<>();
 	
 	private String href;
 	

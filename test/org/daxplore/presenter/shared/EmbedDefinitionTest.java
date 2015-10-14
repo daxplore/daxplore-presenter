@@ -43,7 +43,7 @@ public class EmbedDefinitionTest {
 		Random rnd = new Random(0x7de3ff09);
 		EmbedFlag[] values = EmbedDefinition.EmbedFlag.values();
 		for (int i=0; i<1000; i++) {
-			ArrayList<EmbedFlag> flags = new ArrayList<EmbedFlag>();
+			ArrayList<EmbedFlag> flags = new ArrayList<>();
 			// don't use the 0/null flag, start at j=1
 			for (int j=1; j<values.length; j++) {
 				if (rnd.nextBoolean()) {
@@ -61,7 +61,7 @@ public class EmbedDefinitionTest {
 		Random rnd = new Random(0x7de3ff09);
 		EmbedFlag[] values = EmbedDefinition.EmbedFlag.values();
 		for (int i=0; i<1000; i++) {
-			ArrayList<EmbedFlag> flags = new ArrayList<EmbedFlag>();
+			ArrayList<EmbedFlag> flags = new ArrayList<>();
 			// don't use the 0/null flag, start at j=1
 			for (int j=1; j<values.length; j++) {
 				if (rnd.nextBoolean()) {

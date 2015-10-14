@@ -55,7 +55,7 @@ public class SharedToolsTest {
 	
 	@Test
 	public void testJoinGenericIterable() {
-		List<Object> join = new LinkedList<Object>();
+		List<Object> join = new LinkedList<>();
 		join.add(3);
 		join.add(1.1);
 		join.add("foo");

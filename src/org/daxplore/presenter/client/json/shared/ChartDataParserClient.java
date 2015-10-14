@@ -94,7 +94,7 @@ public class ChartDataParserClient extends JavaScriptObject {
 	public final List<ChartDataItem> getDataItems() {
 		int[] timepoints = JsonTools.jsArrayAsArray(getTimepoints());
 		int perspectiveCount = getPerspectiveCount(timepoints[0]);
-		List<ChartDataItem> list = new ArrayList<ChartDataItem>(perspectiveCount);
+		List<ChartDataItem> list = new ArrayList<>(perspectiveCount);
 		
 		for(int i = 0; i < perspectiveCount; i++){
 			int[] primaryData = JsonTools.jsArrayAsArray(getData(0, Integer.toString(i)));

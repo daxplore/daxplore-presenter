@@ -212,7 +212,7 @@ public class BarChart extends GChartChart {
 	 *            The texts of the question's options.
 	 */
 	protected void createCurves(List<String> questionOptionTexts, boolean printerMode) {
-		barListPrimary = new LinkedList<BarChartBarPrimary>();
+		barListPrimary = new LinkedList<>();
 
 		for (int groupIndex = 0; groupIndex < groupCount; groupIndex++) {
 			for (int questionIndex = 0; questionIndex < questionOptionCount; questionIndex++) {

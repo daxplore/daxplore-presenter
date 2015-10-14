@@ -91,7 +91,7 @@ public class PrefixDataModelImpl implements PrefixDataModel {
 		@Override
 		public void onResponseReceived(Request request, Response response) {
 			if(response.getStatusCode() == HttpServletResponse.SC_OK) {
-				LinkedList<String> prefixes = new LinkedList<String>();
+				LinkedList<String> prefixes = new LinkedList<>();
 				String responseText = response.getText();
 				if(responseText!=null && responseText.length()>0) {
 					JSONArray array = JSONParser.parseStrict(responseText).isArray();

@@ -45,7 +45,7 @@ public class Perspectives {
 
 	@Inject
 	protected Perspectives() {
-		List<String> list = new LinkedList<String>();
+		List<String> list = new LinkedList<>();
 		NativePerspectives perspectiveNative = getPerspectivesNative();
 		for (int i = 0; i < perspectiveNative.perspectiveCount(); i++) {
 			String columnName = perspectiveNative.getColumn(i);

@@ -50,7 +50,7 @@ import com.google.inject.Inject;
 public class PerspectiveCheckboxPanel extends FlowPanel implements ValueChangeHandler<Boolean>,
 		HasValueChangeHandlers<Boolean> {
 
-	private List<CheckBox> checkboxList = new LinkedList<CheckBox>();
+	private List<CheckBox> checkboxList = new LinkedList<>();
 	private CheckBox total;
 	
 	/**
@@ -139,7 +139,7 @@ public class PerspectiveCheckboxPanel extends FlowPanel implements ValueChangeHa
 	 * @return the selected option indexes
 	 */
 	public List<Integer> getPerspectiveOptions() {
-		List<Integer> altList = new LinkedList<Integer>();
+		List<Integer> altList = new LinkedList<>();
 		for (CheckBox c : checkboxList) {
 			if (c.getValue()) {
 				try {

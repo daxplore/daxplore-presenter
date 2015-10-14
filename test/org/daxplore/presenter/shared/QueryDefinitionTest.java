@@ -35,7 +35,7 @@ public class QueryDefinitionTest {
 		Random rnd = new Random(0x7de3ff09);
 		QueryFlag[] values = QueryDefinition.QueryFlag.values();
 		for (int i=0; i<1000; i++) {
-			ArrayList<QueryFlag> flags = new ArrayList<QueryFlag>();
+			ArrayList<QueryFlag> flags = new ArrayList<>();
 			// don't use the 0/null flag, start at j=1
 			for (int j=1; j<values.length; j++) {
 				if (rnd.nextBoolean()) {
@@ -57,14 +57,14 @@ public class QueryDefinitionTest {
 			String perspectiveID = Integer.toHexString(i+100);
 			String questionID = Integer.toHexString(i+500);
 			
-			LinkedList<Integer> usedPerspectiveOptions = new LinkedList<Integer>();
+			LinkedList<Integer> usedPerspectiveOptions = new LinkedList<>();
 			for (int j=0; j<metadata.getOptionCount(perspectiveID); j++) {
 				if (rnd.nextBoolean()) {
 					usedPerspectiveOptions.add(j);
 				}
 			}
 			
-			ArrayList<QueryFlag> flags = new ArrayList<QueryFlag>();
+			ArrayList<QueryFlag> flags = new ArrayList<>();
 			// don't use the 0/null flag, start at j=1
 			for (int j=1; j<values.length; j++) {
 				if (rnd.nextBoolean()) {

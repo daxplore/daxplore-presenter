@@ -143,7 +143,7 @@ public class SharedTools {
 	public static LinkedHashMap<String, String> parseTokens(String tokens) throws IllegalArgumentException {
 		String[] arStr = tokens.split("&");
 
-		LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> params = new LinkedHashMap<>();
 		for (int i = 0; i < arStr.length; i++) {
 			String[] substr = arStr[i].split("=");
 			if (substr.length == 2 && !substr[0].equals("")) {
@@ -283,7 +283,7 @@ public class SharedTools {
 	 * @return A List containing the String chunks
 	 */
 	public static List<String> splitString(String string, int chunkLength) {
-	    List<String> chunkList = new ArrayList<String>((string.length() + chunkLength - 1) / chunkLength);
+	    List<String> chunkList = new ArrayList<>((string.length() + chunkLength - 1) / chunkLength);
 
 	    for (int start = 0; start < string.length(); start += chunkLength) {
 	        chunkList.add(string.substring(start, Math.min(string.length(), start + chunkLength)));

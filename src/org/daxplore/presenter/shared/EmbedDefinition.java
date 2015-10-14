@@ -106,7 +106,7 @@ public class EmbedDefinition {
 		 */
 		static EmbedFlag[] decodeFlags(long flaglong){
 			if(flaglong == 0) return new EmbedFlag[0];
-			ArrayList<EmbedFlag> flags = new ArrayList<EmbedFlag>();
+			ArrayList<EmbedFlag> flags = new ArrayList<>();
 			for(EmbedFlag f: EmbedFlag.values()){
 				if((flaglong & f.bitValue) != 0) flags.add(f);
 			}

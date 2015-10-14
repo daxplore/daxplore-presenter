@@ -117,7 +117,7 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 	 *            true, if the browser history should be set
 	 */
 	private void makeQuery(boolean setHistory) {
-		List<QueryFlag> flags = new LinkedList<QueryFlag>();
+		List<QueryFlag> flags = new LinkedList<>();
 		String questionID = questionPanel.getQuestionID();
 		String perspectiveID = perspectivePanel.getQuestionID();
 		List<Integer> perspectiveOptions = perspectivePanel.getPerspectiveOptions();
@@ -182,12 +182,12 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 			}
 		}
 		String firstPerspectiveID = perspectives.getQuestionIDs().get(0);
-		List<Integer> selectedOptions = new ArrayList<Integer>(0);
+		List<Integer> selectedOptions = new ArrayList<>(0);
 		int selectedPerspectiveOptions = Math.min(questionMetadata.getOptionCount(firstPerspectiveID), config.defaultSelectedPerspectiveOptions());
 		for(int i=0; i<selectedPerspectiveOptions; i++) {
 			selectedOptions.add(i);
 		}
-		ArrayList<QueryFlag> flags = new ArrayList<QueryFlag>(0);
+		ArrayList<QueryFlag> flags = new ArrayList<>(0);
 		QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, firstQuestionID, firstPerspectiveID, selectedOptions, flags);
 		eventBus.fireEvent(new QueryUpdateEvent(queryDefinition));
 	}

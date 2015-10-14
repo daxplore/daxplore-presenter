@@ -99,7 +99,7 @@ public class JsonTools {
 	 * @return the list
 	 */
 	public static List<String> jsArrayAsList(JsArrayString jsArray) {
-		List<String> list = new LinkedList<String>();
+		List<String> list = new LinkedList<>();
 		for (int i = 0; i < jsArray.length(); i++) {
 			list.add(jsArray.get(i));
 		}
@@ -114,7 +114,7 @@ public class JsonTools {
 	 * @return the list
 	 */
 	public static List<Integer> jsArrayAsList(JsArrayInteger jsArray) {
-		List<Integer> list = new LinkedList<Integer>();
+		List<Integer> list = new LinkedList<>();
 		for (int i = 0; i < jsArray.length(); i++) {
 			list.add(jsArray.get(i));
 		}
@@ -129,7 +129,7 @@ public class JsonTools {
 	 * @return the list
 	 */
 	public static List<Double> jsArrayAsList(JsArrayNumber jsArray) {
-		List<Double> list = new LinkedList<Double>();
+		List<Double> list = new LinkedList<>();
 		for (int i = 0; i < jsArray.length(); i++) {
 			list.add(jsArray.get(i));
 		}
@@ -144,7 +144,7 @@ public class JsonTools {
 	 * @return the list
 	 */
 	public static List<Boolean> jsArrayAsList(JsArrayBoolean jsArray) {
-		List<Boolean> list = new LinkedList<Boolean>();
+		List<Boolean> list = new LinkedList<>();
 		for (int i = 0; i < jsArray.length(); i++) {
 			list.add(jsArray.get(i));
 		}

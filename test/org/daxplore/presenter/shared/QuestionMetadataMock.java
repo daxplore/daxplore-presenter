@@ -57,7 +57,7 @@ public class QuestionMetadataMock implements QuestionMetadata {
 	 */
 	@Override
 	public List<String> getOptionTexts(String questionID) {
-		List<String> result = new LinkedList<String>();
+		List<String> result = new LinkedList<>();
 		for (int i = 0; i<getOptionCount(questionID); i++) {
 			result.add(questionID + " option text " + i);
 		}

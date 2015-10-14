@@ -52,15 +52,15 @@ public class PrefixListViewImpl extends Composite implements PrefixListView {
 	protected Button addPrefixButton;
 	
 	private SingleSelectionModel<String> selectionModel;
-	private List<String> prefixList = new LinkedList<String>();
+	private List<String> prefixList = new LinkedList<>();
 	
 	
 	@Inject
 	public PrefixListViewImpl() {
 		TextCell textCell = new TextCell();
-		prefixCellList = new CellList<String>(textCell);
+		prefixCellList = new CellList<>(textCell);
 		prefixCellList.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
-		selectionModel = new SingleSelectionModel<String>();
+		selectionModel = new SingleSelectionModel<>();
 		prefixCellList.setSelectionModel(selectionModel);
 	    prefixCellList.setRowCount(0, true);
 	    

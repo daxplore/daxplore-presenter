@@ -30,7 +30,7 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
  * <p>Send the event over the system's {@link EventBus}.</p>
  */
 public class PrefixListUpdateEvent extends Event<PrefixListUpdateHandler> {
-	private static final Type<PrefixListUpdateHandler> TYPE = new Type<PrefixListUpdateHandler>();
+	private static final Type<PrefixListUpdateHandler> TYPE = new Type<>();
 	
 	private final List<String> prefixList;
 
