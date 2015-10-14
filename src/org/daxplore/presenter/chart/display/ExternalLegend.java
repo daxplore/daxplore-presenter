@@ -40,36 +40,19 @@ public class ExternalLegend extends Composite {
 	 *            the chart texts
 	 * @param query
 	 *            the query
-	 * @param itemLimit
-	 *            max number of legend-items to be displayed
 	 * @param printerMode
 	 *            use the printer-friendly mode
 	 */
-	public ExternalLegend(ChartTexts chartTexts, QueryDefinition queryDefinition, int itemLimit, boolean printerMode) {
+	public ExternalLegend(ChartTexts chartTexts, QueryDefinition queryDefinition, boolean printerMode) {
 		StringBuilder html = new StringBuilder("<table class=\"daxplore-ExternalLegend\">");
 
 		List<String> questionOptionTexts = queryDefinition.getQuestionOptionTexts();
-		int usedOptions = 0;
-		int unusedOptions = 0;
 		for (int optionIndex = 0; optionIndex < queryDefinition.getQuestionOptionCount(); optionIndex++) {
-			if (usedOptions < itemLimit) {
-				String text = questionOptionTexts.get(optionIndex);
-				String boxColor = BarColors.getChartColorSet(optionIndex).getPrimary();
-				html.append(legendRow(text, boxColor, printerMode));
-				usedOptions++;
-			} else {
-				unusedOptions++;
-			}
+			String text = questionOptionTexts.get(optionIndex);
+			String boxColor = BarColors.getChartColorSet(optionIndex).getPrimary();
+			html.append(legendRow(text, boxColor, printerMode));
 		}
-		if (unusedOptions > 0) {
-			html.append("<tr><td colspan=\"2\" class=\"daxplore-ExternalLegend-hiddenCount\">"); //TODO is class used?
-			if (unusedOptions == 1) {
-				html.append(chartTexts.oneOptionHidden());
-			} else {
-				html.append(chartTexts.optionsHidden().replaceFirst("%d", "" + unusedOptions));
-			}
-			html.append("</td></tr>");
-		}
+		
 		html.append("</table>");
 		content = new HTML(html.toString());
 		initWidget(content);

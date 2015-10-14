@@ -184,7 +184,7 @@ public class BarChart extends GChartChart {
 		super(chartTexts, prefixProperties, queryDefinition);
 		this.chartConfig = chartConfig;
 
-		externalLegend = new ExternalLegend(chartTexts, queryDefinition, chartConfig.externalLegendItemLimit(), printerMode);
+		externalLegend = new ExternalLegend(chartTexts, queryDefinition, printerMode);
 
 		usedPerspectiveOptions = queryDefinition.getUsedPerspectiveOptions();
 		groupCount = usedPerspectiveOptions.size() + (queryDefinition.hasFlag(QueryFlag.TOTAL) ? 1 : 0);

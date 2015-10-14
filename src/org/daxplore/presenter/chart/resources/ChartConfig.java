@@ -34,15 +34,6 @@ public interface ChartConfig extends Constants {
 	public int respondentCountCutoff();
 
 	/**
-	 * The maximal number of items displayed in the chart legend.
-	 * 
-	 * <p>If the number of legend items is higher, the rest are hidden.</p>
-	 * 
-	 * @return maximal number of items
-	 */
-	public int externalLegendItemLimit();
-
-	/**
 	 * The default height of charts, used in standard presentation mode.
 	 * 
 	 * <p>This is overridden by embed/print modes that depend on an external
