@@ -220,11 +220,11 @@ public class AdminUploadServlet extends HttpServlet {
 		
 				for (String fileName : fileMap.keySet()) {
 					String storeName = prefix + "#" + fileName;
-					if(fileName.startsWith("properties/")){
-						unpackPropertyFile(pm, storeName, fileMap.get(fileName));
-					} else if(fileName.startsWith("data/")) {
+					if (fileName.startsWith("data")) {
 						unpackStatisticalDataFile(pm, prefix, fileMap.get(fileName));
-					} else if(fileName.startsWith("meta/")) {
+					} else if (fileName.startsWith("groups") ||	fileName.startsWith("perspectives")
+							|| fileName.startsWith("questions") || fileName.startsWith("usertexts")
+							|| fileName.startsWith("boolsettings")) {
 						unpackStaticFile(pm, storeName, fileMap.get(fileName));
 					}
 				}
