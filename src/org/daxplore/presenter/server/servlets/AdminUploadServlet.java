@@ -237,22 +237,19 @@ public class AdminUploadServlet extends HttpServlet {
 	}
 
 	private static void unpackPropertyFile(PersistenceManager pm, String fileName, byte[] fileData) throws InternalServerException {
-		String[] propertiesWhitelist = { "page_title", "secondary_flag", "all_respondents", "timepoint_0", "timepoint_1" };
+		int addedSettings = 0;
 		try(BufferedReader reader = ServerTools.getAsBufferedReader(fileData)) {
 			List<SettingItemStore> items = new LinkedList<>();
 			JSONObject dataMap = (JSONObject) JSONValue.parse(reader);
-			for (String prop : propertiesWhitelist) {
+			for (Object prop : dataMap.keySet()) {
 				String key = fileName.substring(0, fileName.lastIndexOf('.')) + "/" + prop;
 				String value = (String) dataMap.get(prop);
-				if (value == null) {
-					value = "{" + prop + "}";
-					logger.log(Level.WARNING, "Missing property '" + key + "'");
-					//TODO tell uploading user of missing property
-				}
 				items.add(new SettingItemStore(key, value));
+				addedSettings++;
 			}
 			pm.makePersistentAll(items);
-			logger.log(Level.INFO, "Set " + propertiesWhitelist.length + " properties from the file '" + fileName + "'");
+			logger.log(Level.INFO, "Set " + addedSettings + " properties from the file '" + fileName + "'");
+			//TODO tell uploading user of missing properties
 		} catch(IOException e) {
 			throw new InternalServerException("Failed to close unpack property file", e);
 		}
