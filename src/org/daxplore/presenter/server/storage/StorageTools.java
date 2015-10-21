@@ -57,7 +57,7 @@ public class StorageTools {
 				}
 			};
 			
-			Reader reader = new StringReader(TextFileStore.getLocalizedFile(pm, prefix, "meta/questions", locale, ".json"));
+			Reader reader = new StringReader(TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json"));
 			
 			JSONParser parser = new JSONParser();
 			List<Map> questionList = (List<Map>)parser.parse(reader, containerFactory);

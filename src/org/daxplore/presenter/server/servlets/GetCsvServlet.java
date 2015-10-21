@@ -178,7 +178,7 @@ public class GetCsvServlet extends HttpServlet {
 			}
 			
 			int metaDataColumn = queryDefinition.getQuestionOptionCount() + 2;
-			csvTable.get(0)[metaDataColumn] = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "page_title");
+			csvTable.get(0)[metaDataColumn] = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
 			csvTable.get(1)[metaDataColumn] = queryDefinition.getPerspectiveShortText() + ":";
 			csvTable.get(1)[metaDataColumn+1] = queryDefinition.getPerspectiveFullText();
 			csvTable.get(2)[metaDataColumn] = queryDefinition.getQuestionShortText() + ":";

@@ -239,7 +239,7 @@ public class PresenterServlet extends HttpServlet {
 		questions.add(queryDefinition.getQuestionID());
 		questions.add(queryDefinition.getPerspectiveID());
 		
-		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "page_title");
+		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
 		
 		String questionString = StorageTools.getQuestionDefinitions(pm, prefix, questions, locale);
 		String usertexts = TextFileStore.getLocalizedFile(pm, prefix, "usertexts", locale, ".json");
@@ -274,7 +274,7 @@ public class PresenterServlet extends HttpServlet {
 		flags.add(EmbedFlag.PRINT);
 		String embedDefinition = new EmbedDefinition(flags).getAsString();
 
-		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "page_title");
+		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
 		
 		String[] arguments = {
 			pageTitle,				// {0}
