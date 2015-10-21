@@ -71,8 +71,23 @@ public class TextFileStore {
 	private String getFile() {
 		return SharedTools.join(fileChunks, "");
 	}
+	
+	public static String getFile(PersistenceManager pm, String prefix, String name, String suffix) throws BadRequestException {
+		String key = prefix + "#" + name + suffix;
+		try {
+			if(!textFileCache.containsKey(key)) {
+				String file = pm.getObjectById(TextFileStore.class, key).getFile();
+				textFileCache.put(key, file);
+				return file;
+			}
+			return textFileCache.get(key);
+		} catch (Exception e) {
+			// This could also be an internal server exception, but we have no way of finding out
+			throw new BadRequestException("Could not read data item '" + key + "'", e);
+		}
+	}
 
-	public static String getFile(PersistenceManager pm, String prefix, String name, Locale locale, String suffix) throws BadRequestException {
+	public static String getLocalizedFile(PersistenceManager pm, String prefix, String name, Locale locale, String suffix) throws BadRequestException {
 		String key = prefix + "#" + name + "_" + locale.getLanguage() + suffix;
 		try {
 			if(!textFileCache.containsKey(key)) {

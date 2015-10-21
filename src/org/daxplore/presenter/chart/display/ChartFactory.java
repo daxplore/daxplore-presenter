@@ -20,7 +20,7 @@ package org.daxplore.presenter.chart.display;
 
 import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.chart.resources.ChartTexts;
-import org.daxplore.presenter.shared.PrefixProperties;
+import org.daxplore.presenter.client.json.UITexts;
 import org.daxplore.presenter.shared.QueryDefinition;
 
 import com.google.inject.Inject;
@@ -31,17 +31,17 @@ import com.google.inject.Inject;
 public class ChartFactory {
 	private final ChartTexts chartTexts;
 	private final ChartConfig chartConfig;
-	private final PrefixProperties prefixProperties;
+	private final UITexts uiTexts;
 
 	/**
 	 * Instantiates a new chart factory.
 	 * 
 	 */
 	@Inject
-	protected ChartFactory(ChartTexts chartTexts, ChartConfig chartConfig, PrefixProperties prefixProperties) {
+	protected ChartFactory(ChartTexts chartTexts, ChartConfig chartConfig, UITexts uiTexts) {
 		this.chartTexts = chartTexts;
 		this.chartConfig = chartConfig;
-		this.prefixProperties = prefixProperties;
+		this.uiTexts = uiTexts;
 	}
 
 	/**
@@ -50,7 +50,7 @@ public class ChartFactory {
 	 * @return the chart
 	 */
 	public BarChart createBarChart(QueryDefinition queryDefinition, boolean printerMode) {
-		return new BarChart(chartTexts, chartConfig, prefixProperties, queryDefinition, printerMode);
+		return new BarChart(chartTexts, chartConfig, uiTexts, queryDefinition, printerMode);
 	}
 
 	/**
@@ -59,6 +59,6 @@ public class ChartFactory {
 	 * @return the chart
 	 */
 	public BarChartCompare createBarChartCompare(QueryDefinition queryDefinition, boolean printerMode) {
-		return new BarChartCompare(chartTexts, chartConfig, prefixProperties, queryDefinition, printerMode);
+		return new BarChartCompare(chartTexts, chartConfig, uiTexts, queryDefinition, printerMode);
 	}
 }

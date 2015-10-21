@@ -25,9 +25,8 @@ import org.daxplore.presenter.client.event.QueryUpdateEvent;
 import org.daxplore.presenter.client.event.QueryUpdateHandler;
 import org.daxplore.presenter.client.event.SelectionUpdateEvent;
 import org.daxplore.presenter.client.json.Groups;
+import org.daxplore.presenter.client.json.UITexts;
 import org.daxplore.presenter.client.resources.UIResources;
-import org.daxplore.presenter.client.resources.UITexts;
-import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QuestionMetadata;
 
@@ -63,7 +62,8 @@ public class QuestionPanel extends Composite implements QueryUpdateHandler{
 	private VerticalPanel vp = new VerticalPanel();
 
 	@Inject
-	protected QuestionPanel(QuestionMetadata questions, Groups groups, EventBus eventBus, UITexts uiTexts, UIResources uiResources, PrefixProperties prefixProperties) {
+	protected QuestionPanel(QuestionMetadata questions, Groups groups, EventBus eventBus,
+			UITexts uiTexts, UIResources uiResources) {
 		this.eventBus = eventBus;
 		
 		treeRoot = new Tree(uiResources, false);
@@ -92,7 +92,7 @@ public class QuestionPanel extends Composite implements QueryUpdateHandler{
 				html.appendEscaped(questions.getShortText(q));
 				if(questions.hasSecondary(q)) {
 					html.appendHtmlConstant("&nbsp;<span class=\"super\">");
-					html.appendEscaped(prefixProperties.getSecondaryFlagText());
+					html.appendEscaped(uiTexts.secondaryFlag());
 					html.appendHtmlConstant("</span>");
 				}
 				html.appendHtmlConstant("&nbsp;");

@@ -27,11 +27,11 @@ import org.daxplore.presenter.client.event.ImageButtonEvent;
 import org.daxplore.presenter.client.event.ImageButtonHandler;
 import org.daxplore.presenter.client.event.QueryUpdateEvent;
 import org.daxplore.presenter.client.event.QueryUpdateHandler;
+import org.daxplore.presenter.client.json.Prefix;
+import org.daxplore.presenter.client.json.UITexts;
 import org.daxplore.presenter.client.resources.DaxploreConfig;
-import org.daxplore.presenter.client.resources.UITexts;
 import org.daxplore.presenter.shared.EmbedDefinition;
 import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
-import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QueryDefinition;
 
 import com.google.gwt.core.client.GWT;
@@ -76,7 +76,7 @@ public class EmbedPopup extends PopupPanel implements EmbedSizeHandler, QueryUpd
 		MouseUpHandler, ChangeHandler, ValueChangeHandler<Boolean> {
 
 	private DaxploreConfig config;
-	private PrefixProperties prefixProperties;
+	private final String prefix;
 
 	private VerticalPanel mainPanel;
 
@@ -104,9 +104,9 @@ public class EmbedPopup extends PopupPanel implements EmbedSizeHandler, QueryUpd
 	 *            supplies configuration parameters to the client
 	 */
 	@Inject
-	public EmbedPopup(final EventBus eventBus, UITexts uiTexts, DaxploreConfig config, PrefixProperties prefixProperties) {
+	public EmbedPopup(final EventBus eventBus, UITexts uiTexts, DaxploreConfig config, Prefix prefix) {
 		super(true);
-		this.prefixProperties = prefixProperties;
+		this.prefix = prefix.getPrefix();
 		
 		mainPanel = new VerticalPanel();
 		mainPanel.setSpacing(5);
@@ -197,7 +197,7 @@ public class EmbedPopup extends PopupPanel implements EmbedSizeHandler, QueryUpd
 			int height = currentEmbedSize.getHeight(config);
 			
 			// get base address, e.g. http://127.0.0.1/p/myprefix
-			String address = GWT.getHostPageBaseURL() + prefixProperties.getPrefix();
+			String address = GWT.getHostPageBaseURL() + prefix;
 			address += "?f=embed&q=" + queryDefinition.getAsString();
 			address += "&l=" + LocaleInfo.getCurrentLocale().getLocaleName();
 			if(!GWT.isScript() && Window.Location.getParameter("gwt.codesvr") != null) {

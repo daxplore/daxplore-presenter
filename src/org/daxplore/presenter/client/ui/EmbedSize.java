@@ -18,8 +18,8 @@
  */
 package org.daxplore.presenter.client.ui;
 
+import org.daxplore.presenter.client.json.UITexts;
 import org.daxplore.presenter.client.resources.DaxploreConfig;
-import org.daxplore.presenter.client.resources.UITexts;
 
 /**
  * An Enum that defines the sizes that users can select for embedded charts.

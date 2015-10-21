@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.daxplore.presenter.server.ServerPrefixProperties;
 import org.daxplore.presenter.server.ServerTools;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.QuestionMetadataServerImpl;
@@ -118,18 +117,11 @@ public class PresenterServlet extends HttpServlet {
 			} else {
 				Locale locale = ServerTools.selectLocale(request, prefix);
 
-				String secondaryFlagText = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "secondary_flag");
-				//TODO handle timepoints properly
-				String timepoint0Text = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "timepoint_0");
-				String timepoint1Text = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "timepoint_1");
-				String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "page_title");
-				ServerPrefixProperties prefixProperties = new ServerPrefixProperties(prefix, secondaryFlagText, timepoint0Text, timepoint1Text, pageTitle);
-
 				if (feature!=null && feature.equalsIgnoreCase("embed")) { // embedded chart
 					
 					// TODO clean query string
 					String queryString = request.getParameter("q");
-					responseHTML = getEmbedHTML(pm, prefix, locale, queryString, baseurl, prefixProperties, gaTemplate);
+					responseHTML = getEmbedHTML(pm, prefix, locale, queryString, baseurl, gaTemplate);
 					
 				} else if (feature!=null && feature.equalsIgnoreCase("print")) { // printer-friendly chart
 					
@@ -147,7 +139,7 @@ public class PresenterServlet extends HttpServlet {
 					
 				} else { // standard presenter
 					
-					responseHTML = getPresenterHTML(pm, prefix, locale, baseurl, prefixProperties, gaTemplate);
+					responseHTML = getPresenterHTML(pm, prefix, locale, baseurl, gaTemplate);
 					
 				}
 			}
@@ -191,26 +183,29 @@ public class PresenterServlet extends HttpServlet {
 		return MessageFormat.format(browserSuggestionTemplate, (Object[])arguments);
 	}
 	
-	private String getPresenterHTML(PersistenceManager pm, String prefix, Locale locale, String baseurl, ServerPrefixProperties properties, String gaTemplate)
+	private String getPresenterHTML(PersistenceManager pm, String prefix, Locale locale, String baseurl, String gaTemplate)
 			throws InternalServerException, BadRequestException {
 		
 		String perspectives = "", groups = "", questions = "";
-		perspectives = TextFileStore.getFile(pm, prefix, "meta/perspectives", locale, ".json");
-		questions = TextFileStore.getFile(pm, prefix, "meta/questions", locale, ".json");
-		groups = TextFileStore.getFile(pm, prefix, "meta/groups", locale, ".json");
-		String prefixProperties = properties.toJson().toJSONString();
+		perspectives = TextFileStore.getLocalizedFile(pm, prefix, "perspectives", locale, ".json");
+		questions = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
+		groups = TextFileStore.getLocalizedFile(pm, prefix, "groups", locale, ".json");
 		
-		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "page_title");
+		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
+		
+		String boolsettings = "{}";
+		String usertexts = TextFileStore.getLocalizedFile(pm, prefix, "usertexts", locale, ".json");
 		
 		String[] arguments = {
-			locale.toLanguageTag(), // {0}
-			baseurl,				// {1}
-			pageTitle,				// {2}
+			baseurl,				// {0}
+			pageTitle,				// {1}
+			prefix,					// {2}
 			perspectives,			// {3}
 			questions,				// {4}
 			groups,					// {5}
-			prefixProperties,		// {6}
-			gaTemplate				// {7}
+			boolsettings,			// {6}
+			usertexts,				// {7}
+			gaTemplate				// {8}
 		};
 		
 		if (presenterHtmlTemplate == null) {
@@ -225,14 +220,14 @@ public class PresenterServlet extends HttpServlet {
 	}
 	
 	private String getEmbedHTML(PersistenceManager pm, String prefix, Locale locale,
-			String queryString, String baseurl, ServerPrefixProperties properties, String gaTemplate) throws BadRequestException, InternalServerException {
+			String queryString, String baseurl, String gaTemplate) throws BadRequestException, InternalServerException {
 		
 		QuestionMetadata questionMetadata;
 		String key = prefix + "_" + locale.toLanguageTag();
 		if(metadataMap.containsKey(key)) {
 			questionMetadata = metadataMap.get(key);
 		} else {
-			String questionText = TextFileStore.getFile(pm, prefix, "meta/questions", locale, ".json");
+			String questionText = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
 			questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
 			metadataMap.put(key, questionMetadata);
 		}
@@ -244,21 +239,19 @@ public class PresenterServlet extends HttpServlet {
 		questions.add(queryDefinition.getQuestionID());
 		questions.add(queryDefinition.getPerspectiveID());
 		
-		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "page_title");
+		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "page_title");
 		
 		String questionString = StorageTools.getQuestionDefinitions(pm, prefix, questions, locale);
-		
-		String prefixProperties = properties.toJson().toJSONString();
+		String usertexts = TextFileStore.getLocalizedFile(pm, prefix, "usertexts", locale, ".json");
 		
 		String[] arguments = {
-			prefix, 				// {0}
-			locale.toLanguageTag(), // {1}
-			pageTitle,				// {2}
-			baseurl, 				// {3}
-			gaTemplate,				// {4}
-			statItem, 				// {5}
-			questionString,			// {6}
-			prefixProperties		// {7}
+			baseurl, 				// {0}
+			pageTitle,				// {1}
+			gaTemplate,				// {2}
+			prefix, 				// {3}
+			statItem, 				// {4}
+			questionString,			// {5}
+			usertexts				// {6}
 		};
 		
 		if (embedHtmlTemplate == null) {
@@ -281,7 +274,7 @@ public class PresenterServlet extends HttpServlet {
 		flags.add(EmbedFlag.PRINT);
 		String embedDefinition = new EmbedDefinition(flags).getAsString();
 
-		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "page_title");
+		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "page_title");
 		
 		String[] arguments = {
 			pageTitle,				// {0}

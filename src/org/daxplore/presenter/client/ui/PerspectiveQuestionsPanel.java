@@ -19,8 +19,7 @@
 package org.daxplore.presenter.client.ui;
 
 import org.daxplore.presenter.client.json.Perspectives;
-import org.daxplore.presenter.client.resources.UITexts;
-import org.daxplore.presenter.shared.PrefixProperties;
+import org.daxplore.presenter.client.json.UITexts;
 import org.daxplore.presenter.shared.QuestionMetadata;
 
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
@@ -53,15 +52,13 @@ public class PerspectiveQuestionsPanel extends FlowPanel implements HasSelection
 		private final QuestionMetadata questions;
 		private final Perspectives perspectives;
 		private final UITexts uiTexts;
-		private final PrefixProperties prefixProperties;
 
 		@Inject
 		protected PerspectiveQuestionsFactory(QuestionMetadata questions, Perspectives perspectives,
-				UITexts uiTexts, PrefixProperties prefixProperties) {
+				UITexts uiTexts) {
 			this.questions = questions;
 			this.perspectives = perspectives;
 			this.uiTexts = uiTexts;
-			this.prefixProperties = prefixProperties;
 		}
 
 		/**
@@ -70,7 +67,7 @@ public class PerspectiveQuestionsPanel extends FlowPanel implements HasSelection
 		 * @return the perspective questions panel
 		 */
 		public PerspectiveQuestionsPanel createPerspectivePanel() {
-			return new PerspectiveQuestionsPanel(questions, perspectives, uiTexts, prefixProperties);
+			return new PerspectiveQuestionsPanel(questions, perspectives, uiTexts);
 		}
 	}
 
@@ -84,8 +81,7 @@ public class PerspectiveQuestionsPanel extends FlowPanel implements HasSelection
 		return item.getQuestionID();
 	}
 	
-	private PerspectiveQuestionsPanel(QuestionMetadata questions, Perspectives perspectives,
-			UITexts uiTexts, PrefixProperties prefixProperties) {
+	private PerspectiveQuestionsPanel(QuestionMetadata questions, Perspectives perspectives, UITexts uiTexts) {
 		Label header = new Label(uiTexts.pickSelectionGroupHeader());
 		header.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		header.addStyleName("daxplore-PerspectiveQuestionList-header");
@@ -97,7 +93,7 @@ public class PerspectiveQuestionsPanel extends FlowPanel implements HasSelection
 			html.appendEscaped(questions.getShortText(questionID));
 			if(questions.hasSecondary(questionID)) {
 				html.appendHtmlConstant("&nbsp;<span class=\"super\">");
-				html.appendEscaped(prefixProperties.getSecondaryFlagText());
+				html.appendEscaped(uiTexts.secondaryFlag());
 				html.appendHtmlConstant("</span>");
 			}
 			QuestionTreeItem item = new QuestionTreeItem(html.toSafeHtml(), questionID);

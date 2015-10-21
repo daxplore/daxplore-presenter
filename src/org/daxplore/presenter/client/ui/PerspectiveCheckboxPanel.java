@@ -21,8 +21,8 @@ package org.daxplore.presenter.client.ui;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.daxplore.presenter.client.json.UITexts;
 import org.daxplore.presenter.client.resources.DaxploreConfig;
-import org.daxplore.presenter.client.resources.UITexts;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 import org.daxplore.presenter.shared.QuestionMetadata;

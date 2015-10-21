@@ -19,7 +19,7 @@
 package org.daxplore.presenter.chart.display;
 
 import org.daxplore.presenter.chart.resources.ChartTexts;
-import org.daxplore.presenter.shared.PrefixProperties;
+import org.daxplore.presenter.client.json.UITexts;
 import org.daxplore.presenter.shared.QueryDefinition;
 
 import com.google.gwt.dom.client.Style.Position;
@@ -33,7 +33,7 @@ public abstract class GChartChart extends GChart implements Chart {
 	protected final ChartTexts chartTexts;
 
 	protected QueryDefinition queryDefinition;
-	protected PrefixProperties prefixProperties;
+	protected final UITexts uiTexts;
 
 	/**
 	 * A widget containing a legend for the chart, that can be placed anywhere.
@@ -53,9 +53,9 @@ public abstract class GChartChart extends GChart implements Chart {
 	 * @param titleDetail
 	 *            The explanatory text, that is shown under the header.
 	 */
-	protected GChartChart(ChartTexts chartTexts, PrefixProperties prefixProperties, QueryDefinition queryDefinition) {
+	protected GChartChart(ChartTexts chartTexts, UITexts uiTexts, QueryDefinition queryDefinition) {
 		this.queryDefinition = queryDefinition;
-		this.prefixProperties = prefixProperties;
+		this.uiTexts = uiTexts;
 		this.chartTexts = chartTexts;
 		getElement().getStyle().setPosition(Position.RELATIVE);
 		externalHeader = new ExternalHeader(chartTexts, queryDefinition);

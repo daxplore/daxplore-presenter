@@ -22,8 +22,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.daxplore.presenter.client.event.QueryReadyEvent;
+import org.daxplore.presenter.client.json.Prefix;
 import org.daxplore.presenter.client.json.shared.ChartDataParserClient;
-import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QueryDefinition;
 
 import com.google.gwt.http.client.Request;
@@ -48,12 +48,12 @@ public class StatDataServerModel {
 	
 	
 	@Inject
-	public StatDataServerModel(EventBus eventBus, PrefixProperties prefixProperties) {
+	public StatDataServerModel(EventBus eventBus, Prefix prefix) {
 		this.eventBus = eventBus;
 		
 		href = 	Window.Location.getProtocol() + "//" + 
 				Window.Location.getHost() + "/getStats?prefix=" +
-				prefixProperties.getPrefix() + "&";
+				prefix.getPrefix() + "&";
 	}
 	
 	public void makeRequest(QueryDefinition queryDefinition) {

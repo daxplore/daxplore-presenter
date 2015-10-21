@@ -98,7 +98,7 @@ public class GetCsvServlet extends HttpServlet {
 			if(metadataMap.containsKey(key)) {
 				questionMetadata = metadataMap.get(key);
 			} else {
-				String questionText = TextFileStore.getFile(pm, prefix, "meta/questions", locale, ".json");
+				String questionText = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
 				questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
 				metadataMap.put(key, questionMetadata);
 			}
@@ -111,8 +111,8 @@ public class GetCsvServlet extends HttpServlet {
 			questionOptionTexts.add(0,  queryDefinition.getPerspectiveShortText() + " \\ " + queryDefinition.getQuestionShortText());
 			
 			//TODO handle timepoints properly
-			String timepoint0Text = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "timepoint_0");
-			String timepoint1Text = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "timepoint_1");
+			String timepoint0Text = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "timepoint_0");
+			String timepoint1Text = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "timepoint_1");
 			
 			String statString = StatDataItemStore.getStats(pm, prefix, queryDefinition);
 			ChartDataParserServer data = new ChartDataParserServer(statString);
@@ -137,7 +137,7 @@ public class GetCsvServlet extends HttpServlet {
 			
 			if(queryDefinition.hasFlag(QueryFlag.TOTAL) || queryDefinition.getPerspectiveOptionCount()==0){
 				String[] row = new String[columnCount];
-				String allRespondents = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "all_respondents");
+				String allRespondents = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "all_respondents");
 				row[0] = MessageFormat.format("{0} ({1})", allRespondents, timepoint0Text);
 				int[] primaryData = data.getTotalDataItem().getCountData();
 				for (int i=1; i<=queryDefinition.getQuestionOptionCount(); i++) {
@@ -162,7 +162,7 @@ public class GetCsvServlet extends HttpServlet {
 				
 				if(queryDefinition.hasFlag(QueryFlag.TOTAL) || queryDefinition.getPerspectiveOptionCount()==0){
 					String[] row = new String[columnCount];
-					String allRespondents = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "all_respondents");
+					String allRespondents = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "all_respondents");
 					row[0] = MessageFormat.format("{0} ({1})", allRespondents, timepoint1Text);
 					int[] secondaryData = data.getTotalDataItem().getCountDataSecondary();
 					for (int i=1; i<=queryDefinition.getQuestionOptionCount(); i++) {
@@ -178,7 +178,7 @@ public class GetCsvServlet extends HttpServlet {
 			}
 			
 			int metaDataColumn = queryDefinition.getQuestionOptionCount() + 2;
-			csvTable.get(0)[metaDataColumn] = SettingItemStore.getLocalizedProperty(pm, prefix, "properties/usertexts", locale, "page_title");
+			csvTable.get(0)[metaDataColumn] = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "page_title");
 			csvTable.get(1)[metaDataColumn] = queryDefinition.getPerspectiveShortText() + ":";
 			csvTable.get(1)[metaDataColumn+1] = queryDefinition.getPerspectiveFullText();
 			csvTable.get(2)[metaDataColumn] = queryDefinition.getQuestionShortText() + ":";

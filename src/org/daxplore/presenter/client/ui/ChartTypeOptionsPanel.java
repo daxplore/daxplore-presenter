@@ -21,9 +21,8 @@ package org.daxplore.presenter.client.ui;
 import org.daxplore.presenter.client.event.QueryUpdateEvent;
 import org.daxplore.presenter.client.event.QueryUpdateHandler;
 import org.daxplore.presenter.client.event.SelectionUpdateEvent;
+import org.daxplore.presenter.client.json.UITexts;
 import org.daxplore.presenter.client.resources.DaxploreConfig;
-import org.daxplore.presenter.client.resources.UITexts;
-import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
@@ -64,20 +63,17 @@ public class ChartTypeOptionsPanel extends Composite implements QueryUpdateHandl
 	private boolean showMeanButtons;
 	
 	@Inject
-	protected ChartTypeOptionsPanel(EventBus eventBus, UITexts uiTexts, DaxploreConfig config, PrefixProperties prefixProperties) {
+	protected ChartTypeOptionsPanel(EventBus eventBus, UITexts uiTexts, DaxploreConfig config) {
 		this.eventBus = eventBus;
 		
 		this.showMeanButtons = config.showMeanButtons();
 
 		mainPanel = new VerticalPanel();
 		
-		String timepoint0Text = prefixProperties.getTimepointPrimaryText();
-		String timepoint1Text = prefixProperties.getTimepointSecondaryText();
-		
 		dontShowSecondaryButton = new TitleToggleButton(
-						uiTexts.onlyShowNew(timepoint0Text),
-						uiTexts.onlyShowNewTitleEnabled(timepoint0Text),
-						uiTexts.onlyShowNewTitleDisabled(timepoint0Text));
+						uiTexts.onlyShowNew(),
+						uiTexts.onlyShowNewTitleEnabled(),
+						uiTexts.onlyShowNewTitleDisabled());
 		dontShowSecondaryButton.setValue(true);
 		dontShowSecondaryButton.setEnabled(false);
 		dontShowSecondaryButton.addValueChangeHandler(this);
@@ -85,9 +81,9 @@ public class ChartTypeOptionsPanel extends Composite implements QueryUpdateHandl
 		mainPanel.add(dontShowSecondaryButton);
 
 		showSecondaryButton = new TitleToggleButton(
-						uiTexts.compareWithOld(timepoint1Text),
-						uiTexts.compareWithOldTitleEnabled(timepoint1Text, timepoint0Text),
-						uiTexts.compareWithOldTitleDisabled(timepoint1Text));
+						uiTexts.compareWithOld(),
+						uiTexts.compareWithOldTitleEnabled(),
+						uiTexts.compareWithOldTitleDisabled());
 		showSecondaryButton.setEnabled(false);
 		showSecondaryButton.addValueChangeHandler(this);
 		showSecondaryButton.setValue(false, false);

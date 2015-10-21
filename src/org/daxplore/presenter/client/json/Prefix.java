@@ -1,4 +1,5 @@
 /**
+
  *  This file is part of Daxplore Presenter.
  *
  *  Daxplore Presenter is free software: you can redistribute it and/or modify
@@ -14,13 +15,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.shared;
+package org.daxplore.presenter.client.json;
 
-public interface PrefixProperties {
+import com.google.inject.Inject;
 
-	public String getPrefix();
-	public String getSecondaryFlagText();
-	public String getTimepointPrimaryText();
-	public String getTimepointSecondaryText();
-	public String getPageTitle();
+public class Prefix {
+	private String prefix;
+	
+	@Inject
+	public Prefix() {
+		prefix = getNativePrefix();
+	}
+	
+	public String getPrefix() {
+		return prefix;
+	}
+	
+	public static native String getNativePrefix() /*-{
+		return $wnd.prefix;
+	}-*/;
 }

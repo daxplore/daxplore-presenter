@@ -75,7 +75,7 @@ public class GetStatsServlet extends HttpServlet {
 			if (!metadataPrefixMap.containsKey(prefix)) {
 				LocaleStore localeStore = pm.getObjectById(LocaleStore.class, prefix);
 				//it shouldn't matter what locale we use here, as we don't read any localized data
-				String questionText = TextFileStore.getFile(pm, prefix, "meta/questions", localeStore.getDefaultLocale(), ".json");
+				String questionText = TextFileStore.getLocalizedFile(pm, prefix, "questions", localeStore.getDefaultLocale(), ".json");
 				metadataPrefixMap.put(prefix, new QuestionMetadataServerImpl(new StringReader(questionText)));
 			}
 			

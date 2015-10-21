@@ -25,7 +25,7 @@ import org.daxplore.presenter.chart.data.QueryResult;
 import org.daxplore.presenter.chart.data.QueryResultCount;
 import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.chart.resources.ChartTexts;
-import org.daxplore.presenter.shared.PrefixProperties;
+import org.daxplore.presenter.client.json.UITexts;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
@@ -179,9 +179,9 @@ public class BarChart extends GChartChart {
 	 * @param query
 	 *            The query that this chart will display.
 	 */
-	protected BarChart(ChartTexts chartTexts, ChartConfig chartConfig, PrefixProperties prefixProperties,
+	protected BarChart(ChartTexts chartTexts, ChartConfig chartConfig, UITexts uiTexts,
 			QueryDefinition queryDefinition, boolean printerMode) {
-		super(chartTexts, prefixProperties, queryDefinition);
+		super(chartTexts, uiTexts, queryDefinition);
 		this.chartConfig = chartConfig;
 
 		externalLegend = new ExternalLegend(chartTexts, queryDefinition, printerMode);

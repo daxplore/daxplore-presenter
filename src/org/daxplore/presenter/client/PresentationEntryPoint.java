@@ -19,7 +19,7 @@
 package org.daxplore.presenter.client;
 
 import org.daxplore.presenter.client.inject.PresentationInjector;
-import org.daxplore.presenter.client.resources.DaxploreConfig;
+import org.daxplore.presenter.client.json.UITexts;
 import org.daxplore.presenter.client.ui.StagePanel;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -51,7 +51,6 @@ public class PresentationEntryPoint implements EntryPoint {
 		StagePanel stagePanel = injector.getStagePanel();
 		rootPanel.add(stagePanel);
 		Presenter presenter = injector.getPresenter();
-		DaxploreConfig config = injector.getDaxploreConfig();
 		String href = Window.Location.getHref();
 		if (href.contains("#")) {
 			String base64 = href.substring(href.lastIndexOf("#") + 1, href.length());

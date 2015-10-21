@@ -35,6 +35,7 @@ import org.daxplore.presenter.client.event.SetWarningBannerEvent;
 import org.daxplore.presenter.client.event.SetWarningBannerHandler;
 import org.daxplore.presenter.client.json.Groups;
 import org.daxplore.presenter.client.json.Perspectives;
+import org.daxplore.presenter.client.json.Prefix;
 import org.daxplore.presenter.client.model.StatDataServerModel;
 import org.daxplore.presenter.client.resources.DaxploreConfig;
 import org.daxplore.presenter.client.ui.ChartTypeOptionsPanel;
@@ -42,7 +43,6 @@ import org.daxplore.presenter.client.ui.PerspectivePanel;
 import org.daxplore.presenter.client.ui.QuestionPanel;
 import org.daxplore.presenter.client.ui.StagePanel;
 import org.daxplore.presenter.client.ui.WarningBanner;
-import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 import org.daxplore.presenter.shared.QuestionMetadata;
@@ -70,7 +70,7 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 	private final EventBus eventBus;
 	private DaxploreConfig config;
 	private StatDataServerModel statDataServerModel;
-	private PrefixProperties prefixProperties;
+	private final String prefix;
 	private Perspectives perspectives;
 	private Groups groups;
 	private ChartTypeOptionsPanel optionsPanel;
@@ -81,7 +81,7 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 			EventBus eventBus, ChartPanelPresenter chartPanelPresenter,
 			ChartTypeOptionsPanel optionsPanel, QuestionMetadata questionMetadata,
 			DaxploreConfig config, StatDataServerModel statDataServerModel,
-			PrefixProperties prefixProperties, Perspectives perspectives, Groups groups,
+			Prefix prefix, Perspectives perspectives, Groups groups,
 			StagePanel stagePanel) {
 		this.perspectivePanel = perspectivePanel;
 		this.questionPanel = questionPanel;
@@ -90,7 +90,7 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		this.eventBus = eventBus;
 		this.config = config;
 		this.statDataServerModel = statDataServerModel;
-		this.prefixProperties = prefixProperties;
+		this.prefix = prefix.getPrefix();
 		this.perspectives = perspectives;
 		this.groups = groups;
 		this.optionsPanel = optionsPanel;
@@ -140,7 +140,6 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		String historyString = queryDefinition.getAsString();
 		if (setHistory) {
 			History.newItem(historyString, false);
-			String prefix = prefixProperties.getPrefix();
 			Tracking.googleAnalyticsEvent(prefix + " chart", queryDefinition.getAsHumanString(prefix));
 			Tracking.iFrame(historyString);
 		}
@@ -158,7 +157,6 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 	public void restore(String storeString, boolean setHistory) {
 		try {
 			QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, storeString);
-			String prefix = prefixProperties.getPrefix();
 			Tracking.googleAnalyticsEvent(prefix + " chart", queryDefinition.getAsHumanString(prefix));
 			Tracking.iFrame(queryDefinition.getAsString());
 			eventBus.fireEvent(new QueryUpdateEvent(queryDefinition));

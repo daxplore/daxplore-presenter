@@ -20,9 +20,8 @@ package org.daxplore.presenter.client.inject;
 
 import org.daxplore.presenter.client.PresentationEntryPoint;
 import org.daxplore.presenter.client.Presenter;
-import org.daxplore.presenter.client.resources.DaxploreConfig;
+import org.daxplore.presenter.client.json.UITexts;
 import org.daxplore.presenter.client.ui.StagePanel;
-import org.daxplore.presenter.shared.PrefixProperties;
 
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
@@ -45,6 +44,4 @@ import com.google.gwt.inject.client.Ginjector;
 public interface PresentationInjector extends Ginjector {
 	Presenter getPresenter();
 	StagePanel getStagePanel();
-	DaxploreConfig getDaxploreConfig();
-	PrefixProperties getPrefixProperties();
 }

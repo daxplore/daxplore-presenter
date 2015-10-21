@@ -23,9 +23,9 @@ import org.daxplore.presenter.client.event.ImageButtonEvent.ImageButtonAction;
 import org.daxplore.presenter.client.event.ImageButtonHandler;
 import org.daxplore.presenter.client.event.QueryUpdateEvent;
 import org.daxplore.presenter.client.event.QueryUpdateHandler;
+import org.daxplore.presenter.client.json.Prefix;
+import org.daxplore.presenter.client.json.UITexts;
 import org.daxplore.presenter.client.resources.UIResources;
-import org.daxplore.presenter.client.resources.UITexts;
-import org.daxplore.presenter.shared.PrefixProperties;
 import org.daxplore.presenter.shared.QueryDefinition;
 
 import com.google.gwt.core.client.GWT;
@@ -52,19 +52,23 @@ import com.google.web.bindery.event.shared.EventBus;
 public class ImageButtonPanel extends Composite implements QueryUpdateHandler, ImageButtonHandler {
 	
 	private String baseUrl;
+	private UITexts uiTexts;
+	private final String prefix;
 	
 	private HorizontalPanel mainPanel;
 	private QueryDefinition queryDefinition;
-	private PrefixProperties prefixProperties;
 	
 	private WidgetAnchor csvWidgetAnchor;
 	
 	@Inject
-	protected ImageButtonPanel(final EventBus eventBus, UITexts uiTexts, UIResources uiResources, EmbedPopup embedPopup, PrefixProperties prefixProperties) {
-		this.prefixProperties = prefixProperties;
+	protected ImageButtonPanel(final EventBus eventBus, UITexts uiTexts, UIResources uiResources,
+			EmbedPopup embedPopup, Prefix prefix) {
 		
 		baseUrl = GWT.getHostPageBaseURL();					// http://example.com/p/
 		baseUrl = baseUrl.substring(0, baseUrl.length()-2); // http://example.com/
+		
+		this.uiTexts = uiTexts;
+		this.prefix = prefix.getPrefix();
 		
 //		Image buttonImage = new Image(uiResources.printButtonImage());
 //		ImageButton printButton = new ImageButton(buttonImage, uiTexts.printButtonTitle());
@@ -106,12 +110,12 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 	}
 	
 	private String getCsvDownloadSrc() {
-		String fileName = prefixProperties.getPageTitle() + " - " + queryDefinition.getPerspectiveShortText() + " - " + queryDefinition.getQuestionShortText() + ".csv";
+		String fileName = uiTexts.pageTitle() + " - " + queryDefinition.getPerspectiveShortText() + " - " + queryDefinition.getQuestionShortText() + ".csv";
 		fileName = URL.encodePathSegment(fileName);
 		return baseUrl + "getCsv/" + fileName
 				+ "?q=" + queryDefinition.getAsString()
 				+ "&l=" + LocaleInfo.getCurrentLocale().getLocaleName()
-				+ "&prefix=" + prefixProperties.getPrefix();
+				+ "&prefix=" + prefix;
 	}
 	
 	private void openPrintPage(){
