@@ -19,7 +19,6 @@
 package org.daxplore.presenter.client;
 
 import org.daxplore.presenter.client.inject.PresentationInjector;
-import org.daxplore.presenter.client.json.UITexts;
 import org.daxplore.presenter.client.ui.StagePanel;
 
 import com.google.gwt.core.client.EntryPoint;
