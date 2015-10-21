@@ -1,4 +1,0 @@
-properties/[files with key=value pairs, stored as separate key/value properties]
-data/[raw statistics data files, stored as separate data items]
-meta/[metadata definitions, stored as static files]
-texts/[human readable text files, stored as static files]
