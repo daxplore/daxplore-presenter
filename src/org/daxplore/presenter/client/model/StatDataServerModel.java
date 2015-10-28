@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.daxplore.presenter.client.event.QueryReadyEvent;
 import org.daxplore.presenter.client.json.Prefix;
 import org.daxplore.presenter.client.json.shared.ChartDataParserClient;
+import org.daxplore.presenter.shared.QueryData;
 import org.daxplore.presenter.shared.QueryDefinition;
 
 import com.google.gwt.http.client.Request;
@@ -40,7 +41,7 @@ public class StatDataServerModel {
 	
 	private EventBus eventBus;
 	
-	private Map<String, ChartDataParserClient> queryDataCache = new HashMap<>();
+	private Map<String, QueryData> queryDataCache = new HashMap<>();
 	
 	private String href;
 	
@@ -58,10 +59,10 @@ public class StatDataServerModel {
 	
 	public void makeRequest(QueryDefinition queryDefinition) {
 		currentQuery = queryDefinition;
-		String requestString = getRequestString(queryDefinition);
-		if(queryDataCache.containsKey(requestString)) {
+		if(queryDataCache.containsKey(getCacheString(queryDefinition))) {
 			onDataLoaded();
 		} else {
+			String requestString = getRequestString(queryDefinition);
 			String url = href + requestString;
 			RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(url));
 			builder.setTimeoutMillis(5000); //TODO better timeout handling
@@ -78,10 +79,9 @@ public class StatDataServerModel {
 	 * Called when requested data is available
 	 */
 	private void onDataLoaded() {
-		String requestString = getRequestString(currentQuery);
 		// Make sure the newly loaded doesn't belong to an old request
-		if (currentQuery != null && queryDataCache.containsKey(requestString)) {
-			ChartDataParserClient data = queryDataCache.get(requestString);
+		if (currentQuery != null && queryDataCache.containsKey(getCacheString(currentQuery))) {
+			QueryData data = queryDataCache.get(getCacheString(currentQuery));
 			eventBus.fireEvent(new QueryReadyEvent(currentQuery, data));
 			currentQuery = null;
 		}
@@ -89,6 +89,10 @@ public class StatDataServerModel {
 	
 	private static String getRequestString(QueryDefinition queryDefinition) {
 		return "q=" + queryDefinition.getAsString();
+	}
+	
+	private static String getCacheString(QueryDefinition definition) {
+		return definition.getQuestionID() + "@" + definition.getPerspectiveID();
 	}
 	
 	/**
@@ -108,10 +112,9 @@ public class StatDataServerModel {
 		public void onResponseReceived(Request request, Response response) {
 			if (response.getStatusCode() == HttpServletResponse.SC_OK) {
 				System.out.println("Server Data: " + response.getText());
-				ChartDataParserClient data = ChartDataParserClient.parseJson(response.getText());
-				String requestString = getRequestString(queryDefinition);
-				if(!queryDataCache.containsKey(requestString)){
-					queryDataCache.put(requestString, data);
+				QueryData data = ChartDataParserClient.parse(response.getText());
+				if(!queryDataCache.containsKey(getCacheString(queryDefinition))){
+					queryDataCache.put(getCacheString(queryDefinition), data);
 				}
 				onDataLoaded();
 			} else {

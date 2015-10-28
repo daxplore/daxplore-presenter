@@ -21,100 +21,112 @@ package org.daxplore.presenter.client.json.shared;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.daxplore.presenter.shared.ChartDataItem;
+import org.daxplore.presenter.shared.QueryData;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsArrayInteger;
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
 
 /**
  * This class wraps a single server response, which makes up the data
  * for a question/perspective combination.
  */
-public class ChartDataParserClient extends JavaScriptObject {
-	
-	protected ChartDataParserClient() {}
-	
-	/**
-	 * Acts as a constructor for the class. Parses and wraps the json response.
-	 * 
-	 * @param json The json representation of the data
-	 * @return A new instance of this class
-	 */
-	public final static native ChartDataParserClient parseJson(String json) /*-{
-		return eval('('+json+')');
-	}-*/;
-	
+public class ChartDataParserClient {
 	/**
 	 * Get the single data item that comes pre-loaded with embed charts.
 	 * 
 	 * @return the native json data
 	 */
-	public final static native ChartDataParserClient getEmbeddedData() /*-{
+	private final static native JavaScriptObject getEmbedData() /*-{
 		return $wnd.jsondata;
 	}-*/;
 	
-	public final native String getQuestionID() /*-{
-		return this.q;
-	}-*/;
-	
-	public final native String getPerspectiveID() /*-{
-		return this.p;
-	}-*/;
-	
-	private final native JsArrayInteger getTimepoints() /*-{
-		var timepoints = [];
-		for(var key in this.freq) {
-			if(this.freq.hasOwnProperty(key)){
-				timepoints.push(parseInt(key));
-			}
-		}
-		return timepoints;
-	}-*/;
-
-	private final native int getPerspectiveCount(int timepointIndex) /*-{
-		var count = 0;
-		var timepoint = this.freq[timepointIndex];
-		for(var perspective in timepoint) {
-			if(timepoint.hasOwnProperty(perspective)){
-				count+=1;
-			}
-		}
-		return count-1; // -1 to ignore 'all'
-	}-*/;
-	
-	private final native JsArrayInteger getData(int timepoint, String perspective) /*-{
-		return this.freq[timepoint][perspective];
-	}-*/;
-	
-	/**
-	 * Get the {@link ChartDataInterface} data as a list.
-	 * 
-	 * @return the data
-	 */
-	public final List<ChartDataItem> getDataItems() {
-		int[] timepoints = JsonTools.jsArrayAsArray(getTimepoints());
-		int perspectiveCount = getPerspectiveCount(timepoints[0]);
-		List<ChartDataItem> list = new ArrayList<>(perspectiveCount);
-		
-		for(int i = 0; i < perspectiveCount; i++){
-			int[] primaryData = JsonTools.jsArrayAsArray(getData(0, Integer.toString(i)));
-			int[] secondaryData = null;
-			if(timepoints.length==2) { //TODO invalid assumptions about timepoints
-				secondaryData = JsonTools.jsArrayAsArray(getData(1, Integer.toString(i)));
-			}
-			list.add(new ChartDataItem(primaryData, secondaryData, i));
-		}
-		
-		return list;
+	public static QueryData parse(String json) {
+		return getQueryData(JSONParser.parseStrict(json).isObject());
 	}
 	
-	public final ChartDataItem getTotalDataItem() {
-		int[] timepoints = JsonTools.jsArrayAsArray(getTimepoints());
-		int[] primaryData = JsonTools.jsArrayAsArray(getData(timepoints[0], "all"));
-		int[] secondaryData = null;
-		if(timepoints.length==2) { //TODO invalid assumptions about timepoints
-			secondaryData = JsonTools.jsArrayAsArray(getData(timepoints[1], "all"));
+	public static QueryData getEmbeddedData() {
+		return getQueryData(new JSONObject(getEmbedData()));
+	}
+	
+	private static QueryData getQueryData(JSONObject statJsonObject) {
+		String questionID = statJsonObject.get("q").isString().stringValue();
+		String perspectiveID = statJsonObject.get("p").isString().stringValue();
+		QueryData queryData = new QueryData(questionID, perspectiveID);
+		
+		JSONObject freqObject = statJsonObject.get("freq").isObject();
+		if (freqObject != null) {
+			JSONObject freqTimepoint1 = null;
+			if(freqObject.get("0") != null) {
+				freqTimepoint1 = freqObject.get("0").isObject();
+			}
+			
+			if (freqTimepoint1 != null) {
+				int perspectiveCount = freqTimepoint1.size() - 1;
+				List<int[]> freqPrimary = new ArrayList<>();
+				for (int i = 0; i < perspectiveCount; i++) {
+					int[] data = getAsIntArray(freqTimepoint1.get(""+i).isArray());
+					freqPrimary.add(data);
+				}
+				int[] freqPrimaryTotal = getAsIntArray(freqTimepoint1.get("all").isArray());
+				
+				queryData.addFreqPrimary(freqPrimary, freqPrimaryTotal);
+			}
+	
+			JSONObject freqTimepoint2 = null;
+			if(freqObject.get("1") != null) {
+				freqTimepoint2 = freqObject.get("1").isObject();
+			}
+			if (freqTimepoint2 != null) {
+				int perspectiveCount = freqTimepoint2.size() - 1;
+				List<int[]> freqSecondary = new ArrayList<>();
+				for (int i = 0; i < perspectiveCount; i++) {
+					int[] data = getAsIntArray(freqTimepoint2.get("" + i).isArray());
+					freqSecondary.add(data);
+				}
+				int[] freqSecondaryTotal = getAsIntArray(freqTimepoint2.get("all").isArray());
+				
+				queryData.addFreqSecondary(freqSecondary, freqSecondaryTotal);
+			}
 		}
-		return new ChartDataItem(primaryData, secondaryData, -1);
+		
+		JSONObject meanObject = (JSONObject)statJsonObject.get("mean");
+		if(meanObject != null) {
+			JSONObject meanTimepoint1 = (JSONObject)meanObject.get("0");
+			JSONObject meanTimepoint2 = (JSONObject)meanObject.get("1");
+			
+			if(meanTimepoint1 != null) {
+				double[] meanPrimary = getAsDoubleArray(meanTimepoint1.get("mean").isArray());
+				double meanPrimaryTotal = meanTimepoint1.get("all").isNumber().doubleValue();
+				int[] meanPrimaryCount = getAsIntArray(meanTimepoint1.get("count").isArray());
+				queryData.addMeanPrimary(meanPrimary, meanPrimaryTotal, meanPrimaryCount);
+			}
+			
+			if(meanTimepoint2 != null) {
+				double[] meanSecondary = getAsDoubleArray((JSONArray)meanTimepoint2.get("mean"));
+				double meanSecondaryTotal = meanTimepoint2.get("all").isNumber().doubleValue();
+				int[] meanSecondaryCount = getAsIntArray(meanTimepoint2.get("count").isArray());
+				queryData.addMeanSecondary(meanSecondary, meanSecondaryTotal, meanSecondaryCount);
+			}
+		}
+		
+		return queryData;
+	}
+	
+	private static int[] getAsIntArray(JSONArray dataJson) {
+		int[] data = new int[dataJson.size()];
+		for (int i = 0; i<data.length; i++) {
+			data[i] = (int)(dataJson.get(i).isNumber().doubleValue());
+		}
+		return data;
+	}
+
+	private static double[] getAsDoubleArray(JSONArray dataJson) {
+		double[] data = new double[dataJson.size()];
+		for (int i = 0; i<data.length; i++) {
+			data[i] = dataJson.get(i).isNumber().doubleValue();
+		}
+		return data;
 	}
 }

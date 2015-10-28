@@ -16,14 +16,12 @@
  */
 package org.daxplore.presenter.chart;
 
-import org.daxplore.presenter.chart.data.QueryResultCount;
-import org.daxplore.presenter.chart.data.QueryResultCountCompare;
 import org.daxplore.presenter.chart.display.BarChart;
 import org.daxplore.presenter.chart.display.BarChartCompare;
 import org.daxplore.presenter.chart.display.BlankChart;
 import org.daxplore.presenter.chart.display.Chart;
 import org.daxplore.presenter.chart.display.ChartFactory;
-import org.daxplore.presenter.client.json.shared.ChartDataParserClient;
+import org.daxplore.presenter.shared.QueryData;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
@@ -42,17 +40,15 @@ public class ChartPanelPresenter  {
 		view.setChart(new BlankChart());
 	}
 
-	public void onQueryReady(QueryDefinition queryDefinition, ChartDataParserClient queryData) {
+	public void onQueryReady(QueryDefinition queryDefinition, QueryData queryData) {
 		if (!queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
 			BarChart newChart = chartFactory.createBarChart(queryDefinition, false);
-			QueryResultCount result = new QueryResultCount(queryData.getDataItems(), queryData.getTotalDataItem());
-			newChart.addData(result);
+			newChart.addData(queryData);
 			view.setChart(newChart);
 			chart = newChart;
 		} else {
 			BarChartCompare newChart = chartFactory.createBarChartCompare(queryDefinition, false);
-			QueryResultCountCompare result = new QueryResultCountCompare(queryData.getDataItems(), queryData.getTotalDataItem());
-			newChart.addData(result);
+			newChart.addData(queryData);
 			view.setChart(newChart);
 			chart = newChart;
 		}

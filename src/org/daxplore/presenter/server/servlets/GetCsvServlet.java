@@ -44,7 +44,7 @@ import org.daxplore.presenter.server.storage.StatDataItemStore;
 import org.daxplore.presenter.server.storage.TextFileStore;
 import org.daxplore.presenter.server.throwable.BadRequestException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
-import org.daxplore.presenter.shared.ChartDataItem;
+import org.daxplore.presenter.shared.QueryData;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 import org.daxplore.presenter.shared.QuestionMetadata;
@@ -115,8 +115,7 @@ public class GetCsvServlet extends HttpServlet {
 			String timepoint1Text = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "timepoint_1");
 			
 			String statString = StatDataItemStore.getStats(pm, prefix, queryDefinition);
-			ChartDataParserServer data = new ChartDataParserServer(statString);
-			List<ChartDataItem> dataItems = data.getDataItems();
+			QueryData data = ChartDataParserServer.parse(statString);
 			
 			int columnCount = 4 + queryDefinition.getQuestionOptionCount();
 			int rowCount = 0;
@@ -126,7 +125,7 @@ public class GetCsvServlet extends HttpServlet {
 				for(int perspectiveOption : usedPerspectiveOptions) {
 					String[] row = new String[columnCount];
 					row[0] = MessageFormat.format("{0} ({1})", perspectiveOptionTexts.get(perspectiveOption), timepoint0Text);
-					int[] primaryData = dataItems.get(perspectiveOption).getCountData();
+					int[] primaryData = data.getFreqPrimary(perspectiveOption);
 					for (int i=1; i<=queryDefinition.getQuestionOptionCount(); i++) {
 						row[i] = Integer.toString(primaryData[i-1]);				
 					}
@@ -139,7 +138,7 @@ public class GetCsvServlet extends HttpServlet {
 				String[] row = new String[columnCount];
 				String allRespondents = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "all_respondents");
 				row[0] = MessageFormat.format("{0} ({1})", allRespondents, timepoint0Text);
-				int[] primaryData = data.getTotalDataItem().getCountData();
+				int[] primaryData = data.getFreqPrimaryTotal();
 				for (int i=1; i<=queryDefinition.getQuestionOptionCount(); i++) {
 					row[i] = Integer.toString(primaryData[i-1]);	
 				}
@@ -152,7 +151,7 @@ public class GetCsvServlet extends HttpServlet {
 				for(int perspectiveOption : usedPerspectiveOptions) {
 					String[] row = new String[columnCount];
 					row[0] = MessageFormat.format("{0} ({1})", perspectiveOptionTexts.get(perspectiveOption), timepoint1Text);
-					int[] secondaryData = dataItems.get(perspectiveOption).getCountDataSecondary();
+					int[] secondaryData = data.getFreqSecondary(perspectiveOption);
 					for(int i=1; i<=queryDefinition.getQuestionOptionCount(); i++) {
 						row[i] = Integer.toString(secondaryData[i-1]);
 					}
@@ -164,7 +163,7 @@ public class GetCsvServlet extends HttpServlet {
 					String[] row = new String[columnCount];
 					String allRespondents = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "all_respondents");
 					row[0] = MessageFormat.format("{0} ({1})", allRespondents, timepoint1Text);
-					int[] secondaryData = data.getTotalDataItem().getCountDataSecondary();
+					int[] secondaryData = data.getFreqSecondaryTotal();
 					for (int i=1; i<=queryDefinition.getQuestionOptionCount(); i++) {
 						row[i] = Integer.toString(secondaryData[i-1]);	
 					}

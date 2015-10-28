@@ -21,11 +21,10 @@ package org.daxplore.presenter.chart.display;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.daxplore.presenter.chart.data.QueryResult;
-import org.daxplore.presenter.chart.data.QueryResultCount;
 import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.chart.resources.ChartTexts;
 import org.daxplore.presenter.client.json.UITexts;
+import org.daxplore.presenter.shared.QueryData;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
@@ -389,7 +388,7 @@ public class BarChart extends GChartChart {
 	/**
 	 * Add the data and complete the construction of the chart.
 	 */
-	public void addData(QueryResultCount queryResult) {
+	public void addData(QueryData queryData) {
 		List<String> perspectiveOptionTexts = queryDefinition.getPerspectiveOptionTexts();
 		currentPosition = 1 + groupSpacing / 2 + internalGroupSpacing;
 		currentGroup = 0;
@@ -397,9 +396,9 @@ public class BarChart extends GChartChart {
 			if (currentGroup > 0) {
 				drawBetweenGroupsTick();
 			}
-			if (queryResult.hasData(perspectiveOption)
-					&& queryResult.getPopulation(perspectiveOption)!=0) { //TODO temporary hack, handle cut-off properly producer 
-				drawBarGroup(perspectiveOptionTexts.get(perspectiveOption), queryResult.getPopulation(perspectiveOption), queryResult.getCountDataPercentages(perspectiveOption));
+			if (queryData.hasFreqPrimary(perspectiveOption)) {
+				int[] data = queryData.getFreqPrimary(perspectiveOption);
+				drawBarGroup(perspectiveOptionTexts.get(perspectiveOption), sum(data), percentages(data));
 			} else {
 				drawMissingBarGroup(perspectiveOptionTexts.get(perspectiveOption));
 			}
@@ -411,8 +410,9 @@ public class BarChart extends GChartChart {
 				drawBetweenGroupsTick();
 			}
 			String totalText = chartTexts.compareWithAll();
-			if (queryResult.hasTotalDataItemData() && queryResult.getTotalPopulation()!=0) { //TODO temporary hack, handle cut-off properly producer
-				drawBarGroup(totalText, queryResult.getTotalPopulation(), queryResult.getTotalCountDataPercentages());
+			if (queryData.hasFreqPrimaryTotal()) {
+				int[] totalData = queryData.getFreqPrimaryTotal();
+				drawBarGroup(totalText, sum(totalData), percentages(totalData));
 			} else {
 				drawMissingBarGroup(totalText);
 			}

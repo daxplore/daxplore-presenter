@@ -20,8 +20,6 @@ package org.daxplore.presenter.embed;
 
 import java.util.LinkedList;
 
-import org.daxplore.presenter.chart.data.QueryResultCount;
-import org.daxplore.presenter.chart.data.QueryResultCountCompare;
 import org.daxplore.presenter.chart.display.BarChart;
 import org.daxplore.presenter.chart.display.BarChartCompare;
 import org.daxplore.presenter.chart.display.ChartFactory;
@@ -31,6 +29,7 @@ import org.daxplore.presenter.client.json.shared.ChartDataParserClient;
 import org.daxplore.presenter.embed.inject.EmbedInjector;
 import org.daxplore.presenter.shared.EmbedDefinition;
 import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
+import org.daxplore.presenter.shared.QueryData;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 import org.daxplore.presenter.shared.QuestionMetadata;
@@ -79,15 +78,15 @@ public class EmbedEntryPoint implements EntryPoint {
 		}
 
 		try {
-			ChartDataParserClient queryData = ChartDataParserClient.getEmbeddedData();
+			QueryData queryData = ChartDataParserClient.getEmbeddedData();
 			GChartChart chart;
 			boolean printMode = embedDefinition.hasFlag(EmbedFlag.PRINT);
 			if (!queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
 				chart = chartFactory.createBarChart(queryDefinition, printMode);
-				((BarChart)chart).addData(new QueryResultCount(queryData.getDataItems(), queryData.getTotalDataItem()));
+				((BarChart)chart).addData(queryData);
 			} else {
 				chart = chartFactory.createBarChartCompare(queryDefinition, printMode);
-				((BarChartCompare)chart).addData(new QueryResultCountCompare(queryData.getDataItems(), queryData.getTotalDataItem()));
+				((BarChartCompare)chart).addData(queryData);
 			}
 			EmbedView embedView = new EmbedView(chart, queryActiveAnimation,
 					Window.getClientWidth(), Window.getClientHeight(), embedDefinition);

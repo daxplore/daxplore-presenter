@@ -132,4 +132,21 @@ public abstract class GChartChart extends GChart implements Chart {
 	protected double getModelUnitInPixelsY() {
 		return getYAxis().modelToPixel(1) - getYAxis().modelToPixel(0);
 	}
+	
+	protected static double[] percentages(int[] data) {
+		double[] percentages = new double[data.length];
+		int sum = sum(data);
+		for(int i=0; i<data.length; i++) {
+			percentages[i] = ((double)data[i])/sum;
+		}
+		return percentages;
+	}
+	
+	protected static int sum(int[] data) {
+		int sum = 0;
+		for(int i : data) {
+			sum += i;
+		}
+		return sum;
+	}
 }

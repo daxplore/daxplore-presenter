@@ -21,86 +21,93 @@ package org.daxplore.presenter.server;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.daxplore.presenter.shared.ChartDataItem;
+import org.daxplore.presenter.shared.QueryData;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-
-import com.google.gwt.core.client.JavaScriptObject;
 
 /**
  * This class wraps a single json server response, which makes up the data
  * for a question/perspective combination.
  */
-public class ChartDataParserServer extends JavaScriptObject {
+public class ChartDataParserServer {
 
-	private JSONObject statJsonObject, valueObject, timepoint1, timepoint2;
-	
 	/**
 	 * Parses and wraps the json chart data.
 	 */ 
-	public ChartDataParserServer(String json) {
-		statJsonObject = (JSONObject)JSONValue.parse(json);
-		valueObject = (JSONObject)statJsonObject.get("freq");
-		timepoint1 = (JSONObject)valueObject.get("0");
-		timepoint2 = (JSONObject)valueObject.get("1");
-	}
-
-	public String getQuestionID() {
-		return (String)statJsonObject.get("q");
-	}
-	
-	public String getPerspectiveID() {
-		return (String)statJsonObject.get("p");
-	}
-	
-	private int[] getDataPrimary(String perspective) {
-		JSONArray dataJson = (JSONArray)timepoint1.get(perspective);
-		int[] data = new int[dataJson.size()];
-		for (int i = 0; i<data.length; i++) {
-			data[i] = ((Number)dataJson.get(i)).intValue();
-		}
-		return data;
-	}
-
-	private int[] getDataSecondary(String perspective) {
-		JSONArray dataJson = (JSONArray)timepoint2.get(perspective);
-		int[] data = new int[dataJson.size()];
-		for (int i = 0; i<data.length; i++) {
-			data[i] = ((Number)dataJson.get(i)).intValue();
-		}
-		return data;
-	}
-	
-	/**
-	 * Get the {@link ChartDataInterface} data as a list.
-	 * 
-	 * @return the data
-	 */
-	public List<ChartDataItem> getDataItems() {
-		int perspectiveCount = timepoint1.size() - 1;
-		List<ChartDataItem> list = new ArrayList<>(perspectiveCount);
+	public static QueryData parse(String json) {
+		JSONObject statJsonObject = (JSONObject)JSONValue.parse(json);
 		
-		for(int i = 0; i < perspectiveCount; i++){
-			String perspective = Integer.toString(i);
-			int[] primaryData = getDataPrimary(perspective);
-			int[] secondaryData = null;
-			if(timepoint2!=null) {
-				secondaryData = getDataSecondary(perspective);
+		String questionID = (String)statJsonObject.get("q");
+		String perspectiveID = (String)statJsonObject.get("p");
+		QueryData queryData = new QueryData(questionID, perspectiveID);
+		
+		JSONObject freqObject = (JSONObject)statJsonObject.get("freq");
+		if (freqObject != null) {
+			JSONObject freqTimepoint1 = (JSONObject)freqObject.get("0");
+			JSONObject freqTimepoint2 = (JSONObject)freqObject.get("1");
+			
+			if (freqTimepoint1 != null) {
+				int perspectiveCount = freqTimepoint1.size() - 1;
+				List<int[]> freqPrimary = new ArrayList<>();
+				for (int i = 0; i < perspectiveCount; i++) {
+					int[] data = getAsIntArray((JSONArray)freqTimepoint1.get(i));
+					freqPrimary.add(data);
+				}
+				int[] freqPrimaryTotal = getAsIntArray((JSONArray)freqTimepoint1.get("all"));
+				
+				queryData.addFreqPrimary(freqPrimary, freqPrimaryTotal);
 			}
-			list.add(new ChartDataItem(primaryData, secondaryData, i));
+	
+			if (freqTimepoint2 != null) {
+				int perspectiveCount = freqTimepoint2.size() - 1;
+				List<int[]> freqSecondary = new ArrayList<>();
+				for (int i = 0; i < perspectiveCount; i++) {
+					int[] data = getAsIntArray((JSONArray)freqTimepoint2.get(i));
+					freqSecondary.add(data);
+				}
+				int[] freqSecondaryTotal = getAsIntArray((JSONArray)freqTimepoint2.get("all"));
+				
+				queryData.addFreqSecondary(freqSecondary, freqSecondaryTotal);
+			}
 		}
 		
-		return list;
+		JSONObject meanObject = (JSONObject)statJsonObject.get("mean");
+		if(meanObject != null) {
+			JSONObject meanTimepoint1 = (JSONObject)meanObject.get("0");
+			JSONObject meanTimepoint2 = (JSONObject)meanObject.get("1");
+			
+			if(meanTimepoint1 != null) {
+				double[] meanPrimary = getAsDoubleArray((JSONArray)meanTimepoint1.get("mean"));
+				double meanPrimaryTotal = ((Number)meanTimepoint1.get("all")).doubleValue();
+				int[] meanPrimaryCount = getAsIntArray((JSONArray)meanTimepoint1.get("count"));
+				queryData.addMeanPrimary(meanPrimary, meanPrimaryTotal, meanPrimaryCount);
+			}
+			
+			if(meanTimepoint2 != null) {
+				double[] meanSecondary = getAsDoubleArray((JSONArray)meanTimepoint2.get("mean"));
+				double meanSecondaryTotal = ((Number)meanTimepoint2.get("all")).doubleValue();
+				int[] meanSecondaryCount = getAsIntArray((JSONArray)meanTimepoint2.get("count"));
+				queryData.addMeanSecondary(meanSecondary, meanSecondaryTotal, meanSecondaryCount);
+			}
+		}
+		
+		return queryData;
 	}
 	
-	public ChartDataItem getTotalDataItem() {
-		int timepointCount = valueObject.keySet().size();
-		int[] primaryData = getDataPrimary("all");
-		int[] secondaryData = null;
-		if(timepointCount==2) { //TODO invalid assumptions about timepoints
-			secondaryData = getDataSecondary("all");
+	private static int[] getAsIntArray(JSONArray dataJson) {
+		int[] data = new int[dataJson.size()];
+		for (int i = 0; i<data.length; i++) {
+			data[i] = ((Number)dataJson.get(i)).intValue();
 		}
-		return new ChartDataItem(primaryData, secondaryData, -1);
+		return data;
+	}
+
+	private static double[] getAsDoubleArray(JSONArray dataJson) {
+		double[] data = new double[dataJson.size()];
+		for (int i = 0; i<data.length; i++) {
+			data[i] = ((Number)dataJson.get(i)).intValue();
+		}
+		return data;
 	}
 }
