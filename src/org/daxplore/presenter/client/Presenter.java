@@ -133,7 +133,7 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		}
 		
 		QueryDefinition queryDefinition =
-				new QueryDefinition(questionMetadata, perspectiveID, questionID, perspectiveOptions, flags);
+				new QueryDefinition(questionMetadata, questionID, perspectiveID, perspectiveOptions, flags);
 
 		eventBus.fireEvent(new QueryUpdateEvent(queryDefinition));
 
@@ -259,5 +259,6 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 	public void onQueryReady(QueryReadyEvent event) {
 		chartPanelPresenter.onQueryReady(event.getQueryDefinition(), event.getQueryData());
 		stagePanel.setLegend(chartPanelPresenter.getExternalLegend());
+		stagePanel.setDescription(event.getQueryDefinition().getQuestionID());
 	}
 }

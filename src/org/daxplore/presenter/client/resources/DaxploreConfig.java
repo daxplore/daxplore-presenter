@@ -51,6 +51,10 @@ public interface DaxploreConfig extends Constants {
 	 */
 	public String embedHeights();
 
+	public boolean showCSVButton();
+	public boolean showEmbedButton();
+	public boolean showTimeButtons();
+	
 	/**
 	 * A boolean value that defines if the mean buttons should shown.
 	 * 
@@ -60,6 +64,8 @@ public interface DaxploreConfig extends Constants {
 	 * @return true, if the mean buttons should be shown
 	 */
 	public boolean showMeanButtons();
+
+	
 
 	/**
 	 * Get the minimum width that the {@link StagePanel} can have.
@@ -75,5 +81,4 @@ public interface DaxploreConfig extends Constants {
 	 * @return The number of selected perspective options
 	 */
 	public int defaultSelectedPerspectiveOptions();
-	
 }

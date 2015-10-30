@@ -29,6 +29,7 @@ public class QueryData {
 	private double[] meanPrimary, meanSecondary;
 	private double meanPrimaryTotal, meanSecondaryTotal;
 	private int[] meanPrimaryCount, meanSecondaryCount;
+	private int meanPrimaryCountTotal, meanSecondaryCountTotal;
 	
 	public QueryData(String questionID, String perspectiveID) {
 		this.questionID = questionID;
@@ -47,17 +48,19 @@ public class QueryData {
 		hasAddedFreqSecondary = true;
 	}
 	
-	public void addMeanPrimary(double[] meanPrimary, double meanPrimaryTotal, int[] meanPrimaryCount) {
+	public void addMeanPrimary(double[] meanPrimary, double meanPrimaryTotal, int[] meanPrimaryCount, int meanPrimaryCountTotal) {
 		this.meanPrimary = meanPrimary;
 		this.meanPrimaryTotal = meanPrimaryTotal;
 		this.meanPrimaryCount = meanPrimaryCount;
+		this.meanPrimaryCountTotal = meanPrimaryCountTotal;
 		hasAddedMeanPrimary = true;
 	}
 	
-	public void addMeanSecondary(double[] meanSecondary, double meanSecondaryTotal, int[] meanSecondaryCount) {
+	public void addMeanSecondary(double[] meanSecondary, double meanSecondaryTotal, int[] meanSecondaryCount, int meanSecondaryCountTotal) {
 		this.meanSecondary = meanSecondary;
 		this.meanSecondaryTotal = meanSecondaryTotal;
 		this.meanSecondaryCount = meanSecondaryCount;
+		this.meanSecondaryCountTotal = meanSecondaryCountTotal;
 		hasAddedMeanSecondary = true;
 	}
 	
@@ -115,6 +118,14 @@ public class QueryData {
 	
 	/* Mean data */
 	
+	public boolean hasMeanPrimary(int perspectiveOption) {
+		return meanPrimaryCount != null && meanPrimaryCount[perspectiveOption] > 0;
+	}
+	
+	public boolean hasMeanSecondary(int perspectiveOption) {
+		return meanSecondaryCount != null && meanSecondaryCount[perspectiveOption] > 0;
+	}
+	
 	public boolean hasAddedMeanPrimary() {
 		return hasAddedMeanPrimary;
 	}
@@ -145,5 +156,21 @@ public class QueryData {
 
 	public int getMeanSecondaryCount(int perspectiveOption) {
 		return meanSecondaryCount[perspectiveOption];
+	}
+	
+	public int getMeanPrimaryCountTotal () {
+		return meanPrimaryCountTotal;
+	}
+
+	public int getMeanSecondaryCountTotal () {
+		return meanSecondaryCountTotal;
+	}
+	
+	protected static int sum(int[] data) {
+		int sum = 0;
+		for(int i : data) {
+			sum += i;
+		}
+		return sum;
 	}
 }

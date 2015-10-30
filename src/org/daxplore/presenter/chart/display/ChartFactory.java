@@ -20,7 +20,7 @@ package org.daxplore.presenter.chart.display;
 
 import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.chart.resources.ChartTexts;
-import org.daxplore.presenter.client.json.UITexts;
+import org.daxplore.presenter.client.json.shared.UITexts;
 import org.daxplore.presenter.shared.QueryDefinition;
 
 import com.google.inject.Inject;
@@ -60,5 +60,14 @@ public class ChartFactory {
 	 */
 	public BarChartCompare createBarChartCompare(QueryDefinition queryDefinition, boolean printerMode) {
 		return new BarChartCompare(chartTexts, chartConfig, uiTexts, queryDefinition, printerMode);
+	}
+
+	/**
+	 * Creates a new MeanChart.
+	 * 
+	 * @return the chart
+	 */
+	public MeanChart createMeanChart(QueryDefinition queryDefinition, boolean printerMode) {
+		return new MeanChart(chartTexts, chartConfig, uiTexts, queryDefinition, printerMode);
 	}
 }

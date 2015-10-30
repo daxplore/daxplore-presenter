@@ -25,7 +25,7 @@ import org.daxplore.presenter.client.event.QueryUpdateEvent;
 import org.daxplore.presenter.client.event.QueryUpdateHandler;
 import org.daxplore.presenter.client.event.SelectionUpdateEvent;
 import org.daxplore.presenter.client.json.Groups;
-import org.daxplore.presenter.client.json.UITexts;
+import org.daxplore.presenter.client.json.shared.UITexts;
 import org.daxplore.presenter.client.resources.UIResources;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QuestionMetadata;

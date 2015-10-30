@@ -28,7 +28,7 @@ import org.daxplore.presenter.client.event.ImageButtonHandler;
 import org.daxplore.presenter.client.event.QueryUpdateEvent;
 import org.daxplore.presenter.client.event.QueryUpdateHandler;
 import org.daxplore.presenter.client.json.Prefix;
-import org.daxplore.presenter.client.json.UITexts;
+import org.daxplore.presenter.client.json.shared.UITexts;
 import org.daxplore.presenter.client.resources.DaxploreConfig;
 import org.daxplore.presenter.shared.EmbedDefinition;
 import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;

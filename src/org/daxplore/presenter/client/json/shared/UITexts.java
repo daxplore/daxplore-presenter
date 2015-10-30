@@ -16,7 +16,7 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with Daxplore Presenter.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.daxplore.presenter.client.json;
+package org.daxplore.presenter.client.json.shared;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.inject.Inject;

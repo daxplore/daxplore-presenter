@@ -74,8 +74,8 @@ public class QueryDefinitionTest {
 			
 			QueryDefinition d1 = new QueryDefinition(
 					metadata,
-					perspectiveID,
 					questionID,
+					perspectiveID,
 					usedPerspectiveOptions,
 					flags);
 			

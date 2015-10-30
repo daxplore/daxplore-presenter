@@ -148,5 +148,14 @@ public class QuestionJson extends JavaScriptObject {
 	public final native String getFullText() /*-{
 		return this.text;
 	}-*/;
+	
+	/**
+	 * Get a long text that describes this question for use in DescriptionPanel
+	 * 
+	 * @return the text
+	 */
+	public final native String getDescriptionText() /*-{
+		return this.description;
+	}-*/;
 
 }

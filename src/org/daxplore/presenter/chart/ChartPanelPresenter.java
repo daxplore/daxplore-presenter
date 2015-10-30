@@ -21,6 +21,7 @@ import org.daxplore.presenter.chart.display.BarChartCompare;
 import org.daxplore.presenter.chart.display.BlankChart;
 import org.daxplore.presenter.chart.display.Chart;
 import org.daxplore.presenter.chart.display.ChartFactory;
+import org.daxplore.presenter.chart.display.MeanChart;
 import org.daxplore.presenter.shared.QueryData;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
@@ -41,17 +42,53 @@ public class ChartPanelPresenter  {
 	}
 
 	public void onQueryReady(QueryDefinition queryDefinition, QueryData queryData) {
-		if (!queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
-			BarChart newChart = chartFactory.createBarChart(queryDefinition, false);
-			newChart.addData(queryData);
-			view.setChart(newChart);
-			chart = newChart;
+		//TODO switch back to using query definition to display correct chart
+		
+		if(queryData.hasAddedFreqPrimary()) {
+			if (!queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
+				BarChart newChart = chartFactory.createBarChart(queryDefinition, false);
+				newChart.addData(queryData);
+				view.setChart(newChart);
+				chart = newChart;
+			} else {
+				BarChartCompare newChart = chartFactory.createBarChartCompare(queryDefinition, false);
+				newChart.addData(queryData);
+				view.setChart(newChart);
+				chart = newChart;
+			}
 		} else {
-			BarChartCompare newChart = chartFactory.createBarChartCompare(queryDefinition, false);
-			newChart.addData(queryData);
-			view.setChart(newChart);
-			chart = newChart;
+			if (!queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
+				MeanChart newChart = chartFactory.createMeanChart(queryDefinition, false);
+				newChart.addData(queryData);
+				view.setChart(newChart);
+				chart = newChart;
+			} else {
+				//TODO
+			}
 		}
+		
+		/*if(!queryDefinition.hasFlag(QueryFlag.MEAN)) {
+			if (!queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
+				BarChart newChart = chartFactory.createBarChart(queryDefinition, false);
+				newChart.addData(queryData);
+				view.setChart(newChart);
+				chart = newChart;
+			} else {
+				BarChartCompare newChart = chartFactory.createBarChartCompare(queryDefinition, false);
+				newChart.addData(queryData);
+				view.setChart(newChart);
+				chart = newChart;
+			}
+		} else {
+			if (!queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
+				MeanChart newChart = chartFactory.createMeanChart(queryDefinition, false);
+				newChart.addData(queryData);
+				view.setChart(newChart);
+				chart = newChart;
+			} else {
+				//TODO
+			}
+		}*/
 	}
 	
 	public ChartPanelView getView() {

@@ -46,9 +46,9 @@ public interface ChartTexts extends Messages {
 	String barChartComparePrimaryNoAnswerAnnotation(String timepoint, String answerText);
 	String barChartCompareSecondaryAnnotation(String timepoint, String answerPercentage, String answerText);
 	String barChartCompareSecondaryNoAnswerAnnotation(String timepoint, String answerText);
-	String meanChartAnnotation(String mean, String standardDeviation);
-	String meanChartComparePrimaryAnnotation(String timepoint, String mean, String standardDeviation);
-	String meanChartCompareSecondaryAnnotation(String timepoint, String mean, String standardDeviation);
+	String meanChartAnnotation(String mean);
+	String meanChartComparePrimaryAnnotation(String timepoint, String mean);
+	String meanChartCompareSecondaryAnnotation(String timepoint, String mean);
 
 	// ExternalChartLegend
 	String oneGroupHidden();

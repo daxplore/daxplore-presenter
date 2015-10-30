@@ -21,7 +21,7 @@ package org.daxplore.presenter.client.ui;
 import org.daxplore.presenter.client.event.QueryUpdateEvent;
 import org.daxplore.presenter.client.event.QueryUpdateHandler;
 import org.daxplore.presenter.client.event.SelectionUpdateEvent;
-import org.daxplore.presenter.client.json.UITexts;
+import org.daxplore.presenter.client.json.shared.UITexts;
 import org.daxplore.presenter.client.resources.DaxploreConfig;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
@@ -60,38 +60,41 @@ public class ChartTypeOptionsPanel extends Composite implements QueryUpdateHandl
 	
 	private VerticalPanel mainPanel;
 	private TitleToggleButton dontShowSecondaryButton, showSecondaryButton, useAverageButton, useMeanButton;
-	private boolean showMeanButtons;
+	private boolean showMeanButtons, showTimeButtons;
 	
 	@Inject
 	protected ChartTypeOptionsPanel(EventBus eventBus, UITexts uiTexts, DaxploreConfig config) {
 		this.eventBus = eventBus;
 		
 		this.showMeanButtons = config.showMeanButtons();
+		this.showTimeButtons = config.showTimeButtons();
 
 		mainPanel = new VerticalPanel();
 		
-		dontShowSecondaryButton = new TitleToggleButton(
-						uiTexts.onlyShowNew(),
-						uiTexts.onlyShowNewTitleEnabled(),
-						uiTexts.onlyShowNewTitleDisabled());
-		dontShowSecondaryButton.setValue(true);
-		dontShowSecondaryButton.setEnabled(false);
-		dontShowSecondaryButton.addValueChangeHandler(this);
-		dontShowSecondaryButton.setValue(true, false);
-		mainPanel.add(dontShowSecondaryButton);
-
-		showSecondaryButton = new TitleToggleButton(
-						uiTexts.compareWithOld(),
-						uiTexts.compareWithOldTitleEnabled(),
-						uiTexts.compareWithOldTitleDisabled());
-		showSecondaryButton.setEnabled(false);
-		showSecondaryButton.addValueChangeHandler(this);
-		showSecondaryButton.setValue(false, false);
-		mainPanel.add(showSecondaryButton);
-
-		SimplePanel paddingPanel = new SimplePanel();
-		paddingPanel.setHeight("10px");
-		mainPanel.add(paddingPanel);
+		if(showTimeButtons) {
+			dontShowSecondaryButton = new TitleToggleButton(
+							uiTexts.onlyShowNew(),
+							uiTexts.onlyShowNewTitleEnabled(),
+							uiTexts.onlyShowNewTitleDisabled());
+			dontShowSecondaryButton.setValue(true);
+			dontShowSecondaryButton.setEnabled(false);
+			dontShowSecondaryButton.addValueChangeHandler(this);
+			dontShowSecondaryButton.setValue(true, false);
+			mainPanel.add(dontShowSecondaryButton);
+	
+			showSecondaryButton = new TitleToggleButton(
+							uiTexts.compareWithOld(),
+							uiTexts.compareWithOldTitleEnabled(),
+							uiTexts.compareWithOldTitleDisabled());
+			showSecondaryButton.setEnabled(false);
+			showSecondaryButton.addValueChangeHandler(this);
+			showSecondaryButton.setValue(false, false);
+			mainPanel.add(showSecondaryButton);
+	
+			SimplePanel paddingPanel = new SimplePanel();
+			paddingPanel.setHeight("10px");
+			mainPanel.add(paddingPanel);
+		}
 
 		if (showMeanButtons) {
 			useAverageButton = new TitleToggleButton(
@@ -126,17 +129,19 @@ public class ChartTypeOptionsPanel extends Composite implements QueryUpdateHandl
 	public void onQueryUpdate(QueryUpdateEvent event) {
 		queryDefinition = event.getQueryDefinition();
 		
-		if (queryDefinition.hasSecondary()) {
-			showSecondaryButton.setEnabledWithTitleChange(true);
-			dontShowSecondaryButton.setEnabledWithTitleChange(true);
-			boolean secondary = queryDefinition.hasFlag(QueryFlag.SECONDARY);
-			showSecondaryButton.setValue(secondary, false);
-			dontShowSecondaryButton.setValue(!secondary, false);
-		} else {
-			showSecondaryButton.setEnabledWithTitleChange(false);
-			dontShowSecondaryButton.setEnabledWithTitleChange(false);
+		if(showTimeButtons) {
+			if (queryDefinition.hasSecondary()) {
+				showSecondaryButton.setEnabledWithTitleChange(true);
+				dontShowSecondaryButton.setEnabledWithTitleChange(true);
+				boolean secondary = queryDefinition.hasFlag(QueryFlag.SECONDARY);
+				showSecondaryButton.setValue(secondary, false);
+				dontShowSecondaryButton.setValue(!secondary, false);
+			} else {
+				showSecondaryButton.setEnabledWithTitleChange(false);
+				dontShowSecondaryButton.setEnabledWithTitleChange(false);
+			}
 		}
-
+		
 		if (showMeanButtons) {
 			if (queryDefinition.hasMean()) {
 				useMeanButton.setEnabledWithTitleChange(true);

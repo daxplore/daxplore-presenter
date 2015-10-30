@@ -49,6 +49,9 @@ public class StagePanel extends Composite implements ResizeHandler {
 
 	@UiField(provided = true)
 	protected final PerspectivePanel perspectivePanel;
+
+	@UiField(provided = true)
+	protected DescriptionPanel descriptionPanel;
 	
 	@UiField(provided = true)
 	protected final QuestionPanel questionPanel;
@@ -62,6 +65,7 @@ public class StagePanel extends Composite implements ResizeHandler {
 	protected final QueryActiveAnimation queryActiveAnimation;
 	@UiField(provided = true)
 	protected final SimplePanel legendPanel;
+
 	
 	protected int minWidth;
 	
@@ -69,11 +73,12 @@ public class StagePanel extends Composite implements ResizeHandler {
 	protected StagePanel(PerspectivePanel perspectivePanel, QuestionPanel questionPanel,
 			ChartPanelPresenter chartPanelPresenter, DaxploreConfig config,
 			QueryActiveAnimation queryActiveAnimation, ImageButtonPanel imageButtonPanel,
-			ChartTypeOptionsPanel optionsPanel) {
+			ChartTypeOptionsPanel optionsPanel, DescriptionPanel descriptionPanel) {
 		this.perspectivePanel = perspectivePanel;
 		this.questionPanel = questionPanel;
 		this.chartPanel = chartPanelPresenter.getView();
 		this.queryActiveAnimation = queryActiveAnimation;
+		this.descriptionPanel = descriptionPanel;
 		
 		sidebarArea = new VerticalPanel();
 		
@@ -124,5 +129,9 @@ public class StagePanel extends Composite implements ResizeHandler {
 	public void setLegend(Widget legend) {
 		legendPanel.setWidget(legend);
 		updateWidth();
+	}
+	
+	public void setDescription(String questionID) {
+		descriptionPanel.setDecription(questionID);
 	}
 }

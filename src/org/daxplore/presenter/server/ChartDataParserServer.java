@@ -81,14 +81,16 @@ public class ChartDataParserServer {
 				double[] meanPrimary = getAsDoubleArray((JSONArray)meanTimepoint1.get("mean"));
 				double meanPrimaryTotal = ((Number)meanTimepoint1.get("all")).doubleValue();
 				int[] meanPrimaryCount = getAsIntArray((JSONArray)meanTimepoint1.get("count"));
-				queryData.addMeanPrimary(meanPrimary, meanPrimaryTotal, meanPrimaryCount);
+				int meanPrimaryCountTotal = ((Number)meanTimepoint1.get("allcount")).intValue();
+				queryData.addMeanPrimary(meanPrimary, meanPrimaryTotal, meanPrimaryCount, meanPrimaryCountTotal);
 			}
 			
 			if(meanTimepoint2 != null) {
 				double[] meanSecondary = getAsDoubleArray((JSONArray)meanTimepoint2.get("mean"));
 				double meanSecondaryTotal = ((Number)meanTimepoint2.get("all")).doubleValue();
 				int[] meanSecondaryCount = getAsIntArray((JSONArray)meanTimepoint2.get("count"));
-				queryData.addMeanSecondary(meanSecondary, meanSecondaryTotal, meanSecondaryCount);
+				int meanSecondaryCountTotal = ((Number)meanTimepoint2.get("allcount")).intValue();
+				queryData.addMeanSecondary(meanSecondary, meanSecondaryTotal, meanSecondaryCount, meanSecondaryCountTotal);
 			}
 		}
 		

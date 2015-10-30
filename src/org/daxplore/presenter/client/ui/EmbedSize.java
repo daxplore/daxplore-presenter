@@ -18,7 +18,7 @@
  */
 package org.daxplore.presenter.client.ui;
 
-import org.daxplore.presenter.client.json.UITexts;
+import org.daxplore.presenter.client.json.shared.UITexts;
 import org.daxplore.presenter.client.resources.DaxploreConfig;
 
 /**

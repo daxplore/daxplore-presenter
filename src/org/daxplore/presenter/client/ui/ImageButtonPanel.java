@@ -24,7 +24,8 @@ import org.daxplore.presenter.client.event.ImageButtonHandler;
 import org.daxplore.presenter.client.event.QueryUpdateEvent;
 import org.daxplore.presenter.client.event.QueryUpdateHandler;
 import org.daxplore.presenter.client.json.Prefix;
-import org.daxplore.presenter.client.json.UITexts;
+import org.daxplore.presenter.client.json.shared.UITexts;
+import org.daxplore.presenter.client.resources.DaxploreConfig;
 import org.daxplore.presenter.client.resources.UIResources;
 import org.daxplore.presenter.shared.QueryDefinition;
 
@@ -62,13 +63,16 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 	
 	@Inject
 	protected ImageButtonPanel(final EventBus eventBus, UITexts uiTexts, UIResources uiResources,
-			EmbedPopup embedPopup, Prefix prefix) {
+			DaxploreConfig config, EmbedPopup embedPopup, Prefix prefix) {
+
+		this.uiTexts = uiTexts;
+		this.prefix = prefix.getPrefix();
 		
 		baseUrl = GWT.getHostPageBaseURL();					// http://example.com/p/
 		baseUrl = baseUrl.substring(0, baseUrl.length()-2); // http://example.com/
 		
-		this.uiTexts = uiTexts;
-		this.prefix = prefix.getPrefix();
+		
+		mainPanel = new HorizontalPanel();
 		
 //		Image buttonImage = new Image(uiResources.printButtonImage());
 //		ImageButton printButton = new ImageButton(buttonImage, uiTexts.printButtonTitle());
@@ -78,26 +82,27 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 //				eventBus.fireEvent(new ImageButtonEvent(ImageButtonAction.PRINT));
 //			}
 //		});
-		
-		Image buttonImage = new Image(uiResources.csvButtonImage());
-		ImageButton csvButton = new ImageButton(buttonImage, uiTexts.csvButtonTitle());
-		csvWidgetAnchor = new WidgetAnchor("", csvButton);
-		
-		
-		buttonImage = new Image(uiResources.embedButtonImage());
-		ImageButton embedButton = new ImageButton(buttonImage, uiTexts.embedButtonTitle());
-		embedButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				eventBus.fireEvent(new ImageButtonEvent(ImageButtonAction.EMBED));
-			}
-		});
-		ButtonWithPopup embedButtonPopup = new ButtonWithPopup(embedButton, embedPopup);
-		
-		mainPanel = new HorizontalPanel();
 //		mainPanel.add(printButton);
-		mainPanel.add(csvWidgetAnchor);
-		mainPanel.add(embedButtonPopup);
+		
+		if(config.showCSVButton()) {
+			Image buttonImage = new Image(uiResources.csvButtonImage());
+			ImageButton csvButton = new ImageButton(buttonImage, uiTexts.csvButtonTitle());
+			csvWidgetAnchor = new WidgetAnchor("", csvButton);
+			mainPanel.add(csvWidgetAnchor);
+		}
+		
+		if(config.showEmbedButton()) {
+			Image buttonImage = new Image(uiResources.embedButtonImage());
+			ImageButton embedButton = new ImageButton(buttonImage, uiTexts.embedButtonTitle());
+			embedButton.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					eventBus.fireEvent(new ImageButtonEvent(ImageButtonAction.EMBED));
+				}
+			});
+			ButtonWithPopup embedButtonPopup = new ButtonWithPopup(embedButton, embedPopup);
+			mainPanel.add(embedButtonPopup);
+		}
 		
 		mainPanel.setSpacing(5);
 		
@@ -147,7 +152,9 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 	@Override
 	public void onQueryUpdate(QueryUpdateEvent event) {
 		queryDefinition = event.getQueryDefinition();
-		csvWidgetAnchor.setHref(getCsvDownloadSrc());
+		if(csvWidgetAnchor != null) {
+			csvWidgetAnchor.setHref(getCsvDownloadSrc());
+		}
 	}
 	
 }

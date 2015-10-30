@@ -56,6 +56,14 @@ public class QuestionMetadataMock implements QuestionMetadata {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public String getDescriptionText(String questionID) {
+		return questionID + " description text";
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public List<String> getOptionTexts(String questionID) {
 		List<String> result = new LinkedList<>();
 		for (int i = 0; i<getOptionCount(questionID); i++) {

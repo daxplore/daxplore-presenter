@@ -24,6 +24,7 @@ import org.daxplore.presenter.chart.display.BarChart;
 import org.daxplore.presenter.chart.display.BarChartCompare;
 import org.daxplore.presenter.chart.display.ChartFactory;
 import org.daxplore.presenter.chart.display.GChartChart;
+import org.daxplore.presenter.chart.display.MeanChart;
 import org.daxplore.presenter.chart.display.QueryActiveAnimation;
 import org.daxplore.presenter.client.json.shared.ChartDataParserClient;
 import org.daxplore.presenter.embed.inject.EmbedInjector;
@@ -81,13 +82,28 @@ public class EmbedEntryPoint implements EntryPoint {
 			QueryData queryData = ChartDataParserClient.getEmbeddedData();
 			GChartChart chart;
 			boolean printMode = embedDefinition.hasFlag(EmbedFlag.PRINT);
-			if (!queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
-				chart = chartFactory.createBarChart(queryDefinition, printMode);
-				((BarChart)chart).addData(queryData);
+			//TODO switch back to using query definition to display correct chart
+			
+			if(queryData.hasAddedFreqPrimary()) {
+				if (!queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
+					chart = chartFactory.createBarChart(queryDefinition, printMode);
+					((BarChart)chart).addData(queryData);
+				} else {
+					chart = chartFactory.createBarChartCompare(queryDefinition, printMode);
+					((BarChartCompare)chart).addData(queryData);
+				}
 			} else {
-				chart = chartFactory.createBarChartCompare(queryDefinition, printMode);
-				((BarChartCompare)chart).addData(queryData);
+				chart = chartFactory.createMeanChart(queryDefinition, false);
+				((MeanChart)chart).addData(queryData);
 			}
+			
+//			if (!queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
+//				chart = chartFactory.createBarChart(queryDefinition, printMode);
+//				((BarChart)chart).addData(queryData);
+//			} else {
+//				chart = chartFactory.createBarChartCompare(queryDefinition, printMode);
+//				((BarChartCompare)chart).addData(queryData);
+//			}
 			EmbedView embedView = new EmbedView(chart, queryActiveAnimation,
 					Window.getClientWidth(), Window.getClientHeight(), embedDefinition);
 			RootPanel.get().add(embedView);

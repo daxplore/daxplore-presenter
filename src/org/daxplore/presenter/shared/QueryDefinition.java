@@ -152,11 +152,11 @@ public class QueryDefinition {
 	 * @param flags
 	 *            the flags
 	 */
-	public QueryDefinition(QuestionMetadata questionMetadata, String perspectiveID,
-			String questionID, List<Integer> usedPerspectiveOptions, List<QueryFlag> flags)
+	public QueryDefinition(QuestionMetadata questionMetadata, String questionID,
+			String perspectiveID, List<Integer> usedPerspectiveOptions, List<QueryFlag> flags)
 					throws IllegalArgumentException {
-		this.perspectiveID = perspectiveID;
 		this.questionID = questionID;
+		this.perspectiveID = perspectiveID;
 		this.usedPerspectiveOptions = usedPerspectiveOptions;
 		this.questionMetadata = questionMetadata;
 		this.flags = flags.toArray(new QueryFlag[flags.size()]);
@@ -172,7 +172,8 @@ public class QueryDefinition {
 		int optionCount = questionMetadata.getOptionCount(perspectiveID);
 		for (int i : usedPerspectiveOptions) {
 			if (i>optionCount) {
-				throw new IllegalArgumentException("Illegal perspective option: " + i + " > " + optionCount);
+				throw new IllegalArgumentException("Illegal perspective option for"
+						+ " Q = " + questionID + " & P = " + perspectiveID + ": " + i + " > " + optionCount);
 			}
 		}
 	}

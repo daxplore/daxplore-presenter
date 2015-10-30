@@ -70,16 +70,24 @@ public class QuestionMetadataClientImpl implements QuestionMetadata {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getFullText(String questionID) {
-		return getQuestion(questionID).getFullText();
+	public String getShortText(String questionID) {
+		return getQuestion(questionID).getShortText();
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getShortText(String questionID) {
-		return getQuestion(questionID).getShortText();
+	public String getFullText(String questionID) {
+		return getQuestion(questionID).getFullText();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getDescriptionText(String questionID) {
+		return getQuestion(questionID).getDescriptionText();
 	}
 
 	/**

@@ -19,7 +19,7 @@
 package org.daxplore.presenter.client.ui;
 
 import org.daxplore.presenter.client.json.Perspectives;
-import org.daxplore.presenter.client.json.UITexts;
+import org.daxplore.presenter.client.json.shared.UITexts;
 import org.daxplore.presenter.shared.QuestionMetadata;
 
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;

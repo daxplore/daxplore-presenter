@@ -19,7 +19,7 @@
 package org.daxplore.presenter.chart.display;
 
 import org.daxplore.presenter.chart.resources.ChartTexts;
-import org.daxplore.presenter.client.json.UITexts;
+import org.daxplore.presenter.client.json.shared.UITexts;
 import org.daxplore.presenter.shared.QueryDefinition;
 
 import com.google.gwt.dom.client.Style.Position;

@@ -51,6 +51,14 @@
 		padding-bottom: 5px;
 	}
 
+/*** DescriptionPanel.java ***/
+
+	.daxplore-DescriptionPanel {
+		margin:10px;
+		border: 1px solid #D4D4D4;
+		padding: 10px;
+		max-width: 300px;
+	}
 
 /*** QuestionPanel.java ***/
 

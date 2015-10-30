@@ -55,7 +55,7 @@ public class ChartDataParserClient {
 		String perspectiveID = statJsonObject.get("p").isString().stringValue();
 		QueryData queryData = new QueryData(questionID, perspectiveID);
 		
-		JSONObject freqObject = statJsonObject.get("freq").isObject();
+		JSONObject freqObject = (JSONObject)statJsonObject.get("freq");
 		if (freqObject != null) {
 			JSONObject freqTimepoint1 = null;
 			if(freqObject.get("0") != null) {
@@ -100,14 +100,16 @@ public class ChartDataParserClient {
 				double[] meanPrimary = getAsDoubleArray(meanTimepoint1.get("mean").isArray());
 				double meanPrimaryTotal = meanTimepoint1.get("all").isNumber().doubleValue();
 				int[] meanPrimaryCount = getAsIntArray(meanTimepoint1.get("count").isArray());
-				queryData.addMeanPrimary(meanPrimary, meanPrimaryTotal, meanPrimaryCount);
+				int meanPrimaryCountTotal = (int)meanTimepoint1.get("allcount").isNumber().doubleValue();
+				queryData.addMeanPrimary(meanPrimary, meanPrimaryTotal, meanPrimaryCount, meanPrimaryCountTotal);
 			}
 			
 			if(meanTimepoint2 != null) {
 				double[] meanSecondary = getAsDoubleArray((JSONArray)meanTimepoint2.get("mean"));
 				double meanSecondaryTotal = meanTimepoint2.get("all").isNumber().doubleValue();
 				int[] meanSecondaryCount = getAsIntArray(meanTimepoint2.get("count").isArray());
-				queryData.addMeanSecondary(meanSecondary, meanSecondaryTotal, meanSecondaryCount);
+				int meanSecondaryCountTotal = (int)meanTimepoint2.get("allcount").isNumber().doubleValue();
+				queryData.addMeanSecondary(meanSecondary, meanSecondaryTotal, meanSecondaryCount, meanSecondaryCountTotal);
 			}
 		}
 		

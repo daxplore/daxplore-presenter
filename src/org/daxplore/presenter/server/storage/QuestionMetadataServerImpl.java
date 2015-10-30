@@ -98,6 +98,15 @@ public class QuestionMetadataServerImpl implements QuestionMetadata {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public String getShortText(String column) {
+		JSONObject question = getQuestion(column);
+		return (String)question.get("short");
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getFullText(String column) {
 		JSONObject question = getQuestion(column);
 		return (String)question.get("text");
@@ -107,9 +116,9 @@ public class QuestionMetadataServerImpl implements QuestionMetadata {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getShortText(String column) {
+	public String getDescriptionText(String column) {
 		JSONObject question = getQuestion(column);
-		return (String)question.get("short");
+		return (String)question.get("description");
 	}
 
 	/**

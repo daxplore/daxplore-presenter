@@ -31,10 +31,11 @@ import org.daxplore.presenter.client.event.SelectionUpdateHandler;
 import org.daxplore.presenter.client.json.Groups;
 import org.daxplore.presenter.client.json.Perspectives;
 import org.daxplore.presenter.client.json.Prefix;
-import org.daxplore.presenter.client.json.UITexts;
 import org.daxplore.presenter.client.json.shared.QuestionMetadataClientImpl;
+import org.daxplore.presenter.client.json.shared.UITexts;
 import org.daxplore.presenter.client.model.StatDataServerModel;
 import org.daxplore.presenter.client.ui.ChartTypeOptionsPanel;
+import org.daxplore.presenter.client.ui.DescriptionPanel;
 import org.daxplore.presenter.client.ui.EmbedPopup;
 import org.daxplore.presenter.client.ui.ImageButtonPanel;
 import org.daxplore.presenter.client.ui.PerspectiveCheckboxPanel.PerspectiveCheckboxPanelFactory;
@@ -110,6 +111,7 @@ public class PresentationModule extends AbstractGinModule {
 		bind(StagePanel.class).in(Singleton.class);
 		bind(ChartTypeOptionsPanel.class).in(Singleton.class);
 		bind(ImageButtonPanel.class).in(Singleton.class);
+		bind(DescriptionPanel.class).in(Singleton.class);
 
 		/* com.google.web.bindery.event.shared */
 		bind(EventBus.class).to(SimpleEventBus.class).in(Singleton.class);

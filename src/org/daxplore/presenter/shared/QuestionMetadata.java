@@ -59,6 +59,15 @@ public interface QuestionMetadata {
 	 * @return the text
 	 */
 	public String getFullText(String questionID);
+	
+	/**
+	 * Get an text that describes a question, for use in the DecriptionPanel
+	 * 
+	 * @param questionID
+	 *            the questionID
+	 * @return the text
+	 */
+	public String getDescriptionText(String questionID);
 
 	
 	/**

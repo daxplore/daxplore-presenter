@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.chart.resources.ChartTexts;
-import org.daxplore.presenter.client.json.UITexts;
+import org.daxplore.presenter.client.json.shared.UITexts;
 import org.daxplore.presenter.shared.QueryData;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
@@ -97,7 +97,7 @@ public class BarChartCompare extends BarChart {
 	}
 
 	@Override
-	protected void createCurves(List<String> questionOptionTexts, boolean printerMode) {
+	protected void createCurves(boolean printerMode) {
 		/*
 		 * Lists are created here to make sure they exist when the
 		 * super-constructor calls the overridden version of

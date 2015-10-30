@@ -20,7 +20,7 @@ package org.daxplore.presenter.client.ui;
 
 import org.daxplore.presenter.client.Presenter;
 import org.daxplore.presenter.client.event.CloseWarningBannerEvent;
-import org.daxplore.presenter.client.json.UITexts;
+import org.daxplore.presenter.client.json.shared.UITexts;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
