@@ -30,6 +30,7 @@ public class QueryData {
 	private double meanPrimaryTotal, meanSecondaryTotal;
 	private int[] meanPrimaryCount, meanSecondaryCount;
 	private int meanPrimaryCountTotal, meanSecondaryCountTotal;
+	private double meanPrimaryReference, meanSecondaryReference;
 	
 	public QueryData(String questionID, String perspectiveID) {
 		this.questionID = questionID;
@@ -48,19 +49,21 @@ public class QueryData {
 		hasAddedFreqSecondary = true;
 	}
 	
-	public void addMeanPrimary(double[] meanPrimary, double meanPrimaryTotal, int[] meanPrimaryCount, int meanPrimaryCountTotal) {
+	public void addMeanPrimary(double[] meanPrimary, double meanPrimaryTotal, int[] meanPrimaryCount, int meanPrimaryCountTotal, double meanPrimaryReference) {
 		this.meanPrimary = meanPrimary;
 		this.meanPrimaryTotal = meanPrimaryTotal;
 		this.meanPrimaryCount = meanPrimaryCount;
 		this.meanPrimaryCountTotal = meanPrimaryCountTotal;
+		this.meanPrimaryReference = meanPrimaryReference;
 		hasAddedMeanPrimary = true;
 	}
 	
-	public void addMeanSecondary(double[] meanSecondary, double meanSecondaryTotal, int[] meanSecondaryCount, int meanSecondaryCountTotal) {
+	public void addMeanSecondary(double[] meanSecondary, double meanSecondaryTotal, int[] meanSecondaryCount, int meanSecondaryCountTotal, double meanSecondaryReference) {
 		this.meanSecondary = meanSecondary;
 		this.meanSecondaryTotal = meanSecondaryTotal;
 		this.meanSecondaryCount = meanSecondaryCount;
 		this.meanSecondaryCountTotal = meanSecondaryCountTotal;
+		this.meanSecondaryReference = meanSecondaryReference;
 		hasAddedMeanSecondary = true;
 	}
 	
@@ -164,6 +167,14 @@ public class QueryData {
 
 	public int getMeanSecondaryCountTotal () {
 		return meanSecondaryCountTotal;
+	}
+
+	public double getMeanPrimaryReference() {
+		return meanPrimaryReference;
+	}
+	
+	public double getMeanSecondaryReference() {
+		return meanSecondaryReference;
 	}
 	
 	protected static int sum(int[] data) {

@@ -54,20 +54,18 @@ class MeanChartBarSecondary extends MeanChartBarPrimary {
 	 * @param color
 	 *            The color set, used to color this bar.
 	 */
-	MeanChartBarSecondary(ChartTexts chartTexts, Curve barCurve, Curve lineCurve, BarColors color, boolean printerMode, AnnotationLocation hoverLocation) {
-		super(chartTexts, barCurve, lineCurve, color, printerMode, hoverLocation);
+	MeanChartBarSecondary(ChartTexts chartTexts, Curve barCurve, BarColors color, boolean printerMode, AnnotationLocation hoverLocation) {
+		super(chartTexts, barCurve, color, printerMode, hoverLocation);
 		Symbol symbol = barCurve.getSymbol();
 		symbol.setDistanceMetric(1000, 1000);
-
-		symbol = lineCurve.getSymbol();
 		symbol.setBorderColor(color.getSecondaryDeviation());
 	}
 
 	@Override
-	void setHoverTextComparative(String timepointSecondaryText, double mean) {
+	void setHoverTextComparative(String groupName, String timepointSecondaryText, double mean) {
 		String annotation;
 		String meanString = ChartTools.formatAsTwoDigits(mean);
-		annotation = chartTexts.meanChartCompareSecondaryAnnotation(timepointSecondaryText, meanString);
+		annotation = chartTexts.meanChartCompareSecondaryAnnotation(groupName, timepointSecondaryText, meanString);
 		annotation = formatAsHoverText(annotation);
 		curve.getSymbol().setHovertextTemplate(annotation);
 	}

@@ -501,4 +501,8 @@ public class BarChart extends GChartChart {
 		double groupMinWidth = Math.max(xTickMaxCharacterCount * 7.5, questionOptionCount * 20);
 		return (int) (80 + groupMinWidth * groupCount);
 	}
+	
+	public int getMaxWidth() {
+		return Integer.MAX_VALUE; //TODO
+	}
 }

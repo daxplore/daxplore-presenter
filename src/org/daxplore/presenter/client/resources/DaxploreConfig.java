@@ -81,4 +81,6 @@ public interface DaxploreConfig extends Constants {
 	 * @return The number of selected perspective options
 	 */
 	public int defaultSelectedPerspectiveOptions();
+	
+	public boolean defaultSelectTotal();
 }

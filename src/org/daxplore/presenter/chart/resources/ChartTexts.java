@@ -34,6 +34,7 @@ public interface ChartTexts extends Messages {
 
 	// Chart tick text
 	String standardTick(String tickName, int respondentCount);
+	String standardTickNoRespondents(String tickName);
 	String missingTick(String tickName, int respondentCountCutoff);
 	String compareTick(String tickName, String timepointPrimary, int respondentCountPrimary, String timepointSecondary, int respondentCountSecondary);
 	String compareMissingTick(String tickName, int respondentCountCutoff);
@@ -46,9 +47,9 @@ public interface ChartTexts extends Messages {
 	String barChartComparePrimaryNoAnswerAnnotation(String timepoint, String answerText);
 	String barChartCompareSecondaryAnnotation(String timepoint, String answerPercentage, String answerText);
 	String barChartCompareSecondaryNoAnswerAnnotation(String timepoint, String answerText);
-	String meanChartAnnotation(String mean);
-	String meanChartComparePrimaryAnnotation(String timepoint, String mean);
-	String meanChartCompareSecondaryAnnotation(String timepoint, String mean);
+	String meanChartAnnotation(String tickName, String mean);
+	String meanChartComparePrimaryAnnotation(String tickName, String timepoint, String mean);
+	String meanChartCompareSecondaryAnnotation(String tickName, String timepoint, String mean);
 
 	// ExternalChartLegend
 	String oneGroupHidden();

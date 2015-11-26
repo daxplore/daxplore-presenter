@@ -27,7 +27,7 @@
 	}
 	
 	.gwt-Image[src$='gchart.gif'] {
-		z-index: 100 !important;
+/* 		z-index: 100 !important; */
 	}
 	
 	.gwt-Image[src$='daxplore-bar-blank.gif'], .gwt-Image[src^='/pixel/'] {

@@ -48,13 +48,12 @@ class MeanChartBarPrimary extends ChartBar {
 	 * 
 	 * @param barCurve
 	 *            The GChart curve that this bar is mapped to.
-	 * @param lineCurve
-	 *            The GChart curve used to draw the standard deviation lines.
 	 * @param color
 	 *            The color set, used to color this bar.
 	 */
-	MeanChartBarPrimary(ChartTexts chartTexts, Curve barCurve, Curve lineCurve, BarColors color, boolean printerMode, AnnotationLocation hoverLocation) {
+	MeanChartBarPrimary(ChartTexts chartTexts, Curve barCurve, BarColors color, boolean printerMode, AnnotationLocation hoverLocation) {
 		super(chartTexts, barCurve, color, printerMode, hoverLocation);
+		curve.setYShift(1); //TODO y-shift all bars always, instead of using the grid gif z-index hack?
 		unhover();
 	}
 
@@ -72,18 +71,17 @@ class MeanChartBarPrimary extends ChartBar {
 		symbol.setImageURL("/pixel/" + color.getPrimary().substring(1) + ".png");
 	}
 
-	void setHoverTextStandard(double mean) {
-		String annotation;
+	void setHoverTextStandard(String perspectiveOption, double mean) {
 		String meanString = ChartTools.formatAsTwoDigits(mean);
-		annotation = chartTexts.meanChartAnnotation(meanString);
+		String annotation = chartTexts.meanChartAnnotation(perspectiveOption, meanString);
 		annotation = formatAsHoverText(annotation);
 		curve.getSymbol().setHovertextTemplate(annotation);
 	}
 
-	void setHoverTextComparative(String timepointPrimaryText, double mean) {
+	void setHoverTextComparative(String perspectiveOption, String timepointPrimaryText, double mean) {
 		String annotation;
 		String meanString = ChartTools.formatAsTwoDigits(mean);
-		annotation = chartTexts.meanChartComparePrimaryAnnotation(timepointPrimaryText, meanString);
+		annotation = chartTexts.meanChartComparePrimaryAnnotation(perspectiveOption, timepointPrimaryText, meanString);
 		annotation = formatAsHoverText(annotation);
 		curve.getSymbol().setHovertextTemplate(annotation);
 	}

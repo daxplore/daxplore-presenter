@@ -25,8 +25,10 @@ import org.daxplore.presenter.shared.QueryData;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONValue;
 
 /**
  * This class wraps a single server response, which makes up the data
@@ -101,7 +103,12 @@ public class ChartDataParserClient {
 				double meanPrimaryTotal = meanTimepoint1.get("all").isNumber().doubleValue();
 				int[] meanPrimaryCount = getAsIntArray(meanTimepoint1.get("count").isArray());
 				int meanPrimaryCountTotal = (int)meanTimepoint1.get("allcount").isNumber().doubleValue();
-				queryData.addMeanPrimary(meanPrimary, meanPrimaryTotal, meanPrimaryCount, meanPrimaryCountTotal);
+				JSONValue globalJSON = meanTimepoint1.get("global");
+				double global = Double.NaN;
+				if(globalJSON != null && globalJSON.isNumber() != null) {
+					global = globalJSON.isNumber().doubleValue();
+				}
+				queryData.addMeanPrimary(meanPrimary, meanPrimaryTotal, meanPrimaryCount, meanPrimaryCountTotal, global);
 			}
 			
 			if(meanTimepoint2 != null) {
@@ -109,7 +116,12 @@ public class ChartDataParserClient {
 				double meanSecondaryTotal = meanTimepoint2.get("all").isNumber().doubleValue();
 				int[] meanSecondaryCount = getAsIntArray(meanTimepoint2.get("count").isArray());
 				int meanSecondaryCountTotal = (int)meanTimepoint2.get("allcount").isNumber().doubleValue();
-				queryData.addMeanSecondary(meanSecondary, meanSecondaryTotal, meanSecondaryCount, meanSecondaryCountTotal);
+				JSONValue globalJSON = meanTimepoint1.get("global");
+				double global = Double.NaN;
+				if(globalJSON != null && globalJSON.isNumber() != null) {
+					global = globalJSON.isNumber().doubleValue();
+				}
+				queryData.addMeanSecondary(meanSecondary, meanSecondaryTotal, meanSecondaryCount, meanSecondaryCountTotal, global);
 			}
 		}
 		

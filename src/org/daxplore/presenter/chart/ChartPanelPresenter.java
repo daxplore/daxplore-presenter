@@ -42,9 +42,7 @@ public class ChartPanelPresenter  {
 	}
 
 	public void onQueryReady(QueryDefinition queryDefinition, QueryData queryData) {
-		//TODO switch back to using query definition to display correct chart
-		
-		if(queryData.hasAddedFreqPrimary()) {
+		if(!queryDefinition.hasFlag(QueryFlag.MEAN)) {
 			if (!queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
 				BarChart newChart = chartFactory.createBarChart(queryDefinition, false);
 				newChart.addData(queryData);
@@ -63,7 +61,7 @@ public class ChartPanelPresenter  {
 				view.setChart(newChart);
 				chart = newChart;
 			} else {
-				//TODO
+				//TODO mean compare
 			}
 		}
 		

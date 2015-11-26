@@ -132,6 +132,11 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 			flags.add(QueryFlag.TOTAL);
 		}
 		
+		//TODO this sets mean to be the default, the default should be set in the producer instead
+		if(questionMetadata.hasMean(questionID)) {
+			flags.add(QueryFlag.MEAN);
+		}
+		
 		QueryDefinition queryDefinition =
 				new QueryDefinition(questionMetadata, questionID, perspectiveID, perspectiveOptions, flags);
 

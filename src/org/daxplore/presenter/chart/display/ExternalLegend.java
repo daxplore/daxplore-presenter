@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.daxplore.presenter.chart.resources.ChartTexts;
 import org.daxplore.presenter.shared.QueryDefinition;
+import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
@@ -46,12 +47,26 @@ public class ExternalLegend extends Composite {
 	 */
 	public ExternalLegend(ChartTexts chartTexts, QueryDefinition queryDefinition, boolean printerMode) {
 		StringBuilder html = new StringBuilder("<table class=\"daxplore-ExternalLegend\">");
-
-		List<String> questionOptionTexts = queryDefinition.getQuestionOptionTexts();
-		for (int optionIndex = 0; optionIndex < queryDefinition.getQuestionOptionCount(); optionIndex++) {
-			String text = questionOptionTexts.get(optionIndex);
-			String boxColor = BarColors.getChartColorSet(optionIndex).getPrimary();
-			html.append(legendRow(text, boxColor, printerMode));
+		
+		if(queryDefinition.hasFlag(QueryFlag.MEAN)) {
+			List<String> perspectiveOptionTexts = queryDefinition.getPerspectiveOptionTexts();
+			for (int perspectiveOption : queryDefinition.getUsedPerspectiveOptions()) {
+				String text = perspectiveOptionTexts.get(perspectiveOption);
+				String boxColor = BarColors.getChartColorSet(perspectiveOption).getPrimary();
+				html.append(legendRow(text, boxColor, printerMode));
+			}
+			if (queryDefinition.hasFlag(QueryFlag.TOTAL)) {
+				String text = chartTexts.compareWithAll();
+				String boxColor = BarColors.getChartColorSet(queryDefinition.getPerspectiveOptionCount()).getPrimary();
+				html.append(legendRow(text, boxColor, printerMode));
+			}
+		} else {
+			List<String> questionOptionTexts = queryDefinition.getQuestionOptionTexts();
+			for (int optionIndex = 0; optionIndex < queryDefinition.getQuestionOptionCount(); optionIndex++) {
+				String text = questionOptionTexts.get(optionIndex);
+				String boxColor = BarColors.getChartColorSet(optionIndex).getPrimary();
+				html.append(legendRow(text, boxColor, printerMode));
+			}
 		}
 		
 		html.append("</table>");

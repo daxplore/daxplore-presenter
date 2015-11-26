@@ -70,4 +70,7 @@ public class BlankChart extends Composite implements Chart {
 		return new SimplePanel();
 	}
 
+	public int getMaxWidth() {
+		return Integer.MAX_VALUE; //TODO
+	}
 }

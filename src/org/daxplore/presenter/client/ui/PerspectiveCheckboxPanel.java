@@ -18,6 +18,7 @@
  */
 package org.daxplore.presenter.client.ui;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -76,7 +77,11 @@ public class PerspectiveCheckboxPanel extends FlowPanel implements ValueChangeHa
 		 * @return the checkbox panel
 		 */
 		public PerspectiveCheckboxPanel createCheckboxPanel(String questionID) {
-			return new PerspectiveCheckboxPanel(config, questions, uiTexts, questionID, new LinkedList<Integer>(), false);
+			List<Integer> selectedOptions = new ArrayList<>();
+			for(int i=0; i<config.defaultSelectedPerspectiveOptions() && i < questions.getOptionCount(questionID); i++) {
+				selectedOptions.add(i);
+			}
+			return new PerspectiveCheckboxPanel(config, questions, uiTexts, questionID, selectedOptions, config.defaultSelectTotal());
 		}
 
 		/**

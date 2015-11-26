@@ -44,7 +44,7 @@ public class MeanChart extends GChartChart {
 	 * The space between different groups, using the internal GChart distance
 	 * system.
 	 */
-	protected final static double groupSpacing = 1;
+	protected final static double groupSpacing = 0.05;
 
 	/**
 	 * Keeps track of what position the next groups should be drawn at.
@@ -97,12 +97,13 @@ public class MeanChart extends GChartChart {
 	protected int xTickMaxCharacterCount = 13;
 	protected int yTickWidth;
 	protected int yTickCharacterCount;
-	
+
 	protected MeanChart(ChartTexts chartTexts, ChartConfig chartConfig, UITexts uiTexts,
 			QueryDefinition queryDefinition, boolean printerMode) {
 		super(chartTexts, uiTexts, queryDefinition);
 		this.chartConfig = chartConfig;
-		externalLegend = ExternalLegend.getEmptyLegend();
+
+		externalLegend = new ExternalLegend(chartTexts, queryDefinition, printerMode);
 
 		usedPerspectiveOptions = queryDefinition.getUsedPerspectiveOptions();
 		groupCount = usedPerspectiveOptions.size() + (queryDefinition.hasFlag(QueryFlag.TOTAL) ? 1 : 0);
@@ -113,6 +114,9 @@ public class MeanChart extends GChartChart {
 		paddingBarIndex = groupCount * 2;
 
 		createCurves(printerMode);
+
+		addReferenceLine();
+
 		setupMouseHandlers();
 		setupAxes();
 	}
@@ -123,15 +127,15 @@ public class MeanChart extends GChartChart {
 			addCurve();
 			Curve barCurve = getCurve();
 			addCurve();
-			Curve lineCurve = getCurve();
-			addPrimaryBar(new MeanChartBarPrimary(chartTexts, barCurve, lineCurve, getColorSet(perspective), printerMode, AnnotationLocation.SOUTH));
+			addPrimaryBar(new MeanChartBarPrimary(chartTexts, barCurve, getColorSet(perspective), printerMode,
+					AnnotationLocation.SOUTH));
 		}
 		if (queryDefinition.hasFlag(QueryFlag.TOTAL)) {
 			addCurve();
 			Curve barCurve = getCurve();
 			addCurve();
-			Curve lineCurve = getCurve();
-			addPrimaryBar(new MeanChartBarPrimary(chartTexts, barCurve, lineCurve, getColorSet(queryDefinition.getPerspectiveOptionCount()), printerMode, AnnotationLocation.SOUTH));
+			addPrimaryBar(new MeanChartBarPrimary(chartTexts, barCurve,
+					getColorSet(queryDefinition.getPerspectiveOptionCount()), printerMode, AnnotationLocation.SOUTH));
 		}
 		addPaddingCurve();
 	}
@@ -143,6 +147,19 @@ public class MeanChart extends GChartChart {
 		symbol.setSymbolType(SymbolType.VBAR_SOUTHWEST);
 		symbol.setHoverAnnotationEnabled(false);
 		symbol.setModelWidth(0);
+	}
+
+	protected void addReferenceLine() {
+		addCurve();
+		Symbol symbol = getCurve().getSymbol();
+
+		symbol.setSymbolType(SymbolType.LINE);
+		symbol.setHoverAnnotationEnabled(false);
+		symbol.setHoverSelectionEnabled(false);
+		symbol.setModelWidth(0);
+		symbol.setFillThickness(2);
+//		symbol.setDistanceMetric(100, 100);
+		symbol.setBorderColor("#555555"); // TODO externalize
 	}
 
 	/**
@@ -160,26 +177,31 @@ public class MeanChart extends GChartChart {
 		getXAxis().setTickThickness(0); // but with invisible ticks
 		getXAxis().setAxisMin(0); // keeps first bar on chart
 
-		//TODO figure out when to show as option ticks and when to show as a normalized scale
+		// TODO figure out when to show as option ticks and when to show as a
+		// normalized scale
 		boolean normalizedScale = true;
-		if(normalizedScale) {
+		if (normalizedScale) {
 			getYAxis().setAxisMin(0);
-			getYAxis().setAxisMax(100); //copsoq normalized scale 0-100
+			getYAxis().setAxisMax(100); // copsoq normalized scale 0-100
+			getYAxis().setHasGridlines(true);
 			yTickCharacterCount = 0;
-			getYAxis().addTick(0, "<html>0&nbsp;</html>");
-			getYAxis().addTick(25, "<html>25&nbsp;</html>");
-			getYAxis().addTick(50, "<html>50&nbsp;</html>");
-			getYAxis().addTick(75, "<html>75&nbsp;</html>");
-			getYAxis().addTick(100, "<html>100&nbsp;</html>");
+			for (int i = 0; i <= 100; i += 5) {
+				if (i % 10 == 0) {
+					getYAxis().addTick(i, "<html>" + i + "&nbsp;</html>");
+				} else {
+					getYAxis().addTick(i, "");
+				}
+				setGridColor("#BBBBBB"); // TODO externalize
+			}
 		} else {
-			//Option ticks, assuming the lowest option is 1
+			// Option ticks, assuming the lowest option is 1
 			getYAxis().setAxisMin(1);
 			getYAxis().setTickLabelFormat("#.##");
 			getYAxis().setAxisMax(queryDefinition.getQuestionOptionCount());
 			yTickCharacterCount = 0;
-	
+
 			List<String> questionOptionTexts = queryDefinition.getQuestionOptionTexts();
-	
+
 			for (int i = 0; i < queryDefinition.getQuestionOptionCount(); i++) {
 				String optionText = questionOptionTexts.get(i) + " (" + (i + 1) + ")  ";
 				if (optionText.length() > yTickCharacterCount) {
@@ -188,7 +210,7 @@ public class MeanChart extends GChartChart {
 				getYAxis().addTick(i + 1, optionText);
 			}
 		}
-		
+
 		if (ChartTools.ieVersion() > 1) {
 			getYAxis().setTickLabelFontSize(12);
 			getYAxis().setTickLabelFontWeight("normal");
@@ -303,9 +325,8 @@ public class MeanChart extends GChartChart {
 		currentGroup = 0;
 		for (int perspectiveOption : usedPerspectiveOptions) {
 			if (queryData.hasMeanPrimary(perspectiveOption)) {
-				drawBarGroup(perspectiveOptionTexts.get(perspectiveOption), 
-						queryData.getMeanPrimary(perspectiveOption),
-						queryData.getMeanPrimaryCount(perspectiveOption));
+				drawBarGroup(perspectiveOptionTexts.get(perspectiveOption),
+						queryData.getMeanPrimary(perspectiveOption), queryData.getMeanPrimaryCount(perspectiveOption));
 			} else {
 				drawMissingBarGroup(perspectiveOptionTexts.get(perspectiveOption));
 			}
@@ -325,6 +346,15 @@ public class MeanChart extends GChartChart {
 		currentPosition -= (1 + groupSpacing / 2);
 
 		drawPaddingBar();
+
+		if(queryData.getMeanPrimaryReference() != Double.NaN) {
+			double reference = queryData.getMeanPrimaryReference();
+			Curve referenceLine = getCurve();
+			referenceLine.addPoint(0, reference);
+			referenceLine.addPoint(currentPosition, reference);
+			referenceLine.getSymbol().setHovertextTemplate("referensvärde: {x}");
+		}
+
 		update();
 		setVisible(true);
 	}
@@ -333,13 +363,16 @@ public class MeanChart extends GChartChart {
 		MeanChartBarPrimary bar = getBarPrimary(currentGroup);
 
 		bar.setDataPoint(currentPosition, mean);
-		bar.setHoverTextStandard(mean);
+		bar.setHoverTextStandard(groupName, mean);
 
 		// TODO calculate offset from widgets?
-		xTickMaxCharacterCount = Math.max(xTickMaxCharacterCount, groupName.length());
+		// xTickMaxCharacterCount = Math.max(xTickMaxCharacterCount,
+		// groupName.length());
+		xTickMaxCharacterCount = 5;
 
-		String tickText = chartTexts.standardTick(groupName, population);
-		getXAxis().addTick(currentPosition - 0.5, tickText);
+		String tickText = chartTexts.standardTickNoRespondents(groupName);
+		// getXAxis().addTick(currentPosition - 0.5, tickText);
+		getXAxis().addTick(currentPosition - 0.5, "");
 	}
 
 	private void drawMissingBarGroup(String groupName) {
@@ -357,7 +390,6 @@ public class MeanChart extends GChartChart {
 	 */
 	@Override
 	public int getMinWidth() {
-		return (int) (10 + yTickWidth + xTickMaxCharacterCount * groupCount * 7.5);
+		return Math.max((int) (10 + yTickWidth + xTickMaxCharacterCount * groupCount * 7.5), 300);
 	}
-
 }
