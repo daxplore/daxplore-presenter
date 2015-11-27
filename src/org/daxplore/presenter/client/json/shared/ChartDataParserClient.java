@@ -116,7 +116,7 @@ public class ChartDataParserClient {
 				double meanSecondaryTotal = meanTimepoint2.get("all").isNumber().doubleValue();
 				int[] meanSecondaryCount = getAsIntArray(meanTimepoint2.get("count").isArray());
 				int meanSecondaryCountTotal = (int)meanTimepoint2.get("allcount").isNumber().doubleValue();
-				JSONValue globalJSON = meanTimepoint1.get("global");
+				JSONValue globalJSON = meanTimepoint2.get("global");
 				double global = Double.NaN;
 				if(globalJSON != null && globalJSON.isNumber() != null) {
 					global = globalJSON.isNumber().doubleValue();
