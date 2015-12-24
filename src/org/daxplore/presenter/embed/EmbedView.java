@@ -66,8 +66,6 @@ public class EmbedView extends Composite {
 	@UiField(provided = true)
 	protected final VerticalPanel sidebarArea;
 	@UiField(provided = true)
-	protected final QueryActiveAnimation queryActiveAnimation;
-	@UiField(provided = true)
 	protected final SimplePanel legendPanel;
 	
 	private final GChartChart chart;
@@ -96,10 +94,8 @@ public class EmbedView extends Composite {
 	 * @param embedDefinition
 	 *            the embed definition
 	 */
-	public EmbedView(GChartChart chart, QueryActiveAnimation queryActiveAnimation,
-			int width, int height, EmbedDefinition embedDefinition) {
+	public EmbedView(GChartChart chart, int width, int height, EmbedDefinition embedDefinition) {
 		this.chart = chart;
-		this.queryActiveAnimation = queryActiveAnimation;
 		maxWidth = width;
 		maxHeight = height;
 		header = chart.getExternalHeader();

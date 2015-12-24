@@ -44,7 +44,7 @@ public class MeanChart extends GChartChart {
 	 * The space between different groups, using the internal GChart distance
 	 * system.
 	 */
-	protected final static double groupSpacing = 0.05;
+	protected final static double groupSpacing = 0.1;
 
 	/**
 	 * Keeps track of what position the next groups should be drawn at.
@@ -79,10 +79,7 @@ public class MeanChart extends GChartChart {
 	 */
 	protected LinkedList<MeanChartBarPrimary> barListPrimary;
 
-	/**
-	 * The curve index of the padding bar.
-	 */
-	protected int paddingBarIndex;
+	protected Curve paddingCurve, referenceLineCurve;
 
 	/**
 	 * If a bar is hovered with the mouse, it is stored here.
@@ -111,11 +108,8 @@ public class MeanChart extends GChartChart {
 			throw new Error("Group count = " + groupCount);
 		}
 
-		paddingBarIndex = groupCount * 2;
-
-		createCurves(printerMode);
-
 		addReferenceLine();
+		createCurves(printerMode);
 
 		setupMouseHandlers();
 		setupAxes();
@@ -142,17 +136,19 @@ public class MeanChart extends GChartChart {
 
 	protected void addPaddingCurve() {
 		addCurve();
-		Symbol symbol = getCurve().getSymbol();
+		paddingCurve = getCurve();
+		Symbol symbol = paddingCurve.getSymbol();
 		symbol.setBorderWidth(0);
 		symbol.setSymbolType(SymbolType.VBAR_SOUTHWEST);
 		symbol.setHoverAnnotationEnabled(false);
+		symbol.setHoverSelectionEnabled(false);
 		symbol.setModelWidth(0);
 	}
 
 	protected void addReferenceLine() {
 		addCurve();
-		Symbol symbol = getCurve().getSymbol();
-
+		referenceLineCurve = getCurve();
+		Symbol symbol = referenceLineCurve.getSymbol();
 		symbol.setSymbolType(SymbolType.LINE);
 		symbol.setHoverAnnotationEnabled(false);
 		symbol.setHoverSelectionEnabled(false);
@@ -349,10 +345,9 @@ public class MeanChart extends GChartChart {
 
 		if(queryData.getMeanPrimaryReference() != Double.NaN) {
 			double reference = queryData.getMeanPrimaryReference();
-			Curve referenceLine = getCurve();
-			referenceLine.addPoint(0, reference);
-			referenceLine.addPoint(currentPosition, reference);
-			referenceLine.getSymbol().setHovertextTemplate("referensvärde: {x}");
+			referenceLineCurve.addPoint(0, reference);
+			referenceLineCurve.addPoint(currentPosition, reference);
+			referenceLineCurve.getSymbol().setHovertextTemplate("referensvärde: {x}");
 		}
 
 		update();
@@ -382,7 +377,7 @@ public class MeanChart extends GChartChart {
 	}
 
 	protected void drawPaddingBar() {
-		getCurve(paddingBarIndex).addPoint(currentPosition, 0);
+		paddingCurve.addPoint(currentPosition, 0);
 	}
 
 	/**

@@ -66,7 +66,6 @@ public class EmbedEntryPoint implements EntryPoint {
 		String queryString = Window.Location.getParameter("q");
 		QueryDefinition queryDefinition = new QueryDefinition(questions, queryString);
 		ChartFactory chartFactory = injector.getChartFactory();
-		QueryActiveAnimation queryActiveAnimation = injector.getQueryActiveAnimation();
 
 		String href = Window.Location.getHref();
 		EmbedDefinition embedDefinition;
@@ -104,8 +103,7 @@ public class EmbedEntryPoint implements EntryPoint {
 //				chart = chartFactory.createBarChartCompare(queryDefinition, printMode);
 //				((BarChartCompare)chart).addData(queryData);
 //			}
-			EmbedView embedView = new EmbedView(chart, queryActiveAnimation,
-					Window.getClientWidth(), Window.getClientHeight(), embedDefinition);
+			EmbedView embedView = new EmbedView(chart, Window.getClientWidth(), Window.getClientHeight(), embedDefinition);
 			RootPanel.get().add(embedView);
 		} catch (Exception e) {
 			e.printStackTrace();

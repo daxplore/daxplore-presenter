@@ -35,11 +35,12 @@ public class DescriptionPanel extends Composite {
 	public void setDecription(String questionID) {
 		String description = questions.getDescriptionText(questionID);
 		if(description == null || description.trim().isEmpty()) {
-			content.setHTML("");
+			setVisible(false);
 		} else {
 			String title = questions.getShortText(questionID);
 			content.setHTML("<b>" + title + "</b><p>"+description+"</p>");
 			content.setStylePrimaryName("daxplore-DescriptionPanel");
+			setVisible(true);
 		}
 	}
 

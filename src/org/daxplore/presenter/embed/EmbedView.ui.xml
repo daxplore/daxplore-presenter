@@ -21,7 +21,6 @@
 		</g:VerticalPanel>
 				
 		<g:VerticalPanel styleName='{style.sidebarArea}' ui:field="sidebarArea">
-			<chart:QueryActiveAnimation ui:field='queryActiveAnimation'/>
 			<g:SimplePanel ui:field='legendPanel'/>
 		</g:VerticalPanel>
 	</g:HorizontalPanel>

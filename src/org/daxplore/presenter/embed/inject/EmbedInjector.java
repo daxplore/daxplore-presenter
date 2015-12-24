@@ -47,6 +47,4 @@ public interface EmbedInjector extends Ginjector {
 	
 	ChartFactory getChartFactory();
 	QuestionMetadata getQuestions();
-	
-	QueryActiveAnimation getQueryActiveAnimation();
 }
