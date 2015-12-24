@@ -44,7 +44,7 @@ public class Perspectives {
 	private final List<String> questionIDList;
 
 	@Inject
-	protected Perspectives() {
+	public Perspectives() {
 		List<String> list = new LinkedList<>();
 		NativePerspectives perspectiveNative = getPerspectivesNative();
 		for (int i = 0; i < perspectiveNative.perspectiveCount(); i++) {

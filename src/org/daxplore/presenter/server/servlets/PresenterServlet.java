@@ -56,6 +56,7 @@ public class PresenterServlet extends HttpServlet {
 	private static String browserSuggestionTemplate = null;
 	private static String printHtmlTemplate = null;
 	private static String embedHtmlTemplate = null;
+	private static String gridHtmlTemplate = null;
 	private static String googleAnalyticsTrackingTemplate = null;
 	
 	private HashMap<String, QuestionMetadata> metadataMap = new HashMap<>(); 
@@ -137,10 +138,10 @@ public class PresenterServlet extends HttpServlet {
 					String queryString = request.getParameter("q");
 					responseHTML = getPrintHTML(pm, prefix, locale, serverPath, queryString, baseurl, gaTemplate);
 					
-				} else { // standard presenter
-					
+				} else if(feature!=null && feature.equalsIgnoreCase("grid")) { // mean grid
+					responseHTML = getGridHTML(pm, prefix, locale, baseurl, gaTemplate);
+				}else { // standard presenter
 					responseHTML = getPresenterHTML(pm, prefix, locale, baseurl, gaTemplate);
-					
 				}
 			}
 			
@@ -297,5 +298,41 @@ public class PresenterServlet extends HttpServlet {
 		}
 		
 		return MessageFormat.format(printHtmlTemplate, (Object[])arguments);
+	}
+	
+	private String getGridHTML(PersistenceManager pm, String prefix, Locale locale,
+			String baseurl, String gaTemplate) throws InternalServerException, BadRequestException {
+		
+		String perspectives = "", groups = "", questions = "";
+		perspectives = TextFileStore.getLocalizedFile(pm, prefix, "perspectives", locale, ".json");
+		questions = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
+		groups = TextFileStore.getLocalizedFile(pm, prefix, "groups", locale, ".json");
+		
+		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
+		
+		String boolsettings = "{}";
+		String usertexts = TextFileStore.getLocalizedFile(pm, prefix, "usertexts", locale, ".json");
+		
+		String[] arguments = {
+				baseurl,				// {0}
+				pageTitle,				// {1}
+				prefix,					// {2}
+				perspectives,			// {3}
+				questions,				// {4}
+				groups,					// {5}
+				boolsettings,			// {6}
+				usertexts,				// {7}
+				gaTemplate,				// {8}
+			};
+		
+		if (gridHtmlTemplate == null) {
+			try {
+				gridHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/grid.html"));
+			} catch (IOException e) {
+				throw new InternalServerException("Failed to load print html template", e);
+			}
+		}
+		
+		return MessageFormat.format(gridHtmlTemplate, (Object[])arguments);
 	}
 }

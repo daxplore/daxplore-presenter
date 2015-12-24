@@ -47,7 +47,6 @@ public class StatDataServerModel {
 	
 	private QueryDefinition currentQuery;
 	
-	
 	@Inject
 	public StatDataServerModel(EventBus eventBus, Prefix prefix) {
 		this.eventBus = eventBus;
@@ -58,16 +57,20 @@ public class StatDataServerModel {
 	}
 	
 	public void makeRequest(QueryDefinition queryDefinition) {
+		makeRequest(queryDefinition, false);
+	}
+	
+	public void makeRequest(QueryDefinition queryDefinition, boolean updateEvenIfOld) {
 		currentQuery = queryDefinition;
 		if(queryDataCache.containsKey(getCacheString(queryDefinition))) {
-			onDataLoaded();
+			onDataLoaded(queryDefinition, updateEvenIfOld);
 		} else {
 			String requestString = getRequestString(queryDefinition);
 			String url = href + requestString;
 			RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(url));
 			builder.setTimeoutMillis(5000); //TODO better timeout handling
 			try {
-				builder.sendRequest(null, new StatsRequest(queryDefinition));
+				builder.sendRequest(null, new StatsRequest(queryDefinition, updateEvenIfOld));
 			} catch (RequestException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -78,12 +81,20 @@ public class StatDataServerModel {
 	/**
 	 * Called when requested data is available
 	 */
-	private void onDataLoaded() {
+	private void onDataLoaded(QueryDefinition queryDefinition, boolean updateEvenIfOld) {
+		String cacheString = getCacheString(queryDefinition);
+		String currentQueryCacheString = "";
+		if (currentQuery != null) {
+			currentQueryCacheString = getCacheString(currentQuery);
+		}
+
 		// Make sure the newly loaded doesn't belong to an old request
-		if (currentQuery != null && queryDataCache.containsKey(getCacheString(currentQuery))) {
-			QueryData data = queryDataCache.get(getCacheString(currentQuery));
-			eventBus.fireEvent(new QueryReadyEvent(currentQuery, data));
-			currentQuery = null;
+		if (queryDataCache.containsKey(getCacheString(queryDefinition)) && (updateEvenIfOld || cacheString.equals(currentQueryCacheString))) {
+			QueryData data = queryDataCache.get(getCacheString(queryDefinition));
+			eventBus.fireEvent(new QueryReadyEvent(queryDefinition, data));
+			if(cacheString.equals(currentQueryCacheString)) {
+				currentQuery = null;
+			}
 		}
 	}
 	
@@ -100,9 +111,11 @@ public class StatDataServerModel {
 	 */
 	private class StatsRequest implements RequestCallback {
 		private QueryDefinition queryDefinition;
+		private boolean updateEvenIfOld;
 		
-		private StatsRequest(QueryDefinition queryDefinition) {
+		private StatsRequest(QueryDefinition queryDefinition, boolean updateEvenIfOld) {
 			this.queryDefinition = queryDefinition;
+			this.updateEvenIfOld = updateEvenIfOld;
 		}
 
 		/**
@@ -116,7 +129,7 @@ public class StatDataServerModel {
 				if(!queryDataCache.containsKey(getCacheString(queryDefinition))){
 					queryDataCache.put(getCacheString(queryDefinition), data);
 				}
-				onDataLoaded();
+				onDataLoaded(queryDefinition, updateEvenIfOld);
 			} else {
 				// TODO Handle the error.
 				System.out.println("StatsRequest bad response status: " + response.getStatusText());

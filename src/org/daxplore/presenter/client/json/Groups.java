@@ -49,7 +49,7 @@ public class Groups {
 	 * Instantiates a new Groups object that contains all the group data.
 	 */
 	@Inject
-	protected Groups() {
+	public Groups() {
 		LinkedList<GroupJson> list = new LinkedList<>();
 		NativeGroups groupsNative = getGroupsNative();
 		for (int i = 0; i < groupsNative.groupCount(); i++) {

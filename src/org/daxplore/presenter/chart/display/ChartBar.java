@@ -77,6 +77,8 @@ abstract class ChartBar {
 		this.chartTexts = chartTexts;
 		this.printerMode = printerMode;
 
+		curve.setYShift(1);
+		
 		Symbol symbol = curve.getSymbol();
 		symbol.setBorderStyle("none");
 		symbol.setBorderWidth(0);

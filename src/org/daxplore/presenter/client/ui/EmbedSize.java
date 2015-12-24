@@ -79,8 +79,7 @@ public enum EmbedSize {
 	 * @return the button text
 	 */
 	public String getButtonText(DaxploreConfig config, UITexts uiTexts) {
-		String[] embedTexts = uiTexts.embedButtonTexts().split("\\\\,");
-		return embedTexts[textIndex] + " "
-				+ uiTexts.embedButtonNumbers(getWidth(config),	getHeight(config));
+		String[] embedTexts = uiTexts.embedButtonTexts().split(",");
+		return embedTexts[textIndex].trim() + " " + uiTexts.embedButtonNumbers(getWidth(config), getHeight(config));
 	}
 }

@@ -53,7 +53,6 @@ class MeanChartBarPrimary extends ChartBar {
 	 */
 	MeanChartBarPrimary(ChartTexts chartTexts, Curve barCurve, BarColors color, boolean printerMode, AnnotationLocation hoverLocation) {
 		super(chartTexts, barCurve, color, printerMode, hoverLocation);
-		curve.setYShift(1); //TODO y-shift all bars always, instead of using the grid gif z-index hack?
 		unhover();
 	}
 

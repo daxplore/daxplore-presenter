@@ -1,0 +1,13 @@
+<ui:UiBinder
+	xmlns:ui='urn:ui:com.google.gwt.uibinder'
+	xmlns:g='urn:import:com.google.gwt.user.client.ui'
+	xmlns:chart='urn:import:org.daxplore.presenter.chart'
+	xmlns:display='urn:import:org.daxplore.presenter.chart.display'
+	xmlns:client='urn:import:org.daxplore.presenter.client.ui'>
+
+	<ui:style>
+
+	</ui:style>
+	
+	<g:SimplePanel ui:field='gridContainer'></g:SimplePanel>
+</ui:UiBinder>
