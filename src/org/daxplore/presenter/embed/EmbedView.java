@@ -21,7 +21,6 @@ package org.daxplore.presenter.embed;
 import org.daxplore.presenter.chart.display.ExternalHeader;
 import org.daxplore.presenter.chart.display.ExternalLegend;
 import org.daxplore.presenter.chart.display.GChartChart;
-import org.daxplore.presenter.chart.display.QueryActiveAnimation;
 import org.daxplore.presenter.shared.EmbedDefinition;
 import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
 

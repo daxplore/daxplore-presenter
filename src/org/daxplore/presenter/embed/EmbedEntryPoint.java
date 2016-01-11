@@ -25,7 +25,6 @@ import org.daxplore.presenter.chart.display.BarChartCompare;
 import org.daxplore.presenter.chart.display.ChartFactory;
 import org.daxplore.presenter.chart.display.GChartChart;
 import org.daxplore.presenter.chart.display.MeanChart;
-import org.daxplore.presenter.chart.display.QueryActiveAnimation;
 import org.daxplore.presenter.client.json.shared.ChartDataParserClient;
 import org.daxplore.presenter.embed.inject.EmbedInjector;
 import org.daxplore.presenter.shared.EmbedDefinition;
