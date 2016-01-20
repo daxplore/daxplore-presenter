@@ -89,9 +89,9 @@ abstract class ChartBar {
 		
 		symbol.setHoverLocation(hoverLocation);
 		if(hoverLocation==AnnotationLocation.SOUTHWEST) {
-			symbol.setHoverXShift(20);
+			symbol.setHoverXShift(40);
 		} else if(hoverLocation==AnnotationLocation.SOUTHEAST) {
-			symbol.setHoverXShift(-20);
+			symbol.setHoverXShift(-40);
 		}
 
 		symbol.setHoverAnnotationEnabled(!printerMode);

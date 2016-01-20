@@ -60,6 +60,11 @@ public class ExternalLegend extends Composite {
 				String boxColor = BarColors.getChartColorSet(queryDefinition.getPerspectiveOptionCount()).getPrimary();
 				html.append(legendRow(text, boxColor, printerMode));
 			}
+			if (queryDefinition.hasFlag(QueryFlag.MEAN_REFERENCE)) {
+				String text = chartTexts.meanReference();
+				String boxColor = BarColors.getReferenceColors().getPrimary();
+				html.append(legendRow(text, boxColor, printerMode));
+			}
 		} else {
 			List<String> questionOptionTexts = queryDefinition.getQuestionOptionTexts();
 			for (int optionIndex = 0; optionIndex < queryDefinition.getQuestionOptionCount(); optionIndex++) {

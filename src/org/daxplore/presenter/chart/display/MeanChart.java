@@ -63,7 +63,7 @@ public class MeanChart extends GChartChart {
 	 * 
 	 * <p>Includes both the selected options and the total item.</p>
 	 */
-	protected int groupCount;
+	protected int perspectiveCount;
 
 	/**
 	 * A list of the groups to be drawn.
@@ -79,7 +79,8 @@ public class MeanChart extends GChartChart {
 	 */
 	protected LinkedList<MeanChartBarPrimary> barListPrimary;
 
-	protected Curve paddingCurve, referenceLineCurve;
+	protected MeanReferenceLineBar referenceLineBar;
+	protected Curve paddingCurve;
 
 	/**
 	 * If a bar is hovered with the mouse, it is stored here.
@@ -103,12 +104,12 @@ public class MeanChart extends GChartChart {
 		externalLegend = new ExternalLegend(chartTexts, queryDefinition, printerMode);
 
 		usedPerspectiveOptions = queryDefinition.getUsedPerspectiveOptions();
-		groupCount = usedPerspectiveOptions.size() + (queryDefinition.hasFlag(QueryFlag.TOTAL) ? 1 : 0);
-		if (groupCount <= 0) {
-			throw new Error("Group count = " + groupCount);
+		perspectiveCount = usedPerspectiveOptions.size() + (queryDefinition.hasFlag(QueryFlag.TOTAL) ? 1 : 0);
+		if (perspectiveCount <= 0) {
+			throw new Error("Group count = " + perspectiveCount);
 		}
 
-		addReferenceLine();
+		addReferenceLine(printerMode);
 		createCurves(printerMode);
 
 		setupMouseHandlers();
@@ -117,19 +118,30 @@ public class MeanChart extends GChartChart {
 
 	protected void createCurves(boolean printerMode) {
 		barListPrimary = new LinkedList<>();
+		int addedPerspectives = 0;
 		for (int perspective : queryDefinition.getUsedPerspectiveOptions()) {
 			addCurve();
 			Curve barCurve = getCurve();
-			addCurve();
-			addPrimaryBar(new MeanChartBarPrimary(chartTexts, barCurve, getColorSet(perspective), printerMode,
-					AnnotationLocation.SOUTH));
+			
+			AnnotationLocation hoverLocation = AnnotationLocation.SOUTH;
+			if(perspectiveCount>1 && addedPerspectives==0){
+				hoverLocation = AnnotationLocation.SOUTHEAST;
+			} else if(perspectiveCount>1 && addedPerspectives==perspectiveCount-1) {
+				hoverLocation = AnnotationLocation.SOUTHWEST;
+			}
+			addPrimaryBar(new MeanChartBarPrimary(chartTexts, barCurve, getColorSet(perspective), printerMode, hoverLocation));
+			
+			addedPerspectives++;
 		}
 		if (queryDefinition.hasFlag(QueryFlag.TOTAL)) {
 			addCurve();
 			Curve barCurve = getCurve();
-			addCurve();
+			AnnotationLocation hoverLocation = AnnotationLocation.SOUTH;
+			if(perspectiveCount>1) {
+				hoverLocation = AnnotationLocation.SOUTHWEST;
+			}
 			addPrimaryBar(new MeanChartBarPrimary(chartTexts, barCurve,
-					getColorSet(queryDefinition.getPerspectiveOptionCount()), printerMode, AnnotationLocation.SOUTH));
+					getColorSet(queryDefinition.getPerspectiveOptionCount()), printerMode, hoverLocation));
 		}
 		addPaddingCurve();
 	}
@@ -138,24 +150,23 @@ public class MeanChart extends GChartChart {
 		addCurve();
 		paddingCurve = getCurve();
 		Symbol symbol = paddingCurve.getSymbol();
+		
 		symbol.setBorderWidth(0);
 		symbol.setSymbolType(SymbolType.VBAR_SOUTHWEST);
-		symbol.setHoverAnnotationEnabled(false);
+		symbol.setHoverLocation(AnnotationLocation.SOUTH);
+		symbol.setHoverAnnotationEnabled(true);
+		symbol.setBorderStyle("none");
+		
+		symbol.setModelWidth(1.0);
+		symbol.setDistanceMetric(0, 0);
 		symbol.setHoverSelectionEnabled(false);
 		symbol.setModelWidth(0);
 	}
-
-	protected void addReferenceLine() {
+	
+	protected void addReferenceLine(boolean printerMode) {
 		addCurve();
-		referenceLineCurve = getCurve();
-		Symbol symbol = referenceLineCurve.getSymbol();
-		symbol.setSymbolType(SymbolType.LINE);
-		symbol.setHoverAnnotationEnabled(false);
-		symbol.setHoverSelectionEnabled(false);
-		symbol.setModelWidth(0);
-		symbol.setFillThickness(2);
-//		symbol.setDistanceMetric(100, 100);
-		symbol.setBorderColor("#555555"); // TODO externalize
+		Curve referenceCurve = getCurve();
+		referenceLineBar = new MeanReferenceLineBar(chartTexts, BarColors.getReferenceColors(), referenceCurve, printerMode);
 	}
 
 	/**
@@ -264,6 +275,9 @@ public class MeanChart extends GChartChart {
 				return column;
 			}
 		}
+		if (curve == referenceLineBar.getCurve()) {
+			return referenceLineBar;
+		}
 		return null;
 	}
 
@@ -343,11 +357,10 @@ public class MeanChart extends GChartChart {
 
 		drawPaddingBar();
 
-		if(queryData.getMeanPrimaryReference() != Double.NaN) {
+		if(queryDefinition.hasFlag(QueryFlag.MEAN_REFERENCE)) {
 			double reference = queryData.getMeanPrimaryReference();
-			referenceLineCurve.addPoint(0, reference);
-			referenceLineCurve.addPoint(currentPosition, reference);
-			referenceLineCurve.getSymbol().setHovertextTemplate("referensvärde: {x}");
+			referenceLineBar.setDataPoint(currentPosition, reference);
+			referenceLineBar.setHoverText(reference);
 		}
 
 		update();
@@ -373,7 +386,6 @@ public class MeanChart extends GChartChart {
 	private void drawMissingBarGroup(String groupName) {
 		String tickText = chartTexts.missingTick(groupName, chartConfig.respondentCountCutoff());
 		getXAxis().addTick(currentPosition - 0.5, tickText);
-
 	}
 
 	protected void drawPaddingBar() {
@@ -385,6 +397,6 @@ public class MeanChart extends GChartChart {
 	 */
 	@Override
 	public int getMinWidth() {
-		return Math.max((int) (10 + yTickWidth + xTickMaxCharacterCount * groupCount * 7.5), 300);
+		return Math.max((int) (10 + yTickWidth + xTickMaxCharacterCount * perspectiveCount * 7.5), 300);
 	}
 }

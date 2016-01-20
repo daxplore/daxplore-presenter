@@ -122,6 +122,14 @@ public class QuestionMetadataClientImpl implements QuestionMetadata {
 	public boolean hasMean(String questionID) {
 		return getQuestion(questionID).hasMean();
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean hasMeanReferenceValue(String questionID) {
+		return getQuestion(questionID).hasMeanReferenceValue();
+	}
 
 	/**
 	 * Load the questions json-object from JavaScipt and wrap it as a
@@ -145,4 +153,6 @@ public class QuestionMetadataClientImpl implements QuestionMetadata {
 			return this[index];
 		}-*/;
 	}
+
+
 }

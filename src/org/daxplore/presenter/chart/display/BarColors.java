@@ -32,17 +32,17 @@ class BarColors {
 	/**
 	 * The generated CSS strings for the primary colors.
 	 */
-	private final String primary, primaryHover, primaryDeviation;
+	String primary, primaryHover, primaryDeviation;
 
 	/**
 	 * The generated CSS strings for the secondary colors.
 	 */
-	private final String secondary, secondaryHover, secondaryDeviation;
+	String secondary, secondaryHover, secondaryDeviation;
 
 	/**
 	 * The generated CSS string used for the mouseover annotation.
 	 */
-	private final String annotation;
+	String annotation;
 
 	/**
 	 * Defines the default chart color set.
@@ -56,7 +56,16 @@ class BarColors {
 		new BarColors(35.0,  0.1, -0.03),
 		new BarColors(60.0,  0.1, -0.03)
 	};
-
+	
+	private static final BarColors meanReferenceColors = new BarColors(
+			Color.hslToHex(0, 0, 0.40),
+			Color.hslToHex(0, 0, 0.30),
+			Color.hslToHex(0, 0, 0),
+			Color.hslToHex(0, 0, 0),
+			Color.hslToHex(0, 0, 0),
+			Color.hslToHex(0, 0, 0),
+			Color.hslToHex(0, 0, 0.85));
+	
 	/**
 	 * Create a new color set, based on a hue. Adjusting for saturation and
 	 * lightness
@@ -82,6 +91,24 @@ class BarColors {
 
 		annotation = Color.hslToHex(hue, 0.60, 0.85);
 	}
+	
+	
+	/**
+	 * Constructor to set the colors directly
+	 */
+	public BarColors(String primary, String primaryHover, String primaryDeviation, String secondary,
+			String secondaryHover, String secondaryDeviation, String annotation) {
+		super();
+		this.primary = primary;
+		this.primaryHover = primaryHover;
+		this.primaryDeviation = primaryDeviation;
+		this.secondary = secondary;
+		this.secondaryHover = secondaryHover;
+		this.secondaryDeviation = secondaryDeviation;
+		this.annotation = annotation;
+	}
+
+
 
 	/**
 	 * Instantiates a new color set, based on a hue.
@@ -175,5 +202,9 @@ class BarColors {
 	 */
 	public static BarColors getChartColorSet(int index) {
 		return chartColorSet[index % chartColorSet.length];
+	}
+	
+	public static BarColors getReferenceColors() {
+		return meanReferenceColors;
 	}
 }

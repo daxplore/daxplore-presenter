@@ -137,6 +137,10 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 			flags.add(QueryFlag.MEAN);
 		}
 		
+		if(questionMetadata.hasMeanReferenceValue(questionID)){
+			flags.add(QueryFlag.MEAN_REFERENCE);
+		}
+		
 		QueryDefinition queryDefinition =
 				new QueryDefinition(questionMetadata, questionID, perspectiveID, perspectiveOptions, flags);
 

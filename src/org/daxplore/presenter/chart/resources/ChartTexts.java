@@ -50,6 +50,7 @@ public interface ChartTexts extends Messages {
 	String meanChartAnnotation(String tickName, String mean);
 	String meanChartComparePrimaryAnnotation(String tickName, String timepoint, String mean);
 	String meanChartCompareSecondaryAnnotation(String tickName, String timepoint, String mean);
+	String meanReference();
 
 	// ExternalChartLegend
 	String oneGroupHidden();

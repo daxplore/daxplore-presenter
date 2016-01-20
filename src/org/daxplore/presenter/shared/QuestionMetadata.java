@@ -105,4 +105,12 @@ public interface QuestionMetadata {
 	 * @return true, averaging is possible
 	 */
 	public boolean hasMean(String questionID);
+
+	/**
+	 * Check if a question has a mean reference value.
+	 * 
+	 * @param questionID the questionID
+	 * @return true if there is a mean reference value
+	 */
+	public boolean hasMeanReferenceValue(String questionID);
 }

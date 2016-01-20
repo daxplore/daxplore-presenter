@@ -29,7 +29,7 @@ public interface Chart extends IsWidget {
 	/**
 	 * Set the size of the chart.
 	 * 
-	 * <p>Used as a better optionoption to the standard setChartSize. Added
+	 * <p>Used as a better option to the standard setChartSize. Added
 	 * because GChart's setChartSize fails to take a number of things into
 	 * account when calculating its size.</p>
 	 * 

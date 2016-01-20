@@ -79,7 +79,12 @@ public class QueryDefinition {
 		 * Set if a mean chart should be used, otherwise a standard bar chart is
 		 * used.
 		 */
-		 MEAN(4);
+		 MEAN(4),
+		 
+		 /**
+		  * Set if a mean reference value should be used
+		  */
+		 MEAN_REFERENCE(8);
 		
 		/**
 		 * The value of the bit-position used when encoding this flag in a long.

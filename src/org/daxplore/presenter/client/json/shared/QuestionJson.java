@@ -158,4 +158,13 @@ public class QuestionJson extends JavaScriptObject {
 		return this.description;
 	}-*/;
 
+	/**
+	 * Check if the question has a mean reference value.
+	 * 
+	 * @return true if there is a mean reference value
+	 */ 
+	public final native boolean hasMeanReferenceValue() /*-{
+		return typeof(this.mean_reference) != 'undefined' && this.mean_reference;
+	}-*/;
+
 }

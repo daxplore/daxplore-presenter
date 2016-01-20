@@ -164,4 +164,13 @@ public class QuestionMetadataServerImpl implements QuestionMetadata {
 		return question.containsKey("hasMean") && (Boolean)question.get("hasMean"); 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean hasMeanReferenceValue(String column) {
+		JSONObject question = getQuestion(column);
+		return question.containsKey("mean_reference") && (Boolean)question.get("mean_reference"); 
+	}
+
 }
