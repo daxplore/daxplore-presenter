@@ -30,14 +30,16 @@ import com.googlecode.gchart.client.GChart.SymbolType;
  */
 public class MeanReferenceLineBar extends ChartBar {
 	
-	private int lineHeight = 4;
-	
 	MeanReferenceLineBar(ChartTexts chartTexts, BarColors barColors, Curve barCurve, boolean printerMode) {
 		super(chartTexts, barCurve, barColors, printerMode, AnnotationLocation.NORTH);
 		Symbol symbol = barCurve.getSymbol();
+		symbol.setBrushHeight(8);
+		symbol.setBorderColor(getColor().getPrimary());
 		symbol.setDistanceMetric(0, 0);
 		symbol.setSymbolType(SymbolType.LINE);
-		symbol.setHeight(lineHeight);
+		symbol.setBorderStyle("dashed none none none");
+		symbol.setBorderWidth(-3);
+		symbol.setHeight(0);
 
 		unhover();
 	}
@@ -45,22 +47,18 @@ public class MeanReferenceLineBar extends ChartBar {
 	@Override
 	void hover() {
 		Symbol symbol = getCurve().getSymbol();
-		symbol.setBackgroundColor(getColor().getPrimaryHover());
+		symbol.setBorderColor(getColor().getPrimaryHover());
 		if (printerMode) {
 			symbol.setImageURL("/pixel/" + color.getPrimaryHover().substring(1) + ".png");
-		} else {
-			symbol.setImageURL("/img/daxplore-bar-blank.gif");
 		}
 	}
 
 	@Override
 	void unhover() {
 		Symbol symbol = getCurve().getSymbol();
-		symbol.setBackgroundColor(getColor().getPrimary());
+		symbol.setBorderColor(getColor().getPrimary());
 		if (printerMode) {
 			symbol.setImageURL("/pixel/" + color.getPrimary().substring(1) + ".png");
-		} else {
-			symbol.setImageURL("/img/daxplore-bar-blank.gif");
 		}
 	}
 	
@@ -68,9 +66,9 @@ public class MeanReferenceLineBar extends ChartBar {
 	void setDataPoint(double currentPosition, double referenceValue) {
 		curve.getSymbol().setModelWidth(currentPosition);
 		curve.addPoint(currentPosition/2, referenceValue);
-		curve.setYShift(-1);
+		curve.setYShift(-2);
+		curve.setXShift(3);
 		curve.getSymbol().setHoverYShift(10);
-//		curve.getSymbol().setHoverYShift(yShift);
 	}
 	
 	void setHoverText(double referenceValue) {

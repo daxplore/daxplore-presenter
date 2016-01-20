@@ -109,8 +109,11 @@ public class MeanChart extends GChartChart {
 			throw new Error("Group count = " + perspectiveCount);
 		}
 
-		addReferenceLine(printerMode);
 		createCurves(printerMode);
+		
+		if(queryDefinition.hasFlag(QueryFlag.MEAN_REFERENCE)) {
+			addReferenceLine(printerMode);
+		}
 
 		setupMouseHandlers();
 		setupAxes();
