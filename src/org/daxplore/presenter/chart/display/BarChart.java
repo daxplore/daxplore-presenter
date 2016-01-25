@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.chart.resources.ChartTexts;
+import org.daxplore.presenter.client.json.BoolSettings;
 import org.daxplore.presenter.client.json.shared.UITexts;
 import org.daxplore.presenter.shared.QueryData;
 import org.daxplore.presenter.shared.QueryDefinition;
@@ -460,7 +461,12 @@ public class BarChart extends GChartChart {
 			}
 		}
 		xTickMaxCharacterCount = Math.max(xTickMaxCharacterCount, groupName.length());
-		String tickText = chartTexts.standardTick(groupName, groupSize);
+		String tickText;
+		if(BoolSettings.get("respondents")){
+			tickText = chartTexts.standardTick(groupName, groupSize);
+		} else {
+			tickText = chartTexts.standardTickNoRespondents(groupName);
+		}
 		getXAxis().addTick(currentPosition + groupWidth / 2 - 1, tickText);
 	}
 

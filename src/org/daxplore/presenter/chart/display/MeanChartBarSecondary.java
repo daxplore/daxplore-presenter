@@ -20,6 +20,7 @@ package org.daxplore.presenter.chart.display;
 
 import org.daxplore.presenter.chart.ChartTools;
 import org.daxplore.presenter.chart.resources.ChartTexts;
+import org.daxplore.presenter.client.json.BoolSettings;
 
 import com.googlecode.gchart.client.GChart.AnnotationLocation;
 import com.googlecode.gchart.client.GChart.Curve;
@@ -62,10 +63,14 @@ class MeanChartBarSecondary extends MeanChartBarPrimary {
 	}
 
 	@Override
-	void setHoverTextComparative(String groupName, String timepointSecondaryText, double mean) {
+	void setHoverTextComparative(String groupName, String timepointSecondaryText, double mean, int population) {
 		String annotation;
 		String meanString = ChartTools.formatAsTwoDigits(mean);
-		annotation = chartTexts.meanChartCompareSecondaryAnnotation(groupName, timepointSecondaryText, meanString);
+		if(BoolSettings.get("respondents")){
+			annotation = chartTexts.meanChartCompareSecondaryAnnotation(groupName, timepointSecondaryText, meanString, population);
+		} else {
+			annotation = chartTexts.meanChartCompareSecondaryAnnotationNoRespondents(groupName, timepointSecondaryText, meanString);
+		}
 		annotation = formatAsHoverText(annotation);
 		curve.getSymbol().setHovertextTemplate(annotation);
 	}

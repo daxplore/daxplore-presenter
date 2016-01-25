@@ -73,7 +73,7 @@ public class MeanReferenceLineBar extends ChartBar {
 	
 	void setHoverText(double referenceValue) {
 		String meanString = ChartTools.formatAsTwoDigits(referenceValue);
-		String annotation = chartTexts.meanChartAnnotation(chartTexts.meanReference(), meanString);
+		String annotation = chartTexts.meanChartAnnotationNoRespondents(chartTexts.meanReference(), meanString);
 		annotation = formatAsHoverText(annotation);
 		curve.getSymbol().setHovertextTemplate(annotation);
 	}

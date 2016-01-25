@@ -20,6 +20,7 @@ package org.daxplore.presenter.chart.display;
 
 import org.daxplore.presenter.chart.ChartTools;
 import org.daxplore.presenter.chart.resources.ChartTexts;
+import org.daxplore.presenter.client.json.BoolSettings;
 
 import com.googlecode.gchart.client.GChart.AnnotationLocation;
 import com.googlecode.gchart.client.GChart.Curve;
@@ -70,17 +71,26 @@ class MeanChartBarPrimary extends ChartBar {
 		symbol.setImageURL("/pixel/" + color.getPrimary().substring(1) + ".png");
 	}
 
-	void setHoverTextStandard(String perspectiveOption, double mean) {
+	void setHoverTextStandard(String perspectiveOption, double mean, int population) {
 		String meanString = ChartTools.formatAsTwoDigits(mean);
-		String annotation = chartTexts.meanChartAnnotation(perspectiveOption, meanString);
+		String annotation;
+		if(BoolSettings.get("respondents")){
+			annotation = chartTexts.meanChartAnnotation(perspectiveOption, meanString, population);
+		} else {
+			annotation = chartTexts.meanChartAnnotationNoRespondents(perspectiveOption, meanString);
+		}
 		annotation = formatAsHoverText(annotation);
 		curve.getSymbol().setHovertextTemplate(annotation);
 	}
 
-	void setHoverTextComparative(String perspectiveOption, String timepointPrimaryText, double mean) {
+	void setHoverTextComparative(String perspectiveOption, String timepointPrimaryText, double mean, int population) {
 		String annotation;
 		String meanString = ChartTools.formatAsTwoDigits(mean);
-		annotation = chartTexts.meanChartComparePrimaryAnnotation(perspectiveOption, timepointPrimaryText, meanString);
+		if(BoolSettings.get("respondents")){
+			annotation = chartTexts.meanChartComparePrimaryAnnotation(perspectiveOption, timepointPrimaryText, meanString, population);
+		} else {
+			annotation = chartTexts.meanChartComparePrimaryAnnotationNoRespondents(perspectiveOption, timepointPrimaryText, meanString);
+		}
 		annotation = formatAsHoverText(annotation);
 		curve.getSymbol().setHovertextTemplate(annotation);
 	}

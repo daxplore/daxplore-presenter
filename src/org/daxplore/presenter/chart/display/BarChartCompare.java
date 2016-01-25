@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.chart.resources.ChartTexts;
+import org.daxplore.presenter.client.json.BoolSettings;
 import org.daxplore.presenter.client.json.shared.UITexts;
 import org.daxplore.presenter.shared.QueryData;
 import org.daxplore.presenter.shared.QueryDefinition;
@@ -277,7 +278,11 @@ public class BarChartCompare extends BarChart {
 
 		String tickText;
 		if (groupSizeSecondary > 0) {
-			tickText = chartTexts.compareTick(groupName, uiTexts.timepointPrimary(), groupSizePrimary, uiTexts.timepointSecondary(), groupSizeSecondary);
+			if(BoolSettings.get("respondents")){
+				tickText = chartTexts.compareTick(groupName, uiTexts.timepointPrimary(), groupSizePrimary, uiTexts.timepointSecondary(), groupSizeSecondary);
+			} else {
+				tickText = chartTexts.compareTickNoRespondents(groupName);
+			}
 		} else {
 			tickText = chartTexts.compareMissingSecondaryTick(groupName, uiTexts.timepointPrimary(), groupSizePrimary, uiTexts.timepointSecondary(), chartConfig.respondentCountCutoff());
 			xTickMaxCharacterCount = Math.max(xTickMaxCharacterCount, 23);

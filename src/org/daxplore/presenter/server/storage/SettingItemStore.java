@@ -83,8 +83,7 @@ public class SettingItemStore {
 		this.value = value;
 	}
 	
-	public static String getProperty(PersistenceManager pm, String prefix,
-			String fileName, String propertyName) {
+	public static String getProperty(PersistenceManager pm, String prefix, String fileName, String propertyName) {
 		String statStoreKey = prefix + "#" + fileName + "/" + propertyName;
 		try {
 			return pm.getObjectById(SettingItemStore.class, statStoreKey).getValue();

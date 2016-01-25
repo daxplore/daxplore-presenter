@@ -24,6 +24,7 @@ import java.util.List;
 import org.daxplore.presenter.chart.ChartTools;
 import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.chart.resources.ChartTexts;
+import org.daxplore.presenter.client.json.BoolSettings;
 import org.daxplore.presenter.client.json.shared.UITexts;
 import org.daxplore.presenter.shared.QueryData;
 import org.daxplore.presenter.shared.QueryDefinition;
@@ -338,8 +339,7 @@ public class MeanChart extends GChartChart {
 		currentGroup = 0;
 		for (int perspectiveOption : usedPerspectiveOptions) {
 			if (queryData.hasMeanPrimary(perspectiveOption)) {
-				drawBarGroup(perspectiveOptionTexts.get(perspectiveOption),
-						queryData.getMeanPrimary(perspectiveOption), queryData.getMeanPrimaryCount(perspectiveOption));
+				drawBarGroup(perspectiveOptionTexts.get(perspectiveOption), queryData.getMeanPrimary(perspectiveOption), queryData.getMeanPrimaryCount(perspectiveOption));
 			} else {
 				drawMissingBarGroup(perspectiveOptionTexts.get(perspectiveOption));
 			}
@@ -374,15 +374,13 @@ public class MeanChart extends GChartChart {
 		MeanChartBarPrimary bar = getBarPrimary(currentGroup);
 
 		bar.setDataPoint(currentPosition, mean);
-		bar.setHoverTextStandard(groupName, mean);
+		bar.setHoverTextStandard(groupName, mean, population);
 
 		// TODO calculate offset from widgets?
 		// xTickMaxCharacterCount = Math.max(xTickMaxCharacterCount,
 		// groupName.length());
 		xTickMaxCharacterCount = 5;
 
-		String tickText = chartTexts.standardTickNoRespondents(groupName);
-		// getXAxis().addTick(currentPosition - 0.5, tickText);
 		getXAxis().addTick(currentPosition - 0.5, "");
 	}
 

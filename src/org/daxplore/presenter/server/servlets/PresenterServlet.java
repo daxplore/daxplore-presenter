@@ -194,7 +194,7 @@ public class PresenterServlet extends HttpServlet {
 		
 		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
 		
-		String boolsettings = "{}";
+		String boolsettings = TextFileStore.getFile(pm, prefix, "boolsettings.json");
 		String usertexts = TextFileStore.getLocalizedFile(pm, prefix, "usertexts", locale, ".json");
 		
 		String[] arguments = {

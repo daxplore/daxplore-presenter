@@ -37,6 +37,7 @@ public interface ChartTexts extends Messages {
 	String standardTickNoRespondents(String tickName);
 	String missingTick(String tickName, int respondentCountCutoff);
 	String compareTick(String tickName, String timepointPrimary, int respondentCountPrimary, String timepointSecondary, int respondentCountSecondary);
+	String compareTickNoRespondents(String tickName);
 	String compareMissingTick(String tickName, int respondentCountCutoff);
 	String compareMissingSecondaryTick(String tickName, String timepointPrimary, int respondentCountPrimary, String timepointSecondary, int respondentCountCutoff);
 
@@ -47,9 +48,12 @@ public interface ChartTexts extends Messages {
 	String barChartComparePrimaryNoAnswerAnnotation(String timepoint, String answerText);
 	String barChartCompareSecondaryAnnotation(String timepoint, String answerPercentage, String answerText);
 	String barChartCompareSecondaryNoAnswerAnnotation(String timepoint, String answerText);
-	String meanChartAnnotation(String tickName, String mean);
-	String meanChartComparePrimaryAnnotation(String tickName, String timepoint, String mean);
-	String meanChartCompareSecondaryAnnotation(String tickName, String timepoint, String mean);
+	String meanChartAnnotation(String tickName, String mean, int population);
+	String meanChartComparePrimaryAnnotation(String tickName, String timepoint, String mean, int population);
+	String meanChartCompareSecondaryAnnotation(String tickName, String timepoint, String mean, int population);
+	String meanChartAnnotationNoRespondents(String tickName, String mean);
+	String meanChartComparePrimaryAnnotationNoRespondents(String tickName, String timepoint, String mean);
+	String meanChartCompareSecondaryAnnotationNoRespondents(String tickName, String timepoint, String mean);
 	String meanReference();
 
 	// ExternalChartLegend
