@@ -7,17 +7,12 @@
 
 	<ui:style>
    		.sidebarArea {
-			margin-top: -15px;
-			min-width: 220px;
 		}
 		.bottomHorizontal {
-			width: 100%;
 		}
 		.perspective {
-			float:left;
 		}
 		.description {
-			float:right;
 		}
 	</ui:style>
 
@@ -27,15 +22,14 @@
 		
 		<g:VerticalPanel>
 			<chart:ChartPanelView ui:field='chartPanel'/>
-			<g:HorizontalPanel styleName="{style.bottomHorizontal}">
+			<g:HorizontalPanel ui:field='bottomPanel' styleName="{style.bottomHorizontal}">
 			    <client:PerspectivePanel ui:field='perspectivePanel' styleName="{style.perspective}"/>
+				<client:DescriptionPanel ui:field='descriptionPanel' styleName="{style.description}"/>
 			</g:HorizontalPanel>
 		</g:VerticalPanel>
 				
 		<g:VerticalPanel styleName='{style.sidebarArea}' ui:field="sidebarArea">
-			<display:QueryActiveAnimation ui:field='queryActiveAnimation'/>
 			<g:SimplePanel ui:field='legendPanel'/>
-			<client:DescriptionPanel ui:field='descriptionPanel' styleName="{style.description"/>
 		</g:VerticalPanel>
 	</g:HorizontalPanel>
 </ui:UiBinder>

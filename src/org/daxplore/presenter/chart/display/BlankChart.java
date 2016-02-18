@@ -58,8 +58,8 @@ public class BlankChart extends Composite implements Chart {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Widget getExternalLegend() {
-		return new SimplePanel();
+	public ExternalLegend getExternalLegend() {
+		return ExternalLegend.getEmptyLegend();
 	}
 
 	/**

@@ -54,7 +54,8 @@ public interface ChartTexts extends Messages {
 	String meanChartAnnotationNoRespondents(String tickName, String mean);
 	String meanChartComparePrimaryAnnotationNoRespondents(String tickName, String timepoint, String mean);
 	String meanChartCompareSecondaryAnnotationNoRespondents(String tickName, String timepoint, String mean);
-	String meanReference();
+	String meanReference(String mean);
+	String meanReferenceCompact(String mean);
 
 	// ExternalChartLegend
 	String oneGroupHidden();

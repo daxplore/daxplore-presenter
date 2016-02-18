@@ -24,7 +24,6 @@ import java.util.List;
 import org.daxplore.presenter.chart.ChartTools;
 import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.chart.resources.ChartTexts;
-import org.daxplore.presenter.client.json.BoolSettings;
 import org.daxplore.presenter.client.json.shared.UITexts;
 import org.daxplore.presenter.shared.QueryData;
 import org.daxplore.presenter.shared.QueryDefinition;

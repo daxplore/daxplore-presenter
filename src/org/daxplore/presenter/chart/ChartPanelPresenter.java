@@ -21,12 +21,12 @@ import org.daxplore.presenter.chart.display.BarChartCompare;
 import org.daxplore.presenter.chart.display.BlankChart;
 import org.daxplore.presenter.chart.display.Chart;
 import org.daxplore.presenter.chart.display.ChartFactory;
+import org.daxplore.presenter.chart.display.ExternalLegend;
 import org.daxplore.presenter.chart.display.MeanChart;
 import org.daxplore.presenter.shared.QueryData;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ChartPanelPresenter  {
@@ -93,7 +93,7 @@ public class ChartPanelPresenter  {
 		return view;
 	}
 	
-	public Widget getExternalLegend() {
+	public ExternalLegend getExternalLegend() {
 		return chart.getExternalLegend();
 	}
 }

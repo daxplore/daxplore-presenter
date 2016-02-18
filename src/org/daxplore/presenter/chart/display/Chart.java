@@ -58,7 +58,7 @@ public interface Chart extends IsWidget {
 	 * 
 	 * @return the external legend
 	 */
-	public Widget getExternalLegend();
+	public ExternalLegend getExternalLegend();
 
 	/**
 	 * Get a legend widget that can be placed in a webpage outside the actual

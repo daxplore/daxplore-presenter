@@ -46,7 +46,7 @@ public class GridPresenter implements QueryReadyHandler {
 	
 	private Map<QueryDefinition, QueryData> loadedData = new LinkedHashMap<>(); 
 	
-	private String selectedPerspectiveID;
+	private String perspectiveID;
 	private Set<String> addedQuestions = new HashSet<>(); 
 	
 	public GridPresenter(EventBus eventBus, StatDataServerModel statDataServerModel,
@@ -66,8 +66,7 @@ public class GridPresenter implements QueryReadyHandler {
 	
 	private void makeQuery() {
 		//TODO select perspective based on some input
-		String perspectiveID = perspectives.getQuestionIDs().get(0);
-		selectedPerspectiveID = perspectiveID;
+		perspectiveID = perspectives.getQuestionIDs().get(0);
 		
 		for (int groupIndex = 0; groupIndex < groups.getGroupCount(); groupIndex++) {
 			for (String questionID : groups.getQuestionIDs(groupIndex)) {

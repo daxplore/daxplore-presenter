@@ -20,7 +20,6 @@ package org.daxplore.presenter.client.ui;
 
 import org.daxplore.presenter.chart.ChartPanelPresenter;
 import org.daxplore.presenter.chart.ChartPanelView;
-import org.daxplore.presenter.chart.display.QueryActiveAnimation;
 import org.daxplore.presenter.client.resources.DaxploreConfig;
 
 import com.google.gwt.core.client.GWT;
@@ -32,6 +31,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -51,6 +51,9 @@ public class StagePanel extends Composite implements ResizeHandler {
 	protected final PerspectivePanel perspectivePanel;
 
 	@UiField(provided = true)
+	protected HorizontalPanel bottomPanel;
+
+	@UiField(provided = true)
 	protected DescriptionPanel descriptionPanel;
 	
 	@UiField(provided = true)
@@ -62,8 +65,6 @@ public class StagePanel extends Composite implements ResizeHandler {
 	@UiField(provided = true)
 	protected final VerticalPanel sidebarArea;
 	@UiField(provided = true)
-	protected final QueryActiveAnimation queryActiveAnimation;
-	@UiField(provided = true)
 	protected final SimplePanel legendPanel;
 
 	
@@ -71,14 +72,14 @@ public class StagePanel extends Composite implements ResizeHandler {
 	
 	@Inject
 	protected StagePanel(PerspectivePanel perspectivePanel, QuestionPanel questionPanel,
-			ChartPanelPresenter chartPanelPresenter, DaxploreConfig config,
-			QueryActiveAnimation queryActiveAnimation, ImageButtonPanel imageButtonPanel,
+			ChartPanelPresenter chartPanelPresenter, DaxploreConfig config, ImageButtonPanel imageButtonPanel,
 			ChartTypeOptionsPanel optionsPanel, DescriptionPanel descriptionPanel) {
 		this.perspectivePanel = perspectivePanel;
 		this.questionPanel = questionPanel;
 		this.chartPanel = chartPanelPresenter.getView();
-		this.queryActiveAnimation = queryActiveAnimation;
 		this.descriptionPanel = descriptionPanel;
+		
+		bottomPanel = new HorizontalPanel();
 		
 		sidebarArea = new VerticalPanel();
 		
@@ -88,8 +89,8 @@ public class StagePanel extends Composite implements ResizeHandler {
 
 		initWidget(uiBinder.createAndBindUi(this));
 		
-		sidebarArea.insert(imageButtonPanel, 1);
-		sidebarArea.insert(optionsPanel, 2);
+		sidebarArea.insert(imageButtonPanel, 0);
+		sidebarArea.insert(optionsPanel, 1);
 		
 		setStylePrimaryName("daxplore-StagePanel");
 		
@@ -116,9 +117,19 @@ public class StagePanel extends Composite implements ResizeHandler {
 		Scheduler.get().scheduleFinally(new ScheduledCommand() {
 			@Override
 			public void execute() {
-				int desiredStagePanelWidth = Math.max(minWidth, Window.getClientWidth());
-				int widthOfOtherStuff = StagePanel.this.getOffsetWidth() - chartPanel.getOffsetWidth();
-				chartPanel.setMaxWidth(desiredStagePanelWidth - widthOfOtherStuff);
+				int clientWidth = Window.getClientWidth();
+				int questionPanelWidth = questionPanel.getOffsetWidth();
+				int sideAreaWidth = sidebarArea.getOffsetWidth();
+
+				int descriptionPanelMinWidth = 300 + 10 + 2; // min width + padding + border from css 
+				int totalCompontentWidth = questionPanelWidth
+						+ bottomPanel.getOffsetWidth()
+						- descriptionPanel.getOffsetWidth() + descriptionPanelMinWidth
+						+ sideAreaWidth;
+				int containerWidth = Math.max(clientWidth, totalCompontentWidth);
+				int maxWidth = containerWidth - questionPanelWidth - sideAreaWidth;
+				
+				chartPanel.setMaxWidth(maxWidth); 
 			}
 		});
 	}

@@ -63,7 +63,6 @@ public class GridView extends Composite {
 			setOptionHeader(column++, option);
 		}
 		
-		
 		int row = 1;
 		for (Entry<QueryDefinition, QueryData> e : queryDataMap.entrySet()) {
 			QueryDefinition definition = e.getKey();
@@ -94,6 +93,6 @@ public class GridView extends Composite {
 		} else if (mean < referenceMean - diff) {
 			backColor = "green";
 		}
-		grid.setHTML(row, col, "<div style='width:50px;height:25px;background:" + backColor + ";'>" + mean + "</div>");
+		grid.setHTML(row, col, "<span class='daxplore-gridCell' style='background:" + backColor + ";'>" + mean + "</span>");
 	}
 }

@@ -20,20 +20,24 @@ package org.daxplore.presenter.chart.display;
 
 import java.util.List;
 
+import org.daxplore.presenter.chart.ChartTools;
 import org.daxplore.presenter.chart.resources.ChartTexts;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.VerticalPanel;
 
 /**
  * A legend widget for a chart that can be placed outside of the actual chart
  * area.
  */
 public class ExternalLegend extends Composite {
+	private ChartTexts chartTexts;
 	private static ExternalLegend emptyLegend = new ExternalLegend();
-	private HTML content;
+	private VerticalPanel content = new VerticalPanel();
+	private HTML legend;
 
 	/**
 	 * Instantiates a new external legend.
@@ -46,9 +50,11 @@ public class ExternalLegend extends Composite {
 	 *            use the printer-friendly mode
 	 */
 	public ExternalLegend(ChartTexts chartTexts, QueryDefinition queryDefinition, boolean printerMode) {
-		StringBuilder html = new StringBuilder("<table class=\"daxplore-ExternalLegend\">");
-		
+		this.chartTexts = chartTexts;
+		StringBuilder html = new StringBuilder();
 		if(queryDefinition.hasFlag(QueryFlag.MEAN)) {
+			html.append("<div class=\"daxplore-ExternalLegendHeader\">" + queryDefinition.getPerspectiveShortText() + "</div>");
+			html.append("<table class=\"daxplore-ExternalLegend\">");
 			List<String> perspectiveOptionTexts = queryDefinition.getPerspectiveOptionTexts();
 			for (int perspectiveOption : queryDefinition.getUsedPerspectiveOptions()) {
 				String text = perspectiveOptionTexts.get(perspectiveOption);
@@ -60,12 +66,8 @@ public class ExternalLegend extends Composite {
 				String boxColor = BarColors.getChartColorSet(queryDefinition.getPerspectiveOptionCount()).getPrimary();
 				html.append(legendRow(text, boxColor, printerMode));
 			}
-			if (queryDefinition.hasFlag(QueryFlag.MEAN_REFERENCE)) {
-				String text = chartTexts.meanReference();
-				String boxColor = BarColors.getReferenceColors().getPrimary();
-				html.append(legendRow(text, boxColor, printerMode));
-			}
 		} else {
+			html.append("<table class=\"daxplore-ExternalLegend\">");
 			List<String> questionOptionTexts = queryDefinition.getQuestionOptionTexts();
 			for (int optionIndex = 0; optionIndex < queryDefinition.getQuestionOptionCount(); optionIndex++) {
 				String text = questionOptionTexts.get(optionIndex);
@@ -75,8 +77,15 @@ public class ExternalLegend extends Composite {
 		}
 		
 		html.append("</table>");
-		content = new HTML(html.toString());
+		legend = new HTML(html.toString());
+		content.add(legend);
 		initWidget(content);
+	}
+	
+	public void addReferenceValue(double referenceValue) {
+		String text = chartTexts.meanReferenceCompact(ChartTools.formatAsTwoDigits(referenceValue));
+		HTML html = new HTML("<div class=\"daxplore-LegendReference\" style=\"border-color:" + BarColors.getReferenceColors().getPrimary() + "\">" + text + "</div>");
+		content.add(html);
 	}
 	
 	private ExternalLegend() {

@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.daxplore.presenter.chart.ChartPanelPresenter;
+import org.daxplore.presenter.chart.display.ExternalLegend;
 import org.daxplore.presenter.client.event.CloseWarningBannerEvent;
 import org.daxplore.presenter.client.event.CloseWarningBannerHandler;
 import org.daxplore.presenter.client.event.QueryReadyEvent;
@@ -267,7 +268,11 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 	@Override
 	public void onQueryReady(QueryReadyEvent event) {
 		chartPanelPresenter.onQueryReady(event.getQueryDefinition(), event.getQueryData());
-		stagePanel.setLegend(chartPanelPresenter.getExternalLegend());
+		ExternalLegend legend = chartPanelPresenter.getExternalLegend();
+		if (event.getQueryDefinition().hasFlag(QueryFlag.MEAN_REFERENCE)) {
+			legend.addReferenceValue(event.getQueryData().getMeanPrimaryReference());
+		}
+		stagePanel.setLegend(legend);
 		stagePanel.setDescription(event.getQueryDefinition().getQuestionID());
 	}
 }
