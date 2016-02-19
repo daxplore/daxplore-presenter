@@ -47,6 +47,13 @@ class GroupJson extends JavaScriptObject {
 	private final native JsArrayString getQuestionIDsNative() /*-{
 		return this.questions;
 	}-*/;
+	
+	/**
+	 * Get the type, either group or header
+	 */
+	public final native String getType()/*-{
+		return this.type;
+	}-*/;
 
 	/**
 	 * Get the IDs of the questions are in this groups.

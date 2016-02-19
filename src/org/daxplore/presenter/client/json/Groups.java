@@ -44,6 +44,10 @@ import com.google.inject.Inject;
  */
 public class Groups {
 	private final List<GroupJson> groupList;
+	
+	public enum Type {
+		GROUP, HEADER
+	}
 
 	/**
 	 * Instantiates a new Groups object that contains all the group data.
@@ -90,6 +94,14 @@ public class Groups {
 	 */
 	public int getGroupCount() {
 		return groupList.size();
+	}
+	
+	public Type getGroupType(int index) {
+		String type = groupList.get(index).getType();
+		if(type == null) {
+			return Type.GROUP;
+		}
+		return Type.valueOf(groupList.get(index).getType());
 	}
 
 	/**

@@ -80,27 +80,42 @@ public class QuestionPanel extends Composite implements QueryUpdateHandler{
 		
 		for (int i = 0; i < groups.getGroupCount(); i++) {
 			String txt = groups.getGroupName(i);
+			Groups.Type type = groups.getGroupType(i);
 			SafeHtmlBuilder html = new SafeHtmlBuilder();
-			html.appendHtmlConstant("<span class=\"daxplore-QuestionPanel-branch\">&nbsp;");
-			html.appendEscaped(txt);
-			html.appendHtmlConstant("&nbsp;</span>");
-			GroupItem gr = new GroupItem(html.toSafeHtml());
-			List<String> qlist = groups.getQuestionIDs(i);
-			for (String q : qlist) {
-				html = new SafeHtmlBuilder();
-				html.appendHtmlConstant("&nbsp;");
-				html.appendEscaped(questions.getShortText(q));
-				if(questions.hasSecondary(q)) {
-					html.appendHtmlConstant("&nbsp;<span class=\"super\">");
-					html.appendEscaped(uiTexts.secondaryFlag());
-					html.appendHtmlConstant("</span>");
+
+			switch(type) {
+			case GROUP:
+				html.appendHtmlConstant("<span class=\"daxplore-QuestionPanel-branch\">&nbsp;");
+				html.appendEscaped(txt);
+				html.appendHtmlConstant("&nbsp;</span>");
+				GroupItem gr = new GroupItem(html.toSafeHtml());
+				List<String> qlist = groups.getQuestionIDs(i);
+				for (String q : qlist) {
+					html = new SafeHtmlBuilder();
+					html.appendHtmlConstant("&nbsp;");
+					html.appendEscaped(questions.getShortText(q));
+					if(questions.hasSecondary(q)) {
+						html.appendHtmlConstant("&nbsp;<span class=\"super\">");
+						html.appendEscaped(uiTexts.secondaryFlag());
+						html.appendHtmlConstant("</span>");
+					}
+					html.appendHtmlConstant("&nbsp;");
+					QuestionTreeItem qi = new QuestionTreeItem(html.toSafeHtml(), q);
+					qi.setTitle(questions.getFullText(q));
+					gr.addItem(qi);
 				}
-				html.appendHtmlConstant("&nbsp;");
-				QuestionTreeItem qi = new QuestionTreeItem(html.toSafeHtml(), q);
-				qi.setTitle(questions.getFullText(q));
-				gr.addItem(qi);
+				treeRoot.addItem(gr);
+				break;
+			case HEADER:
+				html.appendHtmlConstant("<span class=\"daxplore-QuestionPanel-subheader\">&nbsp;");
+				html.appendEscaped(txt);
+				html.appendHtmlConstant("&nbsp;</span>");
+				TreeItem item = new HeaderItem(html.toSafeHtml());
+				treeRoot.addItem(item);
+				break;
+			default:
+				break;
 			}
-			treeRoot.addItem(gr);
 		}
 
 		vp.add(treeRoot);
@@ -228,6 +243,9 @@ public class QuestionPanel extends Composite implements QueryUpdateHandler{
 						prev = null;
 					}
 				}
+			} else if (event.getSelectedItem() instanceof HeaderItem) {
+				HeaderItem hi = (HeaderItem) event.getSelectedItem();
+				hi.setSelected(false);
 			}
 		}
 
@@ -248,6 +266,16 @@ public class QuestionPanel extends Composite implements QueryUpdateHandler{
 				out = out || getChild(i).isSelected();
 			}
 			return out;
+		}
+	}
+	
+	/**
+	 * A class that defines a group as displayed in the question tree.
+	 */
+	private static class HeaderItem extends TreeItem {
+
+		HeaderItem(SafeHtml html) {
+			super(html);
 		}
 	}
 }

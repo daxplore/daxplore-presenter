@@ -86,6 +86,14 @@
 	.daxplore-QuestionPanel-branch{
 		font-weight: bold;
 	}
+		
+	.daxplore-QuestionPanel-subheader {
+	    color: #808080;
+	    font-size: 14px;
+	    font-weight: bold;
+	    display: block;
+	    margin-top: 15px;
+	}
 
 	.gwt-Tree > div:first-child { 
 	      width: 0px !important; 
