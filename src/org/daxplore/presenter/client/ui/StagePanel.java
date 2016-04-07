@@ -142,7 +142,7 @@ public class StagePanel extends Composite implements ResizeHandler {
 		updateWidth();
 	}
 	
-	public void setDescription(String questionID) {
-		descriptionPanel.setDecription(questionID);
+	public void setDescription(String questionID, String perspectiveID) {
+		descriptionPanel.setDecription(questionID, perspectiveID);
 	}
 }

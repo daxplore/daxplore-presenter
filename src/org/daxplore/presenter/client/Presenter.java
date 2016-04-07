@@ -270,6 +270,6 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 			legend.addReferenceValue(event.getQueryData().getMeanPrimaryReference());
 		}
 		stagePanel.setLegend(legend);
-		stagePanel.setDescription(event.getQueryDefinition().getQuestionID());
+		stagePanel.setDescription(event.getQueryDefinition().getQuestionID(), event.getQueryDefinition().getPerspectiveID());
 	}
 }

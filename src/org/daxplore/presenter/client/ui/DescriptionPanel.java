@@ -32,16 +32,34 @@ public class DescriptionPanel extends Composite {
 		initWidget(content);
 	}
 	
-	public void setDecription(String questionID) {
-		String description = questions.getDescriptionText(questionID);
-		if(description == null || description.trim().isEmpty()) {
+	public void setDecription(String questionID, String perspectiveID) {
+		String questionDescription = questions.getDescriptionText(questionID);
+		String perspectiveDescription = questions.getDescriptionText(perspectiveID);
+	
+		boolean questionEmpty = questionDescription == null || questionDescription.trim().isEmpty();
+		boolean perspectiveEmpty = perspectiveDescription == null || perspectiveDescription.trim().isEmpty();
+	
+		String html = "";
+		
+		if (!questionEmpty) {
+			String title = questions.getShortText(questionID);
+			html += "<b>" + title + "</b><p>"+questionDescription+"</p>";
+		}
+		
+		if (!perspectiveEmpty) {
+			if(!html.isEmpty()) {
+				html += "<hr><br><br>";
+			}
+			String title = questions.getShortText(perspectiveID);
+			html += "<b>" + title + "</b><p>"+perspectiveDescription+"</p>";
+		}
+
+		if(html.isEmpty()) {
 			setVisible(false);
 		} else {
-			String title = questions.getShortText(questionID);
-			content.setHTML("<b>" + title + "</b><p>"+description+"</p>");
+			content.setHTML(html);
 			content.setStylePrimaryName("daxplore-DescriptionPanel");
 			setVisible(true);
 		}
 	}
-
 }

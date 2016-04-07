@@ -89,10 +89,11 @@
 		
 	.daxplore-QuestionPanel-subheader {
 	    color: #808080;
-	    font-size: 14px;
-	    font-weight: bold;
+	    cursor: default;
 	    display: block;
-	    margin-top: 15px;
+	    font-size: 13px;
+	    font-weight: bold;
+	    margin-top: 10px;
 	}
 
 	.gwt-Tree > div:first-child { 
