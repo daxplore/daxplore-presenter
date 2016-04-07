@@ -194,7 +194,7 @@ public class PresenterServlet extends HttpServlet {
 		
 		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
 		
-		String boolsettings = TextFileStore.getFile(pm, prefix, "boolsettings.json");
+		String settings = TextFileStore.getFile(pm, prefix, "settings.json");
 		String usertexts = TextFileStore.getLocalizedFile(pm, prefix, "usertexts", locale, ".json");
 		
 		String[] arguments = {
@@ -204,7 +204,7 @@ public class PresenterServlet extends HttpServlet {
 			perspectives,			// {3}
 			questions,				// {4}
 			groups,					// {5}
-			boolsettings,			// {6}
+			settings,				// {6}
 			usertexts,				// {7}
 			gaTemplate				// {8}
 		};
@@ -310,7 +310,7 @@ public class PresenterServlet extends HttpServlet {
 		
 		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
 		
-		String boolsettings = "{}";
+		String settings = "{}";
 		String usertexts = TextFileStore.getLocalizedFile(pm, prefix, "usertexts", locale, ".json");
 		
 		String[] arguments = {
@@ -320,7 +320,7 @@ public class PresenterServlet extends HttpServlet {
 				perspectives,			// {3}
 				questions,				// {4}
 				groups,					// {5}
-				boolsettings,			// {6}
+				settings,				// {6}
 				usertexts,				// {7}
 				gaTemplate,				// {8}
 			};

@@ -23,9 +23,9 @@ import org.daxplore.presenter.client.event.ImageButtonEvent.ImageButtonAction;
 import org.daxplore.presenter.client.event.ImageButtonHandler;
 import org.daxplore.presenter.client.event.QueryUpdateEvent;
 import org.daxplore.presenter.client.event.QueryUpdateHandler;
+import org.daxplore.presenter.client.json.Settings;
 import org.daxplore.presenter.client.json.Prefix;
 import org.daxplore.presenter.client.json.shared.UITexts;
-import org.daxplore.presenter.client.resources.DaxploreConfig;
 import org.daxplore.presenter.client.resources.UIResources;
 import org.daxplore.presenter.shared.QueryDefinition;
 
@@ -63,7 +63,7 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 	
 	@Inject
 	protected ImageButtonPanel(final EventBus eventBus, UITexts uiTexts, UIResources uiResources,
-			DaxploreConfig config, EmbedPopup embedPopup, Prefix prefix) {
+			EmbedPopup embedPopup, Prefix prefix) {
 
 		this.uiTexts = uiTexts;
 		this.prefix = prefix.getPrefix();
@@ -84,14 +84,14 @@ public class ImageButtonPanel extends Composite implements QueryUpdateHandler, I
 //		});
 //		mainPanel.add(printButton);
 		
-		if(config.showCSVButton()) {
+		if(Settings.getBool("csv")) {
 			Image buttonImage = new Image(uiResources.csvButtonImage());
 			ImageButton csvButton = new ImageButton(buttonImage, uiTexts.csvButtonTitle());
 			csvWidgetAnchor = new WidgetAnchor("", csvButton);
 			mainPanel.add(csvWidgetAnchor);
 		}
 		
-		if(config.showEmbedButton()) {
+		if(Settings.getBool("embed")) {
 			Image buttonImage = new Image(uiResources.embedButtonImage());
 			ImageButton embedButton = new ImageButton(buttonImage, uiTexts.embedButtonTitle());
 			embedButton.addClickHandler(new ClickHandler() {

@@ -53,7 +53,7 @@ public class SharedResourceTools {
 	private static String[] expectedFiles = {
 		"manifest.xml",
 		"data.json",
-		"boolsettings.json"
+		"settings.json"
 		};
 	
 	private static String[] expectedLocalizedFiles = {

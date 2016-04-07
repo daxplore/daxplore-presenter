@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.daxplore.presenter.client.json.Settings;
 import org.daxplore.presenter.client.json.shared.UITexts;
-import org.daxplore.presenter.client.resources.DaxploreConfig;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 import org.daxplore.presenter.shared.QuestionMetadata;
@@ -60,13 +60,11 @@ public class PerspectiveCheckboxPanel extends FlowPanel implements ValueChangeHa
 	public static class PerspectiveCheckboxPanelFactory {
 		private final QuestionMetadata questions;
 		private final UITexts uiTexts;
-		private DaxploreConfig config;
 
 		@Inject
-		protected PerspectiveCheckboxPanelFactory(QuestionMetadata questions, UITexts uiTexts, DaxploreConfig config) {
+		protected PerspectiveCheckboxPanelFactory(QuestionMetadata questions, UITexts uiTexts) {
 			this.questions = questions;
 			this.uiTexts = uiTexts;
-			this.config = config;
 		}
 
 		/**
@@ -78,10 +76,10 @@ public class PerspectiveCheckboxPanel extends FlowPanel implements ValueChangeHa
 		 */
 		public PerspectiveCheckboxPanel createCheckboxPanel(String questionID) {
 			List<Integer> selectedOptions = new ArrayList<>();
-			for(int i=0; i<config.defaultSelectedPerspectiveOptions() && i < questions.getOptionCount(questionID); i++) {
+			for(int i=0; i < Settings.getInt("defaultSelectedPerspectiveOptions") && i < questions.getOptionCount(questionID); i++) {
 				selectedOptions.add(i);
 			}
-			return new PerspectiveCheckboxPanel(config, questions, uiTexts, questionID, selectedOptions, config.defaultSelectTotal());
+			return new PerspectiveCheckboxPanel(questions, uiTexts, questionID, selectedOptions, Settings.getBool("defaultSelectTotal"));
 		}
 
 		/**
@@ -93,12 +91,12 @@ public class PerspectiveCheckboxPanel extends FlowPanel implements ValueChangeHa
 		 * @return the checkbox panel
 		 */
 		public PerspectiveCheckboxPanel createCheckboxPanel(QueryDefinition queryDefinition) {
-			return new PerspectiveCheckboxPanel(config, questions, uiTexts, queryDefinition.getPerspectiveID(),
+			return new PerspectiveCheckboxPanel(questions, uiTexts, queryDefinition.getPerspectiveID(),
 					queryDefinition.getUsedPerspectiveOptions(), queryDefinition.hasFlag(QueryFlag.TOTAL));
 		}
 	}
 
-	private PerspectiveCheckboxPanel(DaxploreConfig config, QuestionMetadata questions,
+	private PerspectiveCheckboxPanel(QuestionMetadata questions,
 			UITexts uiTexts, String questionID, List<Integer> checked, boolean checkTotal) {
 
 		Label header = new Label(uiTexts.pickSelectionAlternativesHeader());
@@ -116,9 +114,6 @@ public class PerspectiveCheckboxPanel extends FlowPanel implements ValueChangeHa
 			chkbox.addValueChangeHandler(this);
 			chkbox.setFormValue(String.valueOf(i));
 			chkbox.setValue(checked.contains(i), false);
-			if (!checkTotal && checked.size() == 0 && i < config.defaultSelectedPerspectiveOptions()) {
-				chkbox.setValue(true, false);
-			}
 			checkboxList.add(chkbox);
 			if (options.size() <= 6) {
 				formatter.setWordWrap(i % options.size(), i / options.size(), false);

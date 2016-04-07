@@ -223,7 +223,7 @@ public class AdminUploadServlet extends HttpServlet {
 					if (fileName.startsWith("data")) {
 						unpackStatisticalDataFile(pm, prefix, fileMap.get(fileName));
 					} else if (fileName.startsWith("groups") ||	fileName.startsWith("perspectives")
-							|| fileName.startsWith("questions") || fileName.startsWith("boolsettings")) {
+							|| fileName.startsWith("questions") || fileName.startsWith("settings")) {
 						unpackStaticFile(pm, storeName, fileMap.get(fileName));
 					} else if(fileName.startsWith("usertexts")) {
 						unpackPropertyFile(pm, storeName, fileMap.get(fileName));

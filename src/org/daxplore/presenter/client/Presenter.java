@@ -37,8 +37,8 @@ import org.daxplore.presenter.client.event.SetWarningBannerHandler;
 import org.daxplore.presenter.client.json.Groups;
 import org.daxplore.presenter.client.json.Perspectives;
 import org.daxplore.presenter.client.json.Prefix;
+import org.daxplore.presenter.client.json.Settings;
 import org.daxplore.presenter.client.model.StatDataServerModel;
-import org.daxplore.presenter.client.resources.DaxploreConfig;
 import org.daxplore.presenter.client.ui.ChartTypeOptionsPanel;
 import org.daxplore.presenter.client.ui.PerspectivePanel;
 import org.daxplore.presenter.client.ui.QuestionPanel;
@@ -69,7 +69,6 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 	private final ChartPanelPresenter chartPanelPresenter;
 	private QuestionMetadata questionMetadata;
 	private final EventBus eventBus;
-	private DaxploreConfig config;
 	private StatDataServerModel statDataServerModel;
 	private final String prefix;
 	private Perspectives perspectives;
@@ -81,15 +80,13 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 	protected Presenter(PerspectivePanel perspectivePanel, QuestionPanel questionPanel,
 			EventBus eventBus, ChartPanelPresenter chartPanelPresenter,
 			ChartTypeOptionsPanel optionsPanel, QuestionMetadata questionMetadata,
-			DaxploreConfig config, StatDataServerModel statDataServerModel,
-			Prefix prefix, Perspectives perspectives, Groups groups,
-			StagePanel stagePanel) {
+			StatDataServerModel statDataServerModel, Prefix prefix, Perspectives perspectives,
+			Groups groups, StagePanel stagePanel) {
 		this.perspectivePanel = perspectivePanel;
 		this.questionPanel = questionPanel;
 		this.questionMetadata = questionMetadata;
 		this.chartPanelPresenter = chartPanelPresenter;
 		this.eventBus = eventBus;
-		this.config = config;
 		this.statDataServerModel = statDataServerModel;
 		this.prefix = prefix.getPrefix();
 		this.perspectives = perspectives;
@@ -191,7 +188,7 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		}
 		String firstPerspectiveID = perspectives.getQuestionIDs().get(0);
 		List<Integer> selectedOptions = new ArrayList<>(0);
-		int selectedPerspectiveOptions = Math.min(questionMetadata.getOptionCount(firstPerspectiveID), config.defaultSelectedPerspectiveOptions());
+		int selectedPerspectiveOptions = Math.min(questionMetadata.getOptionCount(firstPerspectiveID), Settings.getInt("defaultSelectedPerspectiveOptions"));
 		for(int i=0; i<selectedPerspectiveOptions; i++) {
 			selectedOptions.add(i);
 		}

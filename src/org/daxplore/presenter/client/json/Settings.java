@@ -18,10 +18,14 @@ package org.daxplore.presenter.client.json;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
-public class BoolSettings extends JavaScriptObject {
-	protected BoolSettings() {}
+public class Settings extends JavaScriptObject {
+	protected Settings() {}
 	
-	public static final native boolean get(String name) /*-{
-		return $wnd.boolsettings[name];
+	public static final native boolean getBool(String name) /*-{
+		return $wnd.settings[name];
 	}-*/;
+
+	public static final native int getInt(String name) /*-{
+	return $wnd.settings[name];
+}-*/;
 }

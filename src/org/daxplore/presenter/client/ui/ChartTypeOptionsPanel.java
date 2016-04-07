@@ -21,8 +21,8 @@ package org.daxplore.presenter.client.ui;
 import org.daxplore.presenter.client.event.QueryUpdateEvent;
 import org.daxplore.presenter.client.event.QueryUpdateHandler;
 import org.daxplore.presenter.client.event.SelectionUpdateEvent;
+import org.daxplore.presenter.client.json.Settings;
 import org.daxplore.presenter.client.json.shared.UITexts;
-import org.daxplore.presenter.client.resources.DaxploreConfig;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
@@ -63,11 +63,11 @@ public class ChartTypeOptionsPanel extends Composite implements QueryUpdateHandl
 	private boolean showMeanButtons, showTimeButtons;
 	
 	@Inject
-	protected ChartTypeOptionsPanel(EventBus eventBus, UITexts uiTexts, DaxploreConfig config) {
+	protected ChartTypeOptionsPanel(EventBus eventBus, UITexts uiTexts) {
 		this.eventBus = eventBus;
 		
-		this.showMeanButtons = config.showMeanButtons();
-		this.showTimeButtons = config.showTimeButtons();
+		this.showMeanButtons = Settings.getBool("typebuttons");
+		this.showTimeButtons = Settings.getBool("timebuttons");
 
 		mainPanel = new VerticalPanel();
 		

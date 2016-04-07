@@ -18,7 +18,6 @@
  */
 package org.daxplore.presenter.client.resources;
 
-import org.daxplore.presenter.client.ui.ChartTypeOptionsPanel;
 import org.daxplore.presenter.client.ui.EmbedSize;
 import org.daxplore.presenter.client.ui.StagePanel;
 
@@ -51,36 +50,10 @@ public interface DaxploreConfig extends Constants {
 	 */
 	public String embedHeights();
 
-	public boolean showCSVButton();
-	public boolean showEmbedButton();
-	public boolean showTimeButtons();
-	
-	/**
-	 * A boolean value that defines if the mean buttons should shown.
-	 * 
-	 * <p>Used in {@link ChartTypeOptionsPanel} to decide if the buttons should be
-	 * shown.</p>
-	 * 
-	 * @return true, if the mean buttons should be shown
-	 */
-	public boolean showMeanButtons();
-
-	
-
 	/**
 	 * Get the minimum width that the {@link StagePanel} can have.
 	 * 
 	 * @return the min width in pixels
 	 */
 	public int stagePanelMinWidth();
-	
-	/**
-	 * The max number of perspective check boxes that are checked when a new
-	 * perspective is selected.
-	 * 
-	 * @return The number of selected perspective options
-	 */
-	public int defaultSelectedPerspectiveOptions();
-	
-	public boolean defaultSelectTotal();
 }
