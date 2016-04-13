@@ -16,49 +16,52 @@
  */
 package org.daxplore.presenter.client.ui;
 
+import org.daxplore.presenter.client.json.Settings;
 import org.daxplore.presenter.shared.QuestionMetadata;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.inject.Inject;
 
-public class DescriptionPanel extends Composite {
+public class DescriptionPanelLegend extends Composite {
 	private QuestionMetadata questions;
 	private HTML content = new HTML();
 	
 	@Inject
-	public DescriptionPanel(QuestionMetadata questions) {
+	public DescriptionPanelLegend(QuestionMetadata questions) {
 		this.questions = questions;
 		initWidget(content);
 	}
 	
 	public void setDecription(String questionID, String perspectiveID) {
-		String questionDescription = questions.getDescriptionText(questionID);
-		String perspectiveDescription = questions.getDescriptionText(perspectiveID);
-	
-		boolean questionEmpty = questionDescription == null || questionDescription.trim().isEmpty();
-		boolean perspectiveEmpty = perspectiveDescription == null || perspectiveDescription.trim().isEmpty();
-	
 		String html = "";
 		
-		if (!questionEmpty) {
-			String title = questions.getShortText(questionID);
-			html += "<b>" + title + "</b><p>"+questionDescription+"</p>";
+		if (Settings.getQuestionDescriptionPosition() == Settings.DescriptionPosition.LEGEND) {
+			String questionDescription = questions.getDescriptionText(questionID);
+			boolean questionEmpty = questionDescription == null || questionDescription.trim().isEmpty();
+			if(!questionEmpty) {
+				String title = questions.getShortText(questionID);
+				html += "<b>" + title + "</b><p>"+questionDescription+"</p>";
+			}
 		}
 		
-		if (!perspectiveEmpty) {
-			if(!html.isEmpty()) {
-				html += "<hr><br><br>";
+		if (Settings.getPerspectiveDescriptionPosition() == Settings.DescriptionPosition.LEGEND) {
+			String perspectiveDescription = questions.getDescriptionText(perspectiveID);
+			boolean perspectiveEmpty = perspectiveDescription == null || perspectiveDescription.trim().isEmpty();
+			if(!perspectiveEmpty) {
+				if(!html.isEmpty()) {
+					html += "<hr><br>";
+				}
+				String title = questions.getShortText(perspectiveID);
+				html += "<b>" + title + "</b><p>"+perspectiveDescription+"</p>";
 			}
-			String title = questions.getShortText(perspectiveID);
-			html += "<b>" + title + "</b><p>"+perspectiveDescription+"</p>";
 		}
 
 		if(html.isEmpty()) {
 			setVisible(false);
 		} else {
 			content.setHTML(html);
-			content.setStylePrimaryName("daxplore-DescriptionPanel");
+			content.setStylePrimaryName("daxplore-DescriptionPanelLegend");
 			setVisible(true);
 		}
 	}

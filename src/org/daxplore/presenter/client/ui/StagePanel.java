@@ -54,7 +54,10 @@ public class StagePanel extends Composite implements ResizeHandler {
 	protected HorizontalPanel bottomPanel;
 
 	@UiField(provided = true)
-	protected DescriptionPanel descriptionPanel;
+	protected DescriptionPanelBottom descriptionPanelBottom;
+
+	@UiField(provided = true)
+	protected DescriptionPanelLegend descriptionPanelLegend;
 	
 	@UiField(provided = true)
 	protected final QuestionPanel questionPanel;
@@ -73,11 +76,12 @@ public class StagePanel extends Composite implements ResizeHandler {
 	@Inject
 	protected StagePanel(PerspectivePanel perspectivePanel, QuestionPanel questionPanel,
 			ChartPanelPresenter chartPanelPresenter, DaxploreConfig config, ImageButtonPanel imageButtonPanel,
-			ChartTypeOptionsPanel optionsPanel, DescriptionPanel descriptionPanel) {
+			ChartTypeOptionsPanel optionsPanel, DescriptionPanelBottom descriptionPanelBottom, DescriptionPanelLegend descriptionPanelLegend) {
 		this.perspectivePanel = perspectivePanel;
 		this.questionPanel = questionPanel;
 		this.chartPanel = chartPanelPresenter.getView();
-		this.descriptionPanel = descriptionPanel;
+		this.descriptionPanelBottom = descriptionPanelBottom;
+		this.descriptionPanelLegend= descriptionPanelLegend;
 		
 		bottomPanel = new HorizontalPanel();
 		
@@ -121,10 +125,10 @@ public class StagePanel extends Composite implements ResizeHandler {
 				int questionPanelWidth = questionPanel.getOffsetWidth();
 				int sideAreaWidth = sidebarArea.getOffsetWidth();
 
-				int descriptionPanelMinWidth = 300 + 10 + 2; // min width + padding + border from css 
+				int descriptionPanelMinWidth = descriptionPanelBottom.isVisible() ? 300 + 10 + 2 : 0; // min width (set here) + padding + border from css 
 				int totalCompontentWidth = questionPanelWidth
 						+ bottomPanel.getOffsetWidth()
-						- descriptionPanel.getOffsetWidth() + descriptionPanelMinWidth
+						- descriptionPanelBottom.getOffsetWidth() + descriptionPanelMinWidth
 						+ sideAreaWidth;
 				int containerWidth = Math.max(clientWidth, totalCompontentWidth);
 				int maxWidth = containerWidth - questionPanelWidth - sideAreaWidth;
@@ -143,6 +147,7 @@ public class StagePanel extends Composite implements ResizeHandler {
 	}
 	
 	public void setDescription(String questionID, String perspectiveID) {
-		descriptionPanel.setDecription(questionID, perspectiveID);
+		descriptionPanelBottom.setDecription(questionID, perspectiveID);
+		descriptionPanelLegend.setDecription(questionID, perspectiveID);
 	}
 }

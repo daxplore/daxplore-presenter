@@ -18,14 +18,64 @@ package org.daxplore.presenter.client.json;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
-public class Settings extends JavaScriptObject {
-	protected Settings() {}
+public class Settings {
 	
-	public static final native boolean getBool(String name) /*-{
-		return $wnd.settings[name];
-	}-*/;
+	public enum DescriptionPosition {
+		NONE, BOTTOM, LEGEND, PERSPECTIVE
+	}
+	
+	public static boolean getBool(String name) {
+		return SettingsNative.getBool(name);
+	}
+	
+	public static int getInt(String name) {
+		return SettingsNative.getInt(name);
+	}
+	
+	public static double getDouble(String name) {
+		return SettingsNative.getDouble(name);
+	}
+	
+	public static String getString(String name) {
+		return SettingsNative.getString(name);
+	}
 
-	public static final native int getInt(String name) /*-{
-	return $wnd.settings[name];
-}-*/;
+	
+	public static DescriptionPosition getQuestionDescriptionPosition() {
+		try {
+			return DescriptionPosition.valueOf(SettingsNative.getString("questionDescriptionPosition"));
+		} catch (IllegalArgumentException|NullPointerException e) {
+			e.printStackTrace(); // TODO log
+			return DescriptionPosition.NONE;
+		}
+	}
+
+	public static DescriptionPosition getPerspectiveDescriptionPosition() {
+		try {
+			return DescriptionPosition.valueOf(SettingsNative.getString("perspectiveDescriptionPosition"));
+		} catch (IllegalArgumentException|NullPointerException e) {
+			e.printStackTrace(); // TODO log
+			return DescriptionPosition.NONE;
+		}
+	}
+	
+	private static class SettingsNative extends JavaScriptObject {
+		protected SettingsNative() {}
+		
+		public static final native boolean getBool(String name) /*-{
+			return $wnd.settings[name];
+		}-*/;
+	
+		public static final native int getInt(String name) /*-{
+			return $wnd.settings[name];
+		}-*/;
+	
+		public static final native double getDouble(String name) /*-{
+			return $wnd.settings[name];
+		}-*/;
+		
+		public static final native String getString(String name) /*-{
+			return $wnd.settings[name];
+		}-*/;
+	}
 }

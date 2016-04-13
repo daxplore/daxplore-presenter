@@ -49,6 +49,11 @@
 		white-space: nowrap;
 	}
 	
+	.daxplore-PerspectiveCheckboxes-description {
+		text-align: center;
+		margin-top: -5px;
+	}
+	
 	.daxplore-PerspectiveQuestionList-header {
 		font-weight: bold;
 		padding-bottom: 5px;
@@ -56,7 +61,7 @@
 
 /*** DescriptionPanel.java ***/
 
-	.daxplore-DescriptionPanel {
+	.daxplore-DescriptionPanelBottom, .daxplore-DescriptionPanelLegend {
 		margin:10px;
 		border: 1px solid #D4D4D4;
 		padding: 5px;
@@ -64,12 +69,16 @@
 		max-width: 500px;
 	}
 	
-	.daxplore-DescriptionPanel p {
+	 .daxplore-DescriptionPanelLegend {
+	 	width: 200px;
+	 }
+	
+	.daxplore-DescriptionPanelBottom p, .daxplore-DescriptionPanelLegend p {
 		margin-top: 1px;
 		margin-bottom: 1px;
 	}
 	
-	.daxplore-DescriptionPanel ul {
+	.daxplore-DescriptionPanelBottom ul, .daxplore-DescriptionPanelLegend ul {
 		margin-top: 0;
 		padding-left: 20px;
 	}

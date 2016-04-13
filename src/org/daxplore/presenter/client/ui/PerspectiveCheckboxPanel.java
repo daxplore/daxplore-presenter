@@ -35,6 +35,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLTable.CellFormatter;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Label;
@@ -97,14 +98,24 @@ public class PerspectiveCheckboxPanel extends FlowPanel implements ValueChangeHa
 	}
 
 	private PerspectiveCheckboxPanel(QuestionMetadata questions,
-			UITexts uiTexts, String questionID, List<Integer> checked, boolean checkTotal) {
+			UITexts uiTexts, String perspectiveID, List<Integer> checked, boolean checkTotal) {
 
 		Label header = new Label(uiTexts.pickSelectionAlternativesHeader());
 		header.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		header.addStyleName("daxplore-PerspectiveCheckboxes-header");
-		this.add(header);
+		add(header);
+		
+		if (Settings.getPerspectiveDescriptionPosition() == Settings.DescriptionPosition.PERSPECTIVE) {
+			String perspectiveDescription = questions.getDescriptionText(perspectiveID);
+			boolean perspectiveEmpty = perspectiveDescription == null || perspectiveDescription.trim().isEmpty();
+			if(!perspectiveEmpty) {
+				HTML description = new HTML(perspectiveDescription);
+				description.setStylePrimaryName("daxplore-PerspectiveCheckboxes-description");
+				add(description);
+			}
+		}
 
-		List<String> options = questions.getOptionTexts(questionID);
+		List<String> options = questions.getOptionTexts(perspectiveID);
 
 		FlexTable grid = new FlexTable();
 		CellFormatter formatter = grid.getCellFormatter();
@@ -115,21 +126,22 @@ public class PerspectiveCheckboxPanel extends FlowPanel implements ValueChangeHa
 			chkbox.setFormValue(String.valueOf(i));
 			chkbox.setValue(checked.contains(i), false);
 			checkboxList.add(chkbox);
-			if (options.size() <= 6) {
+			int perColumn = Settings.getInt("perspectiveCheckboxesPerColumn");
+			if (options.size() < perColumn) {
 				formatter.setWordWrap(i % options.size(), i / options.size(), false);
 				grid.setWidget(i % options.size(), i / options.size(), chkbox);
 			} else {
-				formatter.setWordWrap(i % 7, i / 7, false);
-				grid.setWidget(i % 7, i / 7, chkbox);
+				formatter.setWordWrap(i % perColumn, i / perColumn, false);
+				grid.setWidget(i % perColumn, i / perColumn, chkbox);
 			}
 		}
-		this.add(grid);
+		add(grid);
 
 		total = new CheckBox(uiTexts.compareWithAll());
 		total.addValueChangeHandler(this);
 		total.setFormValue("all");
 		total.setValue(checkTotal, false);
-		this.add(total);
+		add(total);
 
 	}
 
