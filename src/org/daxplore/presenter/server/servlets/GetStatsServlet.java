@@ -84,7 +84,7 @@ public class GetStatsServlet extends HttpServlet {
 			
 			response.setContentType("text/html; charset=UTF-8");
 			try (PrintWriter respWriter = response.getWriter()) {
-				respWriter.write(StatDataItemStore.getStats(pm, prefix, queryDefinition));
+				respWriter.write(StatDataItemStore.getCrosstabsStats(pm, prefix, queryDefinition));
 				respWriter.close();
 			} catch (IOException e) {
 				throw new InternalServerException("Failed to write response", e);

@@ -27,7 +27,7 @@ import org.daxplore.presenter.shared.Color;
  * saturation and lightness. Use it to color the different parts of a chart
  * column.</p>
  */
-class BarColors {
+public class BarColors {
 
 	/**
 	 * The generated CSS strings for the primary colors.

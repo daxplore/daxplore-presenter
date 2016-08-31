@@ -57,6 +57,7 @@ public class PresenterServlet extends HttpServlet {
 	private static String printHtmlTemplate = null;
 	private static String embedHtmlTemplate = null;
 	private static String gridHtmlTemplate = null;
+	private static String listHtmlTemplate = null;
 	private static String googleAnalyticsTrackingTemplate = null;
 	
 	private HashMap<String, QuestionMetadata> metadataMap = new HashMap<>(); 
@@ -140,7 +141,9 @@ public class PresenterServlet extends HttpServlet {
 					
 				} else if(feature!=null && feature.equalsIgnoreCase("grid")) { // mean grid
 					responseHTML = getGridHTML(pm, prefix, locale, baseurl, gaTemplate);
-				}else { // standard presenter
+				} else if(feature!=null && feature.equalsIgnoreCase("list")) { // mean list
+					responseHTML = getListHTML(pm, prefix, locale, baseurl, gaTemplate);
+				} else { // standard presenter
 					responseHTML = getPresenterHTML(pm, prefix, locale, baseurl, gaTemplate);
 				}
 			}
@@ -234,7 +237,7 @@ public class PresenterServlet extends HttpServlet {
 		}
 		
 		QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, queryString);
-		String statItem = StatDataItemStore.getStats(pm, prefix, queryDefinition);
+		String statItem = StatDataItemStore.getCrosstabsStats(pm, prefix, queryDefinition);
 
 		LinkedList<String> questions = new LinkedList<>();
 		questions.add(queryDefinition.getQuestionID());
@@ -245,6 +248,8 @@ public class PresenterServlet extends HttpServlet {
 		String questionString = StorageTools.getQuestionDefinitions(pm, prefix, questions, locale);
 		String usertexts = TextFileStore.getLocalizedFile(pm, prefix, "usertexts", locale, ".json");
 		
+		String settings = TextFileStore.getFile(pm, prefix, "settings.json");
+		
 		String[] arguments = {
 			baseurl, 				// {0}
 			pageTitle,				// {1}
@@ -252,7 +257,8 @@ public class PresenterServlet extends HttpServlet {
 			prefix, 				// {3}
 			statItem, 				// {4}
 			questionString,			// {5}
-			usertexts				// {6}
+			usertexts,				// {6}
+			settings				// {7}
 		};
 		
 		if (embedHtmlTemplate == null) {
@@ -329,10 +335,49 @@ public class PresenterServlet extends HttpServlet {
 			try {
 				gridHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/grid.html"));
 			} catch (IOException e) {
-				throw new InternalServerException("Failed to load print html template", e);
+				throw new InternalServerException("Failed to load grid html template", e);
 			}
 		}
 		
 		return MessageFormat.format(gridHtmlTemplate, (Object[])arguments);
+	}
+	
+	private String getListHTML(PersistenceManager pm, String prefix, Locale locale,
+			String baseurl, String gaTemplate) throws InternalServerException, BadRequestException {
+		
+		String perspectives = "", groups = "", questions = "";
+		perspectives = TextFileStore.getLocalizedFile(pm, prefix, "perspectives", locale, ".json");
+		questions = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
+		groups = TextFileStore.getLocalizedFile(pm, prefix, "groups", locale, ".json");
+		
+		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
+		
+		String settings = "{}";
+		String usertexts = TextFileStore.getLocalizedFile(pm, prefix, "usertexts", locale, ".json");
+		
+		String meanTotals = "{'" + prefix + "':" + StatDataItemStore.getMeanTotals(pm, prefix) + "}";
+		
+		String[] arguments = {
+				baseurl,				// {0}
+				pageTitle,				// {1}
+				prefix,					// {2}
+				perspectives,			// {3}
+				questions,				// {4}
+				groups,					// {5}
+				settings,				// {6}
+				usertexts,				// {7}
+				meanTotals,				// {8}
+				gaTemplate,				// {9}
+			};
+		
+		if (listHtmlTemplate == null) {
+			try {
+				listHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/list.html"));
+			} catch (IOException e) {
+				throw new InternalServerException("Failed to load list html template", e);
+			}
+		}
+		
+		return MessageFormat.format(listHtmlTemplate, (Object[])arguments);
 	}
 }

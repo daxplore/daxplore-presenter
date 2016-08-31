@@ -19,7 +19,10 @@
 package org.daxplore.presenter.server.storage;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -39,6 +42,8 @@ import org.daxplore.presenter.shared.SharedTools;
  */
 @PersistenceCapable
 public class StatDataItemStore {
+	private static final Logger logger = Logger.getLogger(StatDataItemStore.class.getName());
+	
 	@PrimaryKey
 	private String key;
 	@Persistent
@@ -83,7 +88,7 @@ public class StatDataItemStore {
 		return SharedTools.join(jsonChunks, "");
 	}
 	
-	public static String getStats(PersistenceManager pm, String prefix, QueryDefinition queryDefinition) throws BadRequestException {
+	public static String getCrosstabsStats(PersistenceManager pm, String prefix, QueryDefinition queryDefinition) throws BadRequestException {
 		String questionID = queryDefinition.getQuestionID();
 		String perspectiveID = queryDefinition.getPerspectiveID();
 		String key = String.format("%s#Q=%s&P=%s", prefix, questionID, perspectiveID);
@@ -92,5 +97,16 @@ public class StatDataItemStore {
 		} catch (Exception e) {
 			throw new BadRequestException("Could not read data item '" + key + "'", e);
 		}
+	}
+	
+	public static String getMeanTotals(PersistenceManager pm, String prefix) {
+		String key = String.format("%s#meantotals", prefix);
+		try {
+			StatDataItemStore data = pm.getObjectById(StatDataItemStore.class, key);
+			return data.getJson();
+		} catch (JDOObjectNotFoundException e) {
+			logger.log(Level.WARNING, "Could not read meantotal item for prefix '" + prefix + "'", e);
+		}
+		return "[]";
 	}
 }

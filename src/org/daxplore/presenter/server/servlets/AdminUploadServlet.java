@@ -270,16 +270,29 @@ public class AdminUploadServlet extends HttpServlet {
 
 	private static void unpackStatisticalDataFile(PersistenceManager pm, String prefix, byte[] fileData) throws InternalServerException {
 		try (BufferedReader reader = ServerTools.getAsBufferedReader(fileData)) {
-			List<StatDataItemStore> items = new LinkedList<>();
-			JSONArray dataArray = (JSONArray) JSONValue.parse(reader);
-			for (Object v : dataArray) {
-				JSONObject entry = (JSONObject) v;
-				String key = String.format("%s#Q=%s&P=%s", prefix, entry.get("q"), entry.get("p"));
-				String value = entry.toJSONString();
-				items.add(new StatDataItemStore(key, value));
+			JSONObject data = (JSONObject) JSONValue.parse(reader);
+			
+			if (data.containsKey("crosstabs")) {
+				JSONArray dataArray = (JSONArray) data.get("crosstabs");
+				List<StatDataItemStore> items = new LinkedList<>();
+				for (Object v : dataArray) {
+					JSONObject entry = (JSONObject) v;
+					String key = String.format("%s#Q=%s&P=%s", prefix, entry.get("q"), entry.get("p"));
+					String value = entry.toJSONString();
+					items.add(new StatDataItemStore(key, value));
+				}
+				pm.makePersistentAll(items);
+				logger.log(Level.INFO, "Stored " + items.size() + " statistical data items for prefix '" + prefix + "'");
 			}
-			pm.makePersistentAll(items);
-			logger.log(Level.INFO, "Stored " + items.size() + " statistical data items for prefix '" + prefix + "'");
+			
+			if (data.containsKey("meantotals")) {
+				JSONArray dataArray = (JSONArray) data.get("meantotals");
+				String key = String.format("%s#meantotals", prefix);
+				StatDataItemStore item = new StatDataItemStore(key, dataArray.toJSONString());
+				pm.makePersistent(item);
+				logger.log(Level.INFO, "Stored meantotals for prefix '" + prefix + "'");
+			}
+			
 		} catch (IOException e) {
 			throw new InternalServerException("Failed to close statistical data file", e);
 		}

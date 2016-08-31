@@ -114,7 +114,7 @@ public class GetCsvServlet extends HttpServlet {
 			String timepoint0Text = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "timepoint_0");
 			String timepoint1Text = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "timepoint_1");
 			
-			String statString = StatDataItemStore.getStats(pm, prefix, queryDefinition);
+			String statString = StatDataItemStore.getCrosstabsStats(pm, prefix, queryDefinition);
 			QueryData data = ChartDataParserServer.parse(statString);
 			
 			int columnCount = 4 + queryDefinition.getQuestionOptionCount();
