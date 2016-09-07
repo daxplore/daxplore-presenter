@@ -20,8 +20,10 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.Writer;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,6 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.daxplore.presenter.client.json.shared.JsonTools;
 import org.daxplore.presenter.server.ServerTools;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.QuestionMetadataServerImpl;
@@ -44,9 +47,13 @@ import org.daxplore.presenter.server.throwable.BadRequestException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.EmbedDefinition;
 import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
+import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QuestionMetadata;
 import org.daxplore.shared.SharedResourceTools;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 @SuppressWarnings("serial")
 public class PresenterServlet extends HttpServlet {
@@ -118,12 +125,22 @@ public class PresenterServlet extends HttpServlet {
 				responseHTML = getUnsupportedBrowserHTML(baseurl, gaTemplate);
 			} else {
 				Locale locale = ServerTools.selectLocale(request, prefix);
+				
+				QuestionMetadata questionMetadata;
+				String key = prefix + "_" + locale.toLanguageTag();
+				if(metadataMap.containsKey(key)) {
+					questionMetadata = metadataMap.get(key);
+				} else {
+					String questionText = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
+					questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
+					metadataMap.put(key, questionMetadata);
+				}
 
 				if (feature!=null && feature.equalsIgnoreCase("embed")) { // embedded chart
 					
 					// TODO clean query string
 					String queryString = request.getParameter("q");
-					responseHTML = getEmbedHTML(pm, prefix, locale, queryString, baseurl, gaTemplate);
+					responseHTML = getEmbedHTML(pm, questionMetadata, prefix, locale, queryString, baseurl, gaTemplate);
 					
 				} else if (feature!=null && feature.equalsIgnoreCase("print")) { // printer-friendly chart
 					
@@ -142,7 +159,9 @@ public class PresenterServlet extends HttpServlet {
 				} else if(feature!=null && feature.equalsIgnoreCase("grid")) { // mean grid
 					responseHTML = getGridHTML(pm, prefix, locale, baseurl, gaTemplate);
 				} else if(feature!=null && feature.equalsIgnoreCase("list")) { // mean list
-					responseHTML = getListHTML(pm, prefix, locale, baseurl, gaTemplate);
+					// TODO clean query string
+					String perspectiveID = request.getParameter("p");
+					responseHTML = getListHTML(pm, questionMetadata, prefix, perspectiveID, locale, baseurl, gaTemplate);
 				} else { // standard presenter
 					responseHTML = getPresenterHTML(pm, prefix, locale, baseurl, gaTemplate);
 				}
@@ -223,21 +242,11 @@ public class PresenterServlet extends HttpServlet {
 		return MessageFormat.format(presenterHtmlTemplate, (Object[])arguments);
 	}
 	
-	private String getEmbedHTML(PersistenceManager pm, String prefix, Locale locale,
+	private String getEmbedHTML(PersistenceManager pm, QuestionMetadata questionMetadata, String prefix, Locale locale,
 			String queryString, String baseurl, String gaTemplate) throws BadRequestException, InternalServerException {
 		
-		QuestionMetadata questionMetadata;
-		String key = prefix + "_" + locale.toLanguageTag();
-		if(metadataMap.containsKey(key)) {
-			questionMetadata = metadataMap.get(key);
-		} else {
-			String questionText = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
-			questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
-			metadataMap.put(key, questionMetadata);
-		}
-		
 		QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, queryString);
-		String statItem = StatDataItemStore.getCrosstabsStats(pm, prefix, queryDefinition);
+		String statItem = StatDataItemStore.getStats(pm, prefix, queryDefinition);
 
 		LinkedList<String> questions = new LinkedList<>();
 		questions.add(queryDefinition.getQuestionID());
@@ -316,7 +325,7 @@ public class PresenterServlet extends HttpServlet {
 		
 		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
 		
-		String settings = "{}";
+		String settings = TextFileStore.getFile(pm, prefix, "settings.json");
 		String usertexts = TextFileStore.getLocalizedFile(pm, prefix, "usertexts", locale, ".json");
 		
 		String[] arguments = {
@@ -342,8 +351,9 @@ public class PresenterServlet extends HttpServlet {
 		return MessageFormat.format(gridHtmlTemplate, (Object[])arguments);
 	}
 	
-	private String getListHTML(PersistenceManager pm, String prefix, Locale locale,
-			String baseurl, String gaTemplate) throws InternalServerException, BadRequestException {
+	@SuppressWarnings("unchecked")
+	private String getListHTML(PersistenceManager pm, QuestionMetadata questionMetadata, String prefix, 
+			String perspectiveID, Locale locale, String baseurl, String gaTemplate) throws InternalServerException, BadRequestException {
 		
 		String perspectives = "", groups = "", questions = "";
 		perspectives = TextFileStore.getFile(pm, prefix, "perspectives.json");
@@ -352,10 +362,31 @@ public class PresenterServlet extends HttpServlet {
 		
 		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
 		
-		String settings = "{}";
+		String settings = TextFileStore.getFile(pm, prefix, "settings.json");
 		String usertexts = TextFileStore.getLocalizedFile(pm, prefix, "usertexts", locale, ".json");
 		
-		String meanTotals = "{'" + prefix + "':" + StatDataItemStore.getMeanTotals(pm, prefix) + "}";
+		String listview = TextFileStore.getFile(pm, prefix, "listview.json");
+		JSONArray listVariables = (JSONArray)JSONValue.parse(listview);
+		
+		//TODO cache list data per perspective, make sure to also clear cache
+		JSONArray dataArray = new JSONArray();
+		for(String questionID : getAsStringArray(listVariables)) {
+			List<QueryFlag> flags = new LinkedList<>();
+			flags.add(QueryFlag.MEAN);
+			flags.add(QueryFlag.MEAN_REFERENCE);
+			
+			int optionCount = questionMetadata.getOptionCount(perspectiveID);
+			List<Integer> perspectiveOptions = new ArrayList<>(optionCount);
+			for (int i=0; i<optionCount; i++) {
+				perspectiveOptions.add(i);
+			}
+			
+			QueryDefinition queryDefinition =
+					new QueryDefinition(questionMetadata, questionID, perspectiveID, perspectiveOptions, flags);
+			dataArray.add(JSONValue.parse(StatDataItemStore.getStats(pm, prefix, queryDefinition)));
+		}
+		
+		String listViewData = dataArray.toJSONString();
 		
 		String[] arguments = {
 				baseurl,				// {0}
@@ -366,7 +397,7 @@ public class PresenterServlet extends HttpServlet {
 				groups,					// {5}
 				settings,				// {6}
 				usertexts,				// {7}
-				meanTotals,				// {8}
+				listViewData,			// {8}
 				gaTemplate,				// {9}
 			};
 		
@@ -379,5 +410,13 @@ public class PresenterServlet extends HttpServlet {
 		}
 		
 		return MessageFormat.format(listHtmlTemplate, (Object[])arguments);
+	}
+	
+	private static String[] getAsStringArray(JSONArray dataJson) {
+		String[] data = new String[dataJson.size()];
+		for (int i = 0; i<data.length; i++) {
+			data[i] = (String)dataJson.get(i);
+		}
+		return data;
 	}
 }

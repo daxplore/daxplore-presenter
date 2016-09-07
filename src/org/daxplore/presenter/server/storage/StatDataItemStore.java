@@ -88,7 +88,7 @@ public class StatDataItemStore {
 		return SharedTools.join(jsonChunks, "");
 	}
 	
-	public static String getCrosstabsStats(PersistenceManager pm, String prefix, QueryDefinition queryDefinition) throws BadRequestException {
+	public static String getStats(PersistenceManager pm, String prefix, QueryDefinition queryDefinition) throws BadRequestException {
 		String questionID = queryDefinition.getQuestionID();
 		String perspectiveID = queryDefinition.getPerspectiveID();
 		String key = String.format("%s#Q=%s&P=%s", prefix, questionID, perspectiveID);
@@ -98,15 +98,5 @@ public class StatDataItemStore {
 			throw new BadRequestException("Could not read data item '" + key + "'", e);
 		}
 	}
-	
-	public static String getMeanTotals(PersistenceManager pm, String prefix) {
-		String key = String.format("%s#meantotals", prefix);
-		try {
-			StatDataItemStore data = pm.getObjectById(StatDataItemStore.class, key);
-			return data.getJson();
-		} catch (JDOObjectNotFoundException e) {
-			logger.log(Level.WARNING, "Could not read meantotal item for prefix '" + prefix + "'", e);
-		}
-		return "[]";
-	}
+
 }
