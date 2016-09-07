@@ -64,7 +64,7 @@
 	.daxplore-DescriptionPanelBottom, .daxplore-DescriptionPanelLegend {
 		margin:10px;
 		border: 1px solid #D4D4D4;
-		padding: 5px;
+		padding: 8px 5px 8px 8px;
 		margin-left: 25px;
 		max-width: 500px;
 	}
@@ -79,7 +79,7 @@
 	}
 	
 	.daxplore-DescriptionPanelBottom ul, .daxplore-DescriptionPanelLegend ul {
-		margin-top: 0;
+		margin: 0;
 		padding-left: 20px;
 	}
 

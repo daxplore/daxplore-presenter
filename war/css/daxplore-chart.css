@@ -7,7 +7,7 @@
 /*** ChartPanelView.java ***/
 
 	.daxplore-ChartPanel {
-		border: 1px solid #D4D4D4;
+/* 		border: 1px solid #D4D4D4; */
 	}
 	
 	
@@ -18,7 +18,7 @@
 		padding: 0px;
 		padding-left: 15px;
 		padding-top: 10px;
-		padding-bottom: 10px;
+		padding-bottom: 20px;
 		margin: 0px;	
 	}
 	
