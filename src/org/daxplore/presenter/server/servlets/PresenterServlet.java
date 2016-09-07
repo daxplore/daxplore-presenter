@@ -191,7 +191,7 @@ public class PresenterServlet extends HttpServlet {
 			throws InternalServerException, BadRequestException {
 		
 		String perspectives = "", groups = "", questions = "";
-		perspectives = TextFileStore.getLocalizedFile(pm, prefix, "perspectives", locale, ".json");
+		perspectives = TextFileStore.getFile(pm, prefix, "perspectives.json");
 		questions = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
 		groups = TextFileStore.getLocalizedFile(pm, prefix, "groups", locale, ".json");
 		
@@ -310,7 +310,7 @@ public class PresenterServlet extends HttpServlet {
 			String baseurl, String gaTemplate) throws InternalServerException, BadRequestException {
 		
 		String perspectives = "", groups = "", questions = "";
-		perspectives = TextFileStore.getLocalizedFile(pm, prefix, "perspectives", locale, ".json");
+		perspectives = TextFileStore.getFile(pm, prefix, "perspectives.json");
 		questions = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
 		groups = TextFileStore.getLocalizedFile(pm, prefix, "groups", locale, ".json");
 		
@@ -346,7 +346,7 @@ public class PresenterServlet extends HttpServlet {
 			String baseurl, String gaTemplate) throws InternalServerException, BadRequestException {
 		
 		String perspectives = "", groups = "", questions = "";
-		perspectives = TextFileStore.getLocalizedFile(pm, prefix, "perspectives", locale, ".json");
+		perspectives = TextFileStore.getFile(pm, prefix, "perspectives.json");
 		questions = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
 		groups = TextFileStore.getLocalizedFile(pm, prefix, "groups", locale, ".json");
 		
