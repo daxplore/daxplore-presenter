@@ -136,12 +136,13 @@ public class PerspectiveCheckboxPanel extends FlowPanel implements ValueChangeHa
 			}
 		}
 		add(grid);
-
-		total = new CheckBox(uiTexts.compareWithAll());
-		total.addValueChangeHandler(this);
-		total.setFormValue("all");
-		total.setValue(checkTotal, false);
-		add(total);
+		if (Settings.getBool("showSelectTotal")) {
+			total = new CheckBox(uiTexts.compareWithAll());
+			total.addValueChangeHandler(this);
+			total.setFormValue("all");
+			total.setValue(checkTotal, false);
+			add(total);
+		}
 
 	}
 
@@ -171,7 +172,7 @@ public class PerspectiveCheckboxPanel extends FlowPanel implements ValueChangeHa
 	 * @return true, if the total checkbox is set
 	 */
 	public boolean isTotalSet() {
-		return total.getValue();
+		return total != null && total.getValue();
 	}
 
 	/**
