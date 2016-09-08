@@ -9,7 +9,7 @@
 	<classpathentry kind="lib" path="lib/guice-assistedinject-snapshot.jar"/>
 	<classpathentry kind="lib" path="lib/guice-snapshot.jar"/>
 	<classpathentry kind="lib" path="lib/javax.inject.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/json_simple-1.1.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/json_simple-1.1.jar" sourcepath="lib/sources/json_simple-1.1-all"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/opencsv-2.3.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/commons-codec-1.6.jar" sourcepath="lib/sources/commons-codec-1.6-sources.jar"/>
