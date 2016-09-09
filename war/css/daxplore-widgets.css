@@ -57,6 +57,7 @@
 	.daxplore-PerspectiveQuestionList-header {
 		font-weight: bold;
 		padding-bottom: 5px;
+		white-space: nowrap;
 	}
 
 /*** DescriptionPanel.java ***/
@@ -65,7 +66,6 @@
 		margin:10px;
 		border: 1px solid #D4D4D4;
 		padding: 8px 5px 8px 8px;
-		margin-left: 25px;
 		max-width: 500px;
 	}
 	

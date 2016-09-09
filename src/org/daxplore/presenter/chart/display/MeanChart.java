@@ -117,6 +117,8 @@ public class MeanChart extends GChartChart {
 
 		setupMouseHandlers();
 		setupAxes();
+		
+		addStyleDependentName("mean");
 	}
 
 	protected void createCurves(boolean printerMode) {

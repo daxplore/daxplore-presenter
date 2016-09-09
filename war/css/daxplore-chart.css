@@ -7,7 +7,7 @@
 /*** ChartPanelView.java ***/
 
 	.daxplore-ChartPanel {
-/* 		border: 1px solid #D4D4D4; */
+ 		border: 1px solid #D4D4D4;
 	}
 	
 	
@@ -18,12 +18,16 @@
 		padding: 0px;
 		padding-left: 15px;
 		padding-top: 10px;
-		padding-bottom: 20px;
+		padding-bottom: 10px;
 		margin: 0px;	
 	}
 	
 	.gchart-GChart-compare {
 		padding-bottom: 15px;
+	}
+	
+	.gchart-GChart-mean {
+		padding-bottom: 20px;
 	}
 	
 	.gwt-Image[src$='gchart.gif'] {

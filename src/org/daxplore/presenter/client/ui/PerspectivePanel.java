@@ -70,7 +70,6 @@ public class PerspectivePanel extends HorizontalPanel
 		this.eventBus = eventBus;
 		this.questionListFactory = perspectivePanelFactory;
 
-		setSpacing(10);
 		this.add(perspectiveQuestionsContainer);
 		this.add(checkboxContainer);
 
