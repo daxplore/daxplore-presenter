@@ -159,9 +159,13 @@ public class PresenterServlet extends HttpServlet {
 				} else if(feature!=null && feature.equalsIgnoreCase("grid")) { // mean grid
 					responseHTML = getGridHTML(pm, prefix, locale, baseurl, gaTemplate);
 				} else if(feature!=null && feature.equalsIgnoreCase("list")) { // mean list
-					// TODO clean query string
 					String perspectiveID = request.getParameter("p");
-					responseHTML = getListHTML(pm, questionMetadata, prefix, perspectiveID, locale, baseurl, gaTemplate);
+					if(perspectiveID != null && questionMetadata.hasQuestion(perspectiveID)) {
+						responseHTML = getListHTML(pm, questionMetadata, prefix, perspectiveID, locale, baseurl, gaTemplate);
+					} else {
+						throw new BadRequestException("List request to prefix '" + prefix
+								+ "' with a perspective that doesn't exist: '" + perspectiveID + "'");
+					}
 				} else { // standard presenter
 					responseHTML = getPresenterHTML(pm, prefix, locale, baseurl, gaTemplate);
 				}
