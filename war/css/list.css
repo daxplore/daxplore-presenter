@@ -1,0 +1,149 @@
+
+body {
+  margin: 0; /* TODO use normalize.css? */
+}
+
+.main {
+  position:fixed !important;
+  position:absolute;
+  top:0;
+  right:0;
+  bottom:0;
+  left:0;
+  display: flex;
+}
+
+.column-left {
+  flex: 1;
+  height: 100%;
+          
+}
+
+.chart-wrapper {
+  height: 100%;
+}
+
+.column-right {
+  align-self: center;
+}
+
+.header {
+  padding-bottom: 10px;
+}
+     
+/* Select Box Styles: bavotasan.com Method (with special adaptations by ericrasch.com) */
+/* Source: http://bavotasan.com/2011/style-select-box-using-only-css/ */
+.header-select {
+  background: url(http://i62.tinypic.com/2e3ybe1.jpg) no-repeat right center;
+  height: 34px;
+  width: 240px;
+  overflow: hidden;
+}
+
+.header-select select {
+  background: transparent;
+  padding: 5px; /* If you add too much padding here, the options won't show in IE */      
+  border: 1px solid #ddd;
+  font-size: 16px;
+  font-weight: bold;
+  height: 34px;
+  width: 268px;
+  text-indent: 0px;
+  
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+.chart .bar {
+/*         fill: hsl(30, 50%, 50%); */
+        shape-rendering: geometricPrecision;
+}
+
+.chart .reference {
+  fill: black;
+  shape-rendering: crispEdges;
+}
+/*      .chart text {
+        fill: white;
+        font: 11px sans-serif;
+        text-anchor: end;
+      }*/
+      
+      .reference rect {
+  fill: black;
+}
+
+.reference.bar-hover rect {
+  fill: #555;
+}
+
+.reference.bar-hover rect {
+  fill: #777;
+}
+
+.tick.bar-hover text {
+  fill: black;
+}
+
+.x.axis-description text,
+.axis text {
+  fill: #555;
+  font: 11px sans-serif;
+  text-anchor: middle;
+  cursor: default;
+}
+
+.axis .domain {
+  visibility: hidden;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #bbb;
+  shape-rendering: geometricPrecision;
+}
+
+.y text {
+  text-anchor: end;
+}
+
+.y path,
+.y line {
+  visibility: hidden;
+}
+
+.tooltip { 
+  position: absolute;     
+  text-align: right;    
+  height: auto;
+  width: auto;
+  white-space: nowrap; 
+  font: 12px sans-serif;
+  border: 0px;    
+  border-radius: 8px;     
+  pointer-events: none; 
+  padding: 6px;
+  z-index: 100;
+}
+
+.arrow-left {
+  position: absolute;
+  width: 0; 
+  height: 0; 
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent; 
+  border-right: 10px solid;
+  z-index: 100;
+}
+
+.description {
+  border: 1px solid #d4d4d4;
+  width: 250px;
+  padding: 5px;
+  color: #444;
+  font: 12px sans-serif;
+}
+

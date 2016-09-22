@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 
 import javax.jdo.PersistenceManager;
 import javax.servlet.http.Cookie;
@@ -35,7 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.daxplore.presenter.client.json.shared.JsonTools;
 import org.daxplore.presenter.server.ServerTools;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.QuestionMetadataServerImpl;
@@ -47,12 +47,11 @@ import org.daxplore.presenter.server.throwable.BadRequestException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.EmbedDefinition;
 import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
-import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 import org.daxplore.presenter.shared.QueryDefinition;
+import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 import org.daxplore.presenter.shared.QuestionMetadata;
 import org.daxplore.shared.SharedResourceTools;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 @SuppressWarnings("serial")
@@ -359,10 +358,9 @@ public class PresenterServlet extends HttpServlet {
 	private String getListHTML(PersistenceManager pm, QuestionMetadata questionMetadata, String prefix, 
 			String perspectiveID, Locale locale, String baseurl, String gaTemplate) throws InternalServerException, BadRequestException {
 		
-		String perspectives = "", groups = "", questions = "";
+		String perspectives = "", questions = "";
 		perspectives = TextFileStore.getFile(pm, prefix, "perspectives.json");
 		questions = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
-		groups = TextFileStore.getLocalizedFile(pm, prefix, "groups", locale, ".json");
 		
 		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
 		
@@ -398,11 +396,10 @@ public class PresenterServlet extends HttpServlet {
 				prefix,					// {2}
 				perspectives,			// {3}
 				questions,				// {4}
-				groups,					// {5}
-				settings,				// {6}
-				usertexts,				// {7}
-				listViewData,			// {8}
-				gaTemplate,				// {9}
+				settings,				// {5}
+				usertexts,				// {6}
+				listViewData,			// {7}
+				gaTemplate,				// {8}
 			};
 		
 		if (listHtmlTemplate == null) {
@@ -413,7 +410,13 @@ public class PresenterServlet extends HttpServlet {
 			}
 		}
 		
-		return MessageFormat.format(listHtmlTemplate, (Object[])arguments);
+		String result = listHtmlTemplate;
+		for (int i = 0; i < arguments.length; i++) {
+			result = result.replaceAll("\\{" + i + "\\}", Matcher.quoteReplacement(arguments[i]));
+		}
+		
+		
+		return result;
 	}
 	
 	private static String[] getAsStringArray(JSONArray dataJson) {

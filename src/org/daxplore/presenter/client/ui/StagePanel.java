@@ -125,7 +125,7 @@ public class StagePanel extends Composite implements ResizeHandler {
 				int questionPanelWidth = questionPanel.getOffsetWidth();
 				int sideAreaWidth = sidebarArea.getOffsetWidth();
 
-				int descriptionPanelMinWidth = descriptionPanelBottom.isVisible() ? 250 + 10 + 2 : 0; // min width (set here) + padding + border from css 
+				int descriptionPanelMinWidth = descriptionPanelBottom.isVisible() ? 230 + 10 + 2 : 0; // min width (set here) + padding + border from css 
 				int totalCompontentWidth = questionPanelWidth
 						+ bottomPanel.getOffsetWidth()
 						- descriptionPanelBottom.getOffsetWidth() + descriptionPanelMinWidth

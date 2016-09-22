@@ -3,39 +3,60 @@
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<base href="{0}" target="_blank">
-		<link type="text/css" rel="stylesheet" href="css/grid.css">
-		
 		<title>{1}</title>
 		
-		<script type="text/javascript" charset="UFT-8">
+		<link type="text/css" rel="stylesheet" href="css/list.css">
+		
+		<script type="text/javascript" charset="UTF-8">
 			var prefix = "{2}";
 			var perspectives = {3};
 			var questions = {4};
-			var groups = {5};
-			var settings = {6};
-			var usertexts = {7};
-			var data = {8};
+			var settings = {5};
+			var usertexts = {6};
+			var data = {7};
 		</script>
 		
-		<script type="text/javascript">{9}</script>
+		<script type="text/javascript">{8}</script>
 		
-		<script src="https://d3js.org/d3.v3.js"></script>
-
-	   
+		<script src="https://d3js.org/d3.v4.min.js"></script>
+		<script src="js/list.js""></script>
+		
+		<script type="text/javascript">
+			document.addEventListener("DOMContentLoaded", function(e) { 
+				generateListChart(data, questions);
+			});
+		</script>
+	
 	</head>
 	
 	<body>
 		<div class="pagecontainer">
-			<div class="chart">
-				
-			</div>
-			<noscript>
-				<div class="noscript">
-					<p class="warning-sub">
-						To show this page you must allow it to run JavaScript.
-					</p>
+			<div class="main">
+				<div class="column-left">
+					<div class="header">
+						<div class="header-select">
+							<select>
+								<option>Folktandvården</option>
+								<option>Sociatjänsten</option>
+								<option>HR-arbete</option>
+								<option>Folkhögskolor</option>
+							</select>
+						</div>
+					</div>
+					<div class="chart-wrapper">
+						<svg class="chart"></svg>
+					</div>
 				</div>
-			</noscript>
+				<div class="column-right">
+					<div class="description"></div>
+				</div>
+			</div>
 		</div>
+
+		<noscript>
+			<div class="noscript">
+				<p class="warning-sub">To show this page you must allow it to run JavaScript.</p>
+			</div>
+		</noscript>
 	</body>
 </html>
