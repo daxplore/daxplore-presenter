@@ -358,8 +358,7 @@ public class PresenterServlet extends HttpServlet {
 	private String getListHTML(PersistenceManager pm, QuestionMetadata questionMetadata, String prefix, 
 			String perspectiveID, Locale locale, String baseurl, String gaTemplate) throws InternalServerException, BadRequestException {
 		
-		String perspectives = "", questions = "";
-		perspectives = TextFileStore.getFile(pm, prefix, "perspectives.json");
+		String questions = "";
 		questions = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
 		
 		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
@@ -394,7 +393,7 @@ public class PresenterServlet extends HttpServlet {
 				baseurl,				// {0}
 				pageTitle,				// {1}
 				prefix,					// {2}
-				perspectives,			// {3}
+				perspectiveID,			// {3}
 				questions,				// {4}
 				settings,				// {5}
 				usertexts,				// {6}

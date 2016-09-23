@@ -16,7 +16,6 @@ body {
 .column-left {
   flex: 1;
   height: 100%;
-          
 }
 
 .chart-wrapper {
@@ -33,14 +32,14 @@ body {
      
 /* Select Box Styles: bavotasan.com Method (with special adaptations by ericrasch.com) */
 /* Source: http://bavotasan.com/2011/style-select-box-using-only-css/ */
-.header-select {
+/*.header-select-div {
   background: url(http://i62.tinypic.com/2e3ybe1.jpg) no-repeat right center;
   height: 34px;
   width: 240px;
   overflow: hidden;
 }
 
-.header-select select {
+.header-select {
   background: transparent;
   padding: 5px; /* If you add too much padding here, the options won't show in IE */      
   border: 1px solid #ddd;
@@ -54,11 +53,11 @@ body {
   -moz-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
-}
+}*/
 
 .chart .bar {
 /*         fill: hsl(30, 50%, 50%); */
-        shape-rendering: geometricPrecision;
+  shape-rendering: geometricPrecision;
 }
 
 .chart .reference {
@@ -71,7 +70,7 @@ body {
         text-anchor: end;
       }*/
       
-      .reference rect {
+.reference rect {
   fill: black;
 }
 
@@ -115,7 +114,7 @@ body {
   visibility: hidden;
 }
 
-.tooltip { 
+.tooltipdiv { 
   position: absolute;     
   text-align: right;    
   height: auto;
@@ -143,7 +142,11 @@ body {
   border: 1px solid #d4d4d4;
   width: 250px;
   padding: 5px;
+  margin-left: 5px;
   color: #444;
   font: 12px sans-serif;
 }
 
+.description ul {
+  padding-left: 20px;
+}
