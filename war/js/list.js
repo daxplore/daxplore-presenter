@@ -14,17 +14,19 @@
     colors.average_text = "hsl(60, 60%, 31%)",
     colors.bad_text     = "hsl( 5, 38%, 42%)";
   
-    
     var data, perspective_option;
     var chartBB, xAxisTopHeight, xAxisBottomHeight, margin, width, height;
     var x_scale, y_scale;
     var yAxisWidth;
     
+    var barTransitionTime = 300;
+    var lastHoveredBar = 0;
+    
     // FUNCTIONS
 
-    function setToReferenceColor(q) {
-      d3.select("barrect-" + q)
-        .style("fill", colorForValue(data.reference_map[q], data.reference_map[q], data.direction_map[q]));
+    function setToReferenceColor(i) {
+      d3.select("barrect-" + i)
+        .style("fill", colorForValue(data.reference_map[i], data.reference_map[i], data.direction_map[i]));
     }
     
     function setToNormalColor(i) {
@@ -94,6 +96,7 @@
     }
     
     function tooltipOver(i) {
+      lastHoveredBar = i;
       var tooltipdiv = d3.select(".tooltipdiv");
       
       tooltipdiv.transition()    
@@ -147,7 +150,7 @@
       description.html(header + subheader + subsubheader + data.description_map[data.q_ids[i]]);
     }
     
-    function tooltipOut(i) {
+    function tooltipOut() {
       d3.select(".tooltipdiv")
         .transition()    
           .duration(300)    
@@ -230,7 +233,7 @@
         })
       .on("mouseout",
         function(d, i) {
-          tooltipOut(i);
+          tooltipOut();
           setToNormalColor(i);
         });
     
@@ -275,11 +278,8 @@
         .attr("transform", "translate(" + (width - yAxisWidth)/2 + ", 28)")
         .text("Medelvärde på en skala 0-100, där 5 poäng eller mer anses vara en relevant/märkbar skillnad");
 
-    // BARS
 
-    var barTransition = d3.transition()
-      .duration(500)
-      .ease(d3.easeLinear);
+    // BARS
     
     var bar = chart.selectAll(".bar")
       .data(data.q_ids)
@@ -288,23 +288,26 @@
       .attr("transform", function(d, i) { return "translate(" + (yAxisWidth + 1) + "," + y_scale(d) + ")"; });
 
     bar.append("rect")
-        .attr("id", function(d, i) { return "barrect-" + d; })
-        .attr("height", y_scale.bandwidth())
-        .attr("width", function(d, i) { return x_scale(data.references[i]) + 1; })
-        .style("fill", function(d, i) { return colorForValue(data.references[i], data.references[i], data.direction_map[data.q_ids[i]]); })
-        .on("mouseover",
-          function(d, i) {
-            tooltipOver(i);
-            setToHoverColor(i); 
-          })
-        .on("mouseout",
-          function(d, i) {
-            tooltipOut(i);
-            setToNormalColor(i);
-          })
-      .transition(barTransition)
-        .style("fill", function(d, i) { return colorForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]); })
-        .attr("width", function(d, i) { return x_scale(data.means[i][perspective_option]) + 1; });
+      .attr("class", "barrect")
+      .attr("id", function(d, i) { return "barrect-" + d; })
+      .attr("height", y_scale.bandwidth())
+      .attr("width", function(d, i) { return x_scale(data.references[i]) + 1; })
+      .style("fill", function(d, i) { return colorForValue(data.references[i], data.references[i], data.direction_map[data.q_ids[i]]); })
+      .on("mouseover",
+        function(d, i) {
+          tooltipOver(i);
+          setToHoverColor(i); 
+        })
+      .on("mouseout",
+        function(d, i) {
+          tooltipOut();
+          setToNormalColor(i);
+        })
+    .transition()
+      .duration(barTransitionTime)
+      .ease(d3.easeLinear)
+      .style("fill", function(d, i) { return colorForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]); })
+      .attr("width", function(d, i) { return x_scale(data.means[i][perspective_option]) + 1; });
       
     
     // REFERENCE LINE
@@ -322,7 +325,7 @@
           })
         .on("mouseout",
           function(d, i) {
-            tooltipOut(i);
+            tooltipOut();
             setToNormalColor(i);
           })
       .attr("transform", function(d, i) { return "translate(" + (yAxisWidth + x_scale(data.reference_map[d]) - referenceWidth/2) + "," + (y_scale(d) - referenceExtraHeight/2) + ")"; });
@@ -345,11 +348,22 @@
     
     /* only populate the description box, nothing visual */
     tooltipOver(0);
-    tooltipOut(0);
+    tooltipOut();
   }
   
-  exports.updateData = function() {
+  exports.updateSelecterOption = function(selected_perspective_option) {
+    perspective_option = selected_perspective_option;
     
+    var bar = d3.selectAll(".barrect")
+      .transition()
+        .duration(barTransitionTime)
+        .ease(d3.easeLinear)
+        .style("fill", function(d, i) { return colorForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]); })
+        .attr("width", function(d, i) { return x_scale(data.means[i][perspective_option]) + 1; });
+    
+    /* repopulate the description box and reset the tooltip */
+    tooltipOver(lastHoveredBar);
+    tooltipOut();
   }
   
 })(window);
