@@ -147,6 +147,11 @@ body {
   font: 12px sans-serif;
 }
 
+.description-header {
+  font-weight: bold;
+  font-size: 13px;
+}
+
 .description ul {
   padding-left: 20px;
 }

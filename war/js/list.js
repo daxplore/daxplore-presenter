@@ -126,7 +126,7 @@
           .style("opacity", 1);
       
       var color = colorTextForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]);
-      var header = "<b>" + data.shorttext_map[data.q_ids[i]] + ": " + d3.format(".2")(data.means[i][perspective_option]) + "</b><br>"
+      var header = "<span class='description-header'>" + data.perspective_options[perspective_option] + "</span><br><b>" + data.shorttext_map[data.q_ids[i]] + ": " + d3.format(".2")(data.means[i][perspective_option]) + "</b><br>"
       var subheader = "<b>Referensvärde: " + d3.format(".2")(data.references[i]) + "</b><br>"; 
       
       
@@ -291,8 +291,8 @@
       .attr("class", "barrect")
       .attr("id", function(d, i) { return "barrect-" + d; })
       .attr("height", y_scale.bandwidth())
-      .attr("width", function(d, i) { return x_scale(data.references[i]) + 1; })
-      .style("fill", function(d, i) { return colorForValue(data.references[i], data.references[i], data.direction_map[data.q_ids[i]]); })
+      .style("fill", function(d, i) { return colorForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]); })
+      .attr("width", function(d, i) { return x_scale(data.means[i][perspective_option]) + 1; })
       .on("mouseover",
         function(d, i) {
           tooltipOver(i);
@@ -302,12 +302,7 @@
         function(d, i) {
           tooltipOut();
           setToNormalColor(i);
-        })
-    .transition()
-      .duration(barTransitionTime)
-      .ease(d3.easeLinear)
-      .style("fill", function(d, i) { return colorForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]); })
-      .attr("width", function(d, i) { return x_scale(data.means[i][perspective_option]) + 1; });
+        });
       
     
     // REFERENCE LINE
