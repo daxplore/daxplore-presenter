@@ -18,8 +18,14 @@
     
     <script type="text/javascript">{8}</script>
     
-    <script src="https://d3js.org/d3.v4.js"></script>
-    <script src="js/list.js"></script>
+    <script type="text/javascript" src="https://d3js.org/d3.v4.js"></script>
+
+      
+    <script type="text/javascript" src="js/canvas-toBlob.js"></script>
+    <script type="text/javascript" src="js/FileSaver.js"></script>
+    
+    <script type="text/javascript" src="js/list.js"></script>
+    
     
     <script type="text/javascript">
       var unpacked_data = {};
@@ -54,8 +60,8 @@
         unpacked_data.shorttext_map[q.column] = q.short;
         unpacked_data.description_map[q.column] = unescape(q.description);
         
-        if ("direction" in q) {
-          unpacked_data.direction_map[q.column] = q.direction;
+        if ("gooddirection" in q) {
+          unpacked_data.direction_map[q.column] = q.gooddirection;
         }
         
         if (q.column === perspective) {
@@ -103,6 +109,7 @@
         </div>
         <div class="column-right">
           <div class="description"></div>
+          <span class="save-image" onClick="generateImage()">Spara diagram</span>
         </div>
       </div>
     </div>
