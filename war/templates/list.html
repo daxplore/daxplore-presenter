@@ -70,6 +70,9 @@
       }
       
       unpacked_data.shorttexts = unpacked_data.q_ids.map(function(q) { return unpacked_data.shorttext_map[q]; });
+      
+      unpacked_data.usertexts = usertexts;
+      
     </script>
     
     <script type="text/javascript">
@@ -80,6 +83,8 @@
     
     <script type="text/javascript">
       document.addEventListener("DOMContentLoaded", function(e) {
+        d3.select(".save-image").node().innerHTML = usertexts.imageSaveButton;
+            
         var select = document.getElementsByClassName("header-select")[0];
         for (var i=0; i<unpacked_data.perspective_options.length; i++) {
           select.options.add(new Option(unpacked_data.perspective_options[i], "" + i));
@@ -109,7 +114,7 @@
         </div>
         <div class="column-right">
           <div class="description"></div>
-          <span class="save-image" onClick="generateImage()">Spara diagram</span>
+          <span class="save-image" onClick="generateImage()"></span>
         </div>
       </div>
     </div>

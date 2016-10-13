@@ -103,7 +103,9 @@
         .duration(200)    
         .style("opacity", 1);
       
-      tooltipdiv.html(data.shorttexts[i] + ": <b>" + d3.format(".2s")(data.means[i][perspective_option]) + "</b><br>Referensvärde: <b>" + d3.format(".2")(data.references[i]) + "</b>")
+      tooltipdiv.html(
+          data.shorttexts[i] + ": <b>" + d3.format(".2s")(data.means[i][perspective_option]) + "</b><br>"
+          + data.usertexts.listReferenceValue + ": <b>" + d3.format(".2")(data.references[i]) + "</b>")
         .style("background", colorHoverForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]))
         .style("left", (charwrapperBB.left + x_scale(Math.max(data.means[i][perspective_option], data.references[i])) + yAxisWidth + 14) + "px")   
         .style("top", charwrapperBB.top +  y_scale(data.q_ids[i]) + y_scale.bandwidth()/2 - tooltipdiv.node().getBoundingClientRect().height/2 + "px");
@@ -127,22 +129,22 @@
       
       var color = colorTextForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]);
       var header = "<span class='description-header'>" + data.perspective_options[perspective_option] + "</span><br><b>" + data.shorttext_map[data.q_ids[i]] + ": " + d3.format(".2")(data.means[i][perspective_option]) + "</b><br>"
-      var subheader = "<b>Referensvärde: " + d3.format(".2")(data.references[i]) + "</b><br>"; 
+      var subheader = "<b>" + data.usertexts.listReferenceValue + ": " + d3.format(".2")(data.references[i]) + "</b><br>"; 
       
       
       var trueDiff = data.means[i][perspective_option] - data.references[i]; 
-      if (data.direction_map[data.q_ids[i]] == "LOW") {
+      if (data.direction_map[data.q_ids[i]] == "low") {
         var diff = data.references[i] - data.means[i][perspective_option]; 
       } else {
         var diff = trueDiff; 
       }
             
       if (diff < -5) {
-        var subsubheader = "Sämre än referensgruppen";
+        var subsubheader = data.usertexts.listReferenceWorse;
       } else if (diff > 5) {
-        var subsubheader = "Bättre än referensgruppen";
+        var subsubheader = data.usertexts.listReferenceBetter;
       } else {
-        var subsubheader = "Jämförbart med referensgruppen";
+        var subsubheader = data.usertexts.listReferenceComparable;
       }
       
       subsubheader = "<span style=\"color: " + color + "; font-weight: bold\">" + subsubheader + ": " + d3.format("+.2")(trueDiff) + "</span></b><br><br>";
@@ -266,7 +268,7 @@
         .attr("text-anchor", "middle")
         .attr("transform", "translate(" + (width - yAxisWidth)/2 + ", -20)")
         .style("text-anchor", "middle")
-        .text("Medelvärde på en skala 0-100, där 5 poäng eller mer anses vara en relevant/märkbar skillnad");
+        .text(data.usertexts.listXAxisDescription);
     
         
     // X AXIS BOTTOM
@@ -284,7 +286,7 @@
         .attr("text-anchor", "middle")
         .attr("transform", "translate(" + (width - yAxisWidth)/2 + ", 28)")
         .style("text-anchor", "middle")
-        .text("Medelvärde på en skala 0-100, där 5 poäng eller mer anses vara en relevant/märkbar skillnad");
+        .text(data.usertexts.listXAxisDescription);
 
 
     // BARS
@@ -397,90 +399,6 @@
     tooltipOut();
   }
   
-//   exports.generateImage = function() {
-//     var charwrapperBB = d3.select(".chart").node().getBBox();
-//     
-//     var canvas_chart = d3.select("body").append("canvas")
-//       .attr("id", "canvas-chart")
-//       .attr("width", charwrapperBB.width + "px")
-//       .attr("height", charwrapperBB.height + "px")
-//       .style("visibility", "hidden");   
-//     
-//     canvg(('canvas-chart'), d3.select(".chart").node().innerHTML);
-//     
-//     var header_text = data.perspective_options[perspective_option];
-//     var header_padding_top = 5;
-//     var font_size = 16;
-//     var text_padding_bottom = 10;
-//     var header_font = "bold " + font_size + "px sans-serif";
-//     var text_height = header_padding_top + font_size + text_padding_bottom;
-//         
-//     var complete_width = charwrapperBB.width;
-//     var complete_height = charwrapperBB.height + text_height;
-//     var canvas_complete = d3.select("body").append("canvas")
-//       .attr("id", "canvas-complete")
-//       .attr("width", complete_width + "px")
-//       .attr("height", complete_height + "px")
-//       .style("visibility", "visible");
-//       
-//     var ctx = canvas_complete.node().getContext("2d");
-//     
-//     ctx.fillStyle = "white";
-//     ctx.fillRect(0, 0, complete_width, complete_height);
-//     ctx.fillStyle = "black";
-//     
-//     ctx.font = header_font;
-// 
-//     var text_width = ctx.measureText(header_text).width;
-//     
-//     var bar_area_width = (width - yAxisWidth);
-//     var text_horizontal_shift = yAxisWidth + bar_area_width/2 - text_width/2;
-//     
-//     ctx.fillText(header_text, text_horizontal_shift, header_padding_top + font_size);
-//     ctx.drawImage(canvas_chart.node(), 0, text_height);
-//     
-//     canvas_chart.node().toBlob(function(blob) {
-//         saveAs(blob, header_text + ".png");
-//     });
-//     
-//     canvas_chart.remove();
-//     canvas_complete.remove();
-//   }
-
-// exports.generateImage = function() {
-//   var canvas_chart = d3.select("body").append("canvas")
-//     .attr("id", "canvas-chart")
-//     .attr("width", charwrapperBB.width + "px")
-//     .attr("height", charwrapperBB.height + "px")
-//     .style("position", "absolute")
-//     .style("top", "0px")
-//     .style("right", "0px")
-//     .style("visibility", "visible");   
-//       
-//   var ctx = canvas_chart.node().getContext("2d");
-//   
-//   var img = new Image(100, 200);
-//   img.onload = function() {
-//     ctx.drawImage(img, 0, 0);
-//     
-//     canvas_chart.node().toBlob(function(blob) {
-//       saveAs(blob, "test.png");
-//     });
-//   }
-//   
-// //   var xml = (new XMLSerializer).serializeToString( d3.select(".chart").node());
-// 
-//    var base64 = btoa('<svg xmlns="http://www.w3.org/2000/svg" height="100" width="100">' + d3.select(".chart").node().innerHTML + '</svg>');
-//   img.src = 'data:image/svg+xml;base64,' + base64;
-// 
-// //     img.src = 'data:image/svg+xml;base64,' + 
-// //            btoa('<svg xmlns="http://www.w3.org/2000/svg" height="100" width="100"><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/></svg>');
-// 
-// //   img.src = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBkPSJNMjI0IDM4Ny44MTRWNTEyTDMyIDMyMGwxOTItMTkydjEyNi45MTJDNDQ3LjM3NSAyNjAuMTUyIDQzNy43OTQgMTAzLjAxNiAzODAuOTMgMCA1MjEuMjg3IDE1MS43MDcgNDkxLjQ4IDM5NC43ODUgMjI0IDM4Ny44MTR6Ii8+PC9zdmc+";
-//   
-//   d3.select("body").node().appendChild(img);
-//   
-// }
   exports.generateImage = function() {
     var chartBB = d3.select(".chart").node().getBoundingClientRect();
     
@@ -548,7 +466,7 @@
       
       ctx.fillText(header_text, header_horizontal_shift + img_margin.left, header_padding_top + header_font_size + img_margin.top);
       
-      var source_text = "copsoq.se - en brygga mellan vetenskap och praktik i arbetsmiljöfrågor";
+      var source_text = data.usertexts.imageWaterStamp;
       var source_font_height = 11;
       ctx.font = source_font_height + "px sans-serif";
       ctx.fillStyle = "#555";
