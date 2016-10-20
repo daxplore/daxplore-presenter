@@ -133,23 +133,23 @@
       
       
       var trueDiff = data.means[i][perspective_option] - data.references[i]; 
-      if (data.direction_map[data.q_ids[i]] == "low") {
+      if (data.direction_map[data.q_ids[i]] == "LOW") {
         var diff = data.references[i] - data.means[i][perspective_option]; 
       } else {
         var diff = trueDiff; 
       }
             
       if (diff < -5) {
-        var subsubheader = data.usertexts.listReferenceWorse;
+        var referenceComparison = data.usertexts.listReferenceWorse;
       } else if (diff > 5) {
-        var subsubheader = data.usertexts.listReferenceBetter;
+        var referenceComparison = data.usertexts.listReferenceBetter;
       } else {
-        var subsubheader = data.usertexts.listReferenceComparable;
+        var referenceComparison = data.usertexts.listReferenceComparable;
       }
       
-      subsubheader = "<span style=\"color: " + color + "; font-weight: bold\">" + subsubheader + ": " + d3.format("+.2")(trueDiff) + "</span></b><br><br>";
+      referenceComparison = "<span style=\"color: " + color + "; font-weight: bold\">" + referenceComparison + ": " + d3.format("+.2")(trueDiff) + "</span></b><br><br>";
       
-      description.html(header + subheader + subsubheader + data.description_map[data.q_ids[i]]);
+      description.html(header + subheader + referenceComparison + data.description_map[data.q_ids[i]]);
     }
     
     function tooltipOut() {
@@ -317,8 +317,9 @@
     
     // REFERENCE LINE
     
-    var referenceWidth = 4;
+    var referenceWidth = 2;
     var referenceExtraHeight = 4;
+    var referenceHeight = y_scale.bandwidth() + referenceExtraHeight;
     var reference = chart.selectAll(".reference")
       .data(data.q_ids)
     .enter().append("g")
@@ -337,8 +338,16 @@
       .style("shape-rendering", "crispEdges");
 
     reference.append("rect")
-      .attr("width", referenceWidth/2)
-      .attr("height", y_scale.bandwidth() + referenceExtraHeight);      
+      .attr("width", referenceWidth)
+      .attr("height", referenceHeight);     
+      q
+    // invisible rect for mouseover 
+    reference.append("rect")
+      .attr("transform", "translate(-1, -1)")
+      .attr("width", referenceWidth + 2)
+      .attr("height", referenceHeight + 2)
+      .attr("opacity", "0");  
+
 
       
     // HEADER
@@ -381,6 +390,9 @@
       
     d3.selectAll(".y path, .y line")
       .style("visibility", "hidden");
+      
+    d3.selectAll(".reference rect, .reference path")
+      .style("fill", "#444");
 
   }
   
