@@ -1,168 +1,168 @@
 (function(exports) {
   
-    var colors = {};
+  var colors = {};
 
-    colors.good    = "hsl(95, 38%, 64%)";
-    colors.average = "hsl(58, 60%, 62%)";
-    colors.bad     = "hsl( 5, 38%, 72%)";
-    
-    colors.good_hover    = "hsl(95, 38%, 57%)";
-    colors.average_hover = "hsl(60, 60%, 51%)";
-    colors.bad_hover     = "hsl( 5, 38%, 67%)";
-    
-    colors.good_text    = "hsl(95, 38%, 34%)";
-    colors.average_text = "hsl(60, 60%, 31%)",
-    colors.bad_text     = "hsl( 5, 38%, 42%)";
+  colors.good    = "hsl(95, 38%, 64%)";
+  colors.average = "hsl(58, 60%, 62%)";
+  colors.bad     = "hsl( 5, 38%, 72%)";
   
-    var data, perspective_option;
-    var charwrapperBB, xAxisTopHeight, xAxisBottomHeight, margin, width, height;
-    var x_scale, y_scale;
-    var yAxisWidth;
-    
-    var barTransitionTime = 300;
-    var lastHoveredBar = 0;
-    
-    // FUNCTIONS
+  colors.good_hover    = "hsl(95, 38%, 57%)";
+  colors.average_hover = "hsl(60, 60%, 51%)";
+  colors.bad_hover     = "hsl( 5, 38%, 67%)";
+  
+  colors.good_text    = "hsl(95, 38%, 34%)";
+  colors.average_text = "hsl(60, 60%, 31%)",
+  colors.bad_text     = "hsl( 5, 38%, 42%)";
 
-    function setToReferenceColor(i) {
-      d3.select("barrect-" + i)
-        .style("fill", colorForValue(data.reference_map[i], data.reference_map[i], data.direction_map[data.q_ids[i]]));
-    }
-    
-    function setToNormalColor(i) {
-      d3.select("#barrect-" + data.q_ids[i])
-        .style("fill", colorForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]));
-      d3.selectAll(".q-" + data.q_ids[i])
-        .classed("bar-hover", false);
-      d3.selectAll(".y.axis .tick")
-        .classed("bar-hover", false);
-    }
-    
-    function setToHoverColor(i) {
-      d3.select("#barrect-" + data.q_ids[i])
-        .style("fill", colorHoverForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]));
-      d3.selectAll(".q-" + data.q_ids[i])
-        .classed("bar-hover", true);
-      d3.selectAll(".y.axis .tick")
-        .classed("bar-hover", function(d, index) { return i == index; });
-    }
-        
-    function colorForValue(value, reference, direction) {
-      if (direction == "LOW") {
-        var diff = reference - value;
-      } else {
-        var diff = value - reference;
-      }
+  var data, perspective_option;
+  var charwrapperBB, xAxisTopHeight, xAxisBottomHeight, margin, width, height;
+  var x_scale, y_scale;
+  var yAxisWidth;
+  
+  var barTransitionTime = 300;
+  var lastHoveredBar = 0;
+  
+  // FUNCTIONS
 
-      if (diff < -5) {
-        return colors.bad;
-      } else if (diff > 5) {
-        return colors.good;
-      } else {
-        return colors.average;
-      }
+  function setToReferenceColor(i) {
+    d3.select("barrect-" + i)
+      .style("fill", colorForValue(data.reference_map[i], data.reference_map[i], data.direction_map[data.q_ids[i]]));
+  }
+  
+  function setToNormalColor(i) {
+    d3.select("#barrect-" + data.q_ids[i])
+      .style("fill", colorForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]));
+    d3.selectAll(".q-" + data.q_ids[i])
+      .classed("bar-hover", false);
+    d3.selectAll(".y.axis .tick")
+      .classed("bar-hover", false);
+  }
+  
+  function setToHoverColor(i) {
+    d3.select("#barrect-" + data.q_ids[i])
+      .style("fill", colorHoverForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]));
+    d3.selectAll(".q-" + data.q_ids[i])
+      .classed("bar-hover", true);
+    d3.selectAll(".y.axis .tick")
+      .classed("bar-hover", function(d, index) { return i == index; });
+  }
+      
+  function colorForValue(value, reference, direction) {
+    if (direction == "LOW") {
+      var diff = reference - value;
+    } else {
+      var diff = value - reference;
     }
-    
-    function colorHoverForValue(value, reference, direction) {
-      if (direction == "LOW") {
-        var diff = reference - value;
-      } else {
-        var diff = value - reference;
-      }
 
-      if (diff < -5) {
-        return colors.bad_hover;
-      } else if (diff > 5) {
-        return colors.good_hover;
-      } else {
-        return colors.average_hover;
-      }
+    if (diff < -5) {
+      return colors.bad;
+    } else if (diff > 5) {
+      return colors.good;
+    } else {
+      return colors.average;
     }
-    
-    function colorTextForValue(value, reference, direction) {
-      if (direction == "LOW") {
-        var diff = reference - value;
-      } else {
-        var diff = value - reference;
-      }
+  }
+  
+  function colorHoverForValue(value, reference, direction) {
+    if (direction == "LOW") {
+      var diff = reference - value;
+    } else {
+      var diff = value - reference;
+    }
 
-      if (diff < -5) {
-        return colors.bad_text;
-      } else if (diff > 5) {
-        return colors.good_text;
-      } else {
-        return colors.average_text;
-      }
+    if (diff < -5) {
+      return colors.bad_hover;
+    } else if (diff > 5) {
+      return colors.good_hover;
+    } else {
+      return colors.average_hover;
+    }
+  }
+  
+  function colorTextForValue(value, reference, direction) {
+    if (direction == "LOW") {
+      var diff = reference - value;
+    } else {
+      var diff = value - reference;
+    }
+
+    if (diff < -5) {
+      return colors.bad_text;
+    } else if (diff > 5) {
+      return colors.good_text;
+    } else {
+      return colors.average_text;
+    }
+  }
+  
+  function tooltipOver(i) {
+    lastHoveredBar = i;
+    var tooltipdiv = d3.select(".tooltipdiv");
+    
+    tooltipdiv.transition()    
+      .duration(200)    
+      .style("opacity", 1);
+    
+    tooltipdiv.html(
+        data.shorttexts[i] + ": <b>" + d3.format(".2s")(data.means[i][perspective_option]) + "</b><br>"
+        + data.usertexts.listReferenceValue + ": <b>" + d3.format(".2")(data.references[i]) + "</b>")
+      .style("background", colorHoverForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]))
+      .style("left", (charwrapperBB.left + x_scale(Math.max(data.means[i][perspective_option], data.references[i])) + yAxisWidth + 14) + "px")   
+      .style("top", charwrapperBB.top +  y_scale(data.q_ids[i]) + y_scale.bandwidth()/2 - tooltipdiv.node().getBoundingClientRect().height/2 + "px");
+    
+    var arrowleft = d3.select(".arrow-left");
+    
+    arrowleft.transition()    
+      .duration(200)    
+      .style("opacity", 1);    
+    
+    arrowleft
+      .style("border-right-color", colorHoverForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]))
+      .style("left", (charwrapperBB.left + x_scale(Math.max(data.means[i][perspective_option], data.references[i])) + yAxisWidth + 4) + "px")   
+      .style("top", charwrapperBB.top +  y_scale(data.q_ids[i]) + y_scale.bandwidth()/2 - arrowleft.node().getBoundingClientRect().height/2 + "px");
+      
+    var description = d3.select(".description");
+    
+    description.transition()
+      .duration(0)
+      .style("opacity", 1);
+    
+    var color = colorTextForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]);
+    var header = "<span class='description-header'>" + data.perspective_options[perspective_option] + "</span><br><b>" + data.shorttext_map[data.q_ids[i]] + ": " + d3.format(".2")(data.means[i][perspective_option]) + "</b><br>"
+    var subheader = "<b>" + data.usertexts.listReferenceValue + ": " + d3.format(".2")(data.references[i]) + "</b><br>"; 
+    
+    
+    var trueDiff = data.means[i][perspective_option] - data.references[i]; 
+    if (data.direction_map[data.q_ids[i]] == "LOW") {
+      var diff = data.references[i] - data.means[i][perspective_option]; 
+    } else {
+      var diff = trueDiff; 
+    }
+          
+    if (diff < -5) {
+      var referenceComparison = data.usertexts.listReferenceWorse;
+    } else if (diff > 5) {
+      var referenceComparison = data.usertexts.listReferenceBetter;
+    } else {
+      var referenceComparison = data.usertexts.listReferenceComparable;
     }
     
-    function tooltipOver(i) {
-      lastHoveredBar = i;
-      var tooltipdiv = d3.select(".tooltipdiv");
-      
-      tooltipdiv.transition()    
-        .duration(200)    
-        .style("opacity", 1);
-      
-      tooltipdiv.html(
-          data.shorttexts[i] + ": <b>" + d3.format(".2s")(data.means[i][perspective_option]) + "</b><br>"
-          + data.usertexts.listReferenceValue + ": <b>" + d3.format(".2")(data.references[i]) + "</b>")
-        .style("background", colorHoverForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]))
-        .style("left", (charwrapperBB.left + x_scale(Math.max(data.means[i][perspective_option], data.references[i])) + yAxisWidth + 14) + "px")   
-        .style("top", charwrapperBB.top +  y_scale(data.q_ids[i]) + y_scale.bandwidth()/2 - tooltipdiv.node().getBoundingClientRect().height/2 + "px");
-      
-      var arrowleft = d3.select(".arrow-left");
-      
-      arrowleft.transition()    
-        .duration(200)    
-        .style("opacity", 1);    
-      
-      arrowleft
-        .style("border-right-color", colorHoverForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]))
-        .style("left", (charwrapperBB.left + x_scale(Math.max(data.means[i][perspective_option], data.references[i])) + yAxisWidth + 4) + "px")   
-        .style("top", charwrapperBB.top +  y_scale(data.q_ids[i]) + y_scale.bandwidth()/2 - arrowleft.node().getBoundingClientRect().height/2 + "px");
-        
-      var description = d3.select(".description");
-      
-      description.transition()
-        .duration(0)
-        .style("opacity", 1);
-      
-      var color = colorTextForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]);
-      var header = "<span class='description-header'>" + data.perspective_options[perspective_option] + "</span><br><b>" + data.shorttext_map[data.q_ids[i]] + ": " + d3.format(".2")(data.means[i][perspective_option]) + "</b><br>"
-      var subheader = "<b>" + data.usertexts.listReferenceValue + ": " + d3.format(".2")(data.references[i]) + "</b><br>"; 
-      
-      
-      var trueDiff = data.means[i][perspective_option] - data.references[i]; 
-      if (data.direction_map[data.q_ids[i]] == "LOW") {
-        var diff = data.references[i] - data.means[i][perspective_option]; 
-      } else {
-        var diff = trueDiff; 
-      }
-            
-      if (diff < -5) {
-        var referenceComparison = data.usertexts.listReferenceWorse;
-      } else if (diff > 5) {
-        var referenceComparison = data.usertexts.listReferenceBetter;
-      } else {
-        var referenceComparison = data.usertexts.listReferenceComparable;
-      }
-      
-      referenceComparison = "<span style=\"color: " + color + "; font-weight: bold\">" + referenceComparison + ": " + d3.format("+.2")(trueDiff) + "</span></b><br><br>";
-      
-      description.html(header + subheader + referenceComparison + data.description_map[data.q_ids[i]]);
-    }
+    referenceComparison = "<span style=\"color: " + color + "; font-weight: bold\">" + referenceComparison + ": " + d3.format("+.2")(trueDiff) + "</span></b><br><br>";
     
-    function tooltipOut() {
-      d3.select(".tooltipdiv")
-        .transition()    
-          .duration(300)    
-          .style("opacity", 0); 
-        
-      d3.select(".arrow-left")
-        .transition()    
-          .duration(300)    
-          .style("opacity", 0); 
-      }
+    description.html(header + subheader + referenceComparison + data.description_map[data.q_ids[i]]);
+  }
+  
+  function tooltipOut() {
+    d3.select(".tooltipdiv")
+      .transition()    
+        .duration(300)    
+        .style("opacity", 0); 
+      
+    d3.select(".arrow-left")
+      .transition()    
+        .duration(300)    
+        .style("opacity", 0); 
+    }
   
   
   // EXPORTS 
