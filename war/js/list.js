@@ -121,6 +121,10 @@
       .style("left", (charwrapperBB.left + x_scale(Math.max(data.means[i][perspective_option], data.references[i])) + yAxisWidth + 4) + "px")   
       .style("top", charwrapperBB.top +  y_scale(data.q_ids[i]) + y_scale.bandwidth()/2 - arrowleft.node().getBoundingClientRect().height/2 + "px");
       
+    setDescription(i);
+  }
+  
+  function setDescription(i) {
     var description = d3.select(".description");
     
     description.transition()
@@ -182,13 +186,7 @@
     width = charwrapperBB.width - margin.left - margin.right,
     height = charwrapperBB.height - margin.top - margin.bottom;
 
-      
-    // DESCRIPTION DIV
     
-    d3.select(".description") 
-      .style("opacity", 0);  
-
-      
     // CHART
     
     var chart = d3.select(".chart")
@@ -364,13 +362,11 @@
       
     header_select
       .style("width", select_width+28 + "px")
-      
-      
-    // TOOLTIP DIV
     
-    /* only populate the description box, nothing visual */
-    tooltipOver(0);
-    tooltipOut();
+          
+    // DESCRIPTION
+    // populate the description box
+    setDescription(lastHoveredBar);
     
     
     // GENERAL STYLE
