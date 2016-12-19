@@ -29,55 +29,50 @@
     
     <script type="text/javascript">
       var unpacked_data = {};
-      unpacked_data.q_ids = [];
-
-      unpacked_data.means = [];
-      
-      unpacked_data.references = [];
-      unpacked_data.reference_map = {};
+      var q_ids = [];
+      var means = [];
+      var references = [];
       
       for (var i = 0; i < data.length; i++) {
         var d = data[i];
         
         var q_id = d.q;
-        unpacked_data.q_ids.push(q_id);
+        q_ids.push(q_id);
         
         var mean_array = d.mean["0"].mean;
-        unpacked_data.means.push(mean_array);
+        means.push(mean_array);
         
         var global_reference_mean = d.mean["0"].global;
-        unpacked_data.references.push(global_reference_mean);
-        unpacked_data.reference_map[q_id] = global_reference_mean;
+        references.push(global_reference_mean);
       }
       
-      unpacked_data.perspective_options = [];
-      unpacked_data.shorttext_map = {};
-      unpacked_data.description_map = {};
-      unpacked_data.direction_map = {};
+      var perspective_options = [];
+      var shorttext_map = {};
+      var description_map = {};
+      var direction_map = {};
 
       for (var i=0; i < questions.length; i ++) {
         var q = questions[i];
-        unpacked_data.shorttext_map[q.column] = q.short;
-        unpacked_data.description_map[q.column] = unescape(q.description);
+        shorttext_map[q.column] = q.short;
+        description_map[q.column] = unescape(q.description);
         
         if ("gooddirection" in q) {
-          unpacked_data.direction_map[q.column] = q.gooddirection;
+          direction_map[q.column] = q.gooddirection;
         }
         
         if (q.column === perspective) {
-          unpacked_data.perspective_options = q.options;
+          perspective_options = q.options;
         }
       }
       
-      unpacked_data.shorttexts = unpacked_data.q_ids.map(function(q) { return unpacked_data.shorttext_map[q]; });
-      
-      unpacked_data.usertexts = usertexts;
-      
+      var shorttexts = q_ids.map(function(q) { return shorttext_map[q]; });
+      var descriptions = q_ids.map(function(q) { return description_map[q]; });
+      var directions = q_ids.map(function(q) { return direction_map[q]; });
     </script>
     
     <script type="text/javascript">
       function headerChange(select) {
-        updateSelecterOption(select.value);
+        updateSelectorOption(select.value);
       }
     </script>
     
@@ -86,11 +81,11 @@
         d3.select(".save-image").node().innerHTML = usertexts.imageSaveButton;
             
         var select = document.getElementsByClassName("header-select")[0];
-        for (var i=0; i<unpacked_data.perspective_options.length; i++) {
-          select.options.add(new Option(unpacked_data.perspective_options[i], "" + i));
+        for (var i=0; i<perspective_options.length; i++) {
+          select.options.add(new Option(perspective_options[i], "" + i));
         }
         
-        generateListChart(unpacked_data, 0);
+        generateListChart(q_ids, means, references, perspective_options, shorttexts, usertexts, descriptions, directions, 0);
       });
     </script>
   

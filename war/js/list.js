@@ -14,6 +14,7 @@
   colors.average_text = "hsl(60, 60%, 31%)",
   colors.bad_text     = "hsl( 5, 38%, 42%)";
 
+  var q_ids, means, references, perspective_options, usertexts, descriptions, directions;
   var data, perspective_option;
   var charwrapperBB, xAxisTopHeight, xAxisBottomHeight, margin, width, height;
   var x_scale, y_scale;
@@ -24,24 +25,20 @@
   
   // FUNCTIONS
 
-  function setToReferenceColor(i) {
-    d3.select("barrect-" + i)
-      .style("fill", colorForValue(data.reference_map[i], data.reference_map[i], data.direction_map[data.q_ids[i]]));
-  }
   
   function setToNormalColor(i) {
-    d3.select("#barrect-" + data.q_ids[i])
-      .style("fill", colorForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]));
-    d3.selectAll(".q-" + data.q_ids[i])
+    d3.select("#barrect-" + q_ids[i])
+      .style("fill", colorForValue(means[i][perspective_option], references[i], directions[i]));
+    d3.selectAll(".q-" + q_ids[i])
       .classed("bar-hover", false);
     d3.selectAll(".y.axis .tick")
       .classed("bar-hover", false);
   }
   
   function setToHoverColor(i) {
-    d3.select("#barrect-" + data.q_ids[i])
-      .style("fill", colorHoverForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]));
-    d3.selectAll(".q-" + data.q_ids[i])
+    d3.select("#barrect-" + q_ids[i])
+      .style("fill", colorHoverForValue(means[i][perspective_option], references[i], directions[i]));
+    d3.selectAll(".q-" + q_ids[i])
       .classed("bar-hover", true);
     d3.selectAll(".y.axis .tick")
       .classed("bar-hover", function(d, index) { return i == index; });
@@ -104,11 +101,11 @@
       .style("opacity", 1);
     
     tooltipdiv.html(
-        data.shorttexts[i] + ": <b>" + d3.format(".2s")(data.means[i][perspective_option]) + "</b><br>"
-        + data.usertexts.listReferenceValue + ": <b>" + d3.format(".2")(data.references[i]) + "</b>")
-      .style("background", colorHoverForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]))
-      .style("left", (charwrapperBB.left + x_scale(Math.max(data.means[i][perspective_option], data.references[i])) + yAxisWidth + 14) + "px")   
-      .style("top", charwrapperBB.top +  y_scale(data.q_ids[i]) + y_scale.bandwidth()/2 - tooltipdiv.node().getBoundingClientRect().height/2 + "px");
+        shorttexts[i] + ": <b>" + d3.format(".2s")(means[i][perspective_option]) + "</b><br>"
+        + usertexts.listReferenceValue + ": <b>" + d3.format(".2")(references[i]) + "</b>")
+      .style("background", colorHoverForValue(means[i][perspective_option], references[i],  directions[i]))
+      .style("left", (charwrapperBB.left + x_scale(Math.max(means[i][perspective_option], references[i])) + yAxisWidth + 14) + "px")   
+      .style("top", charwrapperBB.top +  y_scale(q_ids[i]) + y_scale.bandwidth()/2 - tooltipdiv.node().getBoundingClientRect().height/2 + "px");
     
     var arrowleft = d3.select(".arrow-left");
     
@@ -117,9 +114,9 @@
       .style("opacity", 1);    
     
     arrowleft
-      .style("border-right-color", colorHoverForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]))
-      .style("left", (charwrapperBB.left + x_scale(Math.max(data.means[i][perspective_option], data.references[i])) + yAxisWidth + 4) + "px")   
-      .style("top", charwrapperBB.top +  y_scale(data.q_ids[i]) + y_scale.bandwidth()/2 - arrowleft.node().getBoundingClientRect().height/2 + "px");
+      .style("border-right-color", colorHoverForValue(means[i][perspective_option], references[i],  directions[i]))
+      .style("left", (charwrapperBB.left + x_scale(Math.max(means[i][perspective_option], references[i])) + yAxisWidth + 4) + "px")   
+      .style("top", charwrapperBB.top +  y_scale(q_ids[i]) + y_scale.bandwidth()/2 - arrowleft.node().getBoundingClientRect().height/2 + "px");
       
     setDescription(i);
   }
@@ -131,29 +128,29 @@
       .duration(0)
       .style("opacity", 1);
     
-    var color = colorTextForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]);
-    var header = "<span class='description-header'>" + data.perspective_options[perspective_option] + "</span><br><b>" + data.shorttext_map[data.q_ids[i]] + ": " + d3.format(".2")(data.means[i][perspective_option]) + "</b><br>"
-    var subheader = "<b>" + data.usertexts.listReferenceValue + ": " + d3.format(".2")(data.references[i]) + "</b><br>"; 
+    var color = colorTextForValue(means[i][perspective_option], references[i],  directions[i]);
+    var header = "<span class='description-header'>" + perspective_options[perspective_option] + "</span><br><b>" + shorttexts[i] + ": " + d3.format(".2")(means[i][perspective_option]) + "</b><br>"
+    var subheader = "<b>" + usertexts.listReferenceValue + ": " + d3.format(".2")(references[i]) + "</b><br>"; 
     
     
-    var trueDiff = data.means[i][perspective_option] - data.references[i]; 
-    if (data.direction_map[data.q_ids[i]] == "LOW") {
-      var diff = data.references[i] - data.means[i][perspective_option]; 
+    var trueDiff = means[i][perspective_option] - references[i]; 
+    if (directions[i] == "LOW") {
+      var diff = references[i] - means[i][perspective_option]; 
     } else {
       var diff = trueDiff; 
     }
           
     if (diff < -5) {
-      var referenceComparison = data.usertexts.listReferenceWorse;
+      var referenceComparison = usertexts.listReferenceWorse;
     } else if (diff > 5) {
-      var referenceComparison = data.usertexts.listReferenceBetter;
+      var referenceComparison = usertexts.listReferenceBetter;
     } else {
-      var referenceComparison = data.usertexts.listReferenceComparable;
+      var referenceComparison = usertexts.listReferenceComparable;
     }
     
     referenceComparison = "<span style=\"color: " + color + "; font-weight: bold\">" + referenceComparison + ": " + d3.format("+.2")(trueDiff) + "</span></b><br><br>";
     
-    description.html(header + subheader + referenceComparison + data.description_map[data.q_ids[i]]);
+    description.html(header + subheader + referenceComparison + descriptions[i]);
   }
   
   function tooltipOut() {
@@ -169,29 +166,21 @@
     }
   
   
-  // EXPORTS 
-  
-  exports.generateListChart = function(unpacked_data, selected_perspective_option) {
-    data = unpacked_data;
-    perspective_option = selected_perspective_option;
-    
-    // DEFINITIONS
-      
-    charwrapperBB = d3.select(".chart-wrapper").node().getBoundingClientRect();
-    
-    
-    xAxisTopHeight = 30,
-    xAxisBottomHeight = 24,
-    margin = {top: 0, right: 13, bottom: xAxisTopHeight + xAxisBottomHeight, left: 0},
-    width = charwrapperBB.width - margin.left - margin.right,
-    height = charwrapperBB.height - margin.top - margin.bottom;
+  // CHART ELEMENTS
 
-    
-    // CHART
-    
+  function computeDimensions() { 
+    charwrapperBB = d3.select(".chart-wrapper").node().getBoundingClientRect();  
+    xAxisTopHeight = 30;
+    xAxisBottomHeight = 24;
+    margin = {top: 0, right: 13, bottom: xAxisTopHeight + xAxisBottomHeight, left: 0};
+    width = charwrapperBB.width - margin.left - margin.right;
+    height = charwrapperBB.height - margin.top - margin.bottom;
+  }
+  
+  function generateChart() {
     var chart = d3.select(".chart")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom);
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom);
         
     chart.append("rect")
       .attr("width", "100%")
@@ -200,23 +189,25 @@
     
     chart.append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-        
-        
-    // Y SCALE
-        
-    y_scale = d3.scaleBand()
+    
+    return chart;
+  }
+  
+  function generateYScale(q_ids) {
+    var y_scale = d3.scaleBand()
       .range([xAxisTopHeight, height - xAxisBottomHeight])
       .paddingInner(0.3)
       .paddingOuter(0.4);
+
+    y_scale.domain(q_ids);
     
-    y_scale.domain(data.q_ids);
-    
-    
-    // Y AXIS
-    
+    return y_scale;
+  }
+  
+  function generateYAxis(chart, shorttexts, y_scale) {
     var yAxisScale = y_scale.copy();
     
-    yAxisScale.domain(data.shorttexts);
+    yAxisScale.domain(shorttexts);
     
     var yAxis = d3.axisLeft()
       .tickSize(3)
@@ -242,17 +233,17 @@
           tooltipOut();
           setToNormalColor(i);
         });
-    
-
-    // X SCALE
-
-    x_scale = d3.scaleLinear()
+  }
+  
+  function generateXScale() {
+    var x_scale = d3.scaleLinear()
       .domain([0, 100])
       .range([0, width - yAxisWidth]);
       
-      
-    // X AXIS TOP
-    
+    return x_scale;
+  }
+  
+  function generateXAxisTop(chart, x_scale, usertexts) {
     var xAxisTop = d3.axisTop()
       .scale(x_scale)
       .ticks(20, "d")
@@ -266,11 +257,10 @@
         .attr("text-anchor", "middle")
         .attr("transform", "translate(" + (width - yAxisWidth)/2 + ", -20)")
         .style("text-anchor", "middle")
-        .text(data.usertexts.listXAxisDescription);
-    
-        
-    // X AXIS BOTTOM
-    
+        .text(usertexts.listXAxisDescription);
+  }
+  
+  function generateXAxisBottom(chart, x_scale, usertexts) {
     var xAxisBottom = d3.axisBottom()
       .scale(x_scale)
       .ticks(20, "d")
@@ -284,23 +274,22 @@
         .attr("text-anchor", "middle")
         .attr("transform", "translate(" + (width - yAxisWidth)/2 + ", 28)")
         .style("text-anchor", "middle")
-        .text(data.usertexts.listXAxisDescription);
-
-
-    // BARS
-    
+        .text(usertexts.listXAxisDescription); 
+  }
+  
+  function generateBars(chart, q_ids, references, x_scale, y_scale) {
     var bar = chart.selectAll(".bar")
-      .data(data.q_ids)
-    .enter().append("g")
-      .attr("class", function (d, i) { return "bar q-" + d; })
-      .attr("transform", function(d, i) { return "translate(" + (yAxisWidth + 1) + "," + y_scale(d) + ")"; });
+        .data(q_ids)
+      .enter().append("g")
+        .attr("class", function (d, i) { return "bar q-" + d; })
+        .attr("transform", function(d, i) { return "translate(" + (yAxisWidth + 1) + "," + y_scale(d) + ")"; });
 
     bar.append("rect")
       .attr("class", "barrect")
       .attr("id", function(d, i) { return "barrect-" + d; })
       .attr("height", y_scale.bandwidth())
-      .style("fill", function(d, i) { return colorForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]); })
-      .attr("width", function(d, i) { return x_scale(data.means[i][perspective_option]) + 1; })
+      .style("fill", function(d, i) { return colorForValue(means[i][perspective_option], references[i], directions[i]); })
+      .attr("width", function(d, i) { return x_scale(means[i][perspective_option]) + 1; })
       .on("mouseover",
         function(d, i) {
           tooltipOver(i);
@@ -311,15 +300,14 @@
           tooltipOut();
           setToNormalColor(i);
         });
-      
-    
-    // REFERENCE LINE
-    
+  }
+  
+  function generateReferenceLines(chart, q_ids, x_scale, y_scale) {
     var referenceWidth = 2;
     var referenceExtraHeight = 4;
     var referenceHeight = y_scale.bandwidth() + referenceExtraHeight;
     var reference = chart.selectAll(".reference")
-      .data(data.q_ids)
+      .data(q_ids)
     .enter().append("g")
       .attr("class", function (d, i) { return "reference q-" + d; })
         .on("mouseover",
@@ -332,24 +320,22 @@
             tooltipOut();
             setToNormalColor(i);
           })
-      .attr("transform", function(d, i) { return "translate(" + (yAxisWidth + x_scale(data.reference_map[d]) - referenceWidth/2) + "," + (y_scale(d) - referenceExtraHeight/2) + ")"; })
+      .attr("transform", function(d, i) { return "translate(" + (yAxisWidth + x_scale(references[i]) - referenceWidth/2) + "," + (y_scale(d) - referenceExtraHeight/2) + ")"; })
       .style("shape-rendering", "crispEdges");
 
     reference.append("rect")
       .attr("width", referenceWidth)
       .attr("height", referenceHeight);     
-      q
+      
     // invisible rect for mouseover 
     reference.append("rect")
       .attr("transform", "translate(-1, -1)")
       .attr("width", referenceWidth + 2)
       .attr("height", referenceHeight + 2)
-      .attr("opacity", "0");  
-
-
-      
-    // HEADER
-    
+      .attr("opacity", "0");   
+  }
+  
+  function generateHeader() {
     var header_select_div = d3.select(".header-select-div");
     var header_select = d3.select(".header-select");
     var bar_area_width = (width - yAxisWidth);
@@ -361,16 +347,10 @@
       .style("margin-left", yAxisWidth + bar_area_width/2 - select_width/2 + "px");
       
     header_select
-      .style("width", select_width+28 + "px")
-    
-          
-    // DESCRIPTION
-    // populate the description box
-    setDescription(lastHoveredBar);
-    
-    
-    // GENERAL STYLE
-    
+      .style("width", select_width+28 + "px") 
+  }
+  
+  function generateStyle() {
     d3.selectAll(".axis .domain")
       .style("visibility", "hidden");
     
@@ -388,19 +368,71 @@
       .style("visibility", "hidden");
       
     d3.selectAll(".reference rect, .reference path")
-      .style("fill", "#444");
-
+      .style("fill", "#444"); 
   }
   
-  exports.updateSelecterOption = function(selected_perspective_option) {
+  
+  // EXPORTS 
+  
+  exports.generateListChart =
+    function(
+      q_ids_array,
+      means_array,
+      references_array,
+      perspective_options_array,
+      shorttexts_array,
+      usertexts_map,
+      descriptions_array,
+      directions_array,
+      selected_perspective_option) {
+    
+    q_ids = q_ids_array;
+    means = means_array;
+    references = references_array;
+    perspective_options = perspective_options_array;
+    shorttexts = shorttexts_array;
+    usertexts = usertexts_map;
+    descriptions = descriptions_array;
+    directions = directions_array;
+
+    perspective_option = selected_perspective_option;
+    
+    computeDimensions();
+    
+    var chart = generateChart();
+    
+    y_scale = generateYScale(q_ids);
+        
+    generateYAxis(chart, shorttexts, y_scale);
+    
+    x_scale = generateXScale(chart);
+    
+    generateXAxisTop(chart, x_scale, usertexts);
+    
+    generateXAxisBottom(chart, x_scale, usertexts);
+    
+    generateBars(chart, q_ids, references, x_scale, y_scale);
+    
+    generateReferenceLines(chart, q_ids, x_scale, y_scale);
+
+    generateHeader();
+    
+    // populate the description box
+    setDescription(lastHoveredBar);
+    
+    generateStyle();
+  }
+  
+  exports.updateSelectorOption = function(selected_perspective_option) {
     perspective_option = selected_perspective_option;
     
     var bar = d3.selectAll(".barrect")
       .transition()
         .duration(barTransitionTime)
         .ease(d3.easeLinear)
-        .style("fill", function(d, i) { return colorForValue(data.means[i][perspective_option], data.references[i], data.direction_map[data.q_ids[i]]); })
-        .attr("width", function(d, i) { return x_scale(data.means[i][perspective_option]) + 1; });
+        .style("fill", function(d, i) {
+          return colorForValue(means[i][perspective_option], references[i], directions[i]); })
+        .attr("width", function(d, i) { return x_scale(means[i][perspective_option]) + 1; });
     
     /* repopulate the description box and reset the tooltip */
     tooltipOver(lastHoveredBar);
@@ -431,7 +463,7 @@
 
     img = img_selection.node();
 
-    img.onload = function(){
+    img.onload = function() {
       var canvas_chart_selection = d3.select('body').append('canvas')
         .attr("width", chartWidth)
         .attr("height", chartHeight)
@@ -441,7 +473,7 @@
       var chart_ctx = canvas_chart.getContext('2d');
       chart_ctx.drawImage(img, 0, 0);
       
-      var header_text = data.perspective_options[perspective_option];
+      var header_text = perspective_options[perspective_option];
       var header_padding_top = 5;
       var header_font_size = 16;
       var header_padding_bottom = 10;
@@ -474,7 +506,7 @@
       
       ctx.fillText(header_text, header_horizontal_shift + img_margin.left, header_padding_top + header_font_size + img_margin.top);
       
-      var source_text = data.usertexts.imageWaterStamp;
+      var source_text = usertexts.imageWaterStamp;
       var source_font_height = 11;
       ctx.font = source_font_height + "px sans-serif";
       ctx.fillStyle = "#555";
