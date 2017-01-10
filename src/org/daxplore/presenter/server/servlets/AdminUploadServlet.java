@@ -225,10 +225,10 @@ public class AdminUploadServlet extends HttpServlet {
 					} else if (fileName.startsWith("groups") ||	fileName.startsWith("perspectives")
 							|| fileName.startsWith("questions") || fileName.startsWith("settings")
 							|| fileName.startsWith("listview")) {
-						unpackStaticFile(pm, storeName, fileMap.get(fileName));
+						unpackStaticFile(pm, prefix, fileName, fileMap.get(fileName));
 					} else if(fileName.startsWith("usertexts")) {
 						unpackPropertyFile(pm, storeName, fileMap.get(fileName));
-						unpackStaticFile(pm, storeName, fileMap.get(fileName));
+						unpackStaticFile(pm, prefix, fileName, fileMap.get(fileName));
 					}
 				}
 			} catch (BadRequestException e) {
@@ -258,10 +258,10 @@ public class AdminUploadServlet extends HttpServlet {
 		}
 	}
 
-	private static void unpackStaticFile(PersistenceManager pm, String fileName, byte[] fileData) throws InternalServerException {
+	private static void unpackStaticFile(PersistenceManager pm, String prefix, String fileName, byte[] fileData) throws InternalServerException {
 		TextFileStore item;
 		try {
-			item = new TextFileStore(fileName, new String(fileData, "UTF-8"));
+			item = new TextFileStore(prefix, fileName, new String(fileData, "UTF-8"));
 			pm.makePersistent(item);
 			logger.log(Level.INFO, "Stored the static file '" + fileName + "'");
 		} catch (UnsupportedEncodingException e) {

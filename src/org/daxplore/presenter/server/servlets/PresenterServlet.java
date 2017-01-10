@@ -21,26 +21,25 @@ import java.io.StringReader;
 import java.io.Writer;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 
 import javax.jdo.PersistenceManager;
+import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
 import org.daxplore.presenter.server.ServerTools;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.QuestionMetadataServerImpl;
 import org.daxplore.presenter.server.storage.SettingItemStore;
 import org.daxplore.presenter.server.storage.StatDataItemStore;
+import org.daxplore.presenter.server.storage.StaticFileStore;
 import org.daxplore.presenter.server.storage.StorageTools;
 import org.daxplore.presenter.server.storage.TextFileStore;
 import org.daxplore.presenter.server.throwable.BadRequestException;
@@ -58,20 +57,13 @@ import org.json.simple.JSONValue;
 public class PresenterServlet extends HttpServlet {
 	private static Logger logger = Logger.getLogger(PresenterServlet.class.getName());
 	
-	private static String presenterHtmlTemplate = null;
-	private static String browserSuggestionTemplate = null;
-	private static String printHtmlTemplate = null;
-	private static String embedHtmlTemplate = null;
-	private static String gridHtmlTemplate = null;
-	private static String listHtmlTemplate = null;
-	private static String googleAnalyticsTrackingTemplate = null;
-	
-	private HashMap<String, QuestionMetadata> metadataMap = new HashMap<>(); 
-	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 		PersistenceManager pm = null;
 		try {
+			pm = PMF.get().getPersistenceManager();
+			ServletContext sc = getServletContext();
+			
 			// Get input from URL
 			//TODO use better and more stable parsing
 			String prefix = request.getPathInfo();
@@ -105,41 +97,27 @@ public class PresenterServlet extends HttpServlet {
 			}
 			browserSupported |= ignoreBadBrowser;
 			
-			pm = PMF.get().getPersistenceManager();
 			String googleAnalyticsID = SettingItemStore.getProperty(pm, prefix, "adminpanel", "gaID");
 			String gaTemplate = "";
 			if(googleAnalyticsID!=null && !googleAnalyticsID.equals("")) {
-				if (googleAnalyticsTrackingTemplate == null) {
-					try {
-						googleAnalyticsTrackingTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/js/ga-tracking.js"));
-					} catch (IOException e) {
-						throw new InternalServerException("Failed to load the google analytics tracking template", e);
-					}
-				}
-				gaTemplate = MessageFormat.format(googleAnalyticsTrackingTemplate, googleAnalyticsID);
+				String template = StaticFileStore.getStaticFile(sc, "/js/ga-tracking.js");
+				gaTemplate = MessageFormat.format(template, googleAnalyticsID);
 			}
 			
 			String responseHTML = "";
 			if (!browserSupported) {
-				responseHTML = getUnsupportedBrowserHTML(baseurl, gaTemplate);
+				responseHTML = getUnsupportedBrowserHTML(sc, baseurl, gaTemplate);
 			} else {
 				Locale locale = ServerTools.selectLocale(request, prefix);
 				
-				QuestionMetadata questionMetadata;
-				String key = prefix + "_" + locale.toLanguageTag();
-				if(metadataMap.containsKey(key)) {
-					questionMetadata = metadataMap.get(key);
-				} else {
-					String questionText = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
-					questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
-					metadataMap.put(key, questionMetadata);
-				}
+				String questionText = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
+				QuestionMetadata questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
 
 				if (feature!=null && feature.equalsIgnoreCase("embed")) { // embedded chart
 					
 					// TODO clean query string
 					String queryString = request.getParameter("q");
-					responseHTML = getEmbedHTML(pm, questionMetadata, prefix, locale, queryString, baseurl, gaTemplate);
+					responseHTML = getEmbedHTML(pm, sc, questionMetadata, prefix, locale, queryString, baseurl, gaTemplate);
 					
 				} else if (feature!=null && feature.equalsIgnoreCase("print")) { // printer-friendly chart
 					
@@ -153,20 +131,18 @@ public class PresenterServlet extends HttpServlet {
 					
 					// TODO clean query string
 					String queryString = request.getParameter("q");
-					responseHTML = getPrintHTML(pm, prefix, locale, serverPath, queryString, baseurl, gaTemplate);
+					responseHTML = getPrintHTML(pm, sc,  prefix, locale, serverPath, queryString, baseurl, gaTemplate);
 					
-				} else if(feature!=null && feature.equalsIgnoreCase("grid")) { // mean grid
-					responseHTML = getGridHTML(pm, prefix, locale, baseurl, gaTemplate);
 				} else if(feature!=null && feature.equalsIgnoreCase("list")) { // mean list
 					String perspectiveID = request.getParameter("p");
 					if(perspectiveID != null && questionMetadata.hasQuestion(perspectiveID)) {
-						responseHTML = getListHTML(pm, questionMetadata, prefix, perspectiveID, locale, baseurl, gaTemplate);
+						responseHTML = getListHTML(pm, sc, questionMetadata, prefix, perspectiveID, locale, baseurl, gaTemplate);
 					} else {
 						throw new BadRequestException("List request to prefix '" + prefix
 								+ "' with a perspective that doesn't exist: '" + perspectiveID + "'");
 					}
 				} else { // standard presenter
-					responseHTML = getPresenterHTML(pm, prefix, locale, baseurl, gaTemplate);
+					responseHTML = getPresenterHTML(pm, sc, prefix, locale, baseurl, gaTemplate);
 				}
 			}
 			
@@ -192,24 +168,19 @@ public class PresenterServlet extends HttpServlet {
 		}
 	}
 	
-	private String getUnsupportedBrowserHTML(String baseurl, String gaTemplate) throws InternalServerException {
-		if (browserSuggestionTemplate == null) {
-			try {
-				browserSuggestionTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/browser-suggestion.html"));
-			} catch (IOException e) {
-				throw new InternalServerException("Failed to load the html browser suggestion template", e);
-			}
-		}
+	private static String getUnsupportedBrowserHTML(ServletContext sc, String baseurl, String gaTemplate) throws InternalServerException {
 		
 		String[] arguments = {
 			baseurl,				// {0}
 			gaTemplate				// {1}
 		};
 		
-		return MessageFormat.format(browserSuggestionTemplate, (Object[])arguments);
+		String template = StaticFileStore.getStaticFile(sc, "/templates/browser-suggestion.html");
+		
+		return MessageFormat.format(template, (Object[])arguments);
 	}
 	
-	private String getPresenterHTML(PersistenceManager pm, String prefix, Locale locale, String baseurl, String gaTemplate)
+	private static String getPresenterHTML(PersistenceManager pm, ServletContext sc, String prefix, Locale locale, String baseurl, String gaTemplate)
 			throws InternalServerException, BadRequestException {
 		
 		String perspectives = "", groups = "", questions = "";
@@ -234,18 +205,13 @@ public class PresenterServlet extends HttpServlet {
 			gaTemplate				// {8}
 		};
 		
-		if (presenterHtmlTemplate == null) {
-			try {
-				presenterHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/presentation.html"));
-			} catch (IOException e) {
-				throw new InternalServerException("Failed to load the embed html template", e);
-			}
-		}
+		String template = StaticFileStore.getStaticFile(sc, "/templates/presentation.html");
 		
-		return MessageFormat.format(presenterHtmlTemplate, (Object[])arguments);
+		String result = MessageFormat.format(template, (Object[])arguments);
+		return result;
 	}
 	
-	private String getEmbedHTML(PersistenceManager pm, QuestionMetadata questionMetadata, String prefix, Locale locale,
+	private static String getEmbedHTML(PersistenceManager pm, ServletContext sc, QuestionMetadata questionMetadata, String prefix, Locale locale,
 			String queryString, String baseurl, String gaTemplate) throws BadRequestException, InternalServerException {
 		
 		QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, queryString);
@@ -273,18 +239,12 @@ public class PresenterServlet extends HttpServlet {
 			settings				// {7}
 		};
 		
-		if (embedHtmlTemplate == null) {
-			try {
-				embedHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/embed.html"));
-			} catch (IOException e) {
-				throw new InternalServerException("Failed to load the embed html template", e);
-			}
-		}
+		String template = StaticFileStore.getStaticFile(sc, "/templates/embed.html");
 		
-		return MessageFormat.format(embedHtmlTemplate, (Object[])arguments);
+		return MessageFormat.format(template, (Object[])arguments);
 	}
 	
-	private String getPrintHTML(PersistenceManager pm, String prefix, Locale locale,
+	private static String getPrintHTML(PersistenceManager pm, ServletContext sc, String prefix, Locale locale,
 			String serverPath, String queryString, String baseurl, String gaTemplate) throws InternalServerException, BadRequestException {
 		
 		LinkedList<EmbedFlag> flags = new LinkedList<>();
@@ -303,59 +263,16 @@ public class PresenterServlet extends HttpServlet {
 			queryString,			// {4}
 			locale.toLanguageTag(),	// {5}
 			prefix,					// {6}
-			embedDefinition,		// {7}
-			
+			embedDefinition,		// {7}	
 		};
 		
-		if (printHtmlTemplate == null) {
-			try {
-				printHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/print.html"));
-			} catch (IOException e) {
-				throw new InternalServerException("Failed to load print html template", e);
-			}
-		}
+		String template = StaticFileStore.getStaticFile(sc, "/templates/print.html");
 		
-		return MessageFormat.format(printHtmlTemplate, (Object[])arguments);
-	}
-	
-	private String getGridHTML(PersistenceManager pm, String prefix, Locale locale,
-			String baseurl, String gaTemplate) throws InternalServerException, BadRequestException {
-		
-		String perspectives = "", groups = "", questions = "";
-		perspectives = TextFileStore.getFile(pm, prefix, "perspectives.json");
-		questions = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
-		groups = TextFileStore.getLocalizedFile(pm, prefix, "groups", locale, ".json");
-		
-		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
-		
-		String settings = TextFileStore.getFile(pm, prefix, "settings.json");
-		String usertexts = TextFileStore.getLocalizedFile(pm, prefix, "usertexts", locale, ".json");
-		
-		String[] arguments = {
-				baseurl,				// {0}
-				pageTitle,				// {1}
-				prefix,					// {2}
-				perspectives,			// {3}
-				questions,				// {4}
-				groups,					// {5}
-				settings,				// {6}
-				usertexts,				// {7}
-				gaTemplate,				// {8}
-			};
-		
-		if (gridHtmlTemplate == null) {
-			try {
-				gridHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/grid.html"));
-			} catch (IOException e) {
-				throw new InternalServerException("Failed to load grid html template", e);
-			}
-		}
-		
-		return MessageFormat.format(gridHtmlTemplate, (Object[])arguments);
+		return MessageFormat.format(template, (Object[])arguments);
 	}
 	
 	@SuppressWarnings("unchecked")
-	private String getListHTML(PersistenceManager pm, QuestionMetadata questionMetadata, String prefix, 
+	private static String getListHTML(PersistenceManager pm, ServletContext sc, QuestionMetadata questionMetadata, String prefix, 
 			String perspectiveID, Locale locale, String baseurl, String gaTemplate) throws InternalServerException, BadRequestException {
 		
 		String questions = "";
@@ -372,12 +289,12 @@ public class PresenterServlet extends HttpServlet {
 		//TODO cache list data per perspective, make sure to also clear cache
 		JSONArray dataArray = new JSONArray();
 		for(String questionID : getAsStringArray(listVariables)) {
-			List<QueryFlag> flags = new LinkedList<>();
+			LinkedList<QueryFlag> flags = new LinkedList<>();
 			flags.add(QueryFlag.MEAN);
 			flags.add(QueryFlag.MEAN_REFERENCE);
 			
 			int optionCount = questionMetadata.getOptionCount(perspectiveID);
-			List<Integer> perspectiveOptions = new ArrayList<>(optionCount);
+			ArrayList<Integer> perspectiveOptions = new ArrayList<>(optionCount);
 			for (int i=0; i<optionCount; i++) {
 				perspectiveOptions.add(i);
 			}
@@ -390,30 +307,23 @@ public class PresenterServlet extends HttpServlet {
 		String listViewData = dataArray.toJSONString();
 		
 		String[] arguments = {
-				baseurl,				// {0}
-				pageTitle,				// {1}
-				prefix,					// {2}
-				perspectiveID,			// {3}
-				questions,				// {4}
-				settings,				// {5}
-				usertexts,				// {6}
-				listViewData,			// {7}
-				gaTemplate,				// {8}
-			};
+			baseurl,				// {0}
+			pageTitle,				// {1}
+			prefix,					// {2}
+			perspectiveID,			// {3}
+			questions,				// {4}
+			settings,				// {5}
+			usertexts,				// {6}
+			listViewData,			// {7}
+			gaTemplate,				// {8}
+		};
+	
+		String template = StaticFileStore.getStaticFile(sc, "/templates/list.html");
 		
-		if (listHtmlTemplate == null) {
-			try {
-				listHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/list.html"));
-			} catch (IOException e) {
-				throw new InternalServerException("Failed to load list html template", e);
-			}
-		}
-		
-		String result = listHtmlTemplate;
+		String result = template;
 		for (int i = 0; i < arguments.length; i++) {
 			result = result.replaceAll("\\{" + i + "\\}", Matcher.quoteReplacement(arguments[i]));
 		}
-		
 		
 		return result;
 	}

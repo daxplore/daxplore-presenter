@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
+import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
@@ -44,6 +45,10 @@ public class LocaleStore {
 			this.supportedLocales.add(l.toLanguageTag());
 		}
 		this.defaultLocale = defaultLocale.toLanguageTag();
+	}
+	
+	public static LocaleStore getLocaleStore(PersistenceManager pm, String prefix) {
+		return pm.getObjectById(LocaleStore.class, prefix);
 	}
 
 	public String getPrefix() {

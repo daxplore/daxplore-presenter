@@ -23,9 +23,6 @@ import java.util.List;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import org.daxplore.presenter.server.servlets.GetCsvServlet;
-import org.daxplore.presenter.server.servlets.GetStatsServlet;
-
 public class DeleteData {
 	
 	public static String deleteForPrefix(PersistenceManager pm, String prefix) {
@@ -74,10 +71,8 @@ public class DeleteData {
 		resultMessage.append(deletedBlobs).append(" file blobs deleted, ");
 		resultMessage.append(deletedStaticFileItems).append(" static file pointers ");
 		
-		//Clear caches in different places
-		GetStatsServlet.clearServletCache(prefix);
-		GetCsvServlet.clearServletCache();
-		TextFileStore.clearTextFileCache();
+		//Clear cache for prefix
+		//TODO
 		
 		long totalDeleted = deletedPrefixItems + deletedLocaleItems + deletedStatDataItems + deletedSettingItems + deletedStaticFileItems;
 		double timeSeconds = ((System.currentTimeMillis()-time)/Math.pow(10, 6));

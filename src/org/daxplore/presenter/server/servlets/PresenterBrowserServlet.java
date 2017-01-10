@@ -26,30 +26,23 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
+import org.daxplore.presenter.server.storage.StaticFileStore;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 
 @SuppressWarnings("serial")
 public class PresenterBrowserServlet extends HttpServlet {
 	private static Logger logger = Logger.getLogger(PresenterBrowserServlet.class.getName());
-	private static String welcomeTemplate = null;
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 		try {
-			if (welcomeTemplate == null) {
-				try {
-					welcomeTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/welcome.html"));
-				} catch (IOException e) {
-					throw new InternalServerException("Failed to load the welcome template", e);
-				}
-			}
+			String welcomeTemplate = StaticFileStore.getStaticFile(getServletContext(), "/templates/welcome.html");
 			
 			String baseurl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
 			
 			String[] arguments = {
-					baseurl
-				};
+				baseurl
+			};
 			
 			String responseHTML = MessageFormat.format(welcomeTemplate, (Object[])arguments);
 			

@@ -21,8 +21,6 @@ package org.daxplore.presenter.server.servlets;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,7 +37,6 @@ import org.daxplore.presenter.server.storage.TextFileStore;
 import org.daxplore.presenter.server.throwable.BadRequestException;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.QueryDefinition;
-import org.daxplore.presenter.shared.QuestionMetadata;
 import org.daxplore.shared.SharedResourceTools;
 
 /**
@@ -59,7 +56,6 @@ import org.daxplore.shared.SharedResourceTools;
 @SuppressWarnings("serial")
 public class GetStatsServlet extends HttpServlet {
 	private static Logger logger = Logger.getLogger(GetStatsServlet.class.getName());
-	private static Map<String, QuestionMetadata> metadataPrefixMap = new HashMap<>();
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -72,15 +68,14 @@ public class GetStatsServlet extends HttpServlet {
 			if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)){
 				throw new BadRequestException("Request made with syntactically invalid prefix: '" + prefix + "'");
 			}
-			if (!metadataPrefixMap.containsKey(prefix)) {
-				LocaleStore localeStore = pm.getObjectById(LocaleStore.class, prefix);
-				//it shouldn't matter what locale we use here, as we don't read any localized data
-				String questionText = TextFileStore.getLocalizedFile(pm, prefix, "questions", localeStore.getDefaultLocale(), ".json");
-				metadataPrefixMap.put(prefix, new QuestionMetadataServerImpl(new StringReader(questionText)));
-			}
+			
+			LocaleStore localeStore = pm.getObjectById(LocaleStore.class, prefix);
+			//it shouldn't matter what locale we use here, as we don't read any localized data
+			String questionText = TextFileStore.getLocalizedFile(pm, prefix, "questions", localeStore.getDefaultLocale(), ".json");
+			QuestionMetadataServerImpl qmsl = new QuestionMetadataServerImpl(new StringReader(questionText));
 			
 			String queryString = request.getParameter("q");
-			QueryDefinition queryDefinition = new QueryDefinition(metadataPrefixMap.get(prefix), queryString);
+			QueryDefinition queryDefinition = new QueryDefinition(qmsl, queryString);
 			
 			response.setContentType("text/html; charset=UTF-8");
 			try (PrintWriter respWriter = response.getWriter()) {
@@ -105,9 +100,5 @@ public class GetStatsServlet extends HttpServlet {
 				pm.close();
 			}
 		}
-	}
-	
-	public static void clearServletCache(String prefix) {
-		metadataPrefixMap.remove(prefix);
 	}
 }

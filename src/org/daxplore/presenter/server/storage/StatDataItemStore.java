@@ -19,10 +19,8 @@
 package org.daxplore.presenter.server.storage;
 
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;

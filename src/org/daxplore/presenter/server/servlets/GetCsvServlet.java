@@ -23,11 +23,9 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -69,7 +67,6 @@ import au.com.bytecode.opencsv.CSVWriter;
 @SuppressWarnings("serial")
 public class GetCsvServlet extends HttpServlet {
 	private Logger logger = Logger.getLogger(GetCsvServlet.class.getName());
-	private static Map<String, QuestionMetadata> metadataMap = new HashMap<>();
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -94,14 +91,9 @@ public class GetCsvServlet extends HttpServlet {
 			
 			Locale locale = new Locale(localeString);
 			QuestionMetadata questionMetadata;
-			String key = prefix + "_" + locale.toLanguageTag();
-			if(metadataMap.containsKey(key)) {
-				questionMetadata = metadataMap.get(key);
-			} else {
-				String questionText = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
-				questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
-				metadataMap.put(key, questionMetadata);
-			}
+
+			String questionText = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
+			questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
 			QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, queryString);
 			
 			List<String> questionOptionTexts = queryDefinition.getQuestionOptionTexts();
@@ -211,9 +203,5 @@ public class GetCsvServlet extends HttpServlet {
 				pm.close();
 			}
 		}
-	}
-	
-	public static void clearServletCache() {
-		metadataMap.clear();
 	}
 }

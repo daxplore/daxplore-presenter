@@ -27,36 +27,28 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
+import org.daxplore.presenter.server.storage.StaticFileStore;
 import org.daxplore.presenter.server.throwable.InternalServerException;
 
 @SuppressWarnings("serial")
 public class AdminPanelServlet extends HttpServlet {
 	private static final Logger logger = Logger.getLogger(AdminPanelServlet.class.getName());
-	private static String adminHtmlTemplate = null;
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 		try {
 				Locale locale = new Locale("en");
 				String pageTitle = "Daxplore Admin";
-				
-				if (adminHtmlTemplate == null) {
-					try {
-						adminHtmlTemplate = IOUtils.toString(getServletContext().getResourceAsStream("/templates/admin.html"));
-					} catch (IOException e) {
-						throw new InternalServerException("Failed to load the html admin template", e);
-					}
-				}
-				
+
+				String adminHtmlTemplate = StaticFileStore.getStaticFile(getServletContext(), "/templates/admin.html");
 				String baseurl = request.getRequestURL().toString();
 				baseurl = baseurl.substring(0, baseurl.lastIndexOf("/")+1);
 				
 				String[] arguments = {
-						locale.toLanguageTag(), // {0}
-						pageTitle,				// {1}
-						baseurl					// {2}
-						};
+					locale.toLanguageTag(), // {0}
+					pageTitle,				// {1}
+					baseurl					// {2}
+				};
 				
 			try (Writer writer = response.getWriter()) {
 				writer.write(MessageFormat.format(adminHtmlTemplate, (Object[])arguments));

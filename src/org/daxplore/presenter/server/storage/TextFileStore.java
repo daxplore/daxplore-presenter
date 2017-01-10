@@ -21,7 +21,6 @@ package org.daxplore.presenter.server.storage;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.annotations.PersistenceCapable;
@@ -40,8 +39,8 @@ public class TextFileStore {
 	@Persistent
 	private String prefix;
 	
-	private static Map<String, String> textFileCache = new HashMap<>();
-
+	private static HashMap<String, String> localCache = new HashMap<>();
+	
 	/**
 	 * Instantiate a new text file item.
 	 * 
@@ -57,30 +56,23 @@ public class TextFileStore {
 	 * @param file
 	 *            the text file as a string
 	 */
-	public TextFileStore(String key, String file) {
-		this.key = key;
+	public TextFileStore(String prefix, String fileName, String file) {
+		this.prefix = prefix;
+		this.key = prefix + "#" + fileName;
+		localCache.put(key, file);
 		fileChunks = SharedTools.splitString(file, 500); //JDO has a String length limit of 500
-		this.prefix = key.substring(0, key.indexOf('#'));
-	}
-	
-	/**
-	 * Get the file as a text string.
-	 * 
-	 * @return the file
-	 */
-	private String getFile() {
-		return SharedTools.join(fileChunks, "");
 	}
 	
 	public static String getFile(PersistenceManager pm, String prefix, String filename) throws BadRequestException {
 		String key = prefix + "#" + filename;
+		if (localCache.containsKey(key)) {
+			return localCache.get(key);
+		}
+		
 		try {
-			if(!textFileCache.containsKey(key)) {
-				String file = pm.getObjectById(TextFileStore.class, key).getFile();
-				textFileCache.put(key, file);
-				return file;
-			}
-			return textFileCache.get(key);
+			String file = SharedTools.join(pm.getObjectById(TextFileStore.class, key).fileChunks, "");
+			localCache.put(key, file);
+			return file;
 		} catch (Exception e) {
 			// This could also be an internal server exception, but we have no way of finding out
 			throw new BadRequestException("Could not read data item '" + key + "'", e);
@@ -89,10 +81,6 @@ public class TextFileStore {
 
 	public static String getLocalizedFile(PersistenceManager pm, String prefix, String name, Locale locale, String suffix) throws BadRequestException {
 		String filename = name + "_" + locale.getLanguage() + suffix;
-		return getFile(pm, prefix, filename);
-	}
-	
-	public static void clearTextFileCache() {
-		textFileCache.clear();
+ 		return getFile(pm, prefix, filename);
 	}
 }
