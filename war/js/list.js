@@ -14,8 +14,8 @@
   colors.average_text = "hsl(60, 60%, 31%)",
   colors.bad_text     = "hsl( 5, 38%, 42%)";
 
-  var q_ids, means, references, perspective_options, usertexts, descriptions, directions;
-  var data, perspective_option;
+  var q_ids, means, references, perspective_option, usertexts, descriptions, directions;
+  var selected_option;
   var charwrapperBB, xAxisTopHeight, xAxisBottomHeight, margin, width, height;
   var x_scale, y_scale;
   var yAxisWidth;
@@ -28,7 +28,7 @@
   
   function setToNormalColor(i) {
     d3.select("#barrect-" + q_ids[i])
-      .style("fill", colorForValue(means[i][perspective_option], references[i], directions[i]));
+      .style("fill", colorForValue(means[i][selected_option], references[i], directions[i]));
     d3.selectAll(".q-" + q_ids[i])
       .classed("bar-hover", false);
     d3.selectAll(".y.axis .tick")
@@ -37,7 +37,7 @@
   
   function setToHoverColor(i) {
     d3.select("#barrect-" + q_ids[i])
-      .style("fill", colorHoverForValue(means[i][perspective_option], references[i], directions[i]));
+      .style("fill", colorHoverForValue(means[i][selected_option], references[i], directions[i]));
     d3.selectAll(".q-" + q_ids[i])
       .classed("bar-hover", true);
     d3.selectAll(".y.axis .tick")
@@ -101,10 +101,10 @@
       .style("opacity", 1);
     
     tooltipdiv.html(
-        shorttexts[i] + ": <b>" + d3.format(".2s")(means[i][perspective_option]) + "</b><br>"
+        shorttexts[i] + ": <b>" + d3.format(".2s")(means[i][selected_option]) + "</b><br>"
         + usertexts.listReferenceValue + ": <b>" + d3.format(".2")(references[i]) + "</b>")
-      .style("background", colorHoverForValue(means[i][perspective_option], references[i],  directions[i]))
-      .style("left", (charwrapperBB.left + x_scale(Math.max(means[i][perspective_option], references[i])) + yAxisWidth + 14) + "px")   
+      .style("background", colorHoverForValue(means[i][selected_option], references[i],  directions[i]))
+      .style("left", (charwrapperBB.left + x_scale(Math.max(means[i][selected_option], references[i])) + yAxisWidth + 14) + "px")   
       .style("top", charwrapperBB.top +  y_scale(q_ids[i]) + y_scale.bandwidth()/2 - tooltipdiv.node().getBoundingClientRect().height/2 + "px");
     
     var arrowleft = d3.select(".arrow-left");
@@ -114,8 +114,8 @@
       .style("opacity", 1);    
     
     arrowleft
-      .style("border-right-color", colorHoverForValue(means[i][perspective_option], references[i],  directions[i]))
-      .style("left", (charwrapperBB.left + x_scale(Math.max(means[i][perspective_option], references[i])) + yAxisWidth + 4) + "px")   
+      .style("border-right-color", colorHoverForValue(means[i][selected_option], references[i],  directions[i]))
+      .style("left", (charwrapperBB.left + x_scale(Math.max(means[i][selected_option], references[i])) + yAxisWidth + 4) + "px")   
       .style("top", charwrapperBB.top +  y_scale(q_ids[i]) + y_scale.bandwidth()/2 - arrowleft.node().getBoundingClientRect().height/2 + "px");
       
     setDescription(i);
@@ -128,14 +128,14 @@
       .duration(0)
       .style("opacity", 1);
     
-    var color = colorTextForValue(means[i][perspective_option], references[i],  directions[i]);
-    var header = "<span class='description-header'>" + perspective_options[perspective_option] + "</span><br><b>" + shorttexts[i] + ": " + d3.format(".2")(means[i][perspective_option]) + "</b><br>"
+    var color = colorTextForValue(means[i][selected_option], references[i],  directions[i]);
+    var header = "<span class='description-header'>" + perspective_option[selected_option] + "</span><br><b>" + shorttexts[i] + ": " + d3.format(".2")(means[i][selected_option]) + "</b><br>"
     var subheader = "<b>" + usertexts.listReferenceValue + ": " + d3.format(".2")(references[i]) + "</b><br>"; 
     
     
-    var trueDiff = means[i][perspective_option] - references[i]; 
+    var trueDiff = means[i][selected_option] - references[i]; 
     if (directions[i] == "LOW") {
-      var diff = references[i] - means[i][perspective_option]; 
+      var diff = references[i] - means[i][selected_option]; 
     } else {
       var diff = trueDiff; 
     }
@@ -277,7 +277,7 @@
         .text(usertexts.listXAxisDescription); 
   }
   
-  function generateBars(chart, q_ids, references, x_scale, y_scale) {
+  function generateBars(chart, means, q_ids, references, x_scale, y_scale) {
     var bar = chart.selectAll(".bar")
         .data(q_ids)
       .enter().append("g")
@@ -288,8 +288,8 @@
       .attr("class", "barrect")
       .attr("id", function(d, i) { return "barrect-" + d; })
       .attr("height", y_scale.bandwidth())
-      .style("fill", function(d, i) { return colorForValue(means[i][perspective_option], references[i], directions[i]); })
-      .attr("width", function(d, i) { return x_scale(means[i][perspective_option]) + 1; })
+      .style("fill", function(d, i) { return colorForValue(means[i][selected_option], references[i], directions[i]); })
+      .attr("width", function(d, i) { return x_scale(means[i][selected_option]) + 1; })
       .on("mouseover",
         function(d, i) {
           tooltipOver(i);
@@ -379,23 +379,23 @@
       q_ids_array,
       means_array,
       references_array,
-      perspective_options_array,
+      perspective_option_array,
       shorttexts_array,
       usertexts_map,
       descriptions_array,
       directions_array,
-      selected_perspective_option) {
+      selected_selected_option) {
     
     q_ids = q_ids_array;
     means = means_array;
     references = references_array;
-    perspective_options = perspective_options_array;
+    perspective_option = perspective_option_array;
     shorttexts = shorttexts_array;
     usertexts = usertexts_map;
     descriptions = descriptions_array;
     directions = directions_array;
 
-    perspective_option = selected_perspective_option;
+    selected_option = selected_selected_option;
     
     computeDimensions();
     
@@ -411,7 +411,7 @@
     
     generateXAxisBottom(chart, x_scale, usertexts);
     
-    generateBars(chart, q_ids, references, x_scale, y_scale);
+    generateBars(chart, means, q_ids, references, x_scale, y_scale);
     
     generateReferenceLines(chart, q_ids, x_scale, y_scale);
 
@@ -423,16 +423,16 @@
     generateStyle();
   }
   
-  exports.updateSelectorOption = function(selected_perspective_option) {
-    perspective_option = selected_perspective_option;
+  exports.updateSelectorOption = function(selected_selected_option) {
+    selected_option = selected_selected_option;
     
     var bar = d3.selectAll(".barrect")
       .transition()
         .duration(barTransitionTime)
         .ease(d3.easeLinear)
         .style("fill", function(d, i) {
-          return colorForValue(means[i][perspective_option], references[i], directions[i]); })
-        .attr("width", function(d, i) { return x_scale(means[i][perspective_option]) + 1; });
+          return colorForValue(means[i][selected_option], references[i], directions[i]); })
+        .attr("width", function(d, i) { return x_scale(means[i][selected_option]) + 1; });
     
     /* repopulate the description box and reset the tooltip */
     tooltipOver(lastHoveredBar);
@@ -473,7 +473,7 @@
       var chart_ctx = canvas_chart.getContext('2d');
       chart_ctx.drawImage(img, 0, 0);
       
-      var header_text = perspective_options[perspective_option];
+      var header_text = perspective_option[selected_option];
       var header_padding_top = 5;
       var header_font_size = 16;
       var header_padding_bottom = 10;
