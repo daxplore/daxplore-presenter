@@ -20,12 +20,10 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.Writer;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 
 import javax.jdo.PersistenceManager;
 import javax.servlet.ServletContext;
@@ -47,11 +45,8 @@ import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.daxplore.presenter.shared.EmbedDefinition;
 import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
 import org.daxplore.presenter.shared.QueryDefinition;
-import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 import org.daxplore.presenter.shared.QuestionMetadata;
 import org.daxplore.shared.SharedResourceTools;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONValue;
 
 @SuppressWarnings("serial")
 public class PresenterServlet extends HttpServlet {
@@ -97,16 +92,9 @@ public class PresenterServlet extends HttpServlet {
 			}
 			browserSupported |= ignoreBadBrowser;
 			
-			String googleAnalyticsID = SettingItemStore.getProperty(pm, prefix, "adminpanel", "gaID");
-			String gaTemplate = "";
-			if(googleAnalyticsID!=null && !googleAnalyticsID.equals("")) {
-				String template = StaticFileStore.getStaticFile(sc, "/js/ga-tracking.js");
-				gaTemplate = MessageFormat.format(template, googleAnalyticsID);
-			}
-			
 			String responseHTML = "";
 			if (!browserSupported) {
-				responseHTML = getUnsupportedBrowserHTML(sc, baseurl, gaTemplate);
+				responseHTML = getUnsupportedBrowserHTML(sc, baseurl, generateGATemplate(pm, sc, prefix));
 			} else {
 				Locale locale = ServerTools.selectLocale(request, prefix);
 				
@@ -114,13 +102,10 @@ public class PresenterServlet extends HttpServlet {
 				QuestionMetadata questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
 
 				if (feature!=null && feature.equalsIgnoreCase("embed")) { // embedded chart
-					
 					// TODO clean query string
 					String queryString = request.getParameter("q");
-					responseHTML = getEmbedHTML(pm, sc, questionMetadata, prefix, locale, queryString, baseurl, gaTemplate);
-					
+					responseHTML = getEmbedHTML(pm, sc, questionMetadata, prefix, locale, queryString, baseurl, generateGATemplate(pm, sc, prefix));
 				} else if (feature!=null && feature.equalsIgnoreCase("print")) { // printer-friendly chart
-					
 					String serverPath = request.getRequestURL().toString();
 					// remove last slash
 					if (serverPath.charAt(serverPath.length() - 1) == '/') {
@@ -131,18 +116,18 @@ public class PresenterServlet extends HttpServlet {
 					
 					// TODO clean query string
 					String queryString = request.getParameter("q");
-					responseHTML = getPrintHTML(pm, sc,  prefix, locale, serverPath, queryString, baseurl, gaTemplate);
+					responseHTML = getPrintHTML(pm, sc,  prefix, locale, serverPath, queryString, baseurl, generateGATemplate(pm, sc, prefix));
 					
 				} else if(feature!=null && feature.equalsIgnoreCase("list")) { // mean list
 					String perspectiveID = request.getParameter("p");
 					if(perspectiveID != null && questionMetadata.hasQuestion(perspectiveID)) {
-						responseHTML = getListHTML(pm, sc, questionMetadata, prefix, perspectiveID, locale, baseurl, gaTemplate);
+						responseHTML = TextFileStore.getLocalizedFile(pm, prefix, "profile_" + perspectiveID, locale, ".html");
 					} else {
 						throw new BadRequestException("List request to prefix '" + prefix
 								+ "' with a perspective that doesn't exist: '" + perspectiveID + "'");
 					}
 				} else { // standard presenter
-					responseHTML = getPresenterHTML(pm, sc, prefix, locale, baseurl, gaTemplate);
+					responseHTML = TextFileStore.getLocalizedFile(pm, prefix, "explorer", locale, ".html");
 				}
 			}
 			
@@ -168,6 +153,16 @@ public class PresenterServlet extends HttpServlet {
 		}
 	}
 	
+	private static String generateGATemplate(PersistenceManager pm, ServletContext sc, String prefix) throws InternalServerException {
+		String googleAnalyticsID = SettingItemStore.getProperty(pm, prefix, "adminpanel", "gaID");
+		String gaTemplate = "";
+		if(googleAnalyticsID!=null && !googleAnalyticsID.equals("")) {
+			String template = StaticFileStore.getStaticFile(sc, "/js/ga-tracking.js");
+			gaTemplate = MessageFormat.format(template, googleAnalyticsID);
+		}
+		return gaTemplate;
+	}
+	
 	private static String getUnsupportedBrowserHTML(ServletContext sc, String baseurl, String gaTemplate) throws InternalServerException {
 		
 		String[] arguments = {
@@ -178,37 +173,6 @@ public class PresenterServlet extends HttpServlet {
 		String template = StaticFileStore.getStaticFile(sc, "/templates/browser-suggestion.html");
 		
 		return MessageFormat.format(template, (Object[])arguments);
-	}
-	
-	private static String getPresenterHTML(PersistenceManager pm, ServletContext sc, String prefix, Locale locale, String baseurl, String gaTemplate)
-			throws InternalServerException, BadRequestException {
-		
-		String perspectives = "", groups = "", questions = "";
-		perspectives = TextFileStore.getFile(pm, prefix, "perspectives.json");
-		questions = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
-		groups = TextFileStore.getLocalizedFile(pm, prefix, "groups", locale, ".json");
-		
-		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
-		
-		String settings = TextFileStore.getFile(pm, prefix, "settings.json");
-		String usertexts = TextFileStore.getLocalizedFile(pm, prefix, "usertexts", locale, ".json");
-		
-		String[] arguments = {
-			baseurl,				// {0}
-			pageTitle,				// {1}
-			prefix,					// {2}
-			perspectives,			// {3}
-			questions,				// {4}
-			groups,					// {5}
-			settings,				// {6}
-			usertexts,				// {7}
-			gaTemplate				// {8}
-		};
-		
-		String template = StaticFileStore.getStaticFile(sc, "/templates/presentation.html");
-		
-		String result = MessageFormat.format(template, (Object[])arguments);
-		return result;
 	}
 	
 	private static String getEmbedHTML(PersistenceManager pm, ServletContext sc, QuestionMetadata questionMetadata, String prefix, Locale locale,
@@ -269,70 +233,5 @@ public class PresenterServlet extends HttpServlet {
 		String template = StaticFileStore.getStaticFile(sc, "/templates/print.html");
 		
 		return MessageFormat.format(template, (Object[])arguments);
-	}
-	
-	@SuppressWarnings("unchecked")
-	private static String getListHTML(PersistenceManager pm, ServletContext sc, QuestionMetadata questionMetadata, String prefix, 
-			String perspectiveID, Locale locale, String baseurl, String gaTemplate) throws InternalServerException, BadRequestException {
-		
-		String questions = "";
-		questions = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
-		
-		String pageTitle = SettingItemStore.getLocalizedProperty(pm, prefix, "usertexts", locale, "pageTitle");
-		
-		String settings = TextFileStore.getFile(pm, prefix, "settings.json");
-		String usertexts = TextFileStore.getLocalizedFile(pm, prefix, "usertexts", locale, ".json");
-		
-		String listview = TextFileStore.getFile(pm, prefix, "listview.json");
-		JSONArray listVariables = (JSONArray)JSONValue.parse(listview);
-		
-		//TODO cache list data per perspective, make sure to also clear cache
-		JSONArray dataArray = new JSONArray();
-		for(String questionID : getAsStringArray(listVariables)) {
-			LinkedList<QueryFlag> flags = new LinkedList<>();
-			flags.add(QueryFlag.MEAN);
-			flags.add(QueryFlag.MEAN_REFERENCE);
-			
-			int optionCount = questionMetadata.getOptionCount(perspectiveID);
-			ArrayList<Integer> perspectiveOptions = new ArrayList<>(optionCount);
-			for (int i=0; i<optionCount; i++) {
-				perspectiveOptions.add(i);
-			}
-			
-			QueryDefinition queryDefinition =
-					new QueryDefinition(questionMetadata, questionID, perspectiveID, perspectiveOptions, flags);
-			dataArray.add(JSONValue.parse(StatDataItemStore.getStats(pm, prefix, queryDefinition)));
-		}
-		
-		String listViewData = dataArray.toJSONString();
-		
-		String[] arguments = {
-			baseurl,				// {0}
-			pageTitle,				// {1}
-			prefix,					// {2}
-			perspectiveID,			// {3}
-			questions,				// {4}
-			settings,				// {5}
-			usertexts,				// {6}
-			listViewData,			// {7}
-			gaTemplate,				// {8}
-		};
-	
-		String template = StaticFileStore.getStaticFile(sc, "/templates/list.html");
-		
-		String result = template;
-		for (int i = 0; i < arguments.length; i++) {
-			result = result.replaceAll("\\{" + i + "\\}", Matcher.quoteReplacement(arguments[i]));
-		}
-		
-		return result;
-	}
-	
-	private static String[] getAsStringArray(JSONArray dataJson) {
-		String[] data = new String[dataJson.size()];
-		for (int i = 0; i<data.length; i++) {
-			data[i] = (String)dataJson.get(i);
-		}
-		return data;
 	}
 }

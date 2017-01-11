@@ -45,6 +45,7 @@ import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
 import org.daxplore.presenter.server.ServerTools;
 import org.daxplore.presenter.server.admin.UploadFileManifest;
+import org.daxplore.presenter.server.storage.BuildPresentations;
 import org.daxplore.presenter.server.storage.DeleteData;
 import org.daxplore.presenter.server.storage.LocaleStore;
 import org.daxplore.presenter.server.storage.PMF;
@@ -89,7 +90,7 @@ public class AdminUploadServlet extends HttpServlet {
 		    String prefix = null;
 		    try {
 				FileItemIterator fileIterator = upload.getItemIterator(request);
-				String fileName = "";
+				String filename = "";
 				byte[] fileData = null;
 				while(fileIterator.hasNext()) {
 					FileItemStream item = fileIterator.next();
@@ -101,14 +102,14 @@ public class AdminUploadServlet extends HttpServlet {
 								throw new BadRequestException("Form contains extra fields");
 							}
 						} else {
-							fileName = item.getName();
+							filename = item.getName();
 							fileData = IOUtils.toByteArray(stream);
 						}
 					}
 				}
 				if(SharedResourceTools.isSyntacticallyValidPrefix(prefix)) {
-					if(fileData!=null && !fileName.equals("")) {
-						 pm = PMF.get().getPersistenceManager();
+					if(fileData!=null && !filename.equals("")) {
+						pm = PMF.get().getPersistenceManager();
 						unzipAll(pm, prefix, fileData);
 					} else {
 						throw new BadRequestException("No file uploaded");
@@ -116,6 +117,7 @@ public class AdminUploadServlet extends HttpServlet {
 				} else {
 					throw new BadRequestException("Request made with invalid prefix: '" + prefix + "'");
 				}
+				BuildPresentations.buildAndStorePresentation(pm, getServletContext(), request, prefix);
 				logger.log(Level.INFO, "Unpacked new data for prefix '" + prefix + "' in " + ((System.nanoTime()-time)/1000000000.0) + " seconds");
 			} catch (FileUploadException | IOException | BadRequestException e) {
 				logger.log(Level.WARNING, e.getMessage(), e);
@@ -218,17 +220,17 @@ public class AdminUploadServlet extends HttpServlet {
 				pm.makePersistent(localeStore);
 				logger.log(Level.INFO, "Added locale settings for prefix '" + prefix + "'");
 		
-				for (String fileName : fileMap.keySet()) {
-					String storeName = prefix + "#" + fileName;
-					if (fileName.startsWith("data")) {
-						unpackStatisticalDataFile(pm, prefix, fileMap.get(fileName));
-					} else if (fileName.startsWith("groups") ||	fileName.startsWith("perspectives")
-							|| fileName.startsWith("questions") || fileName.startsWith("settings")
-							|| fileName.startsWith("listview")) {
-						unpackStaticFile(pm, prefix, fileName, fileMap.get(fileName));
-					} else if(fileName.startsWith("usertexts")) {
-						unpackPropertyFile(pm, storeName, fileMap.get(fileName));
-						unpackStaticFile(pm, prefix, fileName, fileMap.get(fileName));
+				for (String filename : fileMap.keySet()) {
+					String storeName = prefix + "#" + filename;
+					if (filename.startsWith("data")) {
+						unpackStatisticalDataFile(pm, prefix, fileMap.get(filename));
+					} else if (filename.startsWith("groups") ||	filename.startsWith("perspectives")
+							|| filename.startsWith("questions") || filename.startsWith("settings")
+							|| filename.startsWith("listview")) {
+						unpackStaticFile(pm, prefix, filename, fileMap.get(filename));
+					} else if(filename.startsWith("usertexts")) {
+						unpackPropertyFile(pm, storeName, fileMap.get(filename));
+						unpackStaticFile(pm, prefix, filename, fileMap.get(filename));
 					}
 				}
 			} catch (BadRequestException e) {
@@ -239,31 +241,31 @@ public class AdminUploadServlet extends HttpServlet {
 		}
 	}
 
-	private static void unpackPropertyFile(PersistenceManager pm, String fileName, byte[] fileData) throws InternalServerException {
+	private static void unpackPropertyFile(PersistenceManager pm, String filename, byte[] fileData) throws InternalServerException {
 		int addedSettings = 0;
 		try(BufferedReader reader = ServerTools.getAsBufferedReader(fileData)) {
 			List<SettingItemStore> items = new LinkedList<>();
 			JSONObject dataMap = (JSONObject) JSONValue.parse(reader);
 			for (Object prop : dataMap.keySet()) {
-				String key = fileName.substring(0, fileName.lastIndexOf('.')) + "/" + prop;
+				String key = filename.substring(0, filename.lastIndexOf('.')) + "/" + prop;
 				String value = (String) dataMap.get(prop);
 				items.add(new SettingItemStore(key, value));
 				addedSettings++;
 			}
 			pm.makePersistentAll(items);
-			logger.log(Level.INFO, "Set " + addedSettings + " properties from the file '" + fileName + "'");
+			logger.log(Level.INFO, "Set " + addedSettings + " properties from the file '" + filename + "'");
 			//TODO tell uploading user of missing properties
 		} catch(IOException e) {
 			throw new InternalServerException("Failed to close unpack property file", e);
 		}
 	}
 
-	private static void unpackStaticFile(PersistenceManager pm, String prefix, String fileName, byte[] fileData) throws InternalServerException {
+	private static void unpackStaticFile(PersistenceManager pm, String prefix, String filename, byte[] fileData) throws InternalServerException {
 		TextFileStore item;
 		try {
-			item = new TextFileStore(prefix, fileName, new String(fileData, "UTF-8"));
+			item = new TextFileStore(prefix, filename, new String(fileData, "UTF-8"));
 			pm.makePersistent(item);
-			logger.log(Level.INFO, "Stored the static file '" + fileName + "'");
+			logger.log(Level.INFO, "Stored the static file '" + filename + "'");
 		} catch (UnsupportedEncodingException e) {
 			throw new InternalServerException("UTF-8 not supported by server", e);
 		}

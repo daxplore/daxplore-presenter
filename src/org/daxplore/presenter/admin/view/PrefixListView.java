@@ -31,6 +31,8 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 public interface PrefixListView {
 	
 	void addAddPrefixClickHandler(ClickHandler handler);
+	
+	void addRebuildPresentationsClickHandler(ClickHandler handler);
 
 	String promptForPrefixName();
 

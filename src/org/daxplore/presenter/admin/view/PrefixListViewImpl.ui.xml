@@ -13,6 +13,11 @@
 			font-size: large;
 			font-weight: bold;
 		}
+		.header-presentation {
+			font-size: large;
+			font-weight: bold;
+			margin-top: 30px;
+		}
 		.list {
 			padding: 5px;
 			border: solid 1px darkgray;
@@ -24,6 +29,7 @@
 			padding: 5px;
 		}
 		.button {
+			margin-top: 10px;
 			width: 100%;
 		}
 	</ui:style>
@@ -31,5 +37,7 @@
 		<g:Label styleName="{style.header}">Select a prefix</g:Label>
 		<w:CellList styleName="{style.list}" ui:field='prefixCellList'/>
 		<g:Button ui:field='addPrefixButton' styleName="{style.button}">Add a new prefix</g:Button>
+		<g:Label styleName="{style.header-presentation}">Presentation&nbsp;templates</g:Label>
+		<g:Button ui:field='rebuildPresentationsButton' styleName="{style.button}">Rebuild all</g:Button>
 	</g:VerticalPanel>
 </ui:UiBinder> 

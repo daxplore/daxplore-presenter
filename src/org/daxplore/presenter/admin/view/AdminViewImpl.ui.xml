@@ -53,7 +53,7 @@
 		<g:south size='40'>
 			<g:Label styleName="{style.footer}">Daxplore Presenter is free software. Developed by Axel Winkler and Daniel Dunér at Stockholm University.</g:Label>
 		</g:south>
-		<g:west size='175'>
+		<g:west size='250'>
 			<g:SimplePanel styleName="{style.sidebar}" ui:field='sidebarContentSlot'/>
 		</g:west>
 		<g:center>

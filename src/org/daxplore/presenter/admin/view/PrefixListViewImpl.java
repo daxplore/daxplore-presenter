@@ -51,6 +51,9 @@ public class PrefixListViewImpl extends Composite implements PrefixListView {
 	@UiField
 	protected Button addPrefixButton;
 	
+	@UiField
+	protected Button rebuildPresentationsButton;
+	
 	private SingleSelectionModel<String> selectionModel;
 	private List<String> prefixList = new LinkedList<>();
 	
@@ -73,6 +76,14 @@ public class PrefixListViewImpl extends Composite implements PrefixListView {
 	@Override
 	public void addAddPrefixClickHandler(ClickHandler handler) {
 		addPrefixButton.addClickHandler(handler);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void addRebuildPresentationsClickHandler(ClickHandler handler) {
+		rebuildPresentationsButton.addClickHandler(handler);
 	}
 
 	/**

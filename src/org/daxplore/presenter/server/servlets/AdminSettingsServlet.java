@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.daxplore.presenter.server.storage.BuildPresentations;
 import org.daxplore.presenter.server.storage.PMF;
 import org.daxplore.presenter.server.storage.SettingItemStore;
 import org.daxplore.presenter.server.throwable.BadRequestException;
@@ -51,15 +52,15 @@ public class AdminSettingsServlet extends HttpServlet {
 		try {
 			pm = PMF.get().getPersistenceManager();
 			String prefix = request.getParameter("prefix");
-			if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)){
-				throw new BadRequestException("Not a syntactically valid prefix: '" + prefix + "'");
-			}
 			String action = request.getParameter("action");
 			if(action==null) {
 				throw new BadRequestException("No action requested");
 			}
 			switch(action) {
 			case "get":
+				if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)){
+					throw new BadRequestException("Not a syntactically valid prefix: '" + prefix + "'");
+				}
 				JSONObject json = new JSONObject();
 				for(String key : settings) {
 					String value = SettingItemStore.getProperty(pm, prefix, "adminpanel", key);
@@ -72,6 +73,9 @@ public class AdminSettingsServlet extends HttpServlet {
 				}
 				break;
 			case "put":
+				if(!SharedResourceTools.isSyntacticallyValidPrefix(prefix)){
+					throw new BadRequestException("Not a syntactically valid prefix: '" + prefix + "'");
+				}
 				for(String key : settings) {
 					String value = request.getParameter(key);
 					boolean isValid = false;
@@ -97,11 +101,15 @@ public class AdminSettingsServlet extends HttpServlet {
 							setting = new SettingItemStore(statStoreKey, value);
 						}
 						pm.makePersistent(setting);
+						BuildPresentations.buildAndStorePresentation(pm, getServletContext(), request, prefix);
 						logger.log(Level.INFO, "Set property '" + statStoreKey + "' to '" + value + "'");
 					} else {
 						throw new BadRequestException("Invalid value for setting '" + key + "': '" + value + "'");
 					}
 				}
+				break;
+			case "rebuild-presentations":
+				BuildPresentations.buildAndStoreAllPresentations(pm, getServletContext(), request);
 				break;
 			default:
 				throw new BadRequestException("Invalid action '" + request.getParameter("action") + "' requested");

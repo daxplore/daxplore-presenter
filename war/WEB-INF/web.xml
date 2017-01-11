@@ -43,7 +43,7 @@
 		<url-pattern>/pixel/*</url-pattern>
 	</servlet-mapping>
 	
-	
+		
 	<!-- Password protected admin servlets -->
 	
 	<servlet>
@@ -81,8 +81,17 @@
 		<servlet-name>adminSettings</servlet-name>
 		<url-pattern>/admin/settings</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>hydrateCache</servlet-name>
+		<servlet-class>org.daxplore.presenter.server.servlets.HydrateCacheServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>hydrateCache</servlet-name>
+		<url-pattern>/hydrateCache</url-pattern>
+	</servlet-mapping>
 
-
+	
 	<!-- Administrator security constraints -->
 
 	<security-constraint>

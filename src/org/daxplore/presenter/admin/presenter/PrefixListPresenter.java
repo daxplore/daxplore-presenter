@@ -24,10 +24,15 @@ import org.daxplore.presenter.admin.event.PrefixListUpdateEvent;
 import org.daxplore.presenter.admin.event.PrefixListUpdateHandler;
 import org.daxplore.presenter.admin.event.SelectPrefixEvent;
 import org.daxplore.presenter.admin.model.PrefixDataModel;
+import org.daxplore.presenter.admin.model.ServerPost;
 import org.daxplore.presenter.admin.view.PrefixListView;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.inject.Inject;
@@ -54,6 +59,13 @@ public class PrefixListPresenter implements Presenter {
 			@Override
 			public void onClick(ClickEvent event) {
 				doAddPrefixName();
+			}
+		});
+		
+		display.addRebuildPresentationsClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				sendRebuildPresentationsRequest();
 			}
 		});
 		
@@ -88,6 +100,16 @@ public class PrefixListPresenter implements Presenter {
 		
 		model.addPrefix(prefix);
 		prefixToBeSelected = prefix;
+	}
+	
+	private static void sendRebuildPresentationsRequest() {
+		String href = Window.Location.getProtocol() + "//" + Window.Location.getHost() + Window.Location.getPath() + "/settings";
+		ServerPost.send(href + "?action=rebuild-presentations", new RequestCallback() {
+			@Override
+			public void onResponseReceived(Request request, Response response) {}
+			@Override
+			public void onError(Request request, Throwable exception) {}
+		});
 	}
 	
 	private void doUpdatePrefixList(List<String> prefixList) {

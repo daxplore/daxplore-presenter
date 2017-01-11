@@ -24,7 +24,6 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 public class DeleteData {
-	
 	public static String deleteForPrefix(PersistenceManager pm, String prefix) {
 		long time = System.currentTimeMillis();
 		
@@ -70,9 +69,6 @@ public class DeleteData {
 		int deletedStaticFileItems = fileItems.size();
 		resultMessage.append(deletedBlobs).append(" file blobs deleted, ");
 		resultMessage.append(deletedStaticFileItems).append(" static file pointers ");
-		
-		//Clear cache for prefix
-		//TODO
 		
 		long totalDeleted = deletedPrefixItems + deletedLocaleItems + deletedStatDataItems + deletedSettingItems + deletedStaticFileItems;
 		double timeSeconds = ((System.currentTimeMillis()-time)/Math.pow(10, 6));

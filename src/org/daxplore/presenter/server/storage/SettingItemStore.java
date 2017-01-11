@@ -83,8 +83,8 @@ public class SettingItemStore {
 		this.value = value;
 	}
 	
-	public static String getProperty(PersistenceManager pm, String prefix, String fileName, String propertyName) {
-		String statStoreKey = prefix + "#" + fileName + "/" + propertyName;
+	public static String getProperty(PersistenceManager pm, String prefix, String filename, String propertyName) {
+		String statStoreKey = prefix + "#" + filename + "/" + propertyName;
 		try {
 			return pm.getObjectById(SettingItemStore.class, statStoreKey).getValue();
 		} catch (JDOObjectNotFoundException e) {
@@ -94,8 +94,8 @@ public class SettingItemStore {
 	}
 	
 	public static String getLocalizedProperty(PersistenceManager pm, String prefix,
-			String fileName, Locale locale, String propertyName) throws BadRequestException {
-		String statStoreKey = prefix + "#" + fileName + "_" + locale.toLanguageTag() + "/" + propertyName;
+			String filename, Locale locale, String propertyName) throws BadRequestException {
+		String statStoreKey = prefix + "#" + filename + "_" + locale.toLanguageTag() + "/" + propertyName;
 		try {
 			return pm.getObjectById(SettingItemStore.class, statStoreKey).getValue();
 		} catch (JDOObjectNotFoundException e) {

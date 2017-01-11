@@ -31,24 +31,24 @@ import org.daxplore.presenter.server.throwable.InternalServerException;
 public class StaticFileStore {
 	private static Map<String, String> staticFileCache = new HashMap<>(); 
 	
-	public static String getStaticFile(ServletContext sc, String fileName) throws InternalServerException {
-		String key = getStaticFileKey(fileName);
+	public static String getStaticFile(ServletContext sc, String filename) throws InternalServerException {
+		String key = getStaticFileKey(filename);
 		if (staticFileCache.containsKey(key)) {
 			return staticFileCache.get(key);
 		}
-		loadStaticFile(sc, fileName);
+		loadStaticFile(sc, filename);
 		return staticFileCache.get(key);
 	}
 	
-	public static void loadStaticFile(ServletContext sc, String fileName) throws InternalServerException {
+	public static void loadStaticFile(ServletContext sc, String filename) throws InternalServerException {
 		try {
-			String key = getStaticFileKey(fileName);
+			String key = getStaticFileKey(filename);
 			if (!staticFileCache.containsKey(key)) {
-				String file = IOUtils.toString(sc.getResourceAsStream(fileName));
+				String file = IOUtils.toString(sc.getResourceAsStream(filename));
 				staticFileCache.put(key, file);
 			}
 		} catch (IOException e) {
-			throw new InternalServerException("Failed to load the static file: '" + fileName + "'", e);
+			throw new InternalServerException("Failed to load the static file: '" + filename + "'", e);
 		}
 	}
 	
@@ -56,7 +56,7 @@ public class StaticFileStore {
 		staticFileCache.clear();
 	}
 	
-	private static String getStaticFileKey(String fileName) {
-		return fileName;
+	private static String getStaticFileKey(String filename) {
+		return filename;
 	}
 }

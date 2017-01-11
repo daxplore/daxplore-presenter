@@ -56,21 +56,23 @@ public class TextFileStore {
 	 * @param file
 	 *            the text file as a string
 	 */
-	public TextFileStore(String prefix, String fileName, String file) {
+	public TextFileStore(String prefix, String filename, String file) {
 		this.prefix = prefix;
-		this.key = prefix + "#" + fileName;
+		this.key = prefix + "#" + filename;
 		localCache.put(key, file);
 		fileChunks = SharedTools.splitString(file, 500); //JDO has a String length limit of 500
 	}
 	
 	public static String getFile(PersistenceManager pm, String prefix, String filename) throws BadRequestException {
 		String key = prefix + "#" + filename;
-		if (localCache.containsKey(key)) {
-			return localCache.get(key);
+		
+		String file = localCache.get(key);
+		if (file != null) {
+			return file;
 		}
 		
 		try {
-			String file = SharedTools.join(pm.getObjectById(TextFileStore.class, key).fileChunks, "");
+			file = SharedTools.join(pm.getObjectById(TextFileStore.class, key).fileChunks, "");
 			localCache.put(key, file);
 			return file;
 		} catch (Exception e) {
@@ -82,5 +84,10 @@ public class TextFileStore {
 	public static String getLocalizedFile(PersistenceManager pm, String prefix, String name, Locale locale, String suffix) throws BadRequestException {
 		String filename = name + "_" + locale.getLanguage() + suffix;
  		return getFile(pm, prefix, filename);
+	}
+	
+	
+	public static void clearCache() {
+		localCache.clear();
 	}
 }
