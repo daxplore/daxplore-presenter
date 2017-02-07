@@ -56,7 +56,6 @@ public class PresenterServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 		PersistenceManager pm = null;
 		try {
-			pm = PMF.get().getPersistenceManager();
 			ServletContext sc = getServletContext();
 			
 			// Get input from URL
@@ -97,13 +96,12 @@ public class PresenterServlet extends HttpServlet {
 				responseHTML = getUnsupportedBrowserHTML(sc, baseurl, generateGATemplate(pm, sc, prefix));
 			} else {
 				Locale locale = ServerTools.selectLocale(request, prefix);
-				
-				String questionText = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
-				QuestionMetadata questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
-
+				pm = PMF.get().getPersistenceManager();
 				if (feature!=null && feature.equalsIgnoreCase("embed")) { // embedded chart
 					// TODO clean query string
 					String queryString = request.getParameter("q");
+					String questionText = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
+					QuestionMetadata questionMetadata = new QuestionMetadataServerImpl(new StringReader(questionText));
 					responseHTML = getEmbedHTML(pm, sc, questionMetadata, prefix, locale, queryString, baseurl, generateGATemplate(pm, sc, prefix));
 				} else if (feature!=null && feature.equalsIgnoreCase("print")) { // printer-friendly chart
 					String serverPath = request.getRequestURL().toString();
@@ -120,12 +118,7 @@ public class PresenterServlet extends HttpServlet {
 					
 				} else if(feature!=null && feature.equalsIgnoreCase("list")) { // mean list
 					String perspectiveID = request.getParameter("p");
-					if(perspectiveID != null && questionMetadata.hasQuestion(perspectiveID)) {
-						responseHTML = TextFileStore.getLocalizedFile(pm, prefix, "profile_" + perspectiveID, locale, ".html");
-					} else {
-						throw new BadRequestException("List request to prefix '" + prefix
-								+ "' with a perspective that doesn't exist: '" + perspectiveID + "'");
-					}
+					responseHTML = TextFileStore.getLocalizedFile(pm, prefix, "profile_" + perspectiveID, locale, ".html");
 				} else { // standard presenter
 					responseHTML = TextFileStore.getLocalizedFile(pm, prefix, "explorer", locale, ".html");
 				}

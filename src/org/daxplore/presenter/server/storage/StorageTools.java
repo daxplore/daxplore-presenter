@@ -28,6 +28,7 @@ import java.util.Map;
 import javax.jdo.PersistenceManager;
 
 import org.daxplore.presenter.server.throwable.BadRequestException;
+import org.daxplore.presenter.server.throwable.InternalServerException;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.ContainerFactory;
 import org.json.simple.parser.JSONParser;
@@ -40,10 +41,11 @@ public class StorageTools {
 	 * <p>This is useful when answering an embed request, as the embed mode only
 	 * uses two of the defined questions: one for the question and one for
 	 * the perspective.</p>
+	 * @throws InternalServerException 
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static String getQuestionDefinitions(PersistenceManager pm, String prefix,
-			List<String> questionIDs, Locale locale) throws BadRequestException {
+			List<String> questionIDs, Locale locale) throws BadRequestException, InternalServerException {
 		try {
 			JSONArray definitions = new JSONArray();
 			ContainerFactory containerFactory = new ContainerFactory() {

@@ -54,19 +54,19 @@ public class HydrateCacheServlet extends HttpServlet {
 		try {
 			for (String prefix : PrefixStore.getPrefixes(pm)) {
 				for (Locale locale : LocaleStore.getLocaleStore(pm, prefix).getSupportedLocales()) {
-					TextFileStore.getLocalizedFile(pm, prefix, "explorer", locale, ".html");
+					TextFileStore.cacheLocalizedFile(pm, prefix, "explorer", locale, ".html");
 					
 					String perspectivesJson = TextFileStore.getFile(pm, prefix, "perspectives.json");
 					JSONArray perspectives = (JSONArray)JSONValue.parse(perspectivesJson);
 					for (String perspectiveID : getAsStringArray(perspectives)) {
-						TextFileStore.getLocalizedFile(pm, prefix, "profile_" + perspectiveID, locale, ".html");
+						TextFileStore.cacheLocalizedFile(pm, prefix, "profile_" + perspectiveID, locale, ".html");
 					}
 				}
 			}
 			
 			ServletContext sc = getServletContext();
 			for (String filename : cachedStaticFiles) {
-				StaticFileStore.loadStaticFile(sc, filename);
+				StaticFileStore.cacheStaticFile(sc, filename);
 			}
 		} catch (BadRequestException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);

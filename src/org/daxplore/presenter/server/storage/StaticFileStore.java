@@ -36,11 +36,11 @@ public class StaticFileStore {
 		if (staticFileCache.containsKey(key)) {
 			return staticFileCache.get(key);
 		}
-		loadStaticFile(sc, filename);
+		cacheStaticFile(sc, filename);
 		return staticFileCache.get(key);
 	}
 	
-	public static void loadStaticFile(ServletContext sc, String filename) throws InternalServerException {
+	public static void cacheStaticFile(ServletContext sc, String filename) throws InternalServerException {
 		try {
 			String key = getStaticFileKey(filename);
 			if (!staticFileCache.containsKey(key)) {
@@ -50,10 +50,6 @@ public class StaticFileStore {
 		} catch (IOException e) {
 			throw new InternalServerException("Failed to load the static file: '" + filename + "'", e);
 		}
-	}
-	
-	public static void clearStaticFileCache() {
-		staticFileCache.clear();
 	}
 	
 	private static String getStaticFileKey(String filename) {
