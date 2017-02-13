@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <base href="{0}" target="_blank">
+    <title>{1}</title>
+    
+    <link type="text/css" rel="stylesheet" href="css/profile-chart.css">
+    
+    <script type="text/javascript" charset="UTF-8">
+      var prefix = "{2}";
+      var perspective = "{3}";
+      var questions = {4};
+      var settings = {5};
+      var usertexts = {6};
+      var data = {7};
+    </script>
+    
+    <script type="text/javascript">{7}</script>
+    
+    <script type="text/javascript" src="https://d3js.org/d3.v4.js"></script>
+    
+    <script type="text/javascript" src="js/canvas-toBlob.js"></script>
+    <script type="text/javascript" src="js/FileSaver.js"></script>
+    <script type="text/javascript" src="js/profile-chart.js"></script>
+    
+    <script type="text/javascript">
+      var unpacked_data = {};
+      var q_ids = [];
+      var means = [];
+      
+      for (var i = 0; i < data.length; i++) {
+        var d = data[i];
+        
+        var q_id = d.q;
+        q_ids.push(q_id);
+        
+        var mean_array = d.mean["0"].mean;
+        means.push(mean_array);
+      }
+      
+      var perspective_options = [];
+      var shorttext_map = {};
+      var description_map = {};
+      var direction_map = {};
+      var mean_reference_map = {};
+
+      for (var i=0; i < questions.length; i ++) {
+        var q = questions[i];
+        shorttext_map[q.column] = q.short;
+        description_map[q.column] = unescape(q.description);
+        
+        if ("gooddirection" in q) {
+          direction_map[q.column] = q.gooddirection;
+        }
+        
+        if (q.column === perspective) {
+          perspective_options = q.options;
+        }
+        
+        if (q.use_mean_reference) {
+        	 mean_reference_map[q.column] = q.mean_reference;
+     	  }
+      }
+      
+      var shorttexts = q_ids.map(function(q) { return shorttext_map[q]; });
+      var descriptions = q_ids.map(function(q) { return description_map[q]; });
+      var directions = q_ids.map(function(q) { return direction_map[q]; });
+    </script>
+    
+    <script type="text/javascript">
+      function headerChange(select) {
+        updateSelectorOption(select.value);
+      }
+    </script>
+    
+    <script type="text/javascript">
+      document.addEventListener("DOMContentLoaded", function(e) {
+        d3.select(".save-image").node().innerHTML = usertexts.imageSaveButton;
+            
+        var select = document.getElementsByClassName("header-select")[0];
+        for (var i=0; i<perspective_options.length; i++) {
+          select.options.add(new Option(perspective_options[i], "" + i));
+        }
+        
+        generateListChart(q_ids, means, mean_reference_map, perspective_options, shorttexts, usertexts, descriptions, directions, 0);
+      });
+    </script>
+  
+  </head>
+  
+  <body>
+     <div class="main">
+     	<div class="chart-row">
+       <div class="column-left">
+         <div class="header">
+           <div class="header-select-div">
+             <select class="header-select" onchange="headerChange(this)">
+             </select>
+           </div>
+         </div>
+         <div class="chart-wrapper">
+           <svg class="chart"></svg>
+           <div class="tooltipdiv"></div>
+           <div class="arrow-left"></div>
+         </div>
+       </div>
+       <div class="column-right">
+         <span class="save-image" onClick="generateImage()"></span>
+         <div class="description-wrapper">
+           <div class="description"></div>
+         </div>
+       </div>
+      </div>
+    </div>
+
+    <noscript>
+      <div class="noscript">
+        <p class="warning-sub">To show this page you must allow it to run JavaScript.</p>
+      </div>
+    </noscript>
+  </body>
+</html>

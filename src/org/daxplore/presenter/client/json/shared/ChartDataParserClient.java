@@ -102,12 +102,7 @@ public class ChartDataParserClient {
 				double meanPrimaryTotal = meanTimepoint1.get("all").isNumber().doubleValue();
 				int[] meanPrimaryCount = getAsIntArray(meanTimepoint1.get("count").isArray());
 				int meanPrimaryCountTotal = (int)meanTimepoint1.get("allcount").isNumber().doubleValue();
-				JSONValue globalJSON = meanTimepoint1.get("global");
-				double global = Double.NaN;
-				if(globalJSON != null && globalJSON.isNumber() != null) {
-					global = globalJSON.isNumber().doubleValue();
-				}
-				queryData.addMeanPrimary(meanPrimary, meanPrimaryTotal, meanPrimaryCount, meanPrimaryCountTotal, global);
+				queryData.addMeanPrimary(meanPrimary, meanPrimaryTotal, meanPrimaryCount, meanPrimaryCountTotal);
 			}
 			
 			if(meanTimepoint2 != null) {
@@ -115,12 +110,7 @@ public class ChartDataParserClient {
 				double meanSecondaryTotal = meanTimepoint2.get("all").isNumber().doubleValue();
 				int[] meanSecondaryCount = getAsIntArray(meanTimepoint2.get("count").isArray());
 				int meanSecondaryCountTotal = (int)meanTimepoint2.get("allcount").isNumber().doubleValue();
-				JSONValue globalJSON = meanTimepoint2.get("global");
-				double global = Double.NaN;
-				if(globalJSON != null && globalJSON.isNumber() != null) {
-					global = globalJSON.isNumber().doubleValue();
-				}
-				queryData.addMeanSecondary(meanSecondary, meanSecondaryTotal, meanSecondaryCount, meanSecondaryCountTotal, global);
+				queryData.addMeanSecondary(meanSecondary, meanSecondaryTotal, meanSecondaryCount, meanSecondaryCountTotal);
 			}
 		}
 		

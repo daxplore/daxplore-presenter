@@ -446,4 +446,25 @@ public class QueryDefinition {
 	public boolean hasSecondary() {
 		return questionMetadata.hasSecondary(questionID) && questionMetadata.hasSecondary(perspectiveID);
 	}
+	
+	/**
+	 * Check if the question should use a mean reference value.
+	 * 
+	 * @return true if a mean reference value should be used
+	 */
+	public boolean hasMeanReferenceValue() {
+		return questionMetadata.hasMeanReferenceValue(questionID);
+	}
+	
+	/**
+	 * The question's mean reference value.
+	 * 
+	 * @return the mean reference value
+	 */ 
+	public double getMeanReferenceValue() {
+		return questionMetadata.getMeanReferenceValue(questionID);
+	}
+	
+	
+	
 }

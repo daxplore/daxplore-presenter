@@ -107,5 +107,14 @@ public class QuestionMetadataMock implements QuestionMetadata {
 		Random rnd = new Random(questionID.hashCode() + 4);
 		return rnd.nextBoolean();
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public double getMeanReferenceValue(String questionID) {
+		Random rnd = new Random(questionID.hashCode() + 4);
+		return rnd.nextDouble() % 100;
+	}
 
 }

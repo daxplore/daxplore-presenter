@@ -130,6 +130,14 @@ public class QuestionMetadataClientImpl implements QuestionMetadata {
 	public boolean hasMeanReferenceValue(String questionID) {
 		return getQuestion(questionID).hasMeanReferenceValue();
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public double getMeanReferenceValue(String questionID) {
+		return getQuestion(questionID).getMeanReferenceValue();
+	}
 
 	/**
 	 * Load the questions json-object from JavaScipt and wrap it as a

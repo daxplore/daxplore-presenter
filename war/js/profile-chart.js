@@ -14,7 +14,7 @@
   colors.average_text = "hsl(60, 60%, 31%)",
   colors.bad_text     = "hsl( 5, 38%, 42%)";
 
-  var q_ids, means, references, perspective_option, usertexts, descriptions, directions;
+  var q_ids, means, mean_references, perspective_option, usertexts, descriptions, directions;
   var selected_option;
   var charwrapperBB, xAxisTopHeight, xAxisBottomHeight, margin, width, height;
   var x_scale, y_scale;
@@ -28,7 +28,7 @@
   
   function setToNormalColor(i) {
     d3.select("#barrect-" + q_ids[i])
-      .style("fill", colorForValue(means[i][selected_option], references[i], directions[i]));
+      .style("fill", colorForValue(means[i][selected_option], mean_references[q_ids[i]], directions[i]));
     d3.selectAll(".q-" + q_ids[i])
       .classed("bar-hover", false);
     d3.selectAll(".y.axis .tick")
@@ -37,7 +37,7 @@
   
   function setToHoverColor(i) {
     d3.select("#barrect-" + q_ids[i])
-      .style("fill", colorHoverForValue(means[i][selected_option], references[i], directions[i]));
+      .style("fill", colorHoverForValue(means[i][selected_option], mean_references[q_ids[i]], directions[i]));
     d3.selectAll(".q-" + q_ids[i])
       .classed("bar-hover", true);
     d3.selectAll(".y.axis .tick")
@@ -102,9 +102,9 @@
     
     tooltipdiv.html(
         shorttexts[i] + ": <b>" + d3.format(".2s")(means[i][selected_option]) + "</b><br>"
-        + usertexts.listReferenceValue + ": <b>" + d3.format(".2")(references[i]) + "</b>")
-      .style("background", colorHoverForValue(means[i][selected_option], references[i],  directions[i]))
-      .style("left", (charwrapperBB.left + x_scale(Math.max(means[i][selected_option], references[i])) + yAxisWidth + 14) + "px")   
+        + usertexts.listReferenceValue + ": <b>" + d3.format(".2")(mean_references[q_ids[i]]) + "</b>")
+      .style("background", colorHoverForValue(means[i][selected_option], mean_references[q_ids[i]],  directions[i]))
+      .style("left", (charwrapperBB.left + x_scale(Math.max(means[i][selected_option], mean_references[q_ids[i]])) + yAxisWidth + 14) + "px")   
       .style("top", charwrapperBB.top +  y_scale(q_ids[i]) + y_scale.bandwidth()/2 - tooltipdiv.node().getBoundingClientRect().height/2 + "px");
     
     var arrowleft = d3.select(".arrow-left");
@@ -114,8 +114,8 @@
       .style("opacity", 1);    
     
     arrowleft
-      .style("border-right-color", colorHoverForValue(means[i][selected_option], references[i],  directions[i]))
-      .style("left", (charwrapperBB.left + x_scale(Math.max(means[i][selected_option], references[i])) + yAxisWidth + 4) + "px")   
+      .style("border-right-color", colorHoverForValue(means[i][selected_option], mean_references[q_ids[i]],  directions[i]))
+      .style("left", (charwrapperBB.left + x_scale(Math.max(means[i][selected_option], mean_references[q_ids[i]])) + yAxisWidth + 4) + "px")   
       .style("top", charwrapperBB.top +  y_scale(q_ids[i]) + y_scale.bandwidth()/2 - arrowleft.node().getBoundingClientRect().height/2 + "px");
       
     setDescription(i);
@@ -128,14 +128,14 @@
       .duration(0)
       .style("opacity", 1);
     
-    var color = colorTextForValue(means[i][selected_option], references[i],  directions[i]);
+    var color = colorTextForValue(means[i][selected_option], mean_references[q_ids[i]],  directions[i]);
     var header = "<span class='description-header'>" + perspective_option[selected_option] + "</span><br><b>" + shorttexts[i] + ": " + d3.format(".2")(means[i][selected_option]) + "</b><br>"
-    var subheader = "<b>" + usertexts.listReferenceValue + ": " + d3.format(".2")(references[i]) + "</b><br>"; 
+    var subheader = "<b>" + usertexts.listReferenceValue + ": " + d3.format(".2")(mean_references[q_ids[i]]) + "</b><br>"; 
     
     
-    var trueDiff = means[i][selected_option] - references[i]; 
+    var trueDiff = means[i][selected_option] - mean_references[q_ids[i]]; 
     if (directions[i] == "LOW") {
-      var diff = references[i] - means[i][selected_option]; 
+      var diff = mean_references[q_ids[i]] - means[i][selected_option]; 
     } else {
       var diff = trueDiff; 
     }
@@ -277,7 +277,7 @@
         .text(usertexts.listXAxisDescription); 
   }
   
-  function generateBars(chart, means, q_ids, references, x_scale, y_scale) {
+  function generateBars(chart, means, q_ids, mean_references, x_scale, y_scale) {
     var bar = chart.selectAll(".bar")
         .data(q_ids)
       .enter().append("g")
@@ -288,7 +288,7 @@
       .attr("class", "barrect")
       .attr("id", function(d, i) { return "barrect-" + d; })
       .attr("height", y_scale.bandwidth())
-      .style("fill", function(d, i) { return colorForValue(means[i][selected_option], references[i], directions[i]); })
+      .style("fill", function(d, i) { return colorForValue(means[i][selected_option], mean_references[q_ids[i]], directions[i]); })
       .attr("width", function(d, i) { return x_scale(means[i][selected_option]) + 1; })
       .on("mouseover",
         function(d, i) {
@@ -320,7 +320,7 @@
             tooltipOut();
             setToNormalColor(i);
           })
-      .attr("transform", function(d, i) { return "translate(" + (yAxisWidth + x_scale(references[i]) - referenceWidth/2) + "," + (y_scale(d) - referenceExtraHeight/2) + ")"; })
+      .attr("transform", function(d, i) { return "translate(" + (yAxisWidth + x_scale(mean_references[q_ids[i]]) - referenceWidth/2) + "," + (y_scale(d) - referenceExtraHeight/2) + ")"; })
       .style("shape-rendering", "crispEdges");
 
     reference.append("rect")
@@ -378,7 +378,7 @@
     function(
       q_ids_array,
       means_array,
-      references_array,
+      references_map,
       perspective_option_array,
       shorttexts_array,
       usertexts_map,
@@ -388,7 +388,7 @@
     
     q_ids = q_ids_array;
     means = means_array;
-    references = references_array;
+    mean_references = references_map;
     perspective_option = perspective_option_array;
     shorttexts = shorttexts_array;
     usertexts = usertexts_map;
@@ -411,7 +411,7 @@
     
     generateXAxisBottom(chart, x_scale, usertexts);
     
-    generateBars(chart, means, q_ids, references, x_scale, y_scale);
+    generateBars(chart, means, q_ids, mean_references, x_scale, y_scale);
     
     generateReferenceLines(chart, q_ids, x_scale, y_scale);
 
@@ -431,7 +431,7 @@
         .duration(barTransitionTime)
         .ease(d3.easeLinear)
         .style("fill", function(d, i) {
-          return colorForValue(means[i][selected_option], references[i], directions[i]); })
+          return colorForValue(means[i][selected_option], mean_references[q_ids[i]], directions[i]); })
         .attr("width", function(d, i) { return x_scale(means[i][selected_option]) + 1; });
     
     /* repopulate the description box and reset the tooltip */

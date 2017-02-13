@@ -5,51 +5,32 @@
     <base href="{0}" target="_blank">
     <title>{1}</title>
     
-    <link type="text/css" rel="stylesheet" href="css/list.css">
+    <link type="text/css" rel="stylesheet" href="css/profile-chart.css">
     
     <script type="text/javascript" charset="UTF-8">
       var prefix = "{2}";
-      var perspective = "{3}";
-      var questions = {4};
-      var settings = {5};
-      var usertexts = {6};
-      var data = {7};
+      var questions = {3};
+      var settings = {4};
+      var usertexts = {5};
     </script>
     
-    <script type="text/javascript">{8}</script>
+    <script type="text/javascript">{7}</script>
     
     <script type="text/javascript" src="https://d3js.org/d3.v4.js"></script>
-
-      
+    
     <script type="text/javascript" src="js/canvas-toBlob.js"></script>
     <script type="text/javascript" src="js/FileSaver.js"></script>
-    
-    <script type="text/javascript" src="js/list.js"></script>
-    
+    <script type="text/javascript" src="js/profile-chart.js"></script>
     
     <script type="text/javascript">
-      var unpacked_data = {};
       var q_ids = [];
-      var means = [];
-      var references = [];
-      
-      for (var i = 0; i < data.length; i++) {
-        var d = data[i];
-        
-        var q_id = d.q;
-        q_ids.push(q_id);
-        
-        var mean_array = d.mean["0"].mean;
-        means.push(mean_array);
-        
-        var global_reference_mean = d.mean["0"].global;
-        references.push(global_reference_mean);
-      }
+		// TODO
       
       var perspective_options = [];
       var shorttext_map = {};
       var description_map = {};
       var direction_map = {};
+      var mean_reference_map = {};
 
       for (var i=0; i < questions.length; i ++) {
         var q = questions[i];
@@ -63,6 +44,10 @@
         if (q.column === perspective) {
           perspective_options = q.options;
         }
+        
+        if (q.use_mean_reference) {
+       	 mean_reference_map[q.column] = q.mean_reference;
+    	  }
       }
       
       var shorttexts = q_ids.map(function(q) { return shorttext_map[q]; });
@@ -92,27 +77,29 @@
   </head>
   
   <body>
-    <div class="pagecontainer">
-      <div class="main">
-        <div class="column-left">
-          <div class="header">
-            <div class="header-select-div">
-              <select class="header-select" onchange="headerChange(this)">
-              </select>
-            </div>
-          </div>
-          <div class="chart-wrapper">
-            <svg class="chart"></svg>
-            <div class="tooltipdiv"></div>
-            <div class="arrow-left"></div>
-          </div>
-        </div>
-        <div class="column-right">
-          <span class="save-image" onClick="generateImage()"></span>
-          <div class="description-wrapper">
-            <div class="description"></div>
-          </div>
-        </div>
+     <div class="main">
+     	<div class="content-row">
+     	</div>
+     	<div class="chart-row">
+       <div class="column-left">
+         <div class="header">
+           <div class="header-select-div">
+             <select class="header-select" onchange="headerChange(this)">
+             </select>
+           </div>
+         </div>
+         <div class="chart-wrapper">
+           <svg class="chart"></svg>
+           <div class="tooltipdiv"></div>
+           <div class="arrow-left"></div>
+         </div>
+       </div>
+       <div class="column-right">
+         <span class="save-image" onClick="generateImage()"></span>
+         <div class="description-wrapper">
+           <div class="description"></div>
+         </div>
+       </div>
       </div>
     </div>
 

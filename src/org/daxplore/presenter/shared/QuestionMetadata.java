@@ -107,10 +107,17 @@ public interface QuestionMetadata {
 	public boolean hasMean(String questionID);
 
 	/**
-	 * Check if a question has a mean reference value.
+	 * Check if a question should use a mean reference value.
 	 * 
 	 * @param questionID the questionID
-	 * @return true if there is a mean reference value
+	 * @return true if a mean reference value should be used
 	 */
 	public boolean hasMeanReferenceValue(String questionID);
+	
+	/**
+	 * Get a question's mean reference value.
+	 * 
+	 * @return the mean reference value
+	 */ 
+	public double getMeanReferenceValue(String questionID);
 }

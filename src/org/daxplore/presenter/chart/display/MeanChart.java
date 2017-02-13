@@ -361,8 +361,8 @@ public class MeanChart extends GChartChart {
 
 		drawPaddingBar();
 
-		if(queryDefinition.hasFlag(QueryFlag.MEAN_REFERENCE)) {
-			double reference = queryData.getMeanPrimaryReference();
+		if(queryDefinition.hasFlag(QueryFlag.MEAN_REFERENCE) && queryDefinition.hasMeanReferenceValue()) {
+			double reference = queryDefinition.getMeanReferenceValue();
 			referenceLineBar.setDataPoint(currentPosition, reference);
 			referenceLineBar.setHoverText(reference);
 		}

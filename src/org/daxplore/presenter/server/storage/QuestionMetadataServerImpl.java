@@ -170,7 +170,16 @@ public class QuestionMetadataServerImpl implements QuestionMetadata {
 	@Override
 	public boolean hasMeanReferenceValue(String column) {
 		JSONObject question = getQuestion(column);
-		return question.containsKey("mean_reference") && (Boolean)question.get("mean_reference"); 
+		return question.containsKey("use_mean_reference") && (Boolean)question.get("use_mean_reference"); 
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public double getMeanReferenceValue(String column) {
+		JSONObject question = getQuestion(column);
+		return (Double)question.get("mean_reference"); 
 	}
 
 }

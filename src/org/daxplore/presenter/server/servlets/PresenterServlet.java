@@ -116,9 +116,11 @@ public class PresenterServlet extends HttpServlet {
 					String queryString = request.getParameter("q");
 					responseHTML = getPrintHTML(pm, sc,  prefix, locale, serverPath, queryString, baseurl, generateGATemplate(pm, sc, prefix));
 					
-				} else if(feature!=null && feature.equalsIgnoreCase("list")) { // mean list
+				} else if(feature!=null && (feature.equalsIgnoreCase("list") || feature.equalsIgnoreCase("profile"))) { // profile, list of mean values
 					String perspectiveID = request.getParameter("p");
 					responseHTML = TextFileStore.getLocalizedFile(pm, prefix, "profile_" + perspectiveID, locale, ".html");
+				} else if(feature!=null && feature.equalsIgnoreCase("userprofile")) {
+					responseHTML = TextFileStore.getLocalizedFile(pm, prefix, "userprofile", locale, ".html");
 				} else { // standard presenter
 					responseHTML = TextFileStore.getLocalizedFile(pm, prefix, "explorer", locale, ".html");
 				}

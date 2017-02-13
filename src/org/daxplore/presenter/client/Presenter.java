@@ -264,12 +264,13 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 	 */
 	@Override
 	public void onQueryReady(QueryReadyEvent event) {
-		chartPanelPresenter.onQueryReady(event.getQueryDefinition(), event.getQueryData());
+		QueryDefinition queryDefinition = event.getQueryDefinition();
+		chartPanelPresenter.onQueryReady(queryDefinition, event.getQueryData());
 		ExternalLegend legend = chartPanelPresenter.getExternalLegend();
-		if (event.getQueryDefinition().hasFlag(QueryFlag.MEAN_REFERENCE)) {
-			legend.addReferenceValue(event.getQueryData().getMeanPrimaryReference());
+		if (queryDefinition.hasFlag(QueryFlag.MEAN_REFERENCE) && queryDefinition.hasMeanReferenceValue()) {
+			legend.addReferenceValue(queryDefinition.getMeanReferenceValue());
 		}
 		stagePanel.setLegend(legend);
-		stagePanel.setDescription(event.getQueryDefinition().getQuestionID(), event.getQueryDefinition().getPerspectiveID());
+		stagePanel.setDescription(queryDefinition.getQuestionID(), queryDefinition.getPerspectiveID());
 	}
 }
