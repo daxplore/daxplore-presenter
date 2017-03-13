@@ -4,29 +4,32 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <base href="{0}" target="_blank">
     <title>{1}</title>
-    
+
+    <link type="text/css" rel="stylesheet" href="css/normalize.css">
     <link type="text/css" rel="stylesheet" href="css/profile-chart.css">
-    
+    <link type="text/css" rel="stylesheet" href="css/userprofile.css">
+
     <script type="text/javascript" charset="UTF-8">
       var prefix = "{2}";
-      var questions = {3};
-      var settings = {4};
-      var usertexts = {5};
+      var locale = "{3}";
+      var questions = {4};
+      var settings = {5};
+      var usertexts = {6};
+      var q_ids = {7};
     </script>
-    
-    <script type="text/javascript">{7}</script>
-    
+
+    <script type="text/javascript">{8}</script>
+
     <script type="text/javascript" src="https://d3js.org/d3.v4.js"></script>
-    
+
     <script type="text/javascript" src="js/canvas-toBlob.js"></script>
     <script type="text/javascript" src="js/FileSaver.js"></script>
+
+    <script type="text/javascript" src="js/profile-helpers.js"></script>
+    <script type="text/javascript" src="js/userprofile-grid.js"></script>
     <script type="text/javascript" src="js/profile-chart.js"></script>
-    
+
     <script type="text/javascript">
-      var q_ids = [];
-		// TODO
-      
-      var perspective_options = [];
       var shorttext_map = {};
       var description_map = {};
       var direction_map = {};
@@ -36,49 +39,54 @@
         var q = questions[i];
         shorttext_map[q.column] = q.short;
         description_map[q.column] = unescape(q.description);
-        
+
         if ("gooddirection" in q) {
           direction_map[q.column] = q.gooddirection;
         }
-        
-        if (q.column === perspective) {
-          perspective_options = q.options;
-        }
-        
+
         if (q.use_mean_reference) {
        	 mean_reference_map[q.column] = q.mean_reference;
     	  }
       }
+
+      initiateHelpers(mean_reference_map, shorttext_map, usertexts, description_map, direction_map);
       
-      var shorttexts = q_ids.map(function(q) { return shorttext_map[q]; });
-      var descriptions = q_ids.map(function(q) { return description_map[q]; });
-      var directions = q_ids.map(function(q) { return direction_map[q]; });
-    </script>
-    
-    <script type="text/javascript">
       function headerChange(select) {
         updateSelectorOption(select.value);
       }
-    </script>
-    
-    <script type="text/javascript">
+
       document.addEventListener("DOMContentLoaded", function(e) {
-        d3.select(".save-image").node().innerHTML = usertexts.imageSaveButton;
-            
-        var select = document.getElementsByClassName("header-select")[0];
-        for (var i=0; i<perspective_options.length; i++) {
-          select.options.add(new Option(perspective_options[i], "" + i));
-        }
-        
-        generateListChart(q_ids, means, references, perspective_options, shorttexts, usertexts, descriptions, directions, 0);
+          d3.select(".save-image")
+      		.text(usertexts.imageSaveButton);
+	
+	      generateGrid(locale, q_ids, mean_reference_map, shorttext_map, usertexts, description_map, direction_map);
+	        
+	      generateListChart(q_ids, mean_reference_map, shorttext_map, usertexts, description_map, direction_map, 0);
+	      
+	      addGridUpdateCallback(function(names, means) {
+	    		setChartData(names, means); 
+	      });
+		      
       });
     </script>
-  
+
   </head>
-  
+
   <body>
-     <div class="main">
-     	<div class="content-row">
+     <div class="grid-main">
+     	<div class="grid-row">
+          <span class="grid"></span>
+        	 <div class='grid-column-right'>
+	        	 <span class="add-column-button noselect" onClick="addColumn()"></span>
+	        	 <div class='grid-info'>
+		        	 <table class='grid-legend'>
+		        	 	<tr><td class='grid-legend-symbol cell-good'></td><td class='grid-legend-text good'></td></tr>
+		        	 	<tr><td class='grid-legend-symbol cell-avg'></td><td class='grid-legend-text avg'></td></tr>
+		        	 	<tr><td class='grid-legend-symbol cell-bad'></td><td class='grid-legend-text bad'></td></tr>
+		        	 </table>
+		        	 <div id='grid-description' class='description'></div>
+	        	 </div>
+        	 </div>
      	</div>
      	<div class="chart-row">
        <div class="column-left">
@@ -95,9 +103,9 @@
          </div>
        </div>
        <div class="column-right">
-         <span class="save-image" onClick="generateImage()"></span>
+         <span class="button save-image" onClick="generateImage()"></span>
          <div class="description-wrapper">
-           <div class="description"></div>
+           <div id='chart-description' class="description"></div>
          </div>
        </div>
       </div>

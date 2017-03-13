@@ -5,6 +5,7 @@
     <base href="{0}" target="_blank">
     <title>{1}</title>
     
+    <link type="text/css" rel="stylesheet" href="css/normalize.css">
     <link type="text/css" rel="stylesheet" href="css/profile-chart.css">
     
     <script type="text/javascript" charset="UTF-8">
@@ -22,6 +23,7 @@
     
     <script type="text/javascript" src="js/canvas-toBlob.js"></script>
     <script type="text/javascript" src="js/FileSaver.js"></script>
+    <script type="text/javascript" src="js/profile-helpers.js"></script>
     <script type="text/javascript" src="js/profile-chart.js"></script>
     
     <script type="text/javascript">
@@ -63,34 +65,25 @@
      	  }
       }
       
-      var shorttexts = q_ids.map(function(q) { return shorttext_map[q]; });
-      var descriptions = q_ids.map(function(q) { return description_map[q]; });
-      var directions = q_ids.map(function(q) { return direction_map[q]; });
-    </script>
-    
-    <script type="text/javascript">
+      initiateHelpers(mean_reference_map, shorttext_map, usertexts, description_map, direction_map);
+
       function headerChange(select) {
         updateSelectorOption(select.value);
       }
-    </script>
-    
-    <script type="text/javascript">
+
       document.addEventListener("DOMContentLoaded", function(e) {
-        d3.select(".save-image").node().innerHTML = usertexts.imageSaveButton;
+        d3.select(".save-image")
+        	.text(usertexts.imageSaveButton);
             
-        var select = document.getElementsByClassName("header-select")[0];
-        for (var i=0; i<perspective_options.length; i++) {
-          select.options.add(new Option(perspective_options[i], "" + i));
-        }
-        
-        generateListChart(q_ids, means, mean_reference_map, perspective_options, shorttexts, usertexts, descriptions, directions, 0);
+        generateListChart(q_ids, mean_reference_map, shorttext_map, usertexts, description_map, direction_map, 0);
+        setChartData(perspective_options, means);
       });
     </script>
   
   </head>
   
   <body>
-     <div class="main">
+     <div class="chart-main">
      	<div class="chart-row">
        <div class="column-left">
          <div class="header">
@@ -106,9 +99,9 @@
          </div>
        </div>
        <div class="column-right">
-         <span class="save-image" onClick="generateImage()"></span>
+         <span class="button save-image" onClick="generateImage()"></span>
          <div class="description-wrapper">
-           <div class="description"></div>
+           <div id='chart-description' class="description"></div>
          </div>
        </div>
       </div>

@@ -1,0 +1,132 @@
+
+.grid-main > .chart-row {
+	height: 500px;
+}
+
+.grid-row {
+	display: flex;
+	
+}
+
+.grid-column-left {
+	
+}
+
+.grid-column-right {
+	margin-top: 200px;
+   margin-left: 30px;
+}
+
+.grid {
+	display: inline-flex;
+}
+
+.grid-info {
+}
+
+.rowtext, .grid-legend-text {
+	font-size: 13px;
+	color: rgb(85, 85, 85);
+	white-space: nowrap;
+}
+
+.rowtext {
+	text-align: right;
+	vertical-align: bottom;
+	padding-right: 10px;
+}
+
+.grid-cell input, .header-cell input, .grid-legend-symbol {
+	background: white;
+	border: 1px dashed #BBB;
+	font-size: 12px;
+	height: 18px;
+}
+
+.header-cell input {
+	height: 23px;
+}
+
+.grid-cell input:hover, .header-cell input:hover {
+	border-color: #666;
+}
+
+.grid-cell input:focus, .header-cell input:focus {
+	border: 1px solid black;
+}
+
+.grid-legend {
+	margin-left: 9px;
+	margin-bottom: 10px;
+}
+
+.header-cell {
+  height: 118px;
+  white-space: nowrap;
+}
+
+.header-cell > div {
+  transform: 
+    translate(9px, 35px)
+    rotate(-0.125turn);
+  width: 30px;
+}
+
+.header-cell > div > span {
+/*   padding: 5px 10px; */
+}
+
+.header-cell input {
+	width: 130px;
+	padding: 0 2px;
+	font-weight: bold;
+}
+
+.grid-cell input, .grid-legend-symbol {
+	width: 40px;
+	padding: 0 0;
+	text-align: center;
+}
+
+.add-column-button {
+	position: absolute;
+	background: white;
+	border: 1px dashed #BBB;
+	top: 3px;
+	border-radius: 0;
+	white-space: nowrap;
+}
+
+.cell-good {
+	background: #C8EA7C !important;
+}
+
+.cell-avg {
+	background: #FFEE81 !important;
+}
+
+.cell-bad {
+	background: #FBC3BD !important;
+}
+
+.add-column-button {
+   margin-top: 92px;
+	height: 14px;
+	display: inline-block;
+	cursor: pointer;
+	font-family: Arial;
+	font-size: 13px;
+	font-weight: bold;
+	padding: 5px 10px;
+	text-decoration: none;
+	color: #555;
+}
+
+.add-column-button:hover {
+	border-color: rgb(85, 85, 85);
+}
+
+.add-column-button:active {
+	margin-top: 91px;
+}
+

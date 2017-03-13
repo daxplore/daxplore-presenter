@@ -61,12 +61,12 @@ public class BuildPresentations {
 			JSONArray perspectives = (JSONArray)JSONValue.parse(perspectivesJson);
 			for (String perspectiveID : getAsStringArray(perspectives)) {
 				filename = "profile_" + perspectiveID + "_" + locale.toLanguageTag() + ".html";
-				String profileHTML = getProfileHTML(pm, servletContext, questionMetadata, prefix, perspectiveID, locale, baseurl, gaTemplate);
+				String profileHTML = getProfileHTML(pm, servletContext, questionMetadata, prefix, locale, perspectiveID, baseurl, gaTemplate);
 				toBeStored.add(new TextFileStore(prefix, filename, profileHTML));
 			}
 			
 			filename = "userprofile_" + locale.toLanguageTag() + ".html";
-			String userProfileHtml = getUserProfileHTML(pm, servletContext, questionMetadata, prefix, locale, baseurl, gaTemplate);
+			String userProfileHtml = getUserProfileHTML(pm, servletContext, prefix, locale, baseurl, gaTemplate);
 			toBeStored.add(new TextFileStore(prefix, filename, userProfileHtml));
 		}
 		pm.makePersistentAll(toBeStored);
@@ -109,8 +109,8 @@ public class BuildPresentations {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static String getProfileHTML(PersistenceManager pm, ServletContext sc, QuestionMetadata questionMetadata, String prefix, 
-			String perspectiveID, Locale locale, String baseurl, String gaTemplate) throws InternalServerException, BadRequestException {
+	private static String getProfileHTML(PersistenceManager pm, ServletContext sc, QuestionMetadata questionMetadata,
+			String prefix, Locale locale, String perspectiveID, String baseurl, String gaTemplate) throws InternalServerException, BadRequestException {
 		
 		String questions = "";
 		questions = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
@@ -164,8 +164,8 @@ public class BuildPresentations {
 		return result;
 	}
 	
-	private static String getUserProfileHTML(PersistenceManager pm, ServletContext sc, QuestionMetadata questionMetadata,
-			String prefix, Locale locale, String baseurl, String gaTemplate) throws InternalServerException, BadRequestException {
+	private static String getUserProfileHTML(PersistenceManager pm, ServletContext sc, String prefix,
+			Locale locale, String baseurl, String gaTemplate) throws InternalServerException, BadRequestException {
 		
 		String questions = "";
 		questions = TextFileStore.getLocalizedFile(pm, prefix, "questions", locale, ".json");
@@ -174,15 +174,18 @@ public class BuildPresentations {
 		
 		String settings = TextFileStore.getFile(pm, prefix, "settings.json");
 		String usertexts = TextFileStore.getLocalizedFile(pm, prefix, "usertexts", locale, ".json");
+		String q_ids = TextFileStore.getFile(pm, prefix, "listview.json");
 		
 		String[] arguments = {
 			baseurl,				// {0}
 			pageTitle,				// {1}
 			prefix,					// {2}
+			locale.toLanguageTag(),	// {3}
 			questions,				// {4}
 			settings,				// {5}
 			usertexts,				// {6}
-			gaTemplate,				// {7}
+			q_ids,					// {7}
+			gaTemplate,				// {8}
 		};
 	
 		String template = StaticFileStore.getStaticFile(sc, "/templates/userprofile.html");
