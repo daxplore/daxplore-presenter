@@ -6,10 +6,11 @@
 	xmlns:client='urn:import:org.daxplore.presenter.client.ui'>
 
 	<ui:style>
-   		.sidebarArea {
+   	.sidebarArea {
 		}
 		.bottomHorizontal {
 			margin-top: 10px;
+			width: 100%;
 		}
 		.perspective {
 		}
@@ -24,7 +25,7 @@
 		<g:VerticalPanel>
 			<chart:ChartPanelView ui:field='chartPanel'/>
 			<g:HorizontalPanel ui:field='bottomPanel' styleName="{style.bottomHorizontal}">
-			    <client:PerspectivePanel ui:field='perspectivePanel' styleName="{style.perspective}"/>
+				<g:SimplePanel stylePrimaryName='daxplore-PerspectivePanel'/>
 				<client:DescriptionPanelBottom ui:field='descriptionPanelBottom' styleName="{style.description}"/>
 			</g:HorizontalPanel>
 		</g:VerticalPanel>

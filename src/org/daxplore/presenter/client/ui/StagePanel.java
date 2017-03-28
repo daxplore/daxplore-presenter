@@ -47,7 +47,7 @@ public class StagePanel extends Composite implements ResizeHandler {
 	interface StageUiBinder extends UiBinder<Widget, StagePanel> {/* Empty UiTemplate interface */}
 	private static StageUiBinder uiBinder = GWT.create(StageUiBinder.class);
 
-	@UiField(provided = true)
+//	@UiField(provided = true)
 	protected final PerspectivePanel perspectivePanel;
 
 	@UiField(provided = true)
@@ -67,7 +67,7 @@ public class StagePanel extends Composite implements ResizeHandler {
 	
 	@UiField(provided = true)
 	protected final VerticalPanel sidebarArea;
-	@UiField(provided = true)
+//	@UiField(provided = true)
 	protected final SimplePanel legendPanel;
 
 	

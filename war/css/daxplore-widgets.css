@@ -64,9 +64,9 @@
 
 	.daxplore-DescriptionPanelBottom, .daxplore-DescriptionPanelLegend {
 		margin:10px;
-		border: 1px solid #D4D4D4;
 		padding: 8px 5px 8px 8px;
 		max-width: 500px;
+		float: right;
 	}
 	
 	 .daxplore-DescriptionPanelLegend {
@@ -186,5 +186,204 @@
 	.daxplore-EmbedPopup-iframeSpot {
 		border: none;
 		overflow: hidden;
+	}
+	
+	
+	/*** Pure d3 js perspective picker ***/
+	
+	.img-preload {
+		position: absolute;
+		top: -9999px;
+		left: -9999px;
+		opacity: 0;
+    }
+    
+	.dashed-button {
+		border: 1px dashed #DDD;
+		background: white;
+		padding: 5px;
+		white-space: nowrap;
+		margin: 3px;
+		cursor: pointer;
+		height: 12px;
+		
+		color: #999;
+		font-weight: bold;
+		font-size: 11px;
+		
+		z-index: 1;
+		
+		user-select: none;
+		-moz-user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+	}
+
+	.dashed-button:hover {
+		border-color: #AAA;
+	}
+	
+	.dashed-button:active {
+		margin-top: 2px;
+		margin-bottom: 4px;
+	}
+	
+	.daxplore-PerspectivePanel {
+	   display: flex;
+    	flex-direction: column;
+	}
+	
+	.perspective-header {
+		color: #999;
+		font-weight: bold;
+		padding-top: 10px;
+		padding-bottom: 7px;
+	}
+	
+	.perspective-picker-panel {
+		display: flex;
+		flex-direction: row;
+	}
+	
+	
+	.perspective-variable-picker-padding-top {
+		position: relative;
+		height: 100%;
+      border-left: 1px dashed #DDD;
+      border-top: 1px dashed #DDD;
+      border-right: 1px solid #ABABAB;
+	}
+
+	.perspective-variable-picker-padding-top:after {
+	    position: absolute;
+	    content: "";
+	    width: 1px;
+	    height: 1px;
+	    top: -1px;
+	    right: -1px;
+	    background: #ABABAB;
+	}
+	
+	.perspective-variable-picker-padding-bottom {
+		position: relative;
+		height: 100%;
+      border-left: 1px dashed #DDD;
+      border-right: 1px solid #ABABAB;
+      border-bottom: 1px dashed #DDD;
+	}
+
+	.perspective-variable-picker-padding-bottom:after {
+	    position: absolute;
+	    content: "";
+	    width: 1px;
+	    height: 1px;
+	    right: -1px;
+	    bottom: -1px;
+	    background: #ABABAB;
+	}
+	
+	.perspective-remaining-columns {
+		display: flex;
+		flex-direction: row;
+		overflow: hidden;
+	}
+	
+	.perspective-variable-option {
+		display: flex;
+		align-items: center;
+		
+		border-left: 1px dashed #DDD;
+		border-right: 1px solid #ABABAB;
+		padding: 5px;
+		padding-right: 10px;
+		cursor: pointer;
+	}
+	
+	.perspective-variable-selected {
+		border-top: 1px solid #ABABAB;
+		border-left: 1px solid #ABABAB;
+		border-bottom: 1px solid #ABABAB;
+		border-right: none;
+		
+		padding-right: 11px;
+		padding-bottom: 4px;
+		padding-top: 4px;
+	}
+	
+	.perspective-variable-option:before {
+		content: url('/img/perspective-radio-empty.png');
+		padding-left: 7px;
+		padding-right: 5px;
+		padding-top: 2px;
+	}
+	
+	.perspective-variable-selected:before {
+		content: url('/img/perspective-radio-filled.png');
+	}
+	
+	.perspective-options-first-column, .perspective-remaining-columns {
+		position: relative;
+	}
+	
+	.perspective-options-first-column.fade-bottom:after, .perspective-remaining-columns.fade-bottom:after {
+     content  : "";
+	  position : absolute;
+	  bottom   : 0;
+	  left     : 0;
+	  pointer-events   : none;
+	  background-image : linear-gradient(to bottom, 
+	                     rgba(255,255,255, 0), 
+	                     rgba(255,255,255, 1) 90%);
+	  width    : 100%;
+	  height   : 4em;
+	}
+	
+	.perspective-general-select {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      
+      border-top: 1px solid #ABABAB;
+		border-right: 1px solid #ABABAB;
+	}
+	
+	.perspective-checkbox-panel {
+	  border-right: 1px solid #ABABAB;
+	  border-bottom: 1px solid #ABABAB;
+	  background: white;
+	  height: 100%;
+	}
+	
+	.expand-button-wrapper {
+	 	position: absolute;
+    	bottom: 2px;
+    	right: 2px;
+    }
+
+	.perspective-options-first-column, .perspective-remaining-columns {
+	}
+	
+	.perspective-third-column {
+		margin-bottom: 34px;
+	}
+	
+	.perspective-option {
+		display: flex;
+		align-items: center;
+		padding: 2px;
+		padding-right: 10px;
+		cursor: pointer;
+		white-space: nowrap;
+	}
+	
+	.perspective-option:before {
+		content: url('/img/perspective-checkbox-empty.png');
+		padding-left: 7px;
+		padding-right: 5px;
+		padding-top: 3px;
+	}
+	
+	.perspective-option-selected:before {
+		content: url('/img/perspective-checkbox-filled.png');
 	}
 	

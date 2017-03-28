@@ -38,9 +38,7 @@ import org.daxplore.presenter.client.ui.ChartTypeOptionsPanel;
 import org.daxplore.presenter.client.ui.DescriptionPanelBottom;
 import org.daxplore.presenter.client.ui.EmbedPopup;
 import org.daxplore.presenter.client.ui.ImageButtonPanel;
-import org.daxplore.presenter.client.ui.PerspectiveCheckboxPanel.PerspectiveCheckboxPanelFactory;
 import org.daxplore.presenter.client.ui.PerspectivePanel;
-import org.daxplore.presenter.client.ui.PerspectiveQuestionsPanel.PerspectiveQuestionsFactory;
 import org.daxplore.presenter.client.ui.QuestionPanel;
 import org.daxplore.presenter.client.ui.StagePanel;
 import org.daxplore.presenter.client.ui.WarningBanner.WarningBannerFactory;
@@ -103,8 +101,6 @@ public class PresentationModule extends AbstractGinModule {
 		bind(UITexts.class).in(Singleton.class);
 
 		/* client.ui */
-		bind(PerspectiveCheckboxPanelFactory.class).in(Singleton.class);
-		bind(PerspectiveQuestionsFactory.class).in(Singleton.class);
 		bind(WarningBannerFactory.class).in(Singleton.class);
 		bind(QuestionPanel.class).in(Singleton.class);
 		bind(PerspectivePanel.class).in(Singleton.class);

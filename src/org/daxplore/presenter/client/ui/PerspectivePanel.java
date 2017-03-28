@@ -18,23 +18,15 @@
  */
 package org.daxplore.presenter.client.ui;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.daxplore.presenter.client.event.QueryUpdateEvent;
 import org.daxplore.presenter.client.event.QueryUpdateHandler;
 import org.daxplore.presenter.client.event.SelectionUpdateEvent;
-import org.daxplore.presenter.client.ui.PerspectiveCheckboxPanel.PerspectiveCheckboxPanelFactory;
-import org.daxplore.presenter.client.ui.PerspectiveQuestionsPanel.PerspectiveQuestionsFactory;
 import org.daxplore.presenter.shared.QueryDefinition;
+import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TreeItem;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
@@ -52,33 +44,19 @@ import com.google.web.bindery.event.shared.EventBus;
  * {@link PerspectiveCheckboxPanel} that contains checkboxes for all
  * question options for the current perspective question.</p>
  */
-public class PerspectivePanel extends HorizontalPanel 
-			implements QueryUpdateHandler, SelectionHandler<TreeItem>, ValueChangeHandler<Boolean> {
+public class PerspectivePanel implements QueryUpdateHandler {
 
 	private final EventBus eventBus;
-	private final PerspectiveCheckboxPanelFactory checkPanelFactory;
-	private final PerspectiveQuestionsFactory questionListFactory;
-	private PerspectiveQuestionsPanel perspectiveQuestionList;
-	private PerspectiveCheckboxPanel perspectiveCheckboxes;
-	private SimplePanel perspectiveQuestionsContainer = new SimplePanel();
-	private SimplePanel checkboxContainer = new SimplePanel();
+	
+	private String perspectiveID;
+	private boolean useTotalSelected;
+	private List<Integer> selectedOptions = new ArrayList<>();
 
 	@Inject
-	protected PerspectivePanel(PerspectiveCheckboxPanelFactory checkPanelFactory,
-			EventBus eventBus, PerspectiveQuestionsFactory perspectivePanelFactory) {
-		this.checkPanelFactory = checkPanelFactory;
+	protected PerspectivePanel(EventBus eventBus) {
 		this.eventBus = eventBus;
-		this.questionListFactory = perspectivePanelFactory;
-
-		this.add(perspectiveQuestionsContainer);
-		this.add(checkboxContainer);
-
-		perspectiveQuestionList = perspectivePanelFactory.createPerspectivePanel();
-		perspectiveQuestionsContainer.setWidget(perspectiveQuestionList);
-		perspectiveQuestionsContainer.setVisible(true);
-		
-		perspectiveQuestionList.addSelectionHandler(this);
 		QueryUpdateEvent.register(eventBus, this);
+		exportPerspectiveCallback();
 	}
 
 
@@ -88,7 +66,7 @@ public class PerspectivePanel extends HorizontalPanel
 	 * @return the current perspective's questionID
 	 */
 	public String getQuestionID() {
-		return perspectiveQuestionList.getQuestionID();
+		return perspectiveID;
 	}
 
 	/**
@@ -97,7 +75,7 @@ public class PerspectivePanel extends HorizontalPanel
 	 * @return the flags
 	 */
 	public boolean useTotalSelected() {
-		return perspectiveCheckboxes != null && perspectiveCheckboxes.isTotalSet();
+		return useTotalSelected;
 	}
 
 	/**
@@ -106,10 +84,7 @@ public class PerspectivePanel extends HorizontalPanel
 	 * @return the perspective options
 	 */
 	public List<Integer> getPerspectiveOptions() {
-		if (perspectiveCheckboxes != null) {
-			return perspectiveCheckboxes.getPerspectiveOptions();
-		}
-		return new LinkedList<>();
+		return selectedOptions;
 	}
 
 	/**
@@ -128,56 +103,50 @@ public class PerspectivePanel extends HorizontalPanel
 	 *            the new query definition
 	 */
 	public void setQueryDefinition(QueryDefinition queryDefinition) {
-		if(queryDefinition.getPerspectiveID() != null && !queryDefinition.getPerspectiveID().isEmpty()){
-			perspectiveQuestionList = questionListFactory.createPerspectivePanel();
-			perspectiveQuestionList.setPerspective(queryDefinition.getPerspectiveID(), false);
-			perspectiveQuestionList.addSelectionHandler(this);
-			perspectiveQuestionsContainer.setWidget(perspectiveQuestionList);
-
-			perspectiveCheckboxes = checkPanelFactory.createCheckboxPanel(queryDefinition);
-			perspectiveCheckboxes.addValueChangeHandler(this);
-			checkboxContainer.setWidget(perspectiveCheckboxes);
-		} else {
-			perspectiveQuestionList = questionListFactory.createPerspectivePanel();
-			perspectiveQuestionList.setPerspective("", false);
-			perspectiveQuestionList.addSelectionHandler(this);
-
-			perspectiveQuestionsContainer.setWidget(perspectiveQuestionList);
+		perspectiveID = queryDefinition.getPerspectiveID();
+		selectedOptions = queryDefinition.getUsedPerspectiveOptions();
+		useTotalSelected = queryDefinition.hasFlag(QueryFlag.TOTAL);
+		
+		// TODO check if actually updated
+		StringBuilder sb = new StringBuilder("[");
+		int count = queryDefinition.getPerspectiveOptionCount();
+		for (int i=0; i<count; i++) {
+			sb.append(selectedOptions.contains(i));
+			if (i<count-1) {
+				sb.append(",");
+			}
 		}
+		sb.append("]");
+		setQueryDefinitionNative(perspectiveID, sb.toString(), useTotalSelected);
 	}
+	
+	protected native void setQueryDefinitionNative(String perspectiveID, String options, boolean total) /*-{
+		$wnd.perspectiveSetQueryDefinition(perspectiveID, JSON.parse(options), total);
+	}-*/;
+	
+	protected void gwtPerspectiveCallback(String perspective, String options, boolean total) {
+		this.perspectiveID = perspective;
+		
+		List<Integer> optionList = new ArrayList<>();
+		int i = 0;
+		for (String s : options.split(",")) {
+			if (Boolean.parseBoolean(s)) {
+				optionList.add(i);
+			}
+			i++;
+		}
+		
+		selectedOptions = optionList;
 
-	/**
-	 * This method is automatically called when a new checkbox has been
-	 * selected.
-	 * 
-	 * @param event
-	 *            an event representing the change (the content is irrelevant)
-	 */
-	@Override
-	public void onValueChange(ValueChangeEvent<Boolean> event) {
-		eventBus.fireEvent(new SelectionUpdateEvent());
-	}
-
-	/**
-	 * This method is automatically called when a new perspective-question has
-	 * been selected.
-	 * 
-	 * <p>
-	 * It first replaces the checkbox-section of the perspectivePanel with a new
-	 * set of checkboxes and then sends a new {@link SelectionUpdateEvent} over
-	 * the system's eventbus.
-	 * </p>
-	 * 
-	 * @param event
-	 *            the event
-	 */
-	@Override
-	public void onSelection(SelectionEvent<TreeItem> event) {
-		QuestionTreeItem item = (QuestionTreeItem) event.getSelectedItem();
-		perspectiveCheckboxes = checkPanelFactory.createCheckboxPanel(item.getQuestionID());
-		perspectiveCheckboxes.addValueChangeHandler(this);
-		checkboxContainer.setWidget(perspectiveCheckboxes);
+		this.useTotalSelected = total;
 		
 		eventBus.fireEvent(new SelectionUpdateEvent());
 	}
+	
+	protected native void exportPerspectiveCallback() /*-{
+		var that = this;
+		$wnd.gwtPerspectiveCallback = $entry(function(perspective, options, total) {
+			that.@org.daxplore.presenter.client.ui.PerspectivePanel::gwtPerspectiveCallback(Ljava/lang/String;Ljava/lang/String;Z)(perspective, options, total);
+		});
+	}-*/;
 }

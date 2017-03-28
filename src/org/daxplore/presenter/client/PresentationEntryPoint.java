@@ -57,5 +57,11 @@ public class PresentationEntryPoint implements EntryPoint {
 		} else {
 			presenter.showDefaultChart();
 		}
+		
+		generateExternalElements();
 	}
+	
+	public final native void generateExternalElements() /*-{
+		$wnd.generatePerspectivePanel();
+	}-*/;
 }

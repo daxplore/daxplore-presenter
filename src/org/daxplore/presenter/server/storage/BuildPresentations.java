@@ -105,7 +105,12 @@ public class BuildPresentations {
 		};
 		
 		String template = StaticFileStore.getStaticFile(sc, "/templates/presentation.html");
-		return MessageFormat.format(template, (Object[])arguments);
+		
+		String result = template;
+		for (int i = 0; i < arguments.length; i++) {
+			result = result.replaceAll("\\{" + i + "\\}", Matcher.quoteReplacement(arguments[i]));
+		}
+		return result;
 	}
 	
 	@SuppressWarnings("unchecked")
