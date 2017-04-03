@@ -13,8 +13,8 @@
 }
 
 .grid-column-right {
-	margin-top: 200px;
-   margin-left: 30px;
+    margin-top: 96px;
+    margin-left: 42px;
 }
 
 .grid {
@@ -88,13 +88,14 @@
 	text-align: center;
 }
 
-.add-column-button {
-	position: absolute;
-	background: white;
-	border: 1px dashed #BBB;
-	top: 3px;
-	border-radius: 0;
-	white-space: nowrap;
+.grid-buttons {
+    width: 100%;
+    margin-bottom: 30px;
+    margin-left: 10px;
+}
+
+.save-grid-image-button {
+	float: right;
 }
 
 .cell-good {
@@ -109,24 +110,7 @@
 	background: #FBC3BD !important;
 }
 
-.add-column-button {
-   margin-top: 92px;
-	height: 14px;
-	display: inline-block;
-	cursor: pointer;
-	font-family: Arial;
-	font-size: 13px;
-	font-weight: bold;
-	padding: 5px 10px;
-	text-decoration: none;
-	color: #555;
-}
-
 .add-column-button:hover {
 	border-color: rgb(85, 85, 85);
-}
-
-.add-column-button:active {
-	margin-top: 91px;
 }
 

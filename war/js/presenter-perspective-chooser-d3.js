@@ -97,6 +97,7 @@
     
     var select_all_button = general_select.append('span')
       .classed('dashed-button', true)
+      .classed('perspective-button', true)
       .on('click', function() {
         for (var i=0; i<selected_options.length; i++) {
     	  selected_options[i] = true;
@@ -107,6 +108,7 @@
     
     var deselect_all_button = general_select.append('span')
       .classed('dashed-button', true)
+      .classed('perspective-button', true)
       .on('click', function() {
         for (var i=0; i<selected_options.length; i++) {
     	  selected_options[i] = false;
@@ -142,6 +144,7 @@
     var expand_button = expand_button_wrapper.append('div')
       .classed('expand-button', true)
       .classed('dashed-button', true)
+      .classed('perspective-button', true)
       .text(collapsed ? 'Visa fler >' : '< Visa färre' )
       .style('visibility', function() {
     	  return has_remainder ? null : 'hidden';

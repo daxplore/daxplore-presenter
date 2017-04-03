@@ -5,9 +5,10 @@
     <base href="{0}" target="_blank">
     <title>{1}</title>
 
-    <link type="text/css" rel="stylesheet" href="css/normalize.css">
-    <link type="text/css" rel="stylesheet" href="css/profile-chart.css">
-    <link type="text/css" rel="stylesheet" href="css/userprofile.css">
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/daxplore-common.css">
+    <link rel="stylesheet" href="css/profile-chart.css">
+    <link rel="stylesheet" href="css/userprofile.css">
 
     <script type="text/javascript" charset="UTF-8">
       var prefix = "{2}";
@@ -22,6 +23,7 @@
 
     <script type="text/javascript" src="https://d3js.org/d3.v4.js"></script>
 
+    <script type="text/javascript" src="js/dom-to-image.min.js"></script>
     <script type="text/javascript" src="js/canvas-toBlob.js"></script>
     <script type="text/javascript" src="js/FileSaver.js"></script>
 
@@ -77,14 +79,17 @@
      	<div class="grid-row">
           <span class="grid"></span>
         	 <div class='grid-column-right'>
-	        	 <span class="add-column-button noselect" onClick="addColumn()"></span>
-	        	 <div class='grid-info'>
-		        	 <table class='grid-legend'>
-		        	 	<tr><td class='grid-legend-symbol cell-good'></td><td class='grid-legend-text good'></td></tr>
-		        	 	<tr><td class='grid-legend-symbol cell-avg'></td><td class='grid-legend-text avg'></td></tr>
-		        	 	<tr><td class='grid-legend-symbol cell-bad'></td><td class='grid-legend-text bad'></td></tr>
-		        	 </table>
-		        	 <div id='grid-description' class='description'></div>
+        	 	<div class='grid-buttons'>
+	        		<span class="add-column-button dashed-button" onClick="addColumn()"></span>
+					<span class="save-grid-image-button dashed-button"></span>
+				</div>
+	        	<div class='grid-info'>
+		      	<table class='grid-legend'>
+			        	<tr><td class='grid-legend-symbol cell-good'></td><td class='grid-legend-text good'></td></tr>
+			        	<tr><td class='grid-legend-symbol cell-avg'></td><td class='grid-legend-text avg'></td></tr>
+			        	<tr><td class='grid-legend-symbol cell-bad'></td><td class='grid-legend-text bad'></td></tr>
+		        	</table>
+		        	<div id='grid-description' class='description'></div>
 	        	 </div>
         	 </div>
      	</div>
@@ -103,7 +108,7 @@
          </div>
        </div>
        <div class="column-right">
-         <span class="button save-image" onClick="generateImage()"></span>
+         <span class="save-image dashed-button" onClick="generateImage()"></span>
          <div class="description-wrapper">
            <div id='chart-description' class="description"></div>
          </div>
