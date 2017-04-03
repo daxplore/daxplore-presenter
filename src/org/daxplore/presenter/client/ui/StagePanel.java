@@ -67,7 +67,8 @@ public class StagePanel extends Composite implements ResizeHandler {
 	
 	@UiField(provided = true)
 	protected final VerticalPanel sidebarArea;
-//	@UiField(provided = true)
+
+	@UiField(provided = true)
 	protected final SimplePanel legendPanel;
 
 	
