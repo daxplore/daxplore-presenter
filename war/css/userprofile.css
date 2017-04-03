@@ -14,7 +14,7 @@
 
 .grid-column-right {
     margin-top: 96px;
-    margin-left: 42px;
+    margin-left: 35px;
 }
 
 .grid {
@@ -85,6 +85,7 @@
 .grid-cell input, .grid-legend-symbol {
 	width: 40px;
 	padding: 0 0;
+	margin-right: 7px;
 	text-align: center;
 }
 
