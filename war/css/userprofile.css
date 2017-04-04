@@ -22,29 +22,46 @@
 }
 
 .grid-info {
+	
 }
 
 .rowtext, .grid-legend-text {
-	font-size: 13px;
+	font-size: 11px;
 	color: rgb(85, 85, 85);
 	white-space: nowrap;
 }
 
 .rowtext {
 	text-align: right;
-	vertical-align: bottom;
-	padding-right: 10px;
-}
-
-.grid-cell input, .header-cell input, .grid-legend-symbol {
-	background: white;
-	border: 1px dashed #BBB;
-	font-size: 12px;
-	height: 18px;
+	padding-right: 8px;
 }
 
 .header-cell input {
 	height: 23px;
+}
+
+.grid-cell {
+	padding: 0;
+}
+
+.grid-cell input, .grid-legend-symbol {
+	background: white;
+	border: 1px dashed #BBB;
+	font-size: 10px;
+	height: 16px;
+}
+
+.header-cell input {
+	border: 1px dashed #BBB;
+	font-size: 13px;
+	height: 22px;
+}
+
+.grid-cell input, .grid-legend-symbol {
+	width: 33px;
+	padding: 0;
+	margin-right: 7px;
+	text-align: center;
 }
 
 .grid-cell input:hover, .header-cell input:hover {
@@ -53,6 +70,11 @@
 
 .grid-cell input:focus, .header-cell input:focus {
 	border: 1px solid black;
+}
+
+.rowtext.groupname {
+	font-size: 13px;
+	vertical-align: bottom;
 }
 
 .grid-legend {
@@ -80,13 +102,6 @@
 	width: 130px;
 	padding: 0 2px;
 	font-weight: bold;
-}
-
-.grid-cell input, .grid-legend-symbol {
-	width: 40px;
-	padding: 0 0;
-	margin-right: 7px;
-	text-align: center;
 }
 
 .grid-buttons {

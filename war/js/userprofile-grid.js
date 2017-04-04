@@ -206,6 +206,7 @@
 		header
 		  .append('th')
 		  .classed('rowtext', true)
+		  .classed('groupname', true)
 		  .text('Gruppnamn:');
 		
 		rows = tbody.selectAll('tr')
