@@ -119,6 +119,7 @@ text {
 
 .save-image {
 	align-self: flex-start;
+	margin-left: 10px;
 }
 
 .description-wrapper {

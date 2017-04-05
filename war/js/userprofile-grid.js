@@ -226,45 +226,52 @@
   
   exports.saveGridImage = function() {
 	domtoimage.toPng(d3.select('.grid').node(), {bgcolor: 'white'})
-      .then(function (dataUrl) {
-        var img = new Image();
-        img.onload = function() {
-          var margin = 10;
-          var chart_width = img.width + 2*margin;
-          var chart_height = img.height + 2*margin + 10;
-        
-          var canvas_chart_selection = d3.select('body').append('canvas')
-            .attr('width', chart_width)
-            .attr('height', chart_height)
-            .style('visibility', 'visible');
-          var canvas_chart = canvas_chart_selection.node();
-
-          var ctx = canvas_chart.getContext('2d');
-          
-          ctx.fillStyle = "white";
-          ctx.fillRect(0, 0, chart_width, chart_height);
-          ctx.fillStyle = "black";
-          
-          ctx.drawImage(img, margin, margin);
-          
-          var source_text = usertexts.imageWaterStamp;
-          var source_font_height = 11;
-          ctx.font = source_font_height + 'px sans-serif';
-          ctx.fillStyle = '#555';
-          var source_text_width = ctx.measureText(source_text).width;
-          ctx.fillText(source_text, 5, chart_height - 5);
-          
-          canvas_chart.toBlob(function(blob) {
-            saveAs(blob, 'profildiagram' + '.png');
-          });
-          
-          canvas_chart_selection.remove();
-        }
-        
-        img.src = dataUrl;
-      })
+      .then(function(dataUrl) { generateAndSaveImage(dataUrl); })
       .catch(function (error) {
         console.error('Failed to generate image', error);
       });
+  }
+  
+  var generateAndSaveImage = function (dataUrl, minWidth = 0) {
+    var img = new Image();
+    img.onload = function() {
+      var margin = 10;
+      var chart_width = Math.max(minWidth, img.width + 2*margin);
+      var chart_height = img.height + 2*margin + 10;
+    
+      var canvas_chart_selection = d3.select('body').append('canvas')
+        .attr('width', chart_width)
+        .attr('height', chart_height)
+        .style('visibility', 'visible');
+      var canvas_chart = canvas_chart_selection.node();
+      var ctx = canvas_chart.getContext('2d');
+        
+      var source_text = usertexts.imageWaterStamp;
+      var source_font_height = 11;
+      ctx.font = source_font_height + 'px sans-serif';
+      var source_text_width = ctx.measureText(source_text).width;
+        
+      if (source_text_width + 2 * margin > chart_width) {
+        generateAndSaveImage(dataUrl, source_text_width + 2 * margin);
+        return;
+      }
+        
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, chart_width, chart_height);
+      ctx.fillStyle = "black";
+        
+      ctx.drawImage(img, margin, margin);
+      
+      ctx.fillStyle = '#555';
+      ctx.fillText(source_text, margin, chart_height - 5);
+        
+      canvas_chart.toBlob(function(blob) {
+        saveAs(blob, 'profildiagram' + '.png');
+      });
+        
+      canvas_chart_selection.remove();
+    }
+     
+    img.src = dataUrl;
   }
 })(window);
