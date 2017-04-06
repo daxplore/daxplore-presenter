@@ -62,6 +62,8 @@
                    usernames[i] = el.value;
                  }
                  callCallbacks();
+                 d3.select(el)
+                   .classed('has-content', !(!(el.value) || 0 === el.value.length))
               });
     
     // create a cell in each row for each column
@@ -175,23 +177,23 @@
           setDescriptionShort(d3.select('#grid-description'), q_ids[0]);
         }
         
-          usernames.push('Grupp 1');
+        usernames.push('Grupp 1');
           
-          usermeans = q_ids.map(function(q_id, i) {
-            return [NaN];
-          });
+        usermeans = q_ids.map(function(q_id, i) {
+          return [NaN];
+        });
           
-          systemdata = q_ids.map(function(q_id, i) { 
-            return {
-              q_id,
-              index: i, 
-            reference: references_map[q_id]
-          }});
+        systemdata = q_ids.map(function(q_id, i) { 
+          return {
+            q_id,
+            index: i, 
+          reference: references_map[q_id]
+        }});
           
           
           // GRID FORM
-          var form = d3.select('.grid').append('form')
-            .attr('lang', locale);
+        var form = d3.select('.grid').append('form')
+          .attr('lang', locale);
         var table = form.append('table');
         var thead = table.append('thead');
         tbody = table.append('tbody');
@@ -249,6 +251,9 @@
 	    .style('left', '-9999px')
 	    .style('top', '-9999px')
 	    .append(function() { return gridclone.node(); });
+    
+    gridclone.selectAll('.header-cell input')
+      .style('border', 'none');
     
     domtoimage.toPng(gridclone.node(), {bgcolor: 'white'})
       .then(function(dataUrl) {
