@@ -128,25 +128,20 @@
 		callCallbacks();
   }
   
-  
-  exports.addGridUpdateCallback = 
-	function(callbackFunction) {
-	  	callbackFunctions.push(callbackFunction);
-	  	
-	  	callCallbacks();
-  	}
-  
-  exports.addColumn = function() {
-	  usernames.push('Grupp ' + (usernames.length + 1));
-	  
-	  usermeans.forEach(function(u) {
-		 u.push(NaN);
-	  });
-	  
-	  generateColumns(usernames, usermeans);
+  exports.addGridUpdateCallback = function(callbackFunction) {
+    callbackFunctions.push(callbackFunction);
+    callCallbacks();
   }
   
-
+  exports.addColumn = function() {
+    usernames.push('Grupp ' + (usernames.length + 1));
+	  
+    usermeans.forEach(function(u) {
+      u.push(NaN);
+    });
+	 
+    generateColumns(usernames, usermeans);
+  }
 	  
   exports.generateGrid =
     function(
@@ -191,17 +186,20 @@
 	  	    q_id,
 	  	    index: i, 
 		    reference: references_map[q_id]
-	       }});
+	      }});
 	  	
+	  	
+	  	// GRID FORM
 	  	var form = d3.select('.grid').append('form')
 	  	  .attr('lang', locale);
 		var table = form.append('table');
 		var thead = table.append('thead');
 		tbody = table.append('tbody');
 
-		// append the header row
+		
+		// GRID HEADER
 		var header = thead.append('tr')
-			.classed('grid-header', true);
+		  .classed('grid-header', true);
 		
 		header
 		  .append('th')
@@ -209,11 +207,14 @@
 		  .classed('groupname', true)
 		  .text('Gruppnamn:');
 		
+		
+		// GRID ROWS
 		rows = tbody.selectAll('tr')
 		  .data(systemdata)
 		  .enter()
 		    .append('tr')
-		      .on('mouseover', function(d, i) {
+              .attr('class', function(d) { return 'gridrow-' + d.q_id; })
+	          .on('mouseover', function(d, i) {
 		        setDescriptionShort(d3.select('#grid-description'), d.q_id);
 		      });
 		
@@ -225,8 +226,29 @@
   	}
   
   exports.saveGridImage = function() {
-	domtoimage.toPng(d3.select('.grid').node(), {bgcolor: 'white'})
-      .then(function(dataUrl) { generateAndSaveImage(dataUrl); })
+	var gridclone = d3.select(d3.select('.grid').node().cloneNode(true));
+	
+	row:
+    systemdata.forEach(function(d) {
+      for (var col=0; col<usernames.length; col++) {
+        if (!isNaN(usermeans[d.index][col])) {
+          return;
+        }
+      }
+      gridclone.select('.gridrow-' + d.q_id).remove();
+    });
+    
+    d3.select('body')
+      .append(function() { return gridclone.node(); })
+        .style('position', 'absolute');
+        .style('top', '-9999px');
+        .style('left', '-9999px');
+    
+	domtoimage.toPng(gridclone.node(), {bgcolor: 'white'})
+      .then(function(dataUrl) {
+        generateAndSaveImage(dataUrl);
+        gridclone.remove();
+      })
       .catch(function (error) {
         console.error('Failed to generate image', error);
       });
@@ -253,12 +275,13 @@
         
       if (source_text_width + 2 * margin > chart_width) {
         generateAndSaveImage(dataUrl, source_text_width + 2 * margin);
+        canvas_chart_selection.remove();
         return;
       }
         
-      ctx.fillStyle = "white";
+      ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, chart_width, chart_height);
-      ctx.fillStyle = "black";
+      ctx.fillStyle = 'black';
         
       ctx.drawImage(img, margin, margin);
       
