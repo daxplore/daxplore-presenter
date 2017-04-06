@@ -9,19 +9,19 @@
   var yAxisWidth;
 
   var element_transition = d3.transition()
-  	.duration(300)
-  	.ease(d3.easeLinear);
+      .duration(300)
+      .ease(d3.easeLinear);
   
   var lastHoveredBar = 0;
 
   // FUNCTIONS
   
   function getQid(i) {
-	  return selected_q_ids[i];
+      return selected_q_ids[i];
   }
   
   function getMean(i, selected_option) {
-	  return means[q_ids.indexOf(getQid(i))][selected_option];
+      return means[q_ids.indexOf(getQid(i))][selected_option];
   }
 
   function setToNormalColor(i) {
@@ -96,8 +96,8 @@
   }
   
   function generateChartElements() {
-	  
-	// CHART
+      
+    // CHART
     var chart = d3.select(".chart")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom);
@@ -110,8 +110,8 @@
     
     // Y AXIS
     yAxisElement = chart.append("g")
-	  .classed("y", true)
-	  .classed("axis", true);
+      .classed("y", true)
+      .classed("axis", true);
     
     yAxisReferenceElement = chart.append("g")
       .classed('y', true)
@@ -129,7 +129,7 @@
     chart.append("g")
       .attr("class", "x axis bottom")
     .append("text")
-  	  .attr('class', 'x-bottom-description')
+        .attr('class', 'x-bottom-description')
       .attr("text-anchor", "middle")
       .style("text-anchor", "middle")
       .text(usertexts.listXAxisDescription);
@@ -138,12 +138,12 @@
   
   function updateChartElements() {
     
-	if (first_update) {
-	  var el_trans = d3.transition().duration(0);
-	} else {
-	  var el_trans = element_transition;
-	}
-	
+    if (first_update) {
+      var el_trans = d3.transition().duration(0);
+    } else {
+      var el_trans = element_transition;
+    }
+    
     var chart = d3.selectAll('.chart');
     
     var paddingInner = 0.3;
@@ -156,37 +156,37 @@
     
     var yStop = Math.min(height - xAxisBottomHeight, yHeightWithMaxBand + xAxisTopHeight);
     
-	// CALCULATE Y SCALE
-	y_scale = d3.scaleBand()
+    // CALCULATE Y SCALE
+    y_scale = d3.scaleBand()
       .range([xAxisTopHeight, yStop])
       .paddingInner(paddingInner)
       .paddingOuter(paddingOuter)
       .domain(selected_q_ids);
     
 
-	// UPDATE Y AXIS
-	yAxisScale = y_scale.copy();
-	yAxisScale.domain(selected_q_ids.map(function (q_id) { return shorttexts[q_id] }));
-	var yAxis = d3.axisLeft()
+    // UPDATE Y AXIS
+    yAxisScale = y_scale.copy();
+    yAxisScale.domain(selected_q_ids.map(function (q_id) { return shorttexts[q_id] }));
+    var yAxis = d3.axisLeft()
       .tickSize(3)
       .scale(yAxisScale);
-	
-	oldYAxisWidth = Math.max(50, yAxisReferenceElement.node().getBBox().width);
-	yAxisReferenceElement.call(yAxis);
-	yAxisWidth = Math.max(50, yAxisReferenceElement.node().getBBox().width);
-	
-	if (first_update) {
-		oldYAxisWidth = yAxisWidth;
-	}
-	
-	yAxisElement.interrupt().selectAll('*').interrupt();
-	
-	yAxisElement
-	  .transition(el_trans)
-  	    .attr("transform", "translate(" + yAxisWidth + ", 0)")
-	    .call(yAxis);
-	
-	yAxisElement.selectAll(".y.axis text")
+    
+    oldYAxisWidth = Math.max(50, yAxisReferenceElement.node().getBBox().width);
+    yAxisReferenceElement.call(yAxis);
+    yAxisWidth = Math.max(50, yAxisReferenceElement.node().getBBox().width);
+    
+    if (first_update) {
+        oldYAxisWidth = yAxisWidth;
+    }
+    
+    yAxisElement.interrupt().selectAll('*').interrupt();
+    
+    yAxisElement
+      .transition(el_trans)
+          .attr("transform", "translate(" + yAxisWidth + ", 0)")
+        .call(yAxis);
+    
+    yAxisElement.selectAll(".y.axis text")
       .on("mouseover",
         function(d, i) {
           tooltipOver(i);
@@ -210,7 +210,7 @@
       .scale(x_scale)
       .ticks(20, "d")
       .tickSizeInner(0);
-	    
+        
     var x_axis_top = d3.selectAll("g.x.axis.top");
     
     x_axis_top.interrupt().selectAll('*').interrupt();
@@ -254,23 +254,23 @@
     bars.enter().append("g")
       .classed('bar', true)
       .attr("transform", function(d, i) { return "translate(" + (oldYAxisWidth + 1) + "," + y_scale(d) + ")"; })
-	  .append("rect")
-	    .classed('barrect', true)
-	    .attr("height", y_scale.bandwidth())
-	    .style("fill", function(d, i) { return colorForValue(getMean(i, selected_option), mean_references[getQid(i)], directions[getQid(i)]); })
-	    .attr("width", function(d, i) { return first_update ? x_scale(getMean(i, selected_option)) + 1 : 0; })
-	    .on("mouseover",
-	      function(d) {
-	    	var i = selected_q_ids.indexOf(d);
-	        tooltipOver(i);
-	        setToHoverColor(i);
-	      })
-	    .on("mouseout",
-	      function(d) {
-	    	var i = selected_q_ids.indexOf(d);
-	        tooltipOut();
-	        setToNormalColor(i);
-	      });
+      .append("rect")
+        .classed('barrect', true)
+        .attr("height", y_scale.bandwidth())
+        .style("fill", function(d, i) { return colorForValue(getMean(i, selected_option), mean_references[getQid(i)], directions[getQid(i)]); })
+        .attr("width", function(d, i) { return first_update ? x_scale(getMean(i, selected_option)) + 1 : 0; })
+        .on("mouseover",
+          function(d) {
+            var i = selected_q_ids.indexOf(d);
+            tooltipOver(i);
+            setToHoverColor(i);
+          })
+        .on("mouseout",
+          function(d) {
+            var i = selected_q_ids.indexOf(d);
+            tooltipOut();
+            setToNormalColor(i);
+          });
 
     // animate all bars into position
     bars = d3.selectAll('.bar');
@@ -283,9 +283,9 @@
     
     bars.select(".barrect")
       .transition(el_trans)
-	    .style("fill", function(d, i) {return colorForValue(getMean(i, selected_option), mean_references[getQid(i)], directions[getQid(i)]); })
-	    .attr("height", y_scale.bandwidth())
-	    .attr("width", function(d, i) { return x_scale(getMean(i, selected_option)) + 1; });
+        .style("fill", function(d, i) {return colorForValue(getMean(i, selected_option), mean_references[getQid(i)], directions[getQid(i)]); })
+        .attr("height", y_scale.bandwidth())
+        .attr("width", function(d, i) { return x_scale(getMean(i, selected_option)) + 1; });
     
     // REFERENCE LINES
     var referenceWidth = 2;
@@ -303,13 +303,13 @@
       .classed('reference', true)
       .on("mouseover",
         function(d) {
-    	  var i = selected_q_ids.indexOf(d);
+          var i = selected_q_ids.indexOf(d);
           tooltipOver(i);
           setToHoverColor(i);
         })
       .on("mouseout",
         function(d) {
-    	  var i = selected_q_ids.indexOf(d);
+          var i = selected_q_ids.indexOf(d);
           tooltipOut();
           setToNormalColor(i);
         })
@@ -337,7 +337,7 @@
         .attr("transform", function(d, i) { return "translate(" + (yAxisWidth + x_scale(mean_references[d]) - referenceWidth/2) + "," + (y_scale(d) - referenceExtraHeight/2) + ")"; });
     
     references.select('.reference-line')
-	  .transition(el_trans)
+      .transition(el_trans)
         .attr("width", referenceWidth)
         .attr("height", referenceHeight);
     
@@ -348,7 +348,7 @@
     
     // repopulate the description box and reset the tooltip
     if (selected_q_ids.length > 0) {
-	  tooltipOver(Math.min(lastHoveredBar, selected_q_ids.length -1));
+      tooltipOver(Math.min(lastHoveredBar, selected_q_ids.length -1));
     } else {
       d3.selectAll('#chart-description')
         .style('opacity', '0');
@@ -361,7 +361,7 @@
     var header_select = d3.select(".header-select");
     
     var options = header_select.selectAll('option')
-    	.data(perspective_options, function(d) { return d; });
+        .data(perspective_options, function(d) { return d; });
     
     options.exit().remove();
     
@@ -408,13 +408,13 @@
   }
   
   function get_selected_q_ids(means, selected_option) {
-	  var selected = [];
-	  q_ids.forEach(function(q_id, i) {
-		  if (!isNaN(means[i][selected_option])) {
-			  selected.push(q_id);
-		  }
-	  });
-	  return selected;
+      var selected = [];
+      q_ids.forEach(function(q_id, i) {
+          if (!isNaN(means[i][selected_option])) {
+              selected.push(q_id);
+          }
+      });
+      return selected;
   }
 
 
@@ -446,12 +446,12 @@
   }
 
   exports.setChartData = function(perspective_options_array, means_array) {
-	perspective_options = perspective_options_array;
-	means = means_array;
-	selected_q_ids = get_selected_q_ids(means, selected_option);
-	
-	updateSelectorOption(selected_option);
-	
+    perspective_options = perspective_options_array;
+    means = means_array;
+    selected_q_ids = get_selected_q_ids(means, selected_option);
+    
+    updateSelectorOption(selected_option);
+    
     first_update = false;
   }
   

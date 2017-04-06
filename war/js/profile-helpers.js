@@ -1,6 +1,6 @@
 (function(exports) {
   var mean_references, shorttexts, usertexts, descriptions, directions;
-	  
+      
   var colors = {};
 
   colors.good    = "hsl(95, 38%, 64%)";
@@ -82,19 +82,19 @@
   
   exports.setDescriptionShort =
   function(element, q_id) {
-	var shorttext = shorttexts[q_id];
+    var shorttext = shorttexts[q_id];
     var header = "<span class='description-header'>" + shorttext + "</span><br>";
     var description = descriptions[q_id];
     element.html(header + description);
   }
-	  
+      
   exports.setDescriptionFull =
   function(element, group_name, q_id, mean) {
     var shorttext = shorttexts[q_id];
     var description = descriptions[q_id];
     var reference = mean_references[q_id];
     var direction = directions[q_id];
-	
+    
     element.transition()
       .duration(0)
         .style("opacity", 1);

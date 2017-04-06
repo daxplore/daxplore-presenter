@@ -31,7 +31,7 @@
     
     var perspective_shorttexts = [];
     for (p of perspectives) {
-   	  for (q of questions) {
+         for (q of questions) {
         if (p === q.column) {
           perspective_shorttexts.push(q.short);
           perspective_options.push(q.options);
@@ -100,7 +100,7 @@
       .classed('perspective-button', true)
       .on('click', function() {
         for (var i=0; i<selected_options.length; i++) {
-    	  selected_options[i] = true;
+          selected_options[i] = true;
         }
         updateCheckboxes(true);
       })
@@ -111,7 +111,7 @@
       .classed('perspective-button', true)
       .on('click', function() {
         for (var i=0; i<selected_options.length; i++) {
-    	  selected_options[i] = false;
+          selected_options[i] = false;
         }
         updateCheckboxes(true);
       })
@@ -132,7 +132,7 @@
         .classed('perspective-options-remainder-wrapper', true)
         .style('opacity', collapsed ? 0 : 1)
         .style('width', collapsed ? '0px' : null);
-    	
+        
     var remaining_columns = remaining_columns_wrapper
       .append('div')
         .classed('perspective-remaining-columns', true)
@@ -147,7 +147,7 @@
       .classed('perspective-button', true)
       .text(collapsed ? 'Visa fler >' : '< Visa färre' )
       .style('visibility', function() {
-    	  return has_remainder ? null : 'hidden';
+          return has_remainder ? null : 'hidden';
       })
       .on('click', function() {
         collapsed = !collapsed;
@@ -197,30 +197,30 @@
   }
   
   function updateCheckboxes(fireGwtEvent) {
-	  
+      
     d3.selectAll('.perspective-variable-option')
       .classed('perspective-variable-selected', function(d, i) { return i == selected_perspective; });
-	  
+      
     var show_select_total = settings.showSelectTotal; 
-	var option_count = selected_options.length + (show_select_total ? 1 : 0);
-	var per_column_setting = settings.perspectiveCheckboxesPerColumn;
-	var max_columns = 3;
-	var columns = Math.min(max_columns, Math.ceil(option_count / per_column_setting));
-	var per_column = Math.ceil(option_count / columns);
-	has_remainder = columns > 1;
-	if (collapsed) {
+    var option_count = selected_options.length + (show_select_total ? 1 : 0);
+    var per_column_setting = settings.perspectiveCheckboxesPerColumn;
+    var max_columns = 3;
+    var columns = Math.min(max_columns, Math.ceil(option_count / per_column_setting));
+    var per_column = Math.ceil(option_count / columns);
+    has_remainder = columns > 1;
+    if (collapsed) {
       d3.select('.perspective-options-remainder-wrapper')
         .style('width', '0px');
-	}
-	if (!has_remainder) {
+    }
+    if (!has_remainder) {
       collapsed = true;
-	}
+    }
 
-	var first_column_data = [];
-	var second_column_data = [];
-	var third_column_data = [];
-	
-	for (var i = 0; i < selected_options.length; i++) {
+    var first_column_data = [];
+    var second_column_data = [];
+    var third_column_data = [];
+    
+    for (var i = 0; i < selected_options.length; i++) {
       var option = {text: perspective_options[selected_perspective][i], selected: selected_options[i], index: i};
       if (i < per_column) {
         first_column_data.push(option);
@@ -229,11 +229,11 @@
       } else {
         third_column_data.push(option);
       }
-	}
-	
-	//TODO add total
-	
-	// First column
+    }
+    
+    //TODO add total
+    
+    // First column
     var first_col_options = d3.select('.perspective-options-first-column').selectAll('.perspective-option')
       .data(first_column_data);
     
@@ -290,32 +290,32 @@
     if (fireGwtEvent && selected_options.includes(true)) {
       gwtPerspectiveCallback(perspectives[selected_perspective], selected_options.join(',', true), false);
     }
-	
+    
     updateElements();
   }
   
   function updateElements() {
-	d3.select('.perspective-options-first-column')
+    d3.select('.perspective-options-first-column')
       .classed('fade-bottom', has_remainder && collapsed);
 
-	d3.select('.perspective-remaining-columns')
-	  .classed('fade-bottom', has_remainder && collapsed);
-	
-	d3.select('.expand-button')
+    d3.select('.perspective-remaining-columns')
+      .classed('fade-bottom', has_remainder && collapsed);
+    
+    d3.select('.expand-button')
       .style('visibility', function() {
-    	  return has_remainder ? null : 'hidden';
+          return has_remainder ? null : 'hidden';
       })
       .text(collapsed ? 'Visa fler >' : '< Visa färre ');
-	
-	d3.select('.daxplore-DescriptionPanelBottom')
+    
+    d3.select('.daxplore-DescriptionPanelBottom')
       .interrupt().transition()
         .style('color', collapsed ? 'black': 'hsl(0, 0%, 70%)');
 
-	d3.select('.perspective-remaining-columns')
+    d3.select('.perspective-remaining-columns')
       .interrupt().transition()
         .style('width', collapsed ? '0px' : null);
-	
-	d3.select('.perspective-options-remainder-wrapper')
+    
+    d3.select('.perspective-options-remainder-wrapper')
       .interrupt().transition()
         .style('opacity', collapsed ? 0 : 1)
         .style('width', collapsed ? '0px' : null);
