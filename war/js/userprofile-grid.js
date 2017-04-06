@@ -228,7 +228,7 @@
   exports.saveGridImage = function() {
     var gridclone = d3.select(d3.select('.grid').node().cloneNode(true));
     
-    row:
+    var removed = 0;
     systemdata.forEach(function(d) {
       for (var col=0; col<usernames.length; col++) {
         if (!isNaN(usermeans[d.index][col])) {
@@ -236,18 +236,24 @@
         }
       }
       gridclone.select('.gridrow-' + d.q_id).remove();
+      removed++;
     });
     
+    if (removed == systemdata.length) {
+      gridclone = d3.select(d3.select('.grid').node().cloneNode(true));
+    }
+    
     d3.select('body')
-      .append(function() { return gridclone.node(); })
-        .style('position', 'absolute');
-        .style('top', '-9999px');
-        .style('left', '-9999px');
+      .append('div')
+	    .style('position', 'absolute')
+	    .style('left', '-9999px')
+	    .style('top', '-9999px')
+	    .append(function() { return gridclone.node(); });
     
     domtoimage.toPng(gridclone.node(), {bgcolor: 'white'})
       .then(function(dataUrl) {
-        generateAndSaveImage(dataUrl);
         gridclone.remove();
+        generateAndSaveImage(dataUrl);
       })
       .catch(function (error) {
         console.error('Failed to generate image', error);
