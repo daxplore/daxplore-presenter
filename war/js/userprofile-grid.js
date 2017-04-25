@@ -32,15 +32,16 @@
     // make sure all names are unique for the dropdown
     var names = [];
     for (var i = 0; i < usernames.length; i++) {
-        var name = usernames[i];
-        while(names.indexOf(name) != -1) {
-            name += ' ';
-        }
-        names.push(name);
+      var name = usernames[i];
+      while(names.indexOf(name) != -1) {
+        name += ' ';
+      }
+      names.push(name);
     }
-    callbackFunctions.forEach(function(callback) {
-      callback(names, usermeans);
-    });
+    
+    for (var i=0; i<callbackFunctions.length; i++) {
+      callbackFunctions[i](names, usermeans);
+    }
   }
   
   function generateColumns(usernames, usermeans) {
@@ -165,9 +166,14 @@
         d3.select('.add-column-button')
           .text('+ Lägg till grupp');
         
-        d3.select('.save-grid-image-button')
-          .text('Spara som bild')
-          .on('click', saveGridImage);
+        if (Modernizr.promises && Modernizr.svgforeignobject) {
+          d3.select('.save-grid-image-button')
+            .text('Spara som bild')
+            .on('click', saveGridImage);
+        } else {
+          d3.select('.save-grid-image-button')
+            .remove();
+        }
         
         d3.select('.grid-legend-text.good').text(usertexts.listReferenceBetter);
         d3.select('.grid-legend-text.avg').text(usertexts.listReferenceComparable);
@@ -185,9 +191,9 @@
           
         systemdata = q_ids.map(function(q_id, i) { 
           return {
-            q_id,
+            q_id: q_id,
             index: i, 
-          reference: references_map[q_id]
+            reference: references_map[q_id]
         }});
           
           
@@ -258,14 +264,14 @@
     domtoimage.toPng(gridclone.node(), {bgcolor: 'white'})
       .then(function(dataUrl) {
         gridclone.remove();
-        generateAndSaveImage(dataUrl);
+        generateAndSaveImage(dataUrl, 0);
       })
-      .catch(function (error) {
+      ['catch'](function (error) {
         console.error('Failed to generate image', error);
       });
   }
   
-  var generateAndSaveImage = function (dataUrl, minWidth = 0) {
+  var generateAndSaveImage = function (dataUrl, minWidth) {
     var img = new Image();
     img.onload = function() {
       var margin = 10;

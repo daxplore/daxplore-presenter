@@ -30,15 +30,15 @@
     var dashedBorder = '1px dashed #DDD';
     
     var perspective_shorttexts = [];
-    for (p of perspectives) {
-         for (q of questions) {
+    perspectives.forEach(function(p) {
+      questions.some(function(q) {
         if (p === q.column) {
           perspective_shorttexts.push(q.short);
           perspective_options.push(q.options);
-          break;
+          return true;
         }
-      }
-    }
+      })
+    });
     
     var panel = d3.select('.daxplore-PerspectivePanel');
     
@@ -187,10 +187,10 @@
     if (changed) {
       selected_options = [];
       var i = 0;
-      for (option of perspective_options[selected_perspective]) {
+      perspective_options[selected_perspective].forEach(function(option) {
         selected_options.push(i < settings.defaultSelectedPerspectiveOptions);
         i++;
-      }
+      });
     }
     
     updateCheckboxes(true);

@@ -1,6 +1,7 @@
 
 .grid-main > .chart-row {
 	height: 500px;
+	padding-top: 10px;
 }
 
 .grid-row {
