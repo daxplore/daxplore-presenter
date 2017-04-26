@@ -274,9 +274,24 @@
   var generateAndSaveImage = function (dataUrl, minWidth) {
     var img = new Image();
     img.onload = function() {
+      var max_title_width = 0;
+      var text_test = d3.select('body')
+        .append('span')
+        .classed('text-width-test', true);
+      for (var i=0; i<usernames.length; i++) {
+    	  text_test
+          .text(usernames[i]);
+        max_title_width = Math.max(max_title_width, text_test.node().offsetWidth);
+      }
+      title_height = text_test.node().offsetHeight;
+      
+      var rotation_angle = 2 * Math.PI * 1/8;
+      var header_height = max_title_width*Math.sin(rotation_angle) + title_height*Math.cos(rotation_angle);
+      var subtract_header_space = 120 - header_height;
+      
       var margin = 10;
       var chart_width = Math.max(minWidth, img.width + 2*margin);
-      var chart_height = img.height + 2*margin + 10;
+      var chart_height = img.height + 2*margin + 10 - subtract_header_space;
     
       var canvas_chart_selection = d3.select('body').append('canvas')
         .attr('width', chart_width)
@@ -300,7 +315,7 @@
       ctx.fillRect(0, 0, chart_width, chart_height);
       ctx.fillStyle = 'black';
         
-      ctx.drawImage(img, margin, margin);
+      ctx.drawImage(img, margin, margin - subtract_header_space);
       
       ctx.fillStyle = '#555';
       ctx.fillText(source_text, margin, chart_height - 5);
