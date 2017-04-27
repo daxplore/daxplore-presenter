@@ -37,10 +37,6 @@
 	padding-right: 8px;
 }
 
-.header-cell input {
-	height: 23px;
-}
-
 .grid-cell {
 	padding: 0;
 }
@@ -52,14 +48,26 @@
 	height: 16px;
 }
 
-.header-cell input {
-	background: white;
+.header-cell-input {
+	width: 130px;
 	border: 1px dashed #BBB;
-	font-size: 13px;
-	height: 22px;
 }
 
-.header-cell input.has-content {
+.header-cell-input, .text-width-test {
+	background: white;
+	font-size: 13px;
+	height: 22px;
+	padding: 0 2px;
+	font-weight: bold;
+}
+
+.text-width-test {
+	position: absolute;
+	left: -9999px;
+	top: -9999px;
+	visibility: hidden;
+}
+.header-cell-input.has-content {
 	border: none;
 }
 
@@ -70,11 +78,11 @@
 	text-align: center;
 }
 
-.grid-cell input:hover, .header-cell input:hover {
+.grid-cell input:hover, .header-cell-input:hover {
 	border-color: #666;
 }
 
-.grid-cell input:focus, .header-cell input:focus {
+.grid-cell input:focus, .header-cell-input:focus {
 	border: 1px solid black;
 }
 
@@ -100,15 +108,6 @@
   width: 30px;
 }
 
-.header-cell > div > span {
-/*   padding: 5px 10px; */
-}
-
-.header-cell input {
-	width: 130px;
-	padding: 0 2px;
-	font-weight: bold;
-}
 
 .grid-buttons {
     width: 100%;

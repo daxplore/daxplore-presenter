@@ -133,6 +133,14 @@
       .attr("text-anchor", "middle")
       .style("text-anchor", "middle")
       .text(usertexts.listXAxisDescription);
+    
+    // Hide save image button in IE11 because of a known svg bug
+    // https://connect.microsoft.com/IE/feedbackdetail/view/925655
+    var isIE11 = /Trident.*rv[ :]*11\./.test(navigator.userAgent);
+    if (isIE11) {
+      d3.selectAll('.save-image')
+       .style('display', 'none');
+    }
   }
   
   
@@ -495,10 +503,10 @@
         .attr("height", chartHeight)
         .style("visibility", "hidden");
       var canvas_chart = canvas_chart_selection.node();
-
+  
       var chart_ctx = canvas_chart.getContext('2d');
       chart_ctx.drawImage(img, 0, 0);
-
+  
       var header_text = perspective_options[selected_option];
       var header_padding_top = 5;
       var header_font_size = 16;

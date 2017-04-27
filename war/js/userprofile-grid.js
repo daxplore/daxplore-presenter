@@ -53,19 +53,20 @@
           .append('div')
             .append('span')
               .append('input')
-              .attr('tabindex', function(d, i) { return 1 + i * (q_ids.length + 1) })
-              .attr('placeholder', function (d, i) { return 'Grupp ' + (i + 1) })
-              .on('input', function (d, i, t) {
-                 el = t[i];
-                 if (typeof el.value == 'undefined' || el.value == '') {
-                   usernames[i] = el.placeholder;
-                 } else {
-                   usernames[i] = el.value;
-                 }
-                 callCallbacks();
-                 d3.select(el)
-                   .classed('has-content', !(!(el.value) || 0 === el.value.length))
-              });
+                .classed('header-cell-input', true)
+                .attr('tabindex', function(d, i) { return 1 + i * (q_ids.length + 1) })
+                .attr('placeholder', function (d, i) { return 'Grupp ' + (i + 1) })
+                .on('input', function (d, i, t) {
+                   el = t[i];
+                   if (typeof el.value == 'undefined' || el.value == '') {
+                     usernames[i] = el.placeholder;
+                   } else {
+                     usernames[i] = el.value;
+                   }
+                   callCallbacks();
+                   d3.select(el)
+                     .classed('has-content', !(!(el.value) || 0 === el.value.length))
+                });
     
     // create a cell in each row for each column
     var cells = rows.selectAll('.grid-cell')
@@ -258,44 +259,80 @@
 	    .style('top', '-9999px')
 	    .append(function() { return gridclone.node(); });
     
-    gridclone.selectAll('.header-cell input')
+    gridclone
+      .selectAll('.header-cell')
+      .remove();
+    
+    gridclone
+      .select('.grid-header')
+      .selectAll('.header-cell')
+      .data(usernames).enter()
+        .append('th')
+          .classed('header-cell', true)
+          .append('div')
+            .append('span')
+              .classed('header-cell-input', true)
+              .style('width', 'auto')
+              .text(function (name) { return name; });
+    
+    var text_test = d3.select('body')
+      .append('span')
+      .classed('text-width-test', true);
+    
+    var max_title_width = 0;
+    for (var i=0; i<usernames.length; i++) {
+      text_test
+        .text(usernames[i]);
+      max_title_width = Math.max(max_title_width, text_test.node().offsetWidth);
+    }
+    title_height = text_test.node().offsetHeight;
+    text_test.remove();
+    
+    var rotation_angle = 2 * Math.PI * 1/8;
+    var header_height = gridclone.select('.grid-header').node().offsetHeight;
+    var true_header_height = max_title_width*Math.sin(rotation_angle) + title_height*Math.cos(rotation_angle);
+    var height_offset = true_header_height - header_height;
+    
+    // true_header height represents a square of the longest header
+    // estimate width based on the largest title being the rightmost header.
+    // This could be computed more accurately by for each header calculating:
+    // vertical overflow = true header width - width of columns to the right
+    var chart_width = gridclone.node().offsetWidth + true_header_height - 20;
+    
+    var top_margin = 3 + (height_offset > 0 ? height_offset : 0); 
+    gridclone
+      .style('padding-top', top_margin + 'px')
+      .style('padding-bottom', 1 + 'px');
+    
+    if (height_offset > 0) {
+      height_offset = 0;
+    }
+    
+    gridclone.selectAll('.header-cell-input')
       .style('border', 'none');
     
     domtoimage.toPng(gridclone.node(), {bgcolor: 'white'})
       .then(function(dataUrl) {
         gridclone.remove();
-        generateAndSaveImage(dataUrl, 0);
+        generateAndSaveImage(dataUrl, chart_width, height_offset);
       })
       ['catch'](function (error) {
         console.error('Failed to generate image', error);
       });
   }
   
-  var generateAndSaveImage = function (dataUrl, minWidth) {
+  var generateAndSaveImage = function (dataUrl, minWidth, height_offset) {
     var img = new Image();
     img.onload = function() {
-      var max_title_width = 0;
-      var text_test = d3.select('body')
-        .append('span')
-        .classed('text-width-test', true);
-      for (var i=0; i<usernames.length; i++) {
-    	  text_test
-          .text(usernames[i]);
-        max_title_width = Math.max(max_title_width, text_test.node().offsetWidth);
-      }
-      title_height = text_test.node().offsetHeight;
+      var h_margin = 10;
+      var chart_width = Math.max(minWidth, img.width + 2*h_margin);
+      var top_margin = 10;
+      var bottom_margin = 20;
+      var canvas_height = img.height + height_offset + top_margin + bottom_margin;
       
-      var rotation_angle = 2 * Math.PI * 1/8;
-      var header_height = max_title_width*Math.sin(rotation_angle) + title_height*Math.cos(rotation_angle);
-      var subtract_header_space = 120 - header_height;
-      
-      var margin = 10;
-      var chart_width = Math.max(minWidth, img.width + 2*margin);
-      var chart_height = img.height + 2*margin + 10 - subtract_header_space;
-    
       var canvas_chart_selection = d3.select('body').append('canvas')
         .attr('width', chart_width)
-        .attr('height', chart_height)
+        .attr('height', canvas_height)
         .style('visibility', 'visible');
       var canvas_chart = canvas_chart_selection.node();
       var ctx = canvas_chart.getContext('2d');
@@ -305,20 +342,20 @@
       ctx.font = source_font_height + 'px sans-serif';
       var source_text_width = ctx.measureText(source_text).width;
         
-      if (source_text_width + 2 * margin > chart_width) {
-        generateAndSaveImage(dataUrl, source_text_width + 2 * margin);
+      if (source_text_width + 2 * h_margin > chart_width) {
+        generateAndSaveImage(dataUrl, source_text_width + 2 * h_margin, height_offset);
         canvas_chart_selection.remove();
         return;
       }
         
       ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, chart_width, chart_height);
+      ctx.fillRect(0, 0, chart_width, canvas_height);
       ctx.fillStyle = 'black';
         
-      ctx.drawImage(img, margin, margin - subtract_header_space);
+      ctx.drawImage(img, h_margin, top_margin + height_offset);
       
       ctx.fillStyle = '#555';
-      ctx.fillText(source_text, margin, chart_height - 5);
+      ctx.fillText(source_text, h_margin, canvas_height - 5);
         
       canvas_chart.toBlob(function(blob) {
         saveAs(blob, 'profildiagram' + '.png');
