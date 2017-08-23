@@ -416,13 +416,13 @@
   }
   
   function get_selected_q_ids(means, selected_option) {
-      var selected = [];
-      q_ids.forEach(function(q_id, i) {
-          if (!isNaN(means[i][selected_option])) {
-              selected.push(q_id);
-          }
-      });
-      return selected;
+    var selected = [];
+    q_ids.forEach(function(q_id, i) {
+      if (!isNaN(means[i][selected_option]) && means[i][selected_option] != -1) {
+        selected.push(q_id);
+      }
+    });
+    return selected;
   }
 
 

@@ -12,6 +12,10 @@
   flex-direction: column;
 }
 
+.chart-wrapper {
+	width: 750px;
+}
+
 .content-row {
 	
 }
@@ -23,7 +27,6 @@
 }
 
 .column-left {
-  flex: 1;
   height: 100%;
 }
 

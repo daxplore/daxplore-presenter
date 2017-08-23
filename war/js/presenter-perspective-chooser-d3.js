@@ -8,6 +8,7 @@
   var total_selected = false;
   var has_remainder = false;
   var collapsed = true;
+  var fixed_width = null;
   
   document.addEventListener("DOMContentLoaded", function(e) {
     d3.selectAll('body').append('img')
@@ -25,9 +26,48 @@
     }
   }
 
-  exports.generatePerspectivePanel = function() {
-    var height = 162;
-    var dashedBorder = '1px dashed #DDD';
+  exports.generatePerspectivePanel = function() {  
+    d3.select('.daxplore-PerspectivePanel').html(
+        "<div class='perspective-header'>Välj perspektiv</div>"
+      + "<div class='perspective-picker'>"
+      + "  <div class='perspective-varpicker'>"
+      + "    <div class='pervarpicker-border-wrapper'>"
+      + "      <div class='pervarpicker-top-padding'></div>"
+      + "      <div class='pervarpicker-variables'></div>"
+      + "      <div class='pervarpicker-bottom-padding'></div>"
+      + "    </div>"
+      + "    <div class='pervarpicker-right-border-extender'></div>"
+      + "  </div>"
+      + "  <div class='perspective-options'>"
+      + "    <div class='peropt-buttons'>"
+      + "      <span class='peropt-all-button  perspective-button dashed-button'></span>"
+      + "      <span class='peropt-none-button perspective-button dashed-button'></span>"
+      + "    </div>"
+      + "    <div class='peropt-columns'>"
+      + "      <div class='peropt-col-one'></div>"
+      + "      <div class='peropt-extra-columns'>"
+      + "        <div class='peropt-col-two'></div>"
+      + "        <div class='peropt-col-three'></div>"
+      + "      </div>"
+      + "    </div>"
+      + "    <div class='peropt-bottom-padding'></div>"
+      + "    <div class='peropt-more-wrapper'>"
+      + "      <span class='peropt-more-button perspective-button dashed-button'></span>"
+      + "    </div>"
+      + "  </div>"
+      + "</div>"
+    );
+    
+    window.setTimeout(popuplatePerspectivePanel(), 1);
+  }
+  
+  function popuplatePerspectivePanel() {
+    var variable_list = d3.select('.pervarpicker-variables');
+    
+    if (variable_list.empty()) {
+      window.setTimeout(popuplatePerspectivePanel(), 10);
+      return;
+    }
     
     var perspective_shorttexts = [];
     perspectives.forEach(function(p) {
@@ -40,64 +80,17 @@
       })
     });
     
-    var panel = d3.select('.daxplore-PerspectivePanel');
-    
-    var header = panel.append('div')
-      .classed('perspective-header', true)
-      .text(usertexts.pickSelectionGroupHeader);
-    
-    var picker_panel = panel.append('div')
-      .classed('perspective-picker-panel', true);
-    
-    var variable_picker_wrapper_wrapper = picker_panel.append('div')
-      .classed('perspective-variable-picker-wrapper-wrapper', true)
-      .style('overflow', 'hidden');
-    
-    var variable_picker_wrapper = variable_picker_wrapper_wrapper.append('div')
-      .classed('perspective-variable-picker-wrapper', true)
-      .style('display', 'flex')
-      .style('flex-direction', 'column')
-      .style('height', height + 'px');
-    
-    variable_picker_wrapper_wrapper.append('div')
-      .style('height', '100%')
-      .style('border-right', '1px solid #ABABAB');
-    
-    variable_picker_wrapper.append('div')
-      .classed('perspective-variable-picker-padding-top', true);
-    
-    var variable_picker = variable_picker_wrapper.append('div')
-      .classed('perspective-variable-picker', true);
-    
-    variable_picker_wrapper.append('div')
-      .classed('perspective-variable-picker-padding-bottom', true);
-    
-    variable_picker.selectAll('.perspective-variable-option')
+    variable_list
+      .selectAll('.pervarpicker-varoption')
       .data(perspective_shorttexts)
       .enter()
         .append('div')
-        .classed('perspective-variable-option', true)
+        .classed('pervarpicker-varoption', true)
+        .classed('no-select', true)
         .on('click', function(d, i) { setSelectedPerspective(i); })
         .text(function(d) {return d});
     
-    var checkbox_panel_wrapper = picker_panel.append('div')
-      .classed('perspective-checkbox-panel-wrapper', true)
-      .style('position', 'relative')
-      .style('width', '200px')
-      .style('height', (height-1) + 'px');
-      
-    var checkbox_panel = checkbox_panel_wrapper.append('div')
-      .classed('perspective-checkbox-panel', true)
-      .style('display', 'flex')
-      .style('flex-direction', 'column')
-      .style('position', 'absolute');
-    
-    var general_select = checkbox_panel.append('div')
-      .classed('perspective-general-select', true);
-    
-    var select_all_button = general_select.append('span')
-      .classed('dashed-button', true)
-      .classed('perspective-button', true)
+    d3.selectAll('.peropt-all-button')
       .on('click', function() {
         for (var i=0; i<selected_options.length; i++) {
           selected_options[i] = true;
@@ -105,10 +98,8 @@
         updateCheckboxes(true);
       })
       .text('Markera alla');
-    
-    var deselect_all_button = general_select.append('span')
-      .classed('dashed-button', true)
-      .classed('perspective-button', true)
+      
+    d3.selectAll('.peropt-none-button')
       .on('click', function() {
         for (var i=0; i<selected_options.length; i++) {
           selected_options[i] = false;
@@ -116,52 +107,23 @@
         updateCheckboxes(true);
       })
       .text('Avmarkera alla');
-    
-    var column_wrapper = checkbox_panel.append('div')
-      .classed('perspective-column-wrapper', true)
-      .style('display', 'flex')
-      .style('flex-direction', 'row');
-    
-    var first_column = column_wrapper
-      .append('div')
-        .classed('perspective-options-first-column', true)
-        .classed('fade-bottom', has_remainder && collapsed);
-    
-    var remaining_columns_wrapper = column_wrapper
-      .append('div')
-        .classed('perspective-options-remainder-wrapper', true)
-        .style('opacity', collapsed ? 0 : 1)
-        .style('width', collapsed ? '0px' : null);
-        
-    var remaining_columns = remaining_columns_wrapper
-      .append('div')
-        .classed('perspective-remaining-columns', true)
-        .classed('fade-bottom', has_remainder && collapsed);
-    
-    var expand_button_wrapper = checkbox_panel.append('div')
-      .classed('expand-button-wrapper', true);
-    
-    var expand_button = expand_button_wrapper.append('div')
-      .classed('expand-button', true)
-      .classed('dashed-button', true)
-      .classed('perspective-button', true)
+
+    d3.selectAll('.peropt-more-button')
       .text(collapsed ? 'Visa fler >' : '< Visa färre' )
       .style('visibility', function() {
-          return has_remainder ? null : 'hidden';
+        return has_remainder ? null : 'hidden';
       })
       .on('click', function() {
         collapsed = !collapsed;
+        if (collapsed) {
+          fixed_width = null;
+        } else {
+          fixed_width = d3.select('.perspective-picker').node().offsetWidth;
+        }
+        console.log(fixed_width);
         updateElements();
       });
-    
-    var second_column = remaining_columns
-      .append('div')
-        .classed('perspective-second-column', true);
-    
-    var third_column = remaining_columns
-      .append('div')
-        .classed('perspective-third-column', true);
-
+          
     initializeSelection();
     initialized = true;
     
@@ -198,8 +160,8 @@
   
   function updateCheckboxes(fireGwtEvent) {
       
-    d3.selectAll('.perspective-variable-option')
-      .classed('perspective-variable-selected', function(d, i) { return i == selected_perspective; });
+    d3.selectAll('.pervarpicker-varoption')
+      .classed('pervarpicker-varoption-selected', function(d, i) { return i == selected_perspective; });
       
     var show_select_total = settings.showSelectTotal; 
     var option_count = selected_options.length + (show_select_total ? 1 : 0);
@@ -209,7 +171,7 @@
     var per_column = Math.ceil(option_count / columns);
     has_remainder = columns > 1;
     if (collapsed) {
-      d3.select('.perspective-options-remainder-wrapper')
+      d3.select('.peropt-extra-columns')
         .style('width', '0px');
     }
     if (!has_remainder) {
@@ -233,92 +195,115 @@
     
     //TODO add total
     
+    
     // First column
-    var first_col_options = d3.select('.perspective-options-first-column').selectAll('.perspective-option')
+    var first_col_options = d3.select('.peropt-col-one')
+      .selectAll('.peropt-checkbox')
       .data(first_column_data);
     
     first_col_options.exit().remove();
     
     first_col_options.enter()
       .append('div')
-        .classed('perspective-option', true)
+        .classed('peropt-checkbox', true)
         .on('click', function(d) {
            selected_options[d.index] = !selected_options[d.index];
            updateCheckboxes(true);
          });
     
-    d3.select('.perspective-options-first-column').selectAll('.perspective-option')
-      .classed('perspective-option-selected', function(d) { return d.selected; })
+    d3.select('.peropt-col-one').selectAll('.peropt-checkbox')
+      .classed('peropt-checkbox-selected', function(d) { return d.selected; })
       .text(function(d) { return d.text; });
     
+      
     // Second column
-    var second_col_options = d3.select('.perspective-second-column').selectAll('.perspective-option')
+    var second_col_options = d3.select('.peropt-col-two')
+      .selectAll('.peropt-checkbox')
       .data(second_column_data);
   
     second_col_options.exit().remove();
   
     second_col_options.enter()
       .append('div')
-        .classed('perspective-option', true)
+        .classed('peropt-checkbox', true)
         .on('click', function(d) {
            selected_options[d.index] = !selected_options[d.index];
            updateCheckboxes(true);
          });
   
-    d3.select('.perspective-second-column').selectAll('.perspective-option')
-      .classed('perspective-option-selected', function(d) { return d.selected; })
+    d3.select('.peropt-col-two').selectAll('.peropt-checkbox')
+      .classed('peropt-checkbox-selected', function(d) { return d.selected; })
       .text(function(d) { return d.text; });
-  
+
+      
     // Third column
-    var first_col_options = d3.select('.perspective-third-column').selectAll('.perspective-option')
+    var first_col_options = d3.select('.peropt-col-three')
+      .selectAll('.peropt-checkbox')
       .data(third_column_data);
   
     first_col_options.exit().remove();
   
     first_col_options.enter()
       .append('div')
-        .classed('perspective-option', true)
+        .classed('peropt-checkbox', true)
         .on('click', function(d) {
            selected_options[d.index] = !selected_options[d.index];
            updateCheckboxes(true);
          });
   
-    d3.select('.perspective-third-column').selectAll('.perspective-option')
-      .classed('perspective-option-selected', function(d) { return d.selected; })
+    d3.select('.peropt-col-three').selectAll('.peropt-checkbox')
+      .classed('peropt-checkbox-selected', function(d) { return d.selected; })
       .text(function(d) { return d.text; });
     
-    if (fireGwtEvent && selected_options.includes(true)) {
+    var has_checked_box = false;
+    for (var i=0; i<selected_options.length; i++) {
+      if (selected_options[i]) {
+        has_checked_box = true;
+        break;
+      }
+    }
+    
+    if (fireGwtEvent && has_checked_box) {
       gwtPerspectiveCallback(perspectives[selected_perspective], selected_options.join(',', true), false);
     }
     
+    // hack to handle IE display bugs
+    var isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
+    if (isIE) {
+      var options_height = Math.max(
+        d3.select('.pervarpicker-border-wrapper').node().offsetHeight,
+        62 + 24 * first_column_data.length);
+      d3.select('.perspective-options')
+        .style('height', options_height + 'px');
+    }
+        
     updateElements();
   }
   
   function updateElements() {
-    d3.select('.perspective-options-first-column')
-      .classed('fade-bottom', has_remainder && collapsed);
-
-    d3.select('.perspective-remaining-columns')
-      .classed('fade-bottom', has_remainder && collapsed);
+    d3.select('.perspective-picker')
+      .style('width', fixed_width + 'px');
     
-    d3.select('.expand-button')
+    d3.select('.peropt-more-button')
       .style('visibility', function() {
-          return has_remainder ? null : 'hidden';
+        return has_remainder ? null : 'hidden';
       })
       .text(collapsed ? 'Visa fler >' : '< Visa färre ');
     
+    d3.select('.peropt-bottom-padding')
+      .style('height', function() {
+        return has_remainder ? null : '0px';
+      });
+      
     d3.select('.daxplore-DescriptionPanelBottom')
       .interrupt().transition()
         .style('color', collapsed ? 'black': 'hsl(0, 0%, 70%)');
 
-    d3.select('.perspective-remaining-columns')
-      .interrupt().transition()
-        .style('width', collapsed ? '0px' : null);
-    
-    d3.select('.perspective-options-remainder-wrapper')
+    d3.select('.peropt-extra-columns')
       .interrupt().transition()
         .style('opacity', collapsed ? 0 : 1)
         .style('width', collapsed ? '0px' : null);
+        
   }
   
   

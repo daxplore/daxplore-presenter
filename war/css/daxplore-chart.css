@@ -10,6 +10,9 @@
  		border: 1px solid #D4D4D4;
 	}
 	
+	.daxplore-ChartScrollPanel {
+		overflow-y: hidden !important;
+	}
 	
 /*** GChart ***/
 

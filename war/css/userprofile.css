@@ -1,6 +1,6 @@
 
 .grid-main > .chart-row {
-	height: 500px;
+	height: 600px;
 	padding-top: 10px;
 }
 
@@ -67,6 +67,7 @@
 	top: -9999px;
 	visibility: hidden;
 }
+
 .header-cell-input.has-content {
 	border: none;
 }
@@ -107,7 +108,6 @@
     rotate(-0.125turn);
   width: 30px;
 }
-
 
 .grid-buttons {
     width: 100%;

@@ -63,7 +63,7 @@
 /*** DescriptionPanel.java ***/
 
 	.daxplore-DescriptionPanelBottom, .daxplore-DescriptionPanelLegend {
-		margin: 10px 0 0 20px;
+		margin: 22px 0 0 20px;
 		padding: 8px 5px 8px 8px;
 		max-width: 500px;
 		float: right;
@@ -191,6 +191,152 @@
 	
 	/*** Pure d3 js perspective picker ***/
 	
+	.no-select {
+		-webkit-touch-callout: none;
+		-webkit-user-select: none;
+		-khtml-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+	}
+	
+	.daxplore-PerspectivePanel {
+		display: flex;
+		flex-direction: column;
+	}
+	
+	.perspective-varpicker {
+		display: flex;
+		flex-direction: column;
+	}
+	
+	.perspective-picker {
+		display: flex;
+		flex-direction: row;
+	}
+	
+	.pervarpicker-top-padding {
+		position: relative;
+		min-height: 10px;
+		border-left: 1px dashed #DDD;
+		border-top: 1px dashed #DDD;
+		border-right: 1px solid #ABABAB;
+	}
+	
+	.pervarpicker-bottom-padding {
+		position: relative;
+		min-height: 10px;
+		border-left: 1px dashed #DDD;
+		border-right: 1px solid #ABABAB;
+		border-bottom: 1px dashed #DDD;
+	}
+	
+	.pervarpicker-right-border-extender {
+		flex: 1;
+		border-right: 1px solid #ABABAB;
+	}
+	
+	.pervarpicker-varoption:before {
+		content: url('/img/perspective-radio-empty.png');
+		padding-left: 7px;
+		padding-right: 5px;
+		padding-top: 2px;
+	}
+
+	.pervarpicker-varoption {
+		display: flex;
+		align-items: center;
+		
+		border-left: 1px dashed #DDD;
+		border-right: 1px solid #ABABAB;
+		padding: 5px;
+		padding-right: 10px;
+		cursor: pointer;
+	}
+	
+	.pervarpicker-varoption-selected:before {
+		content: url('/img/perspective-radio-filled.png');
+	}	
+	
+	.pervarpicker-varoption-selected {
+		border-top: 1px solid #ABABAB;
+		border-left: 1px solid #ABABAB;
+		border-bottom: 1px solid #ABABAB;
+		border-right: none;
+		padding-right: 11px;
+		padding-bottom: 4px;
+		padding-top: 4px;
+	}
+	
+	.perspective-options {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		background-color: white;
+		
+		border-top: solid 1px #ABABAB;
+		border-right: solid 1px #ABABAB;
+		border-bottom: solid 1px #ABABAB;
+	}
+	
+	
+	
+	.peropt-buttons {
+		display: flex;
+		flex-direction: row;
+		white-space: nowrap;
+	}
+	
+	.peropt-columns {
+		flex: 1;
+		display: flex;
+		flex-direction: row;
+	}
+	
+	.peropt-extra-columns {
+		overflow: hidden;
+		display: flex;
+		flex-direction: row;
+	}
+	
+	.peropt-bottom-padding {
+		height: 31px;
+	}
+	
+	.peropt-more-wrapper {
+		position: absolute;
+    right: 2px;
+		bottom: 2px;
+	}
+	
+	.peropt-more-button {
+/* 		float: right; */
+	}
+	
+	.peropt-checkbox {
+		display: flex;
+		align-items: center;
+		padding: 2px;
+		padding-right: 10px;
+		cursor: pointer;
+		white-space: nowrap;
+	}
+	
+	.peropt-checkbox:before {
+		content: url('/img/perspective-checkbox-empty.png');
+		padding-left: 7px;
+		padding-right: 5px;
+		padding-top: 3px;
+	}
+	
+	.peropt-checkbox-selected:before {
+		content: url('/img/perspective-checkbox-filled.png');
+	}
+	
+	
+	
+	/*** Pure d3 js perspective picker ***/
+	
 	.img-preload {
 		position: absolute;
 		top: -9999px;
@@ -220,41 +366,40 @@
 		flex-direction: row;
 	}
 	
-	
 	.perspective-variable-picker-padding-top {
 		position: relative;
 		height: 100%;
-      border-left: 1px dashed #DDD;
-      border-top: 1px dashed #DDD;
-      border-right: 1px solid #ABABAB;
+		border-left: 1px dashed #DDD;
+		border-top: 1px dashed #DDD;
+		border-right: 1px solid #ABABAB;
 	}
 
 	.perspective-variable-picker-padding-top:after {
-	    position: absolute;
-	    content: "";
-	    width: 1px;
-	    height: 1px;
-	    top: -1px;
-	    right: -1px;
-	    background: #ABABAB;
+		position: absolute;
+		content: "";
+		width: 1px;
+		height: 1px;
+		top: -1px;
+		right: -1px;
+		background: #ABABAB;
 	}
 	
 	.perspective-variable-picker-padding-bottom {
 		position: relative;
 		height: 100%;
-      border-left: 1px dashed #DDD;
-      border-right: 1px solid #ABABAB;
-      border-bottom: 1px dashed #DDD;
+		border-left: 1px dashed #DDD;
+		border-right: 1px solid #ABABAB;
+		border-bottom: 1px dashed #DDD;
 	}
 
 	.perspective-variable-picker-padding-bottom:after {
-	    position: absolute;
-	    content: "";
-	    width: 1px;
-	    height: 1px;
-	    right: -1px;
-	    bottom: -1px;
-	    background: #ABABAB;
+		position: absolute;
+		content: "";
+		width: 1px;
+		height: 1px;
+		right: -1px;
+		bottom: -1px;
+		background: #ABABAB;
 	}
 	
 	.perspective-remaining-columns {
@@ -314,11 +459,10 @@
 	}
 	
 	.perspective-general-select {
-      display: flex;
-      flex-direction: row;
-      width: 100%;
-      
-      border-top: 1px solid #ABABAB;
+		flex-direction: row;
+		width: 100%;
+		white-space: nowrap;
+		border-top: 1px solid #ABABAB;
 		border-right: 1px solid #ABABAB;
 	}
 	
@@ -327,6 +471,7 @@
 	  border-bottom: 1px solid #ABABAB;
 	  background: white;
 	  height: 100%;
+	  overflow: hidden;
 	}
 	
 	.expand-button-wrapper {

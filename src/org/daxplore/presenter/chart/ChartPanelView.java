@@ -151,7 +151,8 @@ public class ChartPanelView extends Composite {
 				forceScrolling = true;
 			}
 			chartScrollPanel.setSize(chartWidth + "px", chartHeight + "px");
-			chart.setChartSizeSmart(chart.getMinWidth(), chartHeight - 40);
+			chartScrollPanel.setStylePrimaryName("daxplore-ChartScrollPanel");
+			chart.setChartSizeSmart(chart.getMinWidth(), chartHeight - 42);
 		} else if (chartWidth >= chart.getMinWidth()) {
 			if (scrolling) {
 				chartContainerPanel.setWidget(chart);
