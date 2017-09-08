@@ -28,7 +28,9 @@
 
   exports.generatePerspectivePanel = function() {  
     d3.select('.daxplore-PerspectivePanel').html(
-        "<div class='perspective-header'>Välj perspektiv</div>"
+        "<div class='perspective-header'>"
+      + usertexts.perspectivesHeader
+      + "</div>"
       + "<div class='perspective-picker'>"
       + "  <div class='perspective-varpicker'>"
       + "    <div class='pervarpicker-border-wrapper'>"
@@ -97,7 +99,7 @@
         }
         updateCheckboxes(true);
       })
-      .text('Markera alla');
+      .text(usertexts.perspectivesAllButton);
       
     d3.selectAll('.peropt-none-button')
       .on('click', function() {
@@ -106,10 +108,10 @@
         }
         updateCheckboxes(true);
       })
-      .text('Avmarkera alla');
+      .text(usertexts.perspectivesNoneButton);
 
     d3.selectAll('.peropt-more-button')
-      .text(collapsed ? 'Visa fler >' : '< Visa färre' )
+      .text(collapsed ? usertexts.perspectivesMoreButton + '>' : '<' + usertexts.perspectivesLessButton )
       .style('visibility', function() {
         return has_remainder ? null : 'hidden';
       })
@@ -120,7 +122,6 @@
         } else {
           fixed_width = d3.select('.perspective-picker').node().offsetWidth;
         }
-        console.log(fixed_width);
         updateElements();
       });
           
@@ -303,8 +304,7 @@
       .interrupt().transition()
         .style('opacity', collapsed ? 0 : 1)
         .style('width', collapsed ? '0px' : null);
-        
-  }
-  
+ 
+  }  
   
 })(window);

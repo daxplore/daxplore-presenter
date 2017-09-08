@@ -83,55 +83,6 @@
 		padding-left: 20px;
 	}
 
-/*** QuestionPanel.java ***/
-
-	.daxplore-QuestionPanel-header {
-		font-size:1.25em;
-		font-weight:bold;
-		margin-bottom:5px;
-		padding-left: 30px;
-	}
-	
-	.daxplore-QuestionPanel-branch{
-		font-weight: bold;
-	}
-		
-	.daxplore-QuestionPanel-subheader {
-	    color: #808080;
-	    cursor: default;
-	    display: block;
-	    font-size: 13px;
-	    font-weight: bold;
-	    margin-top: 10px;
-	}
-
-	.gwt-Tree > div:first-child { 
-	      width: 0px !important; 
-	      height: 0px !important; 
-	      margin: 0px !important; 
-	      padding: 0px !important; 
-	 } 
-	
-	.gwt-Tree > div {
-	     padding: 0px 5px !important;
-	}
-	
-	.gwt-Tree > div[hidefocus=true] {
-	     width: 0px !important;
-	     height: 0px !important;
-	
-	     margin: 0px !important;
-	     padding: 0px !important;
-	}
-	
-	.gwt-Tree div div div { 
-	     padding: 1px 5px !important;
-	}
-	 
-	.gwt-ToggleButton{
-		white-space: nowrap;	
-	}
-
 
 /*** Image Buttons ***/
 	.daxplore-ImageButton {
@@ -190,31 +141,47 @@
 	
 	
 	/*** Pure d3 js perspective picker ***/
-	
-	.no-select {
-		-webkit-touch-callout: none;
-		-webkit-user-select: none;
-		-khtml-user-select: none;
-		-moz-user-select: none;
-		-ms-user-select: none;
-		user-select: none;
+  
+	.img-preload {
+		position: absolute;
+		top: -9999px;
+		left: -9999px;
+		opacity: 0;
+	}
+    
+	.perspective-button {
+		z-index: 1;
+		color: #999;
 	}
 	
 	.daxplore-PerspectivePanel {
+	   display: flex;
+    flex-direction: column;
+	}
+	
+	.perspective-header {
+		color: #888;
+		font-weight: bold;
+		padding-top: 10px;
+		padding-bottom: 7px;
+	}
+	
+  .perspective-picker {
 		display: flex;
-		flex-direction: column;
+		flex-direction: row;
 	}
 	
 	.perspective-varpicker {
 		display: flex;
 		flex-direction: column;
 	}
-	
-	.perspective-picker {
-		display: flex;
+
+	.peropt-buttons {
+	display: flex;
 		flex-direction: row;
+		white-space: nowrap;
 	}
-	
+
 	.pervarpicker-top-padding {
 		position: relative;
 		min-height: 10px;
@@ -267,6 +234,10 @@
 		padding-bottom: 4px;
 		padding-top: 4px;
 	}
+
+	.pervarpicker-varoption:hover {
+		color: #444;
+	}
 	
 	.perspective-options {
 		position: relative;
@@ -278,15 +249,7 @@
 		border-right: solid 1px #ABABAB;
 		border-bottom: solid 1px #ABABAB;
 	}
-	
-	
-	
-	.peropt-buttons {
-		display: flex;
-		flex-direction: row;
-		white-space: nowrap;
-	}
-	
+
 	.peropt-columns {
 		flex: 1;
 		display: flex;
@@ -309,10 +272,6 @@
 		bottom: 2px;
 	}
 	
-	.peropt-more-button {
-/* 		float: right; */
-	}
-	
 	.peropt-checkbox {
 		display: flex;
 		align-items: center;
@@ -333,177 +292,114 @@
 		content: url('/img/perspective-checkbox-filled.png');
 	}
 	
-	
-	
-	/*** Pure d3 js perspective picker ***/
-	
-	.img-preload {
-		position: absolute;
-		top: -9999px;
-		left: -9999px;
-		opacity: 0;
-    }
-    
-	.perspective-button {
-		z-index: 1;
-		color: #999;
+	.peropt-checkbox:hover {
+		color: #444;
 	}
 	
-	.daxplore-PerspectivePanel {
-	   display: flex;
-    	flex-direction: column;
+	
+	/*** Pure d3 js question picker ***/
+	
+	.daxplore-QuestionPanel {
+		margin-right: 5px; /* if changed here, also change in StagePanel.java */
 	}
 	
-	.perspective-header {
-		color: #999;
+	.question-header {
+		white-space: nowrap;
+		color: #888;
 		font-weight: bold;
-		padding-top: 10px;
 		padding-bottom: 7px;
 	}
 	
-	.perspective-picker-panel {
-		display: flex;
-		flex-direction: row;
-	}
-	
-	.perspective-variable-picker-padding-top {
-		position: relative;
-		height: 100%;
-		border-left: 1px dashed #DDD;
+	.question-picker {
 		border-top: 1px dashed #DDD;
-		border-right: 1px solid #ABABAB;
 	}
 
-	.perspective-variable-picker-padding-top:after {
-		position: absolute;
-		content: "";
-		width: 1px;
-		height: 1px;
-		top: -1px;
-		right: -1px;
-		background: #ABABAB;
+	.question-picker.above-selected {
+		border-top: 1px solid #BBB;
 	}
-	
-	.perspective-variable-picker-padding-bottom {
-		position: relative;
-		height: 100%;
+
+	.question-section-GROUP {
+		display: flex;
+		flex-direction: column;
+
 		border-left: 1px dashed #DDD;
-		border-right: 1px solid #ABABAB;
+		border-right: 1px dashed #DDD;
 		border-bottom: 1px dashed #DDD;
 	}
 
-	.perspective-variable-picker-padding-bottom:after {
-		position: absolute;
-		content: "";
-		width: 1px;
-		height: 1px;
-		right: -1px;
-		bottom: -1px;
-		background: #ABABAB;
+	.question-section-GROUP.above-selected {
+		border-bottom: 1px solid #BBB;
 	}
-	
-	.perspective-remaining-columns {
+
+	.question-section-GROUP.selected {
+		border-style: solid;
+		border-top: none;
+		border-color: #BBB;
+	}
+
+	.question-section-header {
 		display: flex;
 		flex-direction: row;
+		justify-content: space-between;
+		padding: 9px;
+
+		cursor: pointer;	
+	}
+
+	.question-section-header-text {
+		font-weight: bold;
+		white-space: nowrap;
+		margin-right: 7px;
+	}
+
+	.question-section-header-text:hover {
+		color: #444;
+	}
+
+	.question-group-arrow-wrapper {
+		display: flex;
+	}
+
+	.question-group-arrow {
+		align-self: center;
+	}
+	
+	.question-group-arrow:after {
+		content: url('/img/question-expand-arrow.png');
+	}
+
+	.question-section-questions {
 		overflow: hidden;
 	}
-	
-	.perspective-variable-option {
-		display: flex;
+
+	.question-section-questions-inner {
+		padding-bottom: 7px;
+		padding-left: 5px;
+	}
+
+	.question-question {
+	   display: flex;
 		align-items: center;
-		
-		border-left: 1px dashed #DDD;
-		border-right: 1px solid #ABABAB;
-		padding: 5px;
-		padding-right: 10px;
 		cursor: pointer;
-	}
-	
-	.perspective-variable-selected {
-		border-top: 1px solid #ABABAB;
-		border-left: 1px solid #ABABAB;
-		border-bottom: 1px solid #ABABAB;
-		border-right: none;
-		
-		padding-right: 11px;
+		white-space: nowrap;
+
+		padding-top: 0px;
 		padding-bottom: 4px;
-		padding-top: 4px;
+		padding-right: 5px;
 	}
-	
-	.perspective-variable-option:before {
+
+	.question-question:hover {
+		color: #444;
+	}
+
+	.question-question:before {
 		content: url('/img/perspective-radio-empty.png');
-		padding-left: 7px;
+		padding-left: 4px;
 		padding-right: 5px;
 		padding-top: 2px;
 	}
-	
-	.perspective-variable-selected:before {
-		content: url('/img/perspective-radio-filled.png');
-	}
-	
-	.perspective-options-first-column, .perspective-remaining-columns {
-		position: relative;
-	}
-	
-	.perspective-options-first-column.fade-bottom:after, .perspective-remaining-columns.fade-bottom:after {
-     content  : "";
-	  position : absolute;
-	  bottom   : 0;
-	  left     : 0;
-	  pointer-events   : none;
-	  background-image : linear-gradient(to bottom, 
-	                     rgba(255,255,255, 0), 
-	                     rgba(255,255,255, 1) 90%);
-	  width    : 100%;
-	  height   : 4em;
-	}
-	
-	.perspective-general-select {
-		flex-direction: row;
-		width: 100%;
-		white-space: nowrap;
-		border-top: 1px solid #ABABAB;
-		border-right: 1px solid #ABABAB;
-	}
-	
-	.perspective-checkbox-panel {
-	  border-right: 1px solid #ABABAB;
-	  border-bottom: 1px solid #ABABAB;
-	  background: white;
-	  height: 100%;
-	  overflow: hidden;
-	}
-	
-	.expand-button-wrapper {
-	 	position: absolute;
-    	bottom: 2px;
-    	right: 2px;
-    }
 
-	.perspective-options-first-column, .perspective-remaining-columns {
-	}
-	
-	.perspective-third-column {
-		margin-bottom: 34px;
-	}
-	
-	.perspective-option {
-		display: flex;
-		align-items: center;
-		padding: 2px;
-		padding-right: 10px;
-		cursor: pointer;
-		white-space: nowrap;
-	}
-	
-	.perspective-option:before {
-		content: url('/img/perspective-checkbox-empty.png');
-		padding-left: 7px;
-		padding-right: 5px;
-		padding-top: 3px;
-	}
-	
-	.perspective-option-selected:before {
-		content: url('/img/perspective-checkbox-filled.png');
+	.question-question.selected:before {
+		content: url('/img/perspective-radio-filled.png');
 	}
 	

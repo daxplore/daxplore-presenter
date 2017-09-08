@@ -20,7 +20,7 @@
 
 	<g:HorizontalPanel>
 		
-		<client:QuestionPanel ui:field='questionPanel'/>
+		<g:SimplePanel ui:field='questionPanel' stylePrimaryName='daxplore-QuestionPanel'/>
 		
 		<g:VerticalPanel>
 			<chart:ChartPanelView ui:field='chartPanel'/>
@@ -34,5 +34,6 @@
 			<g:SimplePanel ui:field='legendPanel'/>
 			<client:DescriptionPanelLegend ui:field='descriptionPanelLegend' styleName="{style.description}"/>
 		</g:VerticalPanel>
+		
 	</g:HorizontalPanel>
 </ui:UiBinder>

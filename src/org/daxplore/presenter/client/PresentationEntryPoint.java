@@ -62,6 +62,7 @@ public class PresentationEntryPoint implements EntryPoint {
 	}
 	
 	public final native void generateExternalElements() /*-{
+		$wnd.generateQuestionPanel();
 		$wnd.generatePerspectivePanel();
 	}-*/;
 }

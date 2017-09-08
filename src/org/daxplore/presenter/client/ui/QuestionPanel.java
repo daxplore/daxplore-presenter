@@ -18,30 +18,12 @@
  */
 package org.daxplore.presenter.client.ui;
 
-import java.util.Iterator;
-import java.util.List;
-
 import org.daxplore.presenter.client.event.QueryUpdateEvent;
 import org.daxplore.presenter.client.event.QueryUpdateHandler;
 import org.daxplore.presenter.client.event.SelectionUpdateEvent;
-import org.daxplore.presenter.client.json.Groups;
-import org.daxplore.presenter.client.json.shared.UITexts;
-import org.daxplore.presenter.client.resources.UIResources;
 import org.daxplore.presenter.shared.QueryDefinition;
-import org.daxplore.presenter.shared.QuestionMetadata;
 
-import com.google.gwt.event.logical.shared.OpenEvent;
-import com.google.gwt.event.logical.shared.OpenHandler;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Tree;
-import com.google.gwt.user.client.ui.TreeItem;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
@@ -52,78 +34,83 @@ import com.google.web.bindery.event.shared.EventBus;
  * <p>The tree is made up from groups of questions, that the user can
  * select.</p>
  */
-public class QuestionPanel extends Composite implements QueryUpdateHandler{
+public class QuestionPanel extends Composite implements QueryUpdateHandler {
 	
 	private final EventBus eventBus;
 	
-	private Tree treeRoot;
-	private QuestionTreeItem selected;
+	private String questionID;
 	
-	private VerticalPanel vp = new VerticalPanel();
-
 	@Inject
-	protected QuestionPanel(QuestionMetadata questions, Groups groups, EventBus eventBus,
-			UITexts uiTexts, UIResources uiResources) {
+	protected QuestionPanel(EventBus eventBus) {
 		this.eventBus = eventBus;
-		
-		treeRoot = new Tree(uiResources, false);
-		
-		Label header = new Label(uiTexts.pickAQuestionHeader());
-		header.addStyleName("daxplore-QuestionPanel-header");
-		vp.add(header);
-		vp.setCellHeight(header, "30px");
-
-		// Set up questiontree
-
-		treeRoot.addSelectionHandler(new QuestionSelectionHandler());
-		treeRoot.addOpenHandler(new GroupOpenHandler());
-		
-		for (int i = 0; i < groups.getGroupCount(); i++) {
-			String txt = groups.getGroupName(i);
-			Groups.Type type = groups.getGroupType(i);
-			SafeHtmlBuilder html = new SafeHtmlBuilder();
-
-			switch(type) {
-			case GROUP:
-				html.appendHtmlConstant("<span class=\"daxplore-QuestionPanel-branch\">&nbsp;");
-				html.appendEscaped(txt);
-				html.appendHtmlConstant("&nbsp;</span>");
-				GroupItem gr = new GroupItem(html.toSafeHtml());
-				List<String> qlist = groups.getQuestionIDs(i);
-				for (String q : qlist) {
-					html = new SafeHtmlBuilder();
-					html.appendHtmlConstant("&nbsp;");
-					html.appendEscaped(questions.getShortText(q));
-					if(questions.hasSecondary(q)) {
-						html.appendHtmlConstant("&nbsp;<span class=\"super\">");
-						html.appendEscaped(uiTexts.secondaryFlag());
-						html.appendHtmlConstant("</span>");
-					}
-					html.appendHtmlConstant("&nbsp;");
-					QuestionTreeItem qi = new QuestionTreeItem(html.toSafeHtml(), q);
-					qi.setTitle(questions.getFullText(q));
-					gr.addItem(qi);
-				}
-				treeRoot.addItem(gr);
-				break;
-			case HEADER:
-				html.appendHtmlConstant("<span class=\"daxplore-QuestionPanel-subheader\">&nbsp;");
-				html.appendEscaped(txt);
-				html.appendHtmlConstant("&nbsp;</span>");
-				TreeItem item = new HeaderItem(html.toSafeHtml());
-				treeRoot.addItem(item);
-				break;
-			default:
-				break;
-			}
-		}
-
-		vp.add(treeRoot);
-		vp.setCellVerticalAlignment(treeRoot, HasVerticalAlignment.ALIGN_TOP);
-		vp.setWidth("100%");
-		initWidget(vp);
-		
 		QueryUpdateEvent.register(eventBus, this);
+		exportQuestionCallback();
+		
+//		treeRoot = new Tree(uiResources, false);
+//		
+//		Label header = new Label(uiTexts.pickAQuestionHeader());
+//		header.addStyleName("daxplore-QuestionPanel-header");
+//		vp.add(header);
+//		vp.setCellHeight(header, "30px");
+//
+//		// Set up questiontree
+//
+//		treeRoot.addSelectionHandler(new QuestionSelectionHandler());
+//		treeRoot.addOpenHandler(new GroupOpenHandler());
+//		
+//		for (int i = 0; i < groups.getGroupCount(); i++) {
+//			String txt = groups.getGroupName(i);
+//			Groups.Type type = groups.getGroupType(i);
+//			SafeHtmlBuilder html = new SafeHtmlBuilder();
+//
+//			switch(type) {
+//			case GROUP:
+//				html.appendHtmlConstant("<span class=\"daxplore-QuestionPanel-branch\">&nbsp;");
+//				html.appendEscaped(txt);
+//				html.appendHtmlConstant("&nbsp;</span>");
+//				GroupItem gr = new GroupItem(html.toSafeHtml());
+//				List<String> qlist = groups.getQuestionIDs(i);
+//				for (String q : qlist) {
+//					html = new SafeHtmlBuilder();
+//					html.appendHtmlConstant("&nbsp;");
+//					html.appendEscaped(questions.getShortText(q));
+//					if(questions.hasSecondary(q)) {
+//						html.appendHtmlConstant("&nbsp;<span class=\"super\">");
+//						html.appendEscaped(uiTexts.secondaryFlag());
+//						html.appendHtmlConstant("</span>");
+//					}
+//					html.appendHtmlConstant("&nbsp;");
+//					QuestionTreeItem qi = new QuestionTreeItem(html.toSafeHtml(), q);
+//					qi.setTitle(questions.getFullText(q));
+//					gr.addItem(qi);
+//				}
+//				treeRoot.addItem(gr);
+//				break;
+//			case HEADER:
+//				html.appendHtmlConstant("<span class=\"daxplore-QuestionPanel-subheader\">&nbsp;");
+//				html.appendEscaped(txt);
+//				html.appendHtmlConstant("&nbsp;</span>");
+//				TreeItem item = new HeaderItem(html.toSafeHtml());
+//				treeRoot.addItem(item);
+//				break;
+//			default:
+//				break;
+//			}
+//		}
+//
+//		vp.add(treeRoot);
+//		vp.setCellVerticalAlignment(treeRoot, HasVerticalAlignment.ALIGN_TOP);
+//		vp.setWidth("100%");
+//		initWidget(vp);
+	}
+	
+	/**
+	 * Get the questionID of the currently selected question.
+	 * 
+	 * @return the questionID
+	 */
+	public String getQuestionID() {
+		return questionID;
 	}
 	
 	/**
@@ -142,140 +129,24 @@ public class QuestionPanel extends Composite implements QueryUpdateHandler{
 	 *            the new query definition
 	 */
 	public void setQueryDefinition(QueryDefinition queryDefinition) {
-		Iterator<TreeItem> iter = treeRoot.treeItemIterator();
-		while (iter.hasNext()) {
-			TreeItem curr = iter.next();
-			if (curr instanceof QuestionTreeItem) {
-				if (((QuestionTreeItem) curr).getQuestionID().equalsIgnoreCase(queryDefinition.getQuestionID())) {
-					treeRoot.setSelectedItem(null, false);
-					curr.setSelected(true);
-					selected = (QuestionTreeItem) curr;
-					curr.getParentItem().setState(true, true);
-				} else {
-					curr.setSelected(false);
-				}
-			}
-		}
-		treeRoot.ensureSelectedItemVisible();
-	}
-
-	/**
-	 * Get the questionID of the currently selected question.
-	 * 
-	 * @return the questionID
-	 */
-	public String getQuestionID() {
-		if (selected != null) {
-			return selected.getQuestionID();
-		}
-		return "";
-	}
-
-	/**
-	 * A handler that manages the automatic closing of groups.
-	 */
-	private class GroupOpenHandler implements OpenHandler<TreeItem> {
-
-		@Override
-		public void onOpen(OpenEvent<TreeItem> event) {
-			TreeItem t = event.getTarget();
-			for (int i = 0; i < treeRoot.getItemCount(); i++) {
-				TreeItem gr = treeRoot.getItem(i);
-				if (gr instanceof GroupItem) {
-					GroupItem g = (GroupItem) gr;
-					if (g.getState() == true && (g != t) && !(g.hasSelectedChild())) {
-						g.setState(false, false);
-					}
-				}
-			}
-			treeRoot.ensureSelectedItemVisible();
-		}
-
-	}
-
-	/**
-	 * A handler that manages what happens when questions are selected,
-	 * including firing events on the system's eventbus. 
-	 */
-	private class QuestionSelectionHandler implements SelectionHandler<TreeItem> {
-
-		GroupItem prev;
-
-		@Override
-		public void onSelection(SelectionEvent<TreeItem> event) {
-			if (event.getSelectedItem() instanceof QuestionTreeItem) {
-				QuestionTreeItem qi = (QuestionTreeItem) event.getSelectedItem();
-				selected = qi;
-				Iterator<TreeItem> iter = treeRoot.treeItemIterator();
-				while (iter.hasNext()) {
-					TreeItem n = iter.next();
-					if (n instanceof QuestionTreeItem) {
-						QuestionTreeItem curr = (QuestionTreeItem) n;
-						if (curr != selected) {
-							curr.setSelected(false);
-							GroupItem p = (GroupItem) curr.getParentItem();
-							if (!p.hasSelectedChild()) {
-								p.setState(false);
-							}
-						}
-					} else if (n instanceof GroupItem) {
-						if (n.getState() && !(((GroupItem) n).hasSelectedChild())) {
-							n.setState(false);
-						}
-					}
-				}
-				eventBus.fireEvent(new SelectionUpdateEvent());
-			} else if (event.getSelectedItem() instanceof GroupItem) {
-				GroupItem gi = (GroupItem) event.getSelectedItem();
-				gi.setSelected(false);
-				if (selected != null) {
-					selected.setSelected(true);
-				}
-
-				if (gi.getState() == true && (!gi.hasSelectedChild())) {
-					prev = gi;
-					gi.setState(false);
-				} else if (gi.getState() == false) {
-					if (prev != null && prev == gi) {
-						prev = null;
-					} else {
-						gi.setState(true);
-						prev = null;
-					}
-				}
-			} else if (event.getSelectedItem() instanceof HeaderItem) {
-				HeaderItem hi = (HeaderItem) event.getSelectedItem();
-				hi.setSelected(false);
-			}
-		}
-
-	}
-
-	/**
-	 * A class that defines a group as displayed in the question tree.
-	 */
-	private static class GroupItem extends TreeItem {
-
-		GroupItem(SafeHtml html) {
-			super(html);
-		}
-
-		boolean hasSelectedChild() {
-			boolean out = false;
-			for (int i = 0; i < getChildCount(); i++) {
-				out = out || getChild(i).isSelected();
-			}
-			return out;
-		}
+		questionID = queryDefinition.getQuestionID();
+		setQueryDefinitionNative(questionID);
 	}
 	
-	/**
-	 * A class that defines a group as displayed in the question tree.
-	 */
-	private static class HeaderItem extends TreeItem {
+	protected native void setQueryDefinitionNative(String questionID) /*-{
+		$wnd.questionSetQueryDefinition(questionID);
+	}-*/;
 
-		HeaderItem(SafeHtml html) {
-			super(html);
-		}
+	protected void gwtQuestionCallback(String question) {
+		this.questionID = question;
+		
+		eventBus.fireEvent(new SelectionUpdateEvent());
 	}
+	
+	protected native void exportQuestionCallback() /*-{
+		var that = this;
+		$wnd.gwtQuestionCallback = $entry(function(question) {
+			that.@org.daxplore.presenter.client.ui.QuestionPanel::gwtQuestionCallback(Ljava/lang/String;)(question);
+		});
+	}-*/;
 }

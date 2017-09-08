@@ -60,7 +60,7 @@ public class StagePanel extends Composite implements ResizeHandler {
 	protected DescriptionPanelLegend descriptionPanelLegend;
 	
 	@UiField(provided = true)
-	protected final QuestionPanel questionPanel;
+	protected final SimplePanel questionPanel;
 	
 	@UiField(provided = true)
 	protected final ChartPanelView chartPanel;
@@ -75,14 +75,15 @@ public class StagePanel extends Composite implements ResizeHandler {
 	protected int minWidth;
 	
 	@Inject
-	protected StagePanel(PerspectivePanel perspectivePanel, QuestionPanel questionPanel,
-			ChartPanelPresenter chartPanelPresenter, DaxploreConfig config, ImageButtonPanel imageButtonPanel,
-			ChartTypeOptionsPanel optionsPanel, DescriptionPanelBottom descriptionPanelBottom, DescriptionPanelLegend descriptionPanelLegend) {
+	protected StagePanel(PerspectivePanel perspectivePanel,	ChartPanelPresenter chartPanelPresenter,
+			DaxploreConfig config, ImageButtonPanel imageButtonPanel, ChartTypeOptionsPanel optionsPanel,
+			DescriptionPanelBottom descriptionPanelBottom, DescriptionPanelLegend descriptionPanelLegend) {
+		
 		this.perspectivePanel = perspectivePanel;
-		this.questionPanel = questionPanel;
+		this.questionPanel = new SimplePanel();
 		this.chartPanel = chartPanelPresenter.getView();
 		this.descriptionPanelBottom = descriptionPanelBottom;
-		this.descriptionPanelLegend= descriptionPanelLegend;
+		this.descriptionPanelLegend = descriptionPanelLegend;
 		
 		bottomPanel = new HorizontalPanel();
 		
@@ -124,7 +125,7 @@ public class StagePanel extends Composite implements ResizeHandler {
 			@Override
 			public void execute() {
 				int clientWidth = Window.getClientWidth();
-				int questionPanelWidth = questionPanel.getOffsetWidth();
+				int questionPanelWidth = questionPanel.getOffsetWidth() + 5; // question tree width + margin-right (if changed here, also change in css)
 				int sideAreaWidth = sidebarArea.getOffsetWidth();
 
 				int descriptionPanelMinWidth = descriptionPanelBottom.isVisible() ? 230 + 10 + 2 : 0; // min width (set here) + padding + border from css 

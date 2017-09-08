@@ -191,7 +191,7 @@
     
     yAxisElement
       .transition(el_trans)
-          .attr("transform", "translate(" + yAxisWidth + ", 0)")
+        .attr("transform", "translate(" + yAxisWidth + ", 0)")
         .call(yAxis);
     
     yAxisElement.selectAll(".y.axis text")
@@ -561,3 +561,4 @@
     img.src = url;
   }
 })(window);
+
