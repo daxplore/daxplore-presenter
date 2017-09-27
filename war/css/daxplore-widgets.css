@@ -350,6 +350,7 @@
 		font-weight: bold;
 		white-space: nowrap;
 		margin-right: 7px;
+		align-self: center;
 	}
 
 	.question-section-header-text:hover {
