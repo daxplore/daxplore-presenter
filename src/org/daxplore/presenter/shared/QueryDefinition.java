@@ -72,19 +72,25 @@ public class QueryDefinition {
 		 */
 		TOTAL(1), 
 		
-		 /** Set if data from the secondary dataset should be displayed. */
-		 SECONDARY(2), 
+		/** Set if data from the secondary dataset should be displayed. */
+		SECONDARY(2), 
 		 
 		/**
-		 * Set if a mean chart should be used, otherwise a standard bar chart is
-		 * used.
+		* Set if a mean chart should be used, otherwise a standard bar chart is
+		* used.
+		*/
+		MEAN(4),
+		
+		/**
+		 * Set if a mean reference value should be used
 		 */
-		 MEAN(4),
-		 
-		 /**
-		  * Set if a mean reference value should be used
-		  */
-		 MEAN_REFERENCE(8);
+		MEAN_REFERENCE(8),
+		
+		/**
+		* Set if a mean line chart over time should be used, otherwise a standard
+		* bar chart is used.
+		*/
+		LINE(16);
 		
 		/**
 		 * The value of the bit-position used when encoding this flag in a long.

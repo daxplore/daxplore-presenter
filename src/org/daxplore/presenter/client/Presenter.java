@@ -130,8 +130,10 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 			flags.add(QueryFlag.TOTAL);
 		}
 		
-		//TODO this sets mean to be the default, the default should be set in the producer instead
-		if(questionMetadata.hasMean(questionID)) {
+		//TODO this sets line to be the default, then mean. The default should be set in the producer instead
+		if (questionMetadata.hasLine(questionID)) {
+			flags.add(QueryFlag.LINE);
+		} else if (questionMetadata.hasMean(questionID)) {
 			flags.add(QueryFlag.MEAN);
 		}
 		
@@ -193,6 +195,12 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 			selectedOptions.add(i);
 		}
 		ArrayList<QueryFlag> flags = new ArrayList<>(0);
+		//TODO this sets line to be the default, then mean. The default should be set in the producer instead
+		if (questionMetadata.hasLine(firstQuestionID)) {
+			flags.add(QueryFlag.LINE);
+		} else if (questionMetadata.hasMean(firstQuestionID)) {
+			flags.add(QueryFlag.MEAN);
+		}
 		QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, firstQuestionID, firstPerspectiveID, selectedOptions, flags);
 		eventBus.fireEvent(new QueryUpdateEvent(queryDefinition));
 	}

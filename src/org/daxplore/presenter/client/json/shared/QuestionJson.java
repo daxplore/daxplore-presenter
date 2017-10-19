@@ -83,6 +83,20 @@ public class QuestionJson extends JavaScriptObject {
 		}
 		return false;
 	}-*/;
+	
+	/**
+	 * Checks if this question can displayed as a line chart over time
+	 * 
+	 * @return true, if it can be shown as a mean
+	 */
+	public final native boolean hasLine() /*-{
+		for (var i=0; i<this.displaytypes.length; i++) {
+			if(this.displaytypes[i] == "LINE") {
+				return true;
+			}	
+		}
+		return false;
+	}-*/;
 
 	/**
 	 * Get the number of answer-options this question has.

@@ -102,9 +102,18 @@ public interface QuestionMetadata {
 	 * 
 	 * @param questionID
 	 *            the questionID
-	 * @return true, averaging is possible
+	 * @return true if averaging is possible
 	 */
 	public boolean hasMean(String questionID);
+	
+	/**
+	 * Check if a question supports line charts over time.
+	 * 
+	 * @param questionID
+	 *            the questionID
+	 * @return true if it can be shown as a line chart
+	 */
+	public boolean hasLine(String questionID);
 
 	/**
 	 * Check if a question should use a mean reference value.

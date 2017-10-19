@@ -18,32 +18,34 @@
  */
 package org.daxplore.presenter.chart.display;
 
-import com.google.gwt.user.client.ui.Composite;
+import org.daxplore.presenter.chart.resources.ChartTexts;
+import org.daxplore.presenter.shared.QueryData;
+import org.daxplore.presenter.shared.QueryDefinition;
+
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * A blank chart that can be displayed as a placeholder when waiting for a real
- * chart to load.
+ * A chart type for displaying mean values with standard deviations.
  */
-public class BlankChart extends Composite implements Chart {
+public class LineChart extends SimplePanel implements Chart {
+	private ExternalHeader externalHeader;
+	private ExternalLegend externalLegend;
+	private String statJson;
 
-	private SimplePanel mainPanel = new SimplePanel();
-
-	/**
-	 * Instantiates a new blank chart.
-	 */
-	public BlankChart() {
-		initWidget(mainPanel);
-		System.out.println("blank chart");
+	protected LineChart(ChartTexts chartTexts, QueryDefinition queryDefinition, boolean printerMode) {
+		externalHeader = new ExternalHeader(chartTexts, queryDefinition);
+		externalLegend = new ExternalLegend(chartTexts, queryDefinition, printerMode);
+		
+		setStylePrimaryName("line-chart-panel");
 	}
 
-	/**
+	/** 
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void setChartSizeSmart(int width, int height) {
-		mainPanel.setSize(width + "px", height + "px");
+		// TODO Auto-generated method stub
 	}
 
 	/**
@@ -51,6 +53,7 @@ public class BlankChart extends Composite implements Chart {
 	 */
 	@Override
 	public int getMinWidth() {
+		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -59,7 +62,7 @@ public class BlankChart extends Composite implements Chart {
 	 */
 	@Override
 	public ExternalLegend getExternalLegend() {
-		return ExternalLegend.getEmptyLegend();
+		return externalLegend;
 	}
 
 	/**
@@ -67,6 +70,26 @@ public class BlankChart extends Composite implements Chart {
 	 */
 	@Override
 	public Widget getExternalHeader() {
-		return new SimplePanel();
+		return externalHeader;
 	}
+
+	/**
+	 * @param queryData
+	 */
+	public void addData(QueryData queryData) {
+		statJson = queryData.getJson();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void onAttach() {
+		super.onAttach();
+		generateTimeLineChart(statJson);
+	}
+	
+	protected native void generateTimeLineChart(String json) /*-{
+		$wnd.generateTimeLineChart(json);
+	}-*/;
 }

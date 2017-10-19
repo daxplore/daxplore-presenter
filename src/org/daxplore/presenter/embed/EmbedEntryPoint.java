@@ -22,6 +22,7 @@ import java.util.LinkedList;
 
 import org.daxplore.presenter.chart.display.BarChart;
 import org.daxplore.presenter.chart.display.BarChartCompare;
+import org.daxplore.presenter.chart.display.Chart;
 import org.daxplore.presenter.chart.display.ChartFactory;
 import org.daxplore.presenter.chart.display.GChartChart;
 import org.daxplore.presenter.chart.display.MeanChart;
@@ -78,7 +79,7 @@ public class EmbedEntryPoint implements EntryPoint {
 
 		try {
 			QueryData queryData = ChartDataParserClient.getEmbeddedData();
-			GChartChart chart;
+			Chart chart;
 			boolean printMode = embedDefinition.hasFlag(EmbedFlag.PRINT);
 			//TODO switch back to using query definition to display correct chart
 			
@@ -90,6 +91,9 @@ public class EmbedEntryPoint implements EntryPoint {
 					chart = chartFactory.createBarChartCompare(queryDefinition, printMode);
 					((BarChartCompare)chart).addData(queryData);
 				}
+			} else if (queryDefinition.hasFlag(QueryFlag.LINE)){
+				chart = chartFactory.createLineChart(queryDefinition, false);
+				((MeanChart)chart).addData(queryData);
 			} else {
 				chart = chartFactory.createMeanChart(queryDefinition, false);
 				((MeanChart)chart).addData(queryData);

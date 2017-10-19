@@ -151,6 +151,7 @@ public class QuestionMetadataServerImpl implements QuestionMetadata {
 	 */
 	@Override
 	public boolean hasSecondary(String column) {
+		//TODO update to new data structure or remove?
 		JSONObject question = getQuestion(column);
 		return question.containsKey("hasOld") && (Boolean)question.get("hasOld"); 
 	}
@@ -160,8 +161,18 @@ public class QuestionMetadataServerImpl implements QuestionMetadata {
 	 */
 	@Override
 	public boolean hasMean(String column) {
+		//TODO update to new data structure or remove?
 		JSONObject question = getQuestion(column);
 		return question.containsKey("hasMean") && (Boolean)question.get("hasMean"); 
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean hasLine(String questionID) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	/**
@@ -181,5 +192,4 @@ public class QuestionMetadataServerImpl implements QuestionMetadata {
 		JSONObject question = getQuestion(column);
 		return (Double)question.get("mean_reference"); 
 	}
-
 }

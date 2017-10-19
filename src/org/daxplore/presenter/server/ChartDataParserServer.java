@@ -40,7 +40,7 @@ public class ChartDataParserServer {
 		
 		String questionID = (String)statJsonObject.get("q");
 		String perspectiveID = (String)statJsonObject.get("p");
-		QueryData queryData = new QueryData(questionID, perspectiveID);
+		QueryData queryData = new QueryData(json, questionID, perspectiveID);
 		
 		JSONObject freqObject = (JSONObject)statJsonObject.get("freq");
 		if (freqObject != null) {

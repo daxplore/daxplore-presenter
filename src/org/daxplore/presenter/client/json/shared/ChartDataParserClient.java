@@ -53,7 +53,7 @@ public class ChartDataParserClient {
 	private static QueryData getQueryData(JSONObject statJsonObject) {
 		String questionID = statJsonObject.get("q").isString().stringValue();
 		String perspectiveID = statJsonObject.get("p").isString().stringValue();
-		QueryData queryData = new QueryData(questionID, perspectiveID);
+		QueryData queryData = new QueryData(statJsonObject.toString(), questionID, perspectiveID);
 		
 		JSONObject freqObject = (JSONObject)statJsonObject.get("freq");
 		if (freqObject != null) {

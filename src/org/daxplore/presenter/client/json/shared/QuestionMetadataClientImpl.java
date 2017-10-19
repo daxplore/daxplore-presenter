@@ -127,6 +127,14 @@ public class QuestionMetadataClientImpl implements QuestionMetadata {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public boolean hasLine(String questionID) {
+		return getQuestion(questionID).hasLine();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean hasMeanReferenceValue(String questionID) {
 		return getQuestion(questionID).hasMeanReferenceValue();
 	}

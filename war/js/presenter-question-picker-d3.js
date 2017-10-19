@@ -7,8 +7,8 @@
   var group_map = [];
 
   var element_transition = d3.transition()
-      .duration(100)
-      .ease(d3.easeLinear);
+    .duration(100)
+    .ease(d3.easeLinear);
   
   for (var i=0; i < questions.length; i++) {
     var q = questions[i];

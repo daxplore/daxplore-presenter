@@ -35,7 +35,6 @@ public class ChartFactory {
 
 	/**
 	 * Instantiates a new chart factory.
-	 * 
 	 */
 	@Inject
 	protected ChartFactory(ChartTexts chartTexts, ChartConfig chartConfig, UITexts uiTexts) {
@@ -69,5 +68,14 @@ public class ChartFactory {
 	 */
 	public MeanChart createMeanChart(QueryDefinition queryDefinition, boolean printerMode) {
 		return new MeanChart(chartTexts, chartConfig, uiTexts, queryDefinition, printerMode);
+	}
+	
+	/**
+	 * Creates a new LineChart.
+	 * 
+	 * @return the chart
+	 */
+	public LineChart createLineChart(QueryDefinition queryDefinition, boolean printerMode) {
+		return new LineChart(chartTexts, queryDefinition, printerMode);
 	}
 }

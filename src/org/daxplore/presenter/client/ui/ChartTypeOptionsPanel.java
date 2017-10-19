@@ -119,7 +119,7 @@ public class ChartTypeOptionsPanel extends Composite implements QueryUpdateHandl
 	}
 	
 	public boolean useSecondarySelected() {
-		return showSecondaryButton.getValue();
+		return showSecondaryButton != null && showSecondaryButton.getValue();
 	}
 
 	/**

@@ -21,6 +21,8 @@ import java.util.List;
 public class QueryData {
 	private String questionID, perspectiveID;
 	
+	String rawJson;
+	
 	private boolean hasAddedFreqPrimary, hasAddedFreqSecondary;
 	private List<int[]> freqPrimary, freqSecondary;
 	private int[] freqPrimaryTotal, freqSecondaryTotal;
@@ -31,7 +33,8 @@ public class QueryData {
 	private int[] meanPrimaryCount, meanSecondaryCount;
 	private int meanPrimaryCountTotal, meanSecondaryCountTotal;
 	
-	public QueryData(String questionID, String perspectiveID) {
+	public QueryData(String rawJson, String questionID, String perspectiveID) {
+		this.rawJson = rawJson;
 		this.questionID = questionID;
 		this.perspectiveID = perspectiveID;
 	}
@@ -62,6 +65,12 @@ public class QueryData {
 		this.meanSecondaryCount = meanSecondaryCount;
 		this.meanSecondaryCountTotal = meanSecondaryCountTotal;
 		hasAddedMeanSecondary = true;
+	}
+	
+	/* Raw json data */
+	
+	public String getJson() {
+		return rawJson;
 	}
 	
 	/* Question and perspective */

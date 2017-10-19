@@ -98,6 +98,7 @@ public class QuestionMetadataMock implements QuestionMetadata {
 		Random rnd = new Random(questionID.hashCode() + 3);
 		return rnd.nextBoolean();
 	}
+	
 
 	/**
 	 * {@inheritDoc}
@@ -116,5 +117,13 @@ public class QuestionMetadataMock implements QuestionMetadata {
 		Random rnd = new Random(questionID.hashCode() + 4);
 		return rnd.nextDouble() % 100;
 	}
-
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean hasLine(String questionID) {
+		Random rnd = new Random(questionID.hashCode() + 6);
+		return rnd.nextBoolean();
+	}
 }

@@ -18,9 +18,8 @@
  */
 package org.daxplore.presenter.embed;
 
-import org.daxplore.presenter.chart.display.ExternalHeader;
+import org.daxplore.presenter.chart.display.Chart;
 import org.daxplore.presenter.chart.display.ExternalLegend;
-import org.daxplore.presenter.chart.display.GChartChart;
 import org.daxplore.presenter.shared.EmbedDefinition;
 import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
 
@@ -55,7 +54,7 @@ public class EmbedView extends Composite {
 	protected final VerticalPanel chartArea = new VerticalPanel();
 	
 	@UiField(provided=true)
-	protected final ExternalHeader header;
+	protected final Widget header;
 	@UiField(provided = true)
 	protected final SimplePanel chartContainerPanel = new SimplePanel();
 	
@@ -67,7 +66,7 @@ public class EmbedView extends Composite {
 	@UiField(provided = true)
 	protected final SimplePanel legendPanel;
 	
-	private final GChartChart chart;
+	private final Chart chart;
 	
 	/**
 	 * Fields used to figure out and adjust the size of the chart and chartPanel.
@@ -93,7 +92,7 @@ public class EmbedView extends Composite {
 	 * @param embedDefinition
 	 *            the embed definition
 	 */
-	public EmbedView(GChartChart chart, int width, int height, EmbedDefinition embedDefinition) {
+	public EmbedView(Chart chart, int width, int height, EmbedDefinition embedDefinition) {
 		this.chart = chart;
 		maxWidth = width;
 		maxHeight = height;

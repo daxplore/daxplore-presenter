@@ -22,6 +22,7 @@ import org.daxplore.presenter.chart.display.BlankChart;
 import org.daxplore.presenter.chart.display.Chart;
 import org.daxplore.presenter.chart.display.ChartFactory;
 import org.daxplore.presenter.chart.display.ExternalLegend;
+import org.daxplore.presenter.chart.display.LineChart;
 import org.daxplore.presenter.chart.display.MeanChart;
 import org.daxplore.presenter.shared.QueryData;
 import org.daxplore.presenter.shared.QueryDefinition;
@@ -42,19 +43,7 @@ public class ChartPanelPresenter  {
 	}
 
 	public void onQueryReady(QueryDefinition queryDefinition, QueryData queryData) {
-		if(!queryDefinition.hasFlag(QueryFlag.MEAN)) {
-			if (!queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
-				BarChart newChart = chartFactory.createBarChart(queryDefinition, false);
-				newChart.addData(queryData);
-				view.setChart(newChart);
-				chart = newChart;
-			} else {
-				BarChartCompare newChart = chartFactory.createBarChartCompare(queryDefinition, false);
-				newChart.addData(queryData);
-				view.setChart(newChart);
-				chart = newChart;
-			}
-		} else {
+		if(queryDefinition.hasFlag(QueryFlag.MEAN)) {
 			if (!queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
 				MeanChart newChart = chartFactory.createMeanChart(queryDefinition, false);
 				newChart.addData(queryData);
@@ -63,9 +52,12 @@ public class ChartPanelPresenter  {
 			} else {
 				//TODO mean compare
 			}
-		}
-		
-		/*if(!queryDefinition.hasFlag(QueryFlag.MEAN)) {
+		} else if (queryDefinition.hasFlag(QueryFlag.LINE)) {
+			LineChart newChart = chartFactory.createLineChart(queryDefinition, false);
+			newChart.addData(queryData);
+			view.setChart(newChart);
+			chart = newChart;
+		} else { // default bar chart
 			if (!queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
 				BarChart newChart = chartFactory.createBarChart(queryDefinition, false);
 				newChart.addData(queryData);
@@ -77,16 +69,7 @@ public class ChartPanelPresenter  {
 				view.setChart(newChart);
 				chart = newChart;
 			}
-		} else {
-			if (!queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
-				MeanChart newChart = chartFactory.createMeanChart(queryDefinition, false);
-				newChart.addData(queryData);
-				view.setChart(newChart);
-				chart = newChart;
-			} else {
-				//TODO
-			}
-		}*/
+		}
 	}
 	
 	public ChartPanelView getView() {
