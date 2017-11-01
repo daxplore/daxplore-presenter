@@ -156,7 +156,7 @@
       });
     }
     
-    updateCheckboxes(true);
+    updateCheckboxes(changed);
   }
   
   function updateCheckboxes(fireGwtEvent) {
