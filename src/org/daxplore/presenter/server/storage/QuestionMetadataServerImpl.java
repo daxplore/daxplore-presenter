@@ -170,7 +170,16 @@ public class QuestionMetadataServerImpl implements QuestionMetadata {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean hasLine(String questionID) {
+	public boolean hasMeanLine(String questionID) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean hasDichotomizedLine(String questionID) {
 		// TODO Auto-generated method stub
 		return false;
 	}

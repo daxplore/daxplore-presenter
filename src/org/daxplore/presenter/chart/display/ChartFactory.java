@@ -69,13 +69,22 @@ public class ChartFactory {
 	public MeanChart createMeanChart(QueryDefinition queryDefinition, boolean printerMode) {
 		return new MeanChart(chartTexts, chartConfig, uiTexts, queryDefinition, printerMode);
 	}
-	
+
 	/**
-	 * Creates a new LineChart.
+	 * Creates a new mean line chart.
 	 * 
 	 * @return the chart
 	 */
-	public LineChart createLineChart(QueryDefinition queryDefinition, boolean printerMode) {
-		return new LineChart(chartTexts, queryDefinition, printerMode);
+	public DichLineChart createMeanLineChart(QueryDefinition queryDefinition, boolean printerMode) {
+		return new DichLineChart(chartTexts, queryDefinition, printerMode);
+	}
+	
+	/**
+	 * Creates a new dichotomized line chart.
+	 * 
+	 * @return the chart
+	 */
+	public DichLineChart createDichLineChart(QueryDefinition queryDefinition, boolean printerMode) {
+		return new DichLineChart(chartTexts, queryDefinition, printerMode);
 	}
 }

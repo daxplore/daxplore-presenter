@@ -73,11 +73,25 @@ public class QuestionJson extends JavaScriptObject {
 	/**
 	 * Checks if this question can displayed as a mean
 	 * 
-	 * @return true, if it can be shown as a mean
+	 * @return true, if it can be shown as a mean line
 	 */
 	public final native boolean hasMean() /*-{
 		for (var i=0; i<this.displaytypes.length; i++) {
-			if(this.displaytypes[i] == "MEAN") {
+			if(this.displaytypes[i] == "MEANLINE") {
+				return true;
+			}	
+		}
+		return false;
+	}-*/;
+	
+	/**
+	 * Checks if this question can displayed as a dichotomized line chart over time
+	 * 
+	 * @return true, if it can be shown as a dichotomized line chart
+	 */
+	public final native boolean hasDichotomizedLine() /*-{
+		for (var i=0; i<this.displaytypes.length; i++) {
+			if(this.displaytypes[i] == "DICHLINE") {
 				return true;
 			}	
 		}
@@ -89,7 +103,7 @@ public class QuestionJson extends JavaScriptObject {
 	 * 
 	 * @return true, if it can be shown as a mean
 	 */
-	public final native boolean hasLine() /*-{
+	public final native boolean hasMeanLine() /*-{
 		for (var i=0; i<this.displaytypes.length; i++) {
 			if(this.displaytypes[i] == "LINE") {
 				return true;

@@ -30,6 +30,7 @@ public class QuestionMetadataMock implements QuestionMetadata {
 
 	/**
 	 * {@inheritDoc}
+	 * @param questionID 
 	 */
 	@Override
 	public boolean hasQuestion(String questionID) {
@@ -122,7 +123,16 @@ public class QuestionMetadataMock implements QuestionMetadata {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean hasLine(String questionID) {
+	public boolean hasMeanLine(String questionID) {
+		Random rnd = new Random(questionID.hashCode() + 6);
+		return rnd.nextBoolean();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean hasDichotomizedLine(String questionID) {
 		Random rnd = new Random(questionID.hashCode() + 6);
 		return rnd.nextBoolean();
 	}

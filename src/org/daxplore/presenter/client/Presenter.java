@@ -131,8 +131,10 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		}
 		
 		//TODO this sets line to be the default, then mean. The default should be set in the producer instead
-		if (questionMetadata.hasLine(questionID)) {
-			flags.add(QueryFlag.LINE);
+		if (questionMetadata.hasMeanLine(questionID)) {
+			flags.add(QueryFlag.DICHLINE);
+		} else if(questionMetadata.hasDichotomizedLine(questionID)) {
+			flags.add(QueryFlag.MEANLINE);
 		} else if (questionMetadata.hasMean(questionID)) {
 			flags.add(QueryFlag.MEAN);
 		}
@@ -196,8 +198,8 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		}
 		ArrayList<QueryFlag> flags = new ArrayList<>(0);
 		//TODO this sets line to be the default, then mean. The default should be set in the producer instead
-		if (questionMetadata.hasLine(firstQuestionID)) {
-			flags.add(QueryFlag.LINE);
+		if (questionMetadata.hasMeanLine(firstQuestionID)) {
+			flags.add(QueryFlag.MEANLINE);
 		} else if (questionMetadata.hasMean(firstQuestionID)) {
 			flags.add(QueryFlag.MEAN);
 		}

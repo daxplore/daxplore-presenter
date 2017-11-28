@@ -22,7 +22,7 @@ import org.daxplore.presenter.chart.display.BlankChart;
 import org.daxplore.presenter.chart.display.Chart;
 import org.daxplore.presenter.chart.display.ChartFactory;
 import org.daxplore.presenter.chart.display.ExternalLegend;
-import org.daxplore.presenter.chart.display.LineChart;
+import org.daxplore.presenter.chart.display.DichLineChart;
 import org.daxplore.presenter.chart.display.MeanChart;
 import org.daxplore.presenter.shared.QueryData;
 import org.daxplore.presenter.shared.QueryDefinition;
@@ -52,8 +52,13 @@ public class ChartPanelPresenter  {
 			} else {
 				//TODO mean compare
 			}
-		} else if (queryDefinition.hasFlag(QueryFlag.LINE)) {
-			LineChart newChart = chartFactory.createLineChart(queryDefinition, false);
+		} else if (queryDefinition.hasFlag(QueryFlag.MEANLINE)) {
+			DichLineChart newChart = chartFactory.createDichLineChart(queryDefinition, false);
+			newChart.addData(queryData);
+			view.setChart(newChart);
+			chart = newChart;
+		} else if (queryDefinition.hasFlag(QueryFlag.DICHLINE)) {
+			DichLineChart newChart = chartFactory.createDichLineChart(queryDefinition, false);
 			newChart.addData(queryData);
 			view.setChart(newChart);
 			chart = newChart;

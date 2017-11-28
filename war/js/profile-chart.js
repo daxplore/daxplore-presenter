@@ -129,7 +129,7 @@
     chart.append("g")
       .attr("class", "x axis bottom")
     .append("text")
-        .attr('class', 'x-bottom-description')
+      .attr('class', 'x-bottom-description')
       .attr("text-anchor", "middle")
       .style("text-anchor", "middle")
       .text(usertexts.listXAxisDescription);
@@ -164,6 +164,7 @@
     
     var yStop = Math.min(height - xAxisBottomHeight, yHeightWithMaxBand + xAxisTopHeight);
     
+    
     // CALCULATE Y SCALE
     y_scale = d3.scaleBand()
       .range([xAxisTopHeight, yStop])
@@ -184,7 +185,7 @@
     yAxisWidth = Math.max(50, yAxisReferenceElement.node().getBBox().width);
     
     if (first_update) {
-        oldYAxisWidth = yAxisWidth;
+      oldYAxisWidth = yAxisWidth;
     }
     
     yAxisElement.interrupt().selectAll('*').interrupt();
@@ -224,8 +225,8 @@
     x_axis_top.interrupt().selectAll('*').interrupt();
     
     x_axis_top.transition(el_trans)
-        .attr("transform", "translate(" + yAxisWidth + "," + xAxisTopHeight + ")")
-        .call(xAxisTop)
+      .attr("transform", "translate(" + yAxisWidth + "," + xAxisTopHeight + ")")
+      .call(xAxisTop);
         
     d3.selectAll(".x-top-description")
       .transition(el_trans)

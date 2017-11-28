@@ -91,8 +91,8 @@ public class EmbedEntryPoint implements EntryPoint {
 					chart = chartFactory.createBarChartCompare(queryDefinition, printMode);
 					((BarChartCompare)chart).addData(queryData);
 				}
-			} else if (queryDefinition.hasFlag(QueryFlag.LINE)){
-				chart = chartFactory.createLineChart(queryDefinition, false);
+			} else if (queryDefinition.hasFlag(QueryFlag.MEANLINE)){
+				chart = chartFactory.createDichLineChart(queryDefinition, false);
 				((MeanChart)chart).addData(queryData);
 			} else {
 				chart = chartFactory.createMeanChart(queryDefinition, false);

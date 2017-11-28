@@ -404,3 +404,13 @@
 		content: url('/img/perspective-radio-filled.png');
 	}
 	
+	
+	/*** Time line chart in d3 ***/
+	.axis--x path {
+	  display: none;
+	}
+	
+	.line {
+	  fill: none;
+	  stroke-width: 1.5px;
+	}

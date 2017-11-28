@@ -21,19 +21,26 @@ package org.daxplore.presenter.chart.display;
 import org.daxplore.presenter.chart.resources.ChartTexts;
 import org.daxplore.presenter.shared.QueryData;
 import org.daxplore.presenter.shared.QueryDefinition;
+import org.daxplore.presenter.shared.SharedTools;
 
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * A chart type for displaying mean values with standard deviations.
+ * A chart type for displaying a line chart of dichotomized values.
  */
-public class LineChart extends SimplePanel implements Chart {
+public class DichLineChart extends SimplePanel implements Chart {
+	private QueryDefinition queryDefinition;
 	private ExternalHeader externalHeader;
 	private ExternalLegend externalLegend;
 	private String statJson;
+	private String selectedOptionsJson;
 
-	protected LineChart(ChartTexts chartTexts, QueryDefinition queryDefinition, boolean printerMode) {
+	protected DichLineChart(ChartTexts chartTexts, QueryDefinition queryDefinition, boolean printerMode) {
+		this.queryDefinition = queryDefinition;
+		
+		selectedOptionsJson = "[" + SharedTools.join(queryDefinition.getUsedPerspectiveOptions(), ",") + "]";
+		
 		externalHeader = new ExternalHeader(chartTexts, queryDefinition);
 		externalLegend = new ExternalLegend(chartTexts, queryDefinition, printerMode);
 		
@@ -86,10 +93,10 @@ public class LineChart extends SimplePanel implements Chart {
 	@Override
 	protected void onAttach() {
 		super.onAttach();
-		generateTimeLineChart(statJson);
+		generateDichTimeLineChart(selectedOptionsJson, statJson);
 	}
 	
-	protected native void generateTimeLineChart(String json) /*-{
-		$wnd.generateTimeLineChart(json);
+	protected native void generateDichTimeLineChart(String selectedOptions, String json) /*-{
+		$wnd.generateDichTimeLineChart(JSON.parse(selectedOptions), json);
 	}-*/;
 }

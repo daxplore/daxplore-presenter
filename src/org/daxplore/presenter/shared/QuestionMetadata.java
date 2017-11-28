@@ -113,7 +113,16 @@ public interface QuestionMetadata {
 	 *            the questionID
 	 * @return true if it can be shown as a line chart
 	 */
-	public boolean hasLine(String questionID);
+	public boolean hasMeanLine(String questionID);
+	
+	/**
+	 * Check if a question supports dichotomized line charts over time.
+	 * 
+	 * @param questionID
+	 *            the questionID
+	 * @return true if it can be shown as a line chart
+	 */
+	public boolean hasDichotomizedLine(String questionID);
 
 	/**
 	 * Check if a question should use a mean reference value.

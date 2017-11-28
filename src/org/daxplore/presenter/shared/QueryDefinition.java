@@ -61,7 +61,7 @@ public class QueryDefinition {
 	/**
 	 * The Enum QueryFlag.
 	 */
-	public enum QueryFlag{
+	public enum QueryFlag {
 		
 		/** A way to set "no flag". */
 		NULL(0), 
@@ -87,10 +87,14 @@ public class QueryDefinition {
 		MEAN_REFERENCE(8),
 		
 		/**
-		* Set if a mean line chart over time should be used, otherwise a standard
-		* bar chart is used.
+		* Set if a mean line chart over time should be used.
 		*/
-		LINE(16);
+		MEANLINE(16),
+		
+		/**
+		* Set if a dichotomized line chart over time should be used.
+		*/
+		DICHLINE(32);
 		
 		/**
 		 * The value of the bit-position used when encoding this flag in a long.

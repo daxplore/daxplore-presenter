@@ -141,7 +141,7 @@ public class BuildPresentations {
 			}
 			
 			QueryDefinition queryDefinition =
-					new QueryDefinition(questionMetadata, questionID, perspectiveID, perspectiveOptions, flags);
+				new QueryDefinition(questionMetadata, questionID, perspectiveID, perspectiveOptions, flags);
 			dataArray.add(JSONValue.parse(StatDataItemStore.getStats(pm, prefix, queryDefinition)));
 		}
 		
