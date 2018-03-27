@@ -19,6 +19,7 @@
 package org.daxplore.presenter.embed;
 
 import org.daxplore.presenter.chart.display.Chart;
+import org.daxplore.presenter.chart.display.ExternalHeader;
 import org.daxplore.presenter.chart.display.ExternalLegend;
 import org.daxplore.presenter.shared.EmbedDefinition;
 import org.daxplore.presenter.shared.EmbedDefinition.EmbedFlag;
@@ -54,7 +55,7 @@ public class EmbedView extends Composite {
 	protected final VerticalPanel chartArea = new VerticalPanel();
 	
 	@UiField(provided=true)
-	protected final Widget header;
+	protected final ExternalHeader header;
 	@UiField(provided = true)
 	protected final SimplePanel chartContainerPanel = new SimplePanel();
 	

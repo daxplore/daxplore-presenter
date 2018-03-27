@@ -204,4 +204,22 @@ public class QuestionJson extends JavaScriptObject {
 	public final native double getMeanReferenceValue() /*-{
 		return this.mean_reference;
 	}-*/;
+
+	/**
+	 * The default options selected in a dichotomization of the question.
+	 * 
+	 * @return a list of the selected options
+	 */
+	public final List<Integer> getDichotomizedDefaultSelectedOptions() {
+		return Collections.unmodifiableList(JsonTools.jsArrayAsList(getDichSelectedNative()));
+	}
+	
+	/**
+	 * The default options selected in a dichotomization of the question.
+	 * 
+	 * @return a list of the selected options
+	 */
+	private final native JsArrayInteger getDichSelectedNative() /*-{
+		return this.dichselected;
+	}-*/;
 }

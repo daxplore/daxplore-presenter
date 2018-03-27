@@ -183,6 +183,15 @@ public class QuestionMetadataServerImpl implements QuestionMetadata {
 		// TODO Auto-generated method stub
 		return false;
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<Integer> getDichotomizedDefaultSelectedOptions(String questionID) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	/**
 	 * {@inheritDoc}

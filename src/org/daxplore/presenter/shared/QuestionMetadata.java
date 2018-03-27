@@ -123,6 +123,12 @@ public interface QuestionMetadata {
 	 * @return true if it can be shown as a line chart
 	 */
 	public boolean hasDichotomizedLine(String questionID);
+	
+	/**
+	 * The options selected in a dichotomization of the question.
+	 * @return A list of the selected options.
+	 */
+	public List<Integer> getDichotomizedDefaultSelectedOptions(String questionID);
 
 	/**
 	 * Check if a question should use a mean reference value.

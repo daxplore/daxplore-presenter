@@ -35,6 +35,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
  */
 public class ExternalLegend extends Composite {
 	private ChartTexts chartTexts;
+	private QueryDefinition queryDefinition;
 	private static ExternalLegend emptyLegend = new ExternalLegend();
 	private VerticalPanel content = new VerticalPanel();
 	private HTML legend;
@@ -50,6 +51,7 @@ public class ExternalLegend extends Composite {
 	 *            use the printer-friendly mode
 	 */
 	public ExternalLegend(ChartTexts chartTexts, QueryDefinition queryDefinition, boolean printerMode) {
+		this.queryDefinition = queryDefinition;
 		this.chartTexts = chartTexts;
 		StringBuilder html = new StringBuilder();
 		if(queryDefinition.hasFlag(QueryFlag.MEAN)) {
@@ -66,6 +68,8 @@ public class ExternalLegend extends Composite {
 				String boxColor = BarColors.getChartColorSet(queryDefinition.getPerspectiveOptionCount()).getPrimary();
 				html.append(legendRow(text, boxColor, printerMode));
 			}
+		} else if (queryDefinition.hasFlag(QueryFlag.DICHLINE)) {
+			html.append("<div class=\"daxplore-ExternalLegend\"></div>");
 		} else {
 			html.append("<table class=\"daxplore-ExternalLegend\">");
 			List<String> questionOptionTexts = queryDefinition.getQuestionOptionTexts();
@@ -107,4 +111,24 @@ public class ExternalLegend extends Composite {
 		legendRow.append("</td><td>").append(text).append("</td></tr>");
 		return legendRow.toString();
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void onAttach() {
+		super.onAttach();
+		if (queryDefinition.hasFlag(QueryFlag.DICHLINE)) {
+			generateDichTimeLineLegend();
+		}
+	}
+	
+	 /**
+	  * Call d3 code to generate legend.
+	  * 
+	  * Needs to be called after chart is attached and data is generated.
+	  */
+	protected native void generateDichTimeLineLegend() /*-{
+		$wnd.generateDichTimeLineLegend();
+	}-*/;
 }

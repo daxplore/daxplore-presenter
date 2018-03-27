@@ -390,7 +390,6 @@ public class QueryDefinition {
 		return texts;
 	}
 	
-	
 	/*
 	 * Get perspective specific information:
 	 */
@@ -473,6 +472,14 @@ public class QueryDefinition {
 	 */ 
 	public double getMeanReferenceValue() {
 		return questionMetadata.getMeanReferenceValue(questionID);
+	}
+
+	/**
+	 * The options selected in a dichotomization of the question.
+	 * @return A list of the selected options.
+	 */
+	public List<Integer> getDichotomizedSelectedOptions() {
+		return questionMetadata.getDichotomizedDefaultSelectedOptions(questionID);
 	}
 	
 	

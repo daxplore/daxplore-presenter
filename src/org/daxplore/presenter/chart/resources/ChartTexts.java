@@ -28,10 +28,6 @@ public interface ChartTexts extends Messages {
 	// Chart group name
 	String compareWithAll();
 
-	// Chart title text
-	String doubleTitle(String title, String subtitle);
-	String singleTitle(String title);
-
 	// Chart tick text
 	String standardTick(String tickName, int respondentCount);
 	String standardTickNoRespondents(String tickName);
@@ -56,12 +52,6 @@ public interface ChartTexts extends Messages {
 	String meanChartCompareSecondaryAnnotationNoRespondents(String tickName, String timepoint, String mean);
 	String meanReference(String mean);
 	String meanReferenceCompact(String mean);
-
-	// ExternalChartLegend
-	String oneGroupHidden();
-	String groupsHidden();
-	String oneOptionHidden();
-	String optionsHidden();
 
 	// LoadingChartAnimation title and alt texts
 	String loadingChart();

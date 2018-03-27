@@ -143,6 +143,14 @@ public class QuestionMetadataClientImpl implements QuestionMetadata {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public List<Integer> getDichotomizedDefaultSelectedOptions(String questionID) {
+		return getQuestion(questionID).getDichotomizedDefaultSelectedOptions();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean hasMeanReferenceValue(String questionID) {
 		return getQuestion(questionID).hasMeanReferenceValue();
 	}
@@ -177,6 +185,4 @@ public class QuestionMetadataClientImpl implements QuestionMetadata {
 			return this[index];
 		}-*/;
 	}
-
-
 }

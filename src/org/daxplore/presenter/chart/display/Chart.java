@@ -19,7 +19,6 @@
 package org.daxplore.presenter.chart.display;
 
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * An interface used to interact with all charts.
@@ -68,5 +67,5 @@ public interface Chart extends IsWidget {
 	 * 
 	 * @return the external header
 	 */
-	public Widget getExternalHeader();
+	public ExternalHeader getExternalHeader();
 }

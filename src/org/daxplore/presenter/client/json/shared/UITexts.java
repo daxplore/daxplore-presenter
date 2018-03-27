@@ -18,6 +18,10 @@
  */
 package org.daxplore.presenter.client.json.shared;
 
+import java.util.List;
+
+import org.daxplore.presenter.shared.SharedTools;
+
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.inject.Inject;
 
@@ -54,6 +58,28 @@ public class UITexts {
 	public String printButtonTitle() {return get("printButtonTitle");}
 	public String csvButtonTitle() {return get("csvButtonTitle");}
 	public String embedButtonTitle() {return get("embedButtonTitle");}
+	
+	// Chart texts
+	public String dichotomizedSubtitle(List<String> options) {
+		int optCount = options.size();
+		if (optCount == 0) {return "";}
+		
+		String subStart 	= get("dichotomizedSubtitleStart");
+		String subEnd		= get("dichotomizedSubtitleEnd");
+		
+		if (options.size() == 1) {
+			return subStart + options.get(0) + subEnd;
+		}
+		
+		String subSeparator = get("dichotomizedSubtitleSeparator");
+		String subOr 		= get("dichotomizedSubtitleOr");
+		
+		String sub = subStart;
+		sub += SharedTools.join(options.subList(0, optCount-1), subSeparator);
+		sub += subOr + options.get(optCount-1) + subEnd;
+		
+		return sub;
+	}
 	
 	// EmbedTextPopup
 	public String embedPopupTitle() {return get("embedPopupTitle");}
@@ -115,5 +141,4 @@ public class UITexts {
 			return this[key];
 		}-*/;
 	}
-	
 }

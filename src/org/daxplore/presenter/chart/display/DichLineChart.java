@@ -19,6 +19,7 @@
 package org.daxplore.presenter.chart.display;
 
 import org.daxplore.presenter.chart.resources.ChartTexts;
+import org.daxplore.presenter.client.json.shared.UITexts;
 import org.daxplore.presenter.shared.QueryData;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.SharedTools;
@@ -35,13 +36,18 @@ public class DichLineChart extends SimplePanel implements Chart {
 	private ExternalLegend externalLegend;
 	private String statJson;
 	private String selectedOptionsJson;
+	private String lineColorsJSON;
+	private String hoverColorsJSON;
 
-	protected DichLineChart(ChartTexts chartTexts, QueryDefinition queryDefinition, boolean printerMode) {
+	protected DichLineChart(ChartTexts chartTexts, UITexts uiTexts, QueryDefinition queryDefinition, boolean printerMode) {
 		this.queryDefinition = queryDefinition;
+		
+		lineColorsJSON = "[\"" + SharedTools.join(BarColors.getChartColorsPrimaryHex(), "\",\"") + "\"]";
+		hoverColorsJSON = "[\"" + SharedTools.join(BarColors.getChartColorsPrimaryHoverHex(), "\",\"") + "\"]";
 		
 		selectedOptionsJson = "[" + SharedTools.join(queryDefinition.getUsedPerspectiveOptions(), ",") + "]";
 		
-		externalHeader = new ExternalHeader(chartTexts, queryDefinition);
+		externalHeader = new ExternalHeader(uiTexts, queryDefinition);
 		externalLegend = new ExternalLegend(chartTexts, queryDefinition, printerMode);
 		
 		setStylePrimaryName("line-chart-panel");
@@ -52,7 +58,7 @@ public class DichLineChart extends SimplePanel implements Chart {
 	 */
 	@Override
 	public void setChartSizeSmart(int width, int height) {
-		// TODO Auto-generated method stub
+		updateDichTimeLineChartSize(height);
 	}
 
 	/**
@@ -61,7 +67,7 @@ public class DichLineChart extends SimplePanel implements Chart {
 	@Override
 	public int getMinWidth() {
 		// TODO Auto-generated method stub
-		return 0;
+		return 300;
 	}
 
 	/**
@@ -76,7 +82,7 @@ public class DichLineChart extends SimplePanel implements Chart {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Widget getExternalHeader() {
+	public ExternalHeader getExternalHeader() {
 		return externalHeader;
 	}
 
@@ -93,10 +99,14 @@ public class DichLineChart extends SimplePanel implements Chart {
 	@Override
 	protected void onAttach() {
 		super.onAttach();
-		generateDichTimeLineChart(selectedOptionsJson, statJson);
+		generateDichTimeLineChart(selectedOptionsJson, statJson, lineColorsJSON, hoverColorsJSON);
 	}
 	
-	protected native void generateDichTimeLineChart(String selectedOptions, String json) /*-{
-		$wnd.generateDichTimeLineChart(JSON.parse(selectedOptions), json);
+	protected native void generateDichTimeLineChart(String selectedOptions, String json, String lineColors, String hoverColors) /*-{
+		$wnd.generateDichTimeLineChart(JSON.parse(selectedOptions), json, JSON.parse(lineColors), JSON.parse(hoverColors));
+	}-*/;
+	
+	protected native void updateDichTimeLineChartSize(int height) /*-{
+		$wnd.updateDichTimeLineChartSize(height);
 	}-*/;
 }

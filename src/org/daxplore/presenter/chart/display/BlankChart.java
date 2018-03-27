@@ -66,7 +66,7 @@ public class BlankChart extends Composite implements Chart {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Widget getExternalHeader() {
-		return new SimplePanel();
+	public ExternalHeader getExternalHeader() {
+		return new ExternalHeader();
 	}
 }

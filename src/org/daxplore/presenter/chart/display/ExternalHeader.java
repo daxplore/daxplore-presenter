@@ -18,8 +18,12 @@
  */
 package org.daxplore.presenter.chart.display;
 
-import org.daxplore.presenter.chart.resources.ChartTexts;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.daxplore.presenter.client.json.shared.UITexts;
 import org.daxplore.presenter.shared.QueryDefinition;
+import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
@@ -38,19 +42,33 @@ public class ExternalHeader extends Composite {
 	 * @param query
 	 *            the query
 	 */
-	public ExternalHeader(ChartTexts chartTexts, QueryDefinition queryDefinition) {
+	public ExternalHeader(UITexts uiTexts, QueryDefinition queryDefinition) {
 		String titleHeader = queryDefinition.getQuestionShortText();
 		String titleDetail = queryDefinition.getQuestionFullText();
 
 		HTML content = new HTML();
-		if (titleHeader.equalsIgnoreCase(titleDetail)) {
-			String title = chartTexts.singleTitle(titleHeader);
-			content.setHTML(title);
-		} else {
-			String title = chartTexts.doubleTitle(titleHeader, titleDetail);
-			content.setHTML(title);
+		String title = "<div class='daxplore-ExternalHeader-header'>" + titleHeader + "</div>";
+		if (!titleHeader.equalsIgnoreCase(titleDetail)) {
+			title += "<div class='daxplore-ExternalHeader-sub'>" + titleDetail + "</div>";
 		}
+		if (queryDefinition.hasFlag(QueryFlag.DICHLINE)) {
+			List<String> optionTexts = queryDefinition.getQuestionOptionTexts();
+			List<String> usedDichTexts = new LinkedList<>();
+			for (Integer i : queryDefinition.getDichotomizedSelectedOptions()) {
+				usedDichTexts.add(optionTexts.get(i));
+			}
+			title += "<div class='daxplore-ExternalHeader-dichsub'>" + uiTexts.dichotomizedSubtitle(usedDichTexts) + "</div>";
+		}
+		content.setHTML(title);
 		initWidget(content);
+		setStylePrimaryName("daxplore-ExternalHeader");
+	}
+	
+	/**
+	 * Creates a new empty header
+	 */
+	public ExternalHeader() {
+		initWidget(new HTML(""));
 		setStylePrimaryName("daxplore-ExternalHeader");
 	}
 }

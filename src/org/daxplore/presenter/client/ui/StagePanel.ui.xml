@@ -6,8 +6,6 @@
 	xmlns:client='urn:import:org.daxplore.presenter.client.ui'>
 
 	<ui:style>
-   	.sidebarArea {
-		}
 		.bottomHorizontal {
 			margin-top: 10px;
 			width: 100%;
@@ -30,7 +28,7 @@
 			</g:HorizontalPanel>
 		</g:VerticalPanel>
 				
-		<g:VerticalPanel styleName='{style.sidebarArea}' ui:field="sidebarArea">
+		<g:VerticalPanel ui:field="sidebarArea" stylePrimaryName='daxplore-SidebarArea'>
 			<g:SimplePanel ui:field='legendPanel'/>
 			<client:DescriptionPanelLegend ui:field='descriptionPanelLegend' styleName="{style.description}"/>
 		</g:VerticalPanel>

@@ -80,7 +80,6 @@
 		padding-left: 9px;
 	}
 	
-	
 	.daxplore-LegendReference {
 	    border-bottom: medium dashed;
 	    margin-top: 15px;
@@ -91,12 +90,48 @@
 	    float: left;
 	}
 	
+	.dich-legend-row {
+		white-space: nowrap;
+		margin-bottom: 4px;
+		width: auto !important;
+		cursor: default;
+	}
+	
+	.dich-legend-marker {
+	    width: 1.1em;
+	    height: 1.1em;
+	    border-radius: 2px;
+	    display: inline-block;
+	    vertical-align: middle;
+	}
+	
+	.dich-legend-text {
+		margin-left: 5px;
+	}
+	
 /*** External header ***/
+
 	.daxplore-ExternalHeader {
+		display: table;
+		margin: 0 auto;
 		text-align: center;
 		padding-top: 5px;
 		padding-left: 3px;
 		padding-right: 3px;
+	}
+	.daxplore-ExternalHeader-header {
+		font-size: 17px;
+		font-weight: bold;
+	}
+	.daxplore-ExternalHeader-sub {
+		margin-top: 2px;
+		color: #333;
+		font-size: 15px;
+	}
+	.daxplore-ExternalHeader-dichsub {
+		margin-top: 2px;
+		color: #333;
+		font-size: 13px;
 	}
 	
 /*** Query Active Animation ***/

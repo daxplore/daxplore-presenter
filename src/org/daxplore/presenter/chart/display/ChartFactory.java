@@ -76,7 +76,7 @@ public class ChartFactory {
 	 * @return the chart
 	 */
 	public DichLineChart createMeanLineChart(QueryDefinition queryDefinition, boolean printerMode) {
-		return new DichLineChart(chartTexts, queryDefinition, printerMode);
+		return new DichLineChart(chartTexts, uiTexts, queryDefinition, printerMode);
 	}
 	
 	/**
@@ -85,6 +85,6 @@ public class ChartFactory {
 	 * @return the chart
 	 */
 	public DichLineChart createDichLineChart(QueryDefinition queryDefinition, boolean printerMode) {
-		return new DichLineChart(chartTexts, queryDefinition, printerMode);
+		return new DichLineChart(chartTexts, uiTexts, queryDefinition, printerMode);
 	}
 }

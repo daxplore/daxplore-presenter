@@ -407,7 +407,7 @@
     d3.selectAll("text")
       .style("fill", "#555")
       .style("font", "12px sans-serif")
-      .style("cursor", "default")
+      .style("cursor", "default");
 
     d3.selectAll(".y path, .y line")
       .style("visibility", "hidden");

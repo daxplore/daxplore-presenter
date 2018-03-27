@@ -136,4 +136,13 @@ public class QuestionMetadataMock implements QuestionMetadata {
 		Random rnd = new Random(questionID.hashCode() + 6);
 		return rnd.nextBoolean();
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<Integer> getDichotomizedDefaultSelectedOptions(String questionID) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -132,9 +132,9 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		
 		//TODO this sets line to be the default, then mean. The default should be set in the producer instead
 		if (questionMetadata.hasMeanLine(questionID)) {
-			flags.add(QueryFlag.DICHLINE);
-		} else if(questionMetadata.hasDichotomizedLine(questionID)) {
 			flags.add(QueryFlag.MEANLINE);
+		} else if(questionMetadata.hasDichotomizedLine(questionID)) {
+			flags.add(QueryFlag.DICHLINE);
 		} else if (questionMetadata.hasMean(questionID)) {
 			flags.add(QueryFlag.MEAN);
 		}

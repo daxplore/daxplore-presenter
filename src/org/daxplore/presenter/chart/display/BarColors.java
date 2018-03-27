@@ -18,7 +18,13 @@
  */
 package org.daxplore.presenter.chart.display;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.daxplore.presenter.shared.Color;
+import org.daxplore.presenter.shared.SharedTools;
+
+import com.google.gwt.core.shared.GWT;
 
 /**
  * An immutable color used to color charts.
@@ -65,6 +71,9 @@ public class BarColors {
 			Color.hslToHex(0, 0, 0),
 			Color.hslToHex(0, 0, 0),
 			Color.hslToHex(0, 0, 0.85));
+	
+	private static List<String> chartColorPrimaryHex;
+	private static List<String> chartColorPrimaryHoverHex;
 	
 	/**
 	 * Create a new color set, based on a hue. Adjusting for saturation and
@@ -206,5 +215,25 @@ public class BarColors {
 	
 	public static BarColors getReferenceColors() {
 		return meanReferenceColors;
+	}
+	
+	public static List<String> getChartColorsPrimaryHex() {
+		if (chartColorPrimaryHex == null) {
+			chartColorPrimaryHex = new ArrayList<>(chartColorSet.length); 
+			for (BarColors c : chartColorSet) {
+				chartColorPrimaryHex.add(c.getPrimary());
+			}
+		}
+		return chartColorPrimaryHex;
+	}
+	
+	public static List<String> getChartColorsPrimaryHoverHex() {
+		if (chartColorPrimaryHoverHex == null) {
+			chartColorPrimaryHoverHex = new ArrayList<>(chartColorSet.length); 
+			for (BarColors c : chartColorSet) {
+				chartColorPrimaryHoverHex.add(c.getAnnotation());
+			}
+		}
+		return chartColorPrimaryHoverHex;
 	}
 }
