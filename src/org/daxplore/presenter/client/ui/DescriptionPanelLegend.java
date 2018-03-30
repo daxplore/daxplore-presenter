@@ -50,7 +50,7 @@ public class DescriptionPanelLegend extends Composite {
 			boolean perspectiveEmpty = perspectiveDescription == null || perspectiveDescription.trim().isEmpty();
 			if(!perspectiveEmpty) {
 				if(!html.isEmpty()) {
-					html += "<hr><br>";
+					html += "<hr>";
 				}
 				String title = questions.getShortText(perspectiveID);
 				html += "<b>" + title + "</b><p>"+perspectiveDescription+"</p>";

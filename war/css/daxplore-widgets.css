@@ -63,7 +63,7 @@
 /*** DescriptionPanel.java ***/
 
 	.daxplore-DescriptionPanelBottom, .daxplore-DescriptionPanelLegend {
-		margin: 22px 0 0 20px;
+		margin: 22px 0 0 10px;
 		padding: 8px 5px 8px 8px;
 		max-width: 500px;
 		float: right;

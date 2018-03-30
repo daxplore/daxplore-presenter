@@ -18,6 +18,7 @@
   
   var pointSymbol = d3.symbol().type(d3.symbolCircle);
   var pointSize = 40;
+  var pointFocusSize = 550;
   
   var fade_transition = d3.transition()
       .duration(300)
@@ -41,51 +42,49 @@
         var row = d3.select(".dich-legend-row-" + option_index);
         row.interrupt().selectAll('*').interrupt();
         
-        var line = d3.selectAll(".dataset-" + option_index);
-        line.interrupt().selectAll('*').interrupt();
+        var lineMain = d3.selectAll(".line.dataset-" + option_index);
+        lineMain.interrupt().selectAll('*').interrupt();
+       
+        var pointMain = d3.selectAll(".dich-point.dataset-" + option_index);
+        pointMain.interrupt().selectAll('*').interrupt();
         
         if (option_index != focused_index) {
           row.transition(fade_transition)
             .style("opacity", 0.6);
           
-          line.transition(fade_transition)
+          lineMain.transition(fade_transition)
+            .attr("opacity", 0.3);
+            
+          pointMain.transition(fade_transition)
             .attr("opacity", 0.3);
         } else {
           row.style("opacity", 1);
-          line.attr("opacity", 1);
+          lineMain.attr("opacity", 1);
+          pointMain.attr("opacity", 1);
         }
     }
-//       d3.select("#barrect-" + getQid(i))
-//         .style("fill", colorForValue(getMean(i, selected_option), mean_references[getQid(i)], directions[getQid(i)]));
-//       d3.selectAll(".q-" + getQid(i))
-//         .classed("bar-hover", false);
-//       d3.selectAll(".y.axis .tick")
-//         .classed("bar-hover", false);
-//     }
   }
 
   function unfadeAll() {
     for (var i=0; i<current_options.length; i++) {
-        var option_index = current_options[i].index;
-        var row = d3.select(".dich-legend-row-" + option_index);
-        row.interrupt().selectAll('*').interrupt();
-        row
-          .transition(fade_transition)
-          .style("opacity", 1);
-          
-        var line = d3.selectAll(".dataset-" + option_index);
-          line.interrupt().selectAll('*').interrupt();
-          line
-            .transition(fade_transition)
-            .attr("opacity", 1);
+      var option_index = current_options[i].index;
+      var row = d3.select(".dich-legend-row-" + option_index);
+      row.interrupt().selectAll('*').interrupt();
+      row
+        .transition(fade_transition)
+        .style("opacity", 1);
     }
-//     d3.select("#barrect-" + getQid(i))
-//       .style("fill", colorHoverForValue(getMean(i, selected_option), mean_references[getQid(i)], directions[getQid(i)]));
-//     d3.selectAll(".q-" + getQid(i))
-//       .classed("bar-hover", true);
-//     d3.selectAll(".y.axis .tick")
-//       .classed("bar-hover", function(d, index) { return i == index; });
-//   }
+    var lineMain = d3.selectAll(".line");
+    lineMain.interrupt().selectAll('*').interrupt();
+    lineMain
+        .transition(fade_transition)
+        .attr("opacity", 1);
+        
+    var pointMain = d3.selectAll(".dich-point");
+    pointMain.interrupt().selectAll('*').interrupt();
+    pointMain
+        .transition(fade_transition)
+        .attr("opacity", 1);
   }
   
   function tooltipOver(focused_index) {
@@ -96,19 +95,27 @@
 //     tooltips.transition(fade_transition)
 //       .style("opacity", 1);
     
-    var symbol = d3.symbol().type(d3.symbolCircle);
-    var points = d3.selectAll(".dich-point.dataset-" + focused_index);
-//     points.interrupt().selectAll('*').interrupt();
-//     points.attr("d", symbol.size(64));
-//     console.log(points);
-    points
-//       .transition().duration(100)
-      .attr("d", symbol.size(500));
-//     path.attr("d", symbol.size(64));
-
-//     points.transition().duration(1000).attr("d", symbol.size(550));
-//     points.transition(fade_transition)
-//       .attr("d", symbol.size(400));
+//     var symbol = d3.symbol().type(d3.symbolCircle);
+//     var points = d3.selectAll(".dich-point.dataset-" + focused_index);
+// //     points.interrupt().selectAll('*').interrupt();
+// //     points.attr("d", symbol.size(64));
+// //     console.log(points);
+//     points
+// //       .transition().duration(100)
+//       .attr("d", symbol.size(500));
+// //     path.attr("d", symbol.size(64));
+// 
+// //     points.transition().duration(1000).attr("d", symbol.size(550));
+// //     points.transition(fade_transition)
+// //       .attr("d", symbol.size(400));
+    
+    var lineCover = d3.selectAll(".line-cover.dataset-" + focused_index);
+    lineCover
+      .attr("opacity", "1");
+    
+    var pointMain = d3.selectAll(".dich-point-cover.dataset-" + focused_index);
+    pointMain
+      .attr("opacity", "1");
   }
   
   function tooltipOut() {
@@ -118,16 +125,24 @@
 //     tooltips.transition(fade_transition)
 //       .style("opacity", 0);
     
-    var symbol = d3.symbol().type(d3.symbolCircle);
-    var points = d3.selectAll(".dich-point");
-//     points.interrupt().selectAll('*').interrupt();
-    points.attr("d", symbol.size(pointSize));
-    
-//     var symbol = d3.symbol().size(40).type(d3.symbolCircle);
+//     var symbol = d3.symbol().type(d3.symbolCircle);
 //     var points = d3.selectAll(".dich-point");
-//     points.interrupt().selectAll('*').interrupt();
-//     points.transition(fade_transition)
-//       .attr("d", symbol.size(pointSize));
+// //     points.interrupt().selectAll('*').interrupt();
+//     points.attr("d", symbol.size(pointSize));
+//     
+// //     var symbol = d3.symbol().size(40).type(d3.symbolCircle);
+// //     var points = d3.selectAll(".dich-point");
+// //     points.interrupt().selectAll('*').interrupt();
+// //     points.transition(fade_transition)
+// //       .attr("d", symbol.size(pointSize));
+    
+    var lineCover = d3.selectAll(".line-cover");
+    lineCover
+      .attr("opacity", "0");
+    
+    var pointMain = d3.selectAll(".dich-point-cover");
+    pointMain
+      .attr("opacity", "0");
   }
 
   
@@ -263,10 +278,10 @@
 //       })
 //       .style("stroke", function(d) { return z_scale_color(d.id); });
       
-    current_options.forEach(function(option) {
-      var color = z_scale_color(option.id);
-      var hover_color = z_scale_hover_color(option.id);
-      
+//     current_options.forEach(function(option) {
+//       var color = z_scale_color(option.id);
+//       var hover_color = z_scale_hover_color(option.id);
+//       
       
     // Connect the points with lines
 //       chart_g.append("path")
@@ -288,6 +303,8 @@
 //         });
         
       // Connect the points with lines
+    current_options.forEach(function(option) {
+      var color = z_scale_color(option.id);
       d3.select(".line.dataset-" + option.index).remove();
       chart_g.append("path")
         .datum(option.values)
@@ -306,8 +323,11 @@
             tooltipOut();
             unfadeAll();
         });
+    });
         
       // Individual points
+    current_options.forEach(function(option) {
+      var color = z_scale_color(option.id);
       chart_g.selectAll(".dich-point.dataset-" + option.index)
         .data(option.values)
       .enter().append("path")
@@ -329,38 +349,79 @@
             unfadeAll();
         });
         
-        chart_g.selectAll(".dich-point.dataset-" + option.index)
-          .attr("transform", function(d) {
-            return "translate(" + (x_scale(d.timepoint) + x_bandwidth/2) + "," + y_scale(d.percentage) + ")";
-          });
+      chart_g.selectAll(".dich-point.dataset-" + option.index)
+        .attr("transform", function(d) {
+          return "translate(" + (x_scale(d.timepoint) + x_bandwidth/2) + "," + y_scale(d.percentage) + ")";
+        });
         
-        // Add tooltip divs
-        var dichWrapper = d3.select(".dich-line-chart").node().getBoundingClientRect();
+    });
+      
+    // Mouse over elements added later in order to cover underlying elements when highlighted
+    current_options.forEach(function(option) {
+      var color = z_scale_color(option.id);
+
+      // Connect the points with lines
+      d3.selectAll(".line-cover.dataset-" + option.index).remove();
+      chart_g.append("path")
+        .datum(option.values)
+        .attr("class", "line-cover dataset-" + option.index)
+        .attr("fill", "none")
+        .attr("stroke", color)
+        .attr("stroke-width", "3")
+        .attr("opacity", "0")
+        .attr("pointer-events", "none")
+        .attr("d", line);
+    });
+    
+    current_options.forEach(function(option) {
+      var color = z_scale_color(option.id);
+      // Individual points
+      d3.selectAll(".dich-point-cover.dataset-" + option.index).remove();
+      chart_g.selectAll(".dich-point-cover.dataset-" + option.index)
+        .data(option.values)
+      .enter().append("path")
+        .attr("class", "dich-point-cover dataset-" + option.index)
+        .attr("fill", color)
+        .attr("stroke", color)
+        .attr("d", pointSymbol.size(pointFocusSize))
+        .attr("opacity", "0")
+        .attr("pointer-events", "none");
+        
+      chart_g.selectAll(".dich-point-cover.dataset-" + option.index)
+        .attr("transform", function(d) {
+          return "translate(" + (x_scale(d.timepoint) + x_bandwidth/2) + "," + y_scale(d.percentage) + ")";
+        });
+    });
+
+    current_options.forEach(function(option) {
+      // Add tooltip divs
+//       var dichWrapper = d3.select(".dich-line-chart").node().getBoundingClientRect();
 //         var xAxisStart = d3.select(".dichtime-x-axis").node().getBoundingClientRect().x;
-        d3.select(".line-chart-panel")
-          .selectAll(".point-tooltip-" + option.index)
-          .data(option.values)
-          .enter().append("div")
-            .attr("class", "point-tooltip point-tooltip-" + option.index)
-            .style("left", function (d) { return (dichWrapper.x + yAxisWidth + x_scale(d.timepoint) + x_bandwidth/2 - 4) + "px"; })
-            .style("top", function (d) { return (dichWrapper.y + y_scale(d.percentage) + 0) + "px"; })
-//             .style("background-color", hover_color)
-            .style("display", "none")
-            .html(function (d) { return percentage_format(d.percentage)})
-            .on("mouseover",
-              function(d) {
-                tooltipOver(option.index);
-                fadeOthers(option.index)
-            })
-            .on("mouseout",
-              function(d) {
-                tooltipOut();
-                unfadeAll();
-            });
-            
-        d3.selectAll(".point-tooltip")
-          .style("left", function (d) { return (dichWrapper.x + yAxisWidth + x_scale(d.timepoint) + x_bandwidth/2 - 4) + "px"; })
-          .style("top", function (d) { return (dichWrapper.y + y_scale(d.percentage) + 0) + "px"; });
+      d3.selectAll(".point-tooltip-" + option.index).remove();
+      chart_g.selectAll(".point-tooltip-" + option.index)
+        .data(option.values)
+        .enter().append("text")
+          .attr("class", "point-tooltip point-tooltip-" + option.index)
+          .text(function (d) { return percentage_format(d.percentage)})
+          .style("font-size", "10px")
+          .on("mouseover",
+            function(d) {
+              tooltipOver(option.index);
+              fadeOthers(option.index)
+          })
+          .on("mouseout",
+            function(d) {
+              tooltipOut();
+              unfadeAll();
+          });
+          
+      chart_g.selectAll(".point-tooltip-" + option.index)
+          .attr("transform", function(d) {
+            return "translate("
+            + (x_scale(d.timepoint) + x_bandwidth/2 - this.getComputedTextLength()/2) + ","
+            + (y_scale(d.percentage) + 3.5) + ")";
+          })
+          .style("display", "none");
     });
   }
   
@@ -424,7 +485,7 @@
   exports.generateDichTimeLineLegend = function() {
     // GENERATE LEGEND
     var legend = d3.select('.daxplore-ExternalLegend')
-      .style("margin-top", (height/2) + "px")
+      .style("margin-top", (height/3) + "px")
       .style("margin-left", "4px");
       
     var option = legend.selectAll(".dich-legend-row")
