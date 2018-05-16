@@ -22,9 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.daxplore.presenter.shared.Color;
-import org.daxplore.presenter.shared.SharedTools;
-
-import com.google.gwt.core.shared.GWT;
 
 /**
  * An immutable color used to color charts.

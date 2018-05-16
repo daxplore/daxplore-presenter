@@ -132,7 +132,6 @@ public class BuildPresentations {
 		for(String questionID : getAsStringArray(listVariables)) {
 			LinkedList<QueryFlag> flags = new LinkedList<>();
 			flags.add(QueryFlag.MEAN);
-			flags.add(QueryFlag.MEAN_REFERENCE);
 			
 			int optionCount = questionMetadata.getOptionCount(perspectiveID);
 			ArrayList<Integer> perspectiveOptions = new ArrayList<>(optionCount);

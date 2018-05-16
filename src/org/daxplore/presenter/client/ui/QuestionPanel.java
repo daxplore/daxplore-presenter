@@ -21,7 +21,9 @@ package org.daxplore.presenter.client.ui;
 import org.daxplore.presenter.client.event.QueryUpdateEvent;
 import org.daxplore.presenter.client.event.QueryUpdateHandler;
 import org.daxplore.presenter.client.event.SelectionUpdateEvent;
+import org.daxplore.presenter.client.json.Groups;
 import org.daxplore.presenter.shared.QueryDefinition;
+import org.daxplore.presenter.shared.QuestionMetadata;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.inject.Inject;
@@ -37,14 +39,15 @@ import com.google.web.bindery.event.shared.EventBus;
 public class QuestionPanel extends Composite implements QueryUpdateHandler {
 	
 	private final EventBus eventBus;
-	
 	private String questionID;
 	
 	@Inject
-	protected QuestionPanel(EventBus eventBus) {
+	protected QuestionPanel(EventBus eventBus, Groups groups) {
 		this.eventBus = eventBus;
 		QueryUpdateEvent.register(eventBus, this);
 		exportQuestionCallback();
+
+		questionID = groups.getQuestionIDs(0).get(0);
 		
 //		treeRoot = new Tree(uiResources, false);
 //		

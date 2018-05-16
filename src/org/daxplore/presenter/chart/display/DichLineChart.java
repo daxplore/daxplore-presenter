@@ -25,7 +25,6 @@ import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.SharedTools;
 
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * A chart type for displaying a line chart of dichotomized values.

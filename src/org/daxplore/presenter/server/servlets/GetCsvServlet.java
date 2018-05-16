@@ -138,8 +138,8 @@ public class GetCsvServlet extends HttpServlet {
 				rowCount++;
 			}
 
-			
-			if (queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
+			//TODO handle TIMEPOINTS_ALL and all chart types
+			if (queryDefinition.hasFlag(QueryFlag.TIMEPOINTS_TWO)) {
 				for(int perspectiveOption : usedPerspectiveOptions) {
 					String[] row = new String[columnCount];
 					row[0] = MessageFormat.format("{0} ({1})", perspectiveOptionTexts.get(perspectiveOption), timepoint1Text);

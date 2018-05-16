@@ -24,7 +24,6 @@ import org.daxplore.presenter.chart.display.BarChart;
 import org.daxplore.presenter.chart.display.BarChartCompare;
 import org.daxplore.presenter.chart.display.Chart;
 import org.daxplore.presenter.chart.display.ChartFactory;
-import org.daxplore.presenter.chart.display.GChartChart;
 import org.daxplore.presenter.chart.display.MeanChart;
 import org.daxplore.presenter.client.json.shared.ChartDataParserClient;
 import org.daxplore.presenter.embed.inject.EmbedInjector;
@@ -83,15 +82,16 @@ public class EmbedEntryPoint implements EntryPoint {
 			boolean printMode = embedDefinition.hasFlag(EmbedFlag.PRINT);
 			//TODO switch back to using query definition to display correct chart
 			
+			//TODO update to handle all chart types
 			if(queryData.hasAddedFreqPrimary()) {
-				if (!queryDefinition.hasFlag(QueryFlag.SECONDARY)) {
+				if (!queryDefinition.hasFlag(QueryFlag.TIMEPOINTS_TWO)) {
 					chart = chartFactory.createBarChart(queryDefinition, printMode);
 					((BarChart)chart).addData(queryData);
 				} else {
 					chart = chartFactory.createBarChartCompare(queryDefinition, printMode);
 					((BarChartCompare)chart).addData(queryData);
 				}
-			} else if (queryDefinition.hasFlag(QueryFlag.MEANLINE)){
+			} else if (queryDefinition.hasFlag(QueryFlag.DICHOTOMIZED)){
 				chart = chartFactory.createDichLineChart(queryDefinition, false);
 				((MeanChart)chart).addData(queryData);
 			} else {

@@ -28,6 +28,7 @@ import org.daxplore.presenter.client.json.shared.UITexts;
 import org.daxplore.presenter.shared.QueryData;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
+import org.daxplore.presenter.shared.QuestionMetadata;
 
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
@@ -95,8 +96,10 @@ public class MeanChart extends GChartChart {
 	protected int xTickMaxCharacterCount = 13;
 	protected int yTickWidth;
 	protected int yTickCharacterCount;
+	
+	protected boolean useMeanReferenceLine;
 
-	protected MeanChart(ChartTexts chartTexts, ChartConfig chartConfig, UITexts uiTexts,
+	protected MeanChart(ChartTexts chartTexts, ChartConfig chartConfig, UITexts uiTexts, QuestionMetadata questionMetadata,
 			QueryDefinition queryDefinition, boolean printerMode) {
 		super(chartTexts, uiTexts, queryDefinition);
 		this.chartConfig = chartConfig;
@@ -111,7 +114,9 @@ public class MeanChart extends GChartChart {
 
 		createCurves(printerMode);
 		
-		if(queryDefinition.hasFlag(QueryFlag.MEAN_REFERENCE)) {
+		useMeanReferenceLine = questionMetadata.hasMeanReferenceValue(queryDefinition.getQuestionID());
+		
+		if(useMeanReferenceLine) {
 			addReferenceLine(printerMode);
 		}
 
@@ -361,7 +366,7 @@ public class MeanChart extends GChartChart {
 
 		drawPaddingBar();
 
-		if(queryDefinition.hasFlag(QueryFlag.MEAN_REFERENCE) && queryDefinition.hasMeanReferenceValue()) {
+		if(useMeanReferenceLine) {
 			double reference = queryDefinition.getMeanReferenceValue();
 			referenceLineBar.setDataPoint(currentPosition, reference);
 			referenceLineBar.setHoverText(reference);

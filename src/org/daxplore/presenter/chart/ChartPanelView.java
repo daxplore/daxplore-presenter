@@ -38,53 +38,66 @@ import com.google.inject.Inject;
  * <p>When a new chart should be displayed, call the setChart method. It will
  * display the new chart, once that chart is loaded.</p>
  */
-public class ChartPanelView extends Composite {
-	interface ChartUiBinder extends UiBinder<Widget, ChartPanelView> { /* Empty UiTemplate interface */	}
-
-	private static ChartUiBinder uiBinder = GWT.create(ChartUiBinder.class);
-
-	@UiField(provided = true)
-	protected final SimplePanel headerPanel;
-	@UiField(provided = true)
-	protected final SimplePanel chartContainerPanel = new SimplePanel();
+public class ChartPanelView extends SimplePanel {
+//	interface ChartUiBinder extends UiBinder<Widget, ChartPanelView> { /* Empty UiTemplate interface */	}
+//
+//	private static ChartUiBinder uiBinder = GWT.create(ChartUiBinder.class);
+//
+//	@UiField(provided = true)
+//	protected final SimplePanel headerPanel;
+//	
+//	@UiField(provided = true)
+//	protected final SimplePanel chartContainerPanel = new SimplePanel();
 
 	/**
 	 * The chart that belongs to this panel.
 	 */
-	private Chart chart;
+//	private Chart chart;
 	
 	/**
 	 * Fields used to figure out and adjust the size of the chart and
 	 * chartPanel.
 	 */
-	private int resizeRecursions;
-	protected int maxWidth, maxHeight, chartWidth, chartHeight;
-	private ScrollPanel chartScrollPanel = new ScrollPanel();
-	private boolean scrolling = false, forceScrolling = false;
+//	private int resizeRecursions;
+//	protected int maxWidth, maxHeight, chartWidth, chartHeight;
+//	private ScrollPanel chartScrollPanel = new ScrollPanel();
+//	private boolean scrolling = false, forceScrolling = false;
+	
+//	private SimplePanel freqPanel = new SimplePanel();
+//	private SimplePanel meanPanel = new SimplePanel();
+//	private SimplePanel dichPanel = new SimplePanel();
 
 	@Inject
 	protected ChartPanelView(ChartConfig chartConfig) {
-		chartContainerPanel.setStylePrimaryName("daxplore-ChartContainerPanel");
+//		this.setStylePrimaryName("daxplore-ChartContainerPanel");
+//		
+//		freqPanel.setWidget(new HTML("freq panel"));
+//		meanPanel.setWidget(new HTML("mean panel"));
+//		dichPanel.setWidget(new HTML("dich panel"));
+//
+//		chartContainerPanel.add(freqPanel, "Frekvenser");
+//		chartContainerPanel.add(meanPanel, "Genomsnitt");
+//		chartContainerPanel.add(dichPanel, "Dikotomiserat");
 
-		headerPanel = new SimplePanel();
+//		headerPanel = new SimplePanel();
 
-		initWidget(uiBinder.createAndBindUi(this));
+//		initWidget(uiBinder.createAndBindUi(this));
 		setStylePrimaryName("daxplore-ChartPanel");
 
-		maxWidth = 800; // TODO this is temporary, the wanted value is set using setMaxWidth(int width)
-		maxHeight = chartConfig.chartHeight();
+//		maxWidth = 800; // TODO this is temporary, the wanted value is set using setMaxWidth(int width)
+//		maxHeight = chartConfig.chartHeight();
 	}
 
-	public void setChart(Chart chart) {
-		headerPanel.setWidget(chart.getExternalHeader());
-		if (scrolling) {
-			chartScrollPanel.setWidget(chart);
-		} else {
-			chartContainerPanel.setWidget(chart);
-		}
-		this.chart = chart;
-		adjustSizeRecursively();
-	}
+//	public void setChart(Chart chart) {
+//		headerPanel.setWidget(chart.getExternalHeader());
+//		if (scrolling) {
+//			chartScrollPanel.setWidget(chart);
+//		} else {
+//			chartContainerPanel.setWidget(chart);
+//		}
+//		this.chart = chart;
+//		adjustSizeRecursively();
+//	}
 	
 	/**
 	 * Set the maximal allowed size of the chart panel, and in turn the chart.
@@ -95,10 +108,10 @@ public class ChartPanelView extends Composite {
 	 * @param width
 	 *            The wanted with of this ChartPanel.
 	 */
-	public void setMaxWidth(int width) {
-		maxWidth = width;
-		adjustSizeRecursively();
-	}
+//	public void setMaxWidth(int width) {
+//		maxWidth = width;
+//		adjustSizeRecursively();
+//	}
 
 	/**
 	 * Try to adjust the size of the chartPanel, based on maxWidth and
@@ -108,11 +121,11 @@ public class ChartPanelView extends Composite {
 	 * iterations. This is needed because the browser must draw the panel before
 	 * its size can be calculated.</p>
 	 */
-	private void adjustSizeRecursively() {
-		resizeRecursions = 0;
-		forceScrolling = false;
-		adjustSizeRecursivelySub();
-	}
+//	private void adjustSizeRecursively() {
+//		resizeRecursions = 0;
+//		forceScrolling = false;
+//		adjustSizeRecursivelySub();
+//	}
 
 	/**
 	 * A recursive subprocess started by adjustSizeRecursively. <b>Do not call
@@ -125,52 +138,52 @@ public class ChartPanelView extends Composite {
 	 * <p>The method calls itself repeatedly until a correct size has been
 	 * found.</p>
 	 */
-	private void adjustSizeRecursivelySub() {
-		int actualWidth = getOffsetWidth();
-		int actualHeight = chartContainerPanel.getOffsetHeight() + headerPanel.getOffsetHeight();
-		int diffWidth = maxWidth - actualWidth;
-		int diffHeight = maxHeight - actualHeight;
-
-		if (chart == null 
-				|| (resizeRecursions != 0 && actualWidth == maxWidth && actualHeight == maxHeight) 
-				|| (resizeRecursions != 0 && diffWidth == 0 && diffHeight == 0)) {
-			return;
-		}
-
-		chartWidth += diffWidth;
-		chartWidth = Math.max(0, chartWidth);
-
-		chartHeight += diffHeight;
-		chartHeight = Math.max(0, chartHeight);
-
-		if (chartWidth < chart.getMinWidth() || forceScrolling) {
-			if (!scrolling) {
-				chartContainerPanel.setWidget(chartScrollPanel);
-				chartScrollPanel.setWidget(chart);
-				scrolling = true;
-				forceScrolling = true;
-			}
-			chartScrollPanel.setSize(chartWidth + "px", chartHeight + "px");
-			chartScrollPanel.setStylePrimaryName("daxplore-ChartScrollPanel");
-			chart.setChartSizeSmart(chart.getMinWidth(), chartHeight - 42);
-		} else if (chartWidth >= chart.getMinWidth()) {
-			if (scrolling) {
-				chartContainerPanel.setWidget(chart);
-				scrolling = false;
-			}
-			chart.setChartSizeSmart(chartWidth, chartHeight);
-		}
-
-		resizeRecursions++;
-		if (resizeRecursions < 10) {
-			Scheduler.get().scheduleFinally(new ScheduledCommand() {
-				@Override
-				public void execute() {
-					adjustSizeRecursivelySub();
-				}
-			});
-		}
-	}
+//	private void adjustSizeRecursivelySub() {
+//		int actualWidth = getOffsetWidth();
+//		int actualHeight = chartContainerPanel.getOffsetHeight() + headerPanel.getOffsetHeight();
+//		int diffWidth = maxWidth - actualWidth;
+//		int diffHeight = maxHeight - actualHeight;
+//
+//		if (chart == null 
+//				|| (resizeRecursions != 0 && actualWidth == maxWidth && actualHeight == maxHeight) 
+//				|| (resizeRecursions != 0 && diffWidth == 0 && diffHeight == 0)) {
+//			return;
+//		}
+//
+//		chartWidth += diffWidth;
+//		chartWidth = Math.max(0, chartWidth);
+//
+//		chartHeight += diffHeight;
+//		chartHeight = Math.max(0, chartHeight);
+//
+//		if (chartWidth < chart.getMinWidth() || forceScrolling) {
+//			if (!scrolling) {
+//				chartContainerPanel.setWidget(chartScrollPanel);
+//				chartScrollPanel.setWidget(chart);
+//				scrolling = true;
+//				forceScrolling = true;
+//			}
+//			chartScrollPanel.setSize(chartWidth + "px", chartHeight + "px");
+//			chartScrollPanel.setStylePrimaryName("daxplore-ChartScrollPanel");
+//			chart.setChartSizeSmart(chart.getMinWidth(), chartHeight - 42);
+//		} else if (chartWidth >= chart.getMinWidth()) {
+//			if (scrolling) {
+//				chartContainerPanel.setWidget(chart);
+//				scrolling = false;
+//			}
+//			chart.setChartSizeSmart(chartWidth, chartHeight);
+//		}
+//
+//		resizeRecursions++;
+//		if (resizeRecursions < 10) {
+//			Scheduler.get().scheduleFinally(new ScheduledCommand() {
+//				@Override
+//				public void execute() {
+//					adjustSizeRecursivelySub();
+//				}
+//			});
+//		}
+//	}
 
 
 }

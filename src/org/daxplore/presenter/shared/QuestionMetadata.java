@@ -87,42 +87,43 @@ public interface QuestionMetadata {
 	 * @return the number of question options
 	 */
 	public int getOptionCount(String questionID);
-
-	/**
-	 * Check if a question supports secondary data.
-	 * 
-	 * @param questionID
-	 *            the questionID
-	 * @return true, if there is secondary data
-	 */
-	public boolean hasSecondary(String questionID);
-
-	/**
-	 * Check if a question supports displaying mean data.
-	 * 
-	 * @param questionID
-	 *            the questionID
-	 * @return true if averaging is possible
-	 */
-	public boolean hasMean(String questionID);
 	
 	/**
-	 * Check if a question supports line charts over time.
+	 * Get a list of all the supported timepoints.
+	 * 
+	 * @param questionID
+	 *            the questionID
+	 * @return a list of timepoint indexes
+	 */
+	public List<Integer> getTimepointIndexes(String questionID);
+
+	/**
+	 * Check if a question should be displayed as a freq chart.
+	 * 
+	 * @param questionID
+	 *            the questionID
+	 * @return true if a mean chart should be used
+	 */
+	public boolean useFreqChart(String questionID);
+	
+	/**
+	 * Check if a question should be displayed as a mean chart.
+	 * 
+	 * @param questionID
+	 *            the questionID
+	 * @return true if a mean chart should be used
+	 */
+	public boolean useMeanChart(String questionID);
+	
+	
+	/**
+	 * Check if a question should be displayed as a dichotomized line chart over time.
 	 * 
 	 * @param questionID
 	 *            the questionID
 	 * @return true if it can be shown as a line chart
 	 */
-	public boolean hasMeanLine(String questionID);
-	
-	/**
-	 * Check if a question supports dichotomized line charts over time.
-	 * 
-	 * @param questionID
-	 *            the questionID
-	 * @return true if it can be shown as a line chart
-	 */
-	public boolean hasDichotomizedLine(String questionID);
+	public boolean useDichotomizedChart(String questionID);
 	
 	/**
 	 * The options selected in a dichotomization of the question.

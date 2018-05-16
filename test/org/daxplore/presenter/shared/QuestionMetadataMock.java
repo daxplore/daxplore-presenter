@@ -82,24 +82,6 @@ public class QuestionMetadataMock implements QuestionMetadata {
 		return rnd.nextInt(20) + 2;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean hasSecondary(String questionID) {
-		Random rnd = new Random(questionID.hashCode() + 2);
-		return rnd.nextBoolean();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean hasMean(String questionID) {
-		Random rnd = new Random(questionID.hashCode() + 3);
-		return rnd.nextBoolean();
-	}
-	
 
 	/**
 	 * {@inheritDoc}
@@ -123,17 +105,24 @@ public class QuestionMetadataMock implements QuestionMetadata {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean hasMeanLine(String questionID) {
-		Random rnd = new Random(questionID.hashCode() + 6);
+	public boolean useFreqChart(String questionID) {
+		Random rnd = new Random(questionID.hashCode() + 13);
 		return rnd.nextBoolean();
 	}
-	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean hasDichotomizedLine(String questionID) {
-		Random rnd = new Random(questionID.hashCode() + 6);
+	public boolean useMeanChart(String questionID) {
+		Random rnd = new Random(questionID.hashCode() + 14);
+		return rnd.nextBoolean();
+	}
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean useDichotomizedChart(String questionID) {
+		Random rnd = new Random(questionID.hashCode() + 15);
 		return rnd.nextBoolean();
 	}
 
@@ -142,6 +131,15 @@ public class QuestionMetadataMock implements QuestionMetadata {
 	 */
 	@Override
 	public List<Integer> getDichotomizedDefaultSelectedOptions(String questionID) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<Integer> getTimepointIndexes(String questionID) {
 		// TODO Auto-generated method stub
 		return null;
 	}

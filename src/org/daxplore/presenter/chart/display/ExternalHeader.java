@@ -51,7 +51,7 @@ public class ExternalHeader extends Composite {
 		if (!titleHeader.equalsIgnoreCase(titleDetail)) {
 			title += "<div class='daxplore-ExternalHeader-sub'>" + titleDetail + "</div>";
 		}
-		if (queryDefinition.hasFlag(QueryFlag.DICHLINE)) {
+		if (queryDefinition.hasFlag(QueryFlag.DICHOTOMIZED)) {
 			List<String> optionTexts = queryDefinition.getQuestionOptionTexts();
 			List<String> usedDichTexts = new LinkedList<>();
 			for (Integer i : queryDefinition.getDichotomizedSelectedOptions()) {

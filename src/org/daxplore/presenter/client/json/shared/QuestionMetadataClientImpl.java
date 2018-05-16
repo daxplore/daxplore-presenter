@@ -105,38 +105,39 @@ public class QuestionMetadataClientImpl implements QuestionMetadata {
 	public int getOptionCount(String questionID) {
 		return getQuestion(questionID).getOptionCount();
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean hasSecondary(String questionID) {
-		//TODO Remove the assumption that the "seconday" data has timepoint index 1!
-		return getQuestion(questionID).hasDataForTimepoint(1);
+	public List<Integer> getTimepointIndexes(String questionID) {
+		return getQuestion(questionID).getTimepointIndexes();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean hasMean(String questionID) {
-		return getQuestion(questionID).hasMean();
+	public boolean useDichotomizedChart(String questionID) {
+		return getQuestion(questionID).useDichotomizedChart();
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean hasMeanLine(String questionID) {
-		return getQuestion(questionID).hasMeanLine();
+	public boolean useMeanChart(String questionID) {
+		return getQuestion(questionID).useMeanChart();
 	}
+	
 	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean hasDichotomizedLine(String questionID) {
-		return getQuestion(questionID).hasDichotomizedLine();
+	public boolean useFreqChart(String questionID) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 	/**

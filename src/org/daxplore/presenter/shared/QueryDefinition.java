@@ -66,14 +66,20 @@ public class QueryDefinition {
 		/** A way to set "no flag". */
 		NULL(0), 
 		
+		
 		/**
 		 * Set if the "total data item" (that contains all respondents) should
-		 * be displayed.
+		 * be checked. Check producer uploaded settings to see if the total
+		 * checkbox is visible in the first place.
 		 */
-		TOTAL(1), 
+		 TOTAL(1), 
 		
-		/** Set if data from the secondary dataset should be displayed. */
-		SECONDARY(2), 
+		/**
+		 * Set if data from the secondary dataset should be displayed.
+		 * 
+		 * @deprecated Use TIMEPOINTS_TWO instead.
+		 */
+		//SECONDARY(2), 
 		 
 		/**
 		* Set if a mean chart should be used, otherwise a standard bar chart is
@@ -83,18 +89,34 @@ public class QueryDefinition {
 		
 		/**
 		 * Set if a mean reference value should be used
+		 * 
+		 * @deprecated Look up question metadata instead.
 		 */
-		MEAN_REFERENCE(8),
+		//MEAN_REFERENCE(8),
 		
 		/**
 		* Set if a mean line chart over time should be used.
+		* 
+		* @deprecated Use MEAN in combination with TIMEPOINTS_ALL instead.
 		*/
-		MEANLINE(16),
+		//MEANLINE(16),
 		
 		/**
 		* Set if a dichotomized line chart over time should be used.
 		*/
-		DICHLINE(32);
+		DICHOTOMIZED(32),
+		
+		/**
+		* Set if a frequency chart should be used.
+		*/
+		FREQUENCY(64),
+		
+		/**
+		 * Set the number of timepoints to show in chart.
+		 */
+		TIMEPOINTS_ONE(128),
+		TIMEPOINTS_TWO(256),
+		TIMEPOINTS_ALL(512);
 		
 		/**
 		 * The value of the bit-position used when encoding this flag in a long.
@@ -107,7 +129,7 @@ public class QueryDefinition {
 		 * @param bitValue
 		 *            the value of the bit-position used when encoding this flag in a long
 		 */
-		QueryFlag(int bitValue) {
+		QueryFlag(long bitValue) {
 			this.bitValue = bitValue;
 		}
 		
@@ -436,25 +458,6 @@ public class QueryDefinition {
 	/*
 	 * Get question/perspective specific information:
 	 */
-	/**
-	 * Check if this question-perspective combination supports displaying
-	 * mean data.
-	 * 
-	 * @return true, if averaging is possible
-	 */
-	public boolean hasMean() {
-		return questionMetadata.hasMean(questionID) && questionMetadata.hasMean(perspectiveID);
-	}
-	
-	/**
-	 * Check if this question-perspective combination supports displaying
-	 * secondary data.
-	 * 
-	 * @return true, if there is secondary data
-	 */
-	public boolean hasSecondary() {
-		return questionMetadata.hasSecondary(questionID) && questionMetadata.hasSecondary(perspectiveID);
-	}
 	
 	/**
 	 * Check if the question should use a mean reference value.

@@ -57,11 +57,11 @@ public class QuestionJson extends JavaScriptObject {
 	}-*/;
 
 	/**
-	 * Checks if this question contains frequency data
+	 * Checks if this question should be displayed as a frequency chart
 	 * 
 	 * @return true, if it contains frequency data
 	 */
-	public final native boolean hasFrequencies() /*-{
+	public final native boolean useFrequencyChart() /*-{
 		for (var i=0; i<this.displaytypes.length; i++) {
 			if(this.displaytypes[i] == "FREQ") {
 				return true;
@@ -71,13 +71,13 @@ public class QuestionJson extends JavaScriptObject {
 	}-*/;
 
 	/**
-	 * Checks if this question can displayed as a mean
+	 * Checks if this question should be displayed as a mean chart
 	 * 
 	 * @return true, if it can be shown as a mean line
 	 */
-	public final native boolean hasMean() /*-{
+	public final native boolean useMeanChart() /*-{
 		for (var i=0; i<this.displaytypes.length; i++) {
-			if(this.displaytypes[i] == "MEANLINE") {
+			if(this.displaytypes[i] == "MEAN") {
 				return true;
 			}	
 		}
@@ -85,13 +85,13 @@ public class QuestionJson extends JavaScriptObject {
 	}-*/;
 	
 	/**
-	 * Checks if this question can displayed as a dichotomized line chart over time
+	 * Checks if this question should be displayed as a dichotomized line chart over time
 	 * 
 	 * @return true, if it can be shown as a dichotomized line chart
 	 */
-	public final native boolean hasDichotomizedLine() /*-{
+	public final native boolean useDichotomizedChart() /*-{
 		for (var i=0; i<this.displaytypes.length; i++) {
-			if(this.displaytypes[i] == "DICHLINE") {
+			if(this.displaytypes[i] == "DICH") {
 				return true;
 			}	
 		}
@@ -148,7 +148,7 @@ public class QuestionJson extends JavaScriptObject {
 	/**
 	 * Get a list of all the supported timepoints.
 	 * 
-	 * @return the option texts
+	 * @return a list of timepoint indexes
 	 */
 	public final List<Integer> getTimepointIndexes() {
 		return Collections.unmodifiableList(JsonTools.jsArrayAsList(getTimepointIndexesNative()));

@@ -60,14 +60,14 @@
       + "</div>"
     );
     
-    window.setTimeout(popuplatePerspectivePanel(), 1);
+    window.setTimeout(popuplatePerspectivePanel, 1);
   }
   
   function popuplatePerspectivePanel() {
     var variable_list = d3.select('.pervarpicker-variables');
     
     if (variable_list.empty()) {
-      window.setTimeout(popuplatePerspectivePanel(), 10);
+      window.setTimeout(popuplatePerspectivePanel, 10);
       return;
     }
     

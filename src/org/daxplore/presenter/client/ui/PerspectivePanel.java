@@ -24,6 +24,7 @@ import java.util.List;
 import org.daxplore.presenter.client.event.QueryUpdateEvent;
 import org.daxplore.presenter.client.event.QueryUpdateHandler;
 import org.daxplore.presenter.client.event.SelectionUpdateEvent;
+import org.daxplore.presenter.client.json.Perspectives;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
@@ -53,9 +54,12 @@ public class PerspectivePanel implements QueryUpdateHandler {
 	private List<Integer> selectedOptions = new ArrayList<>();
 
 	@Inject
-	protected PerspectivePanel(EventBus eventBus) {
+	protected PerspectivePanel(EventBus eventBus, Perspectives perspectives) {
 		this.eventBus = eventBus;
 		QueryUpdateEvent.register(eventBus, this);
+		
+		perspectiveID = perspectives.getQuestionIDs().get(0);
+		
 		exportPerspectiveCallback();
 	}
 

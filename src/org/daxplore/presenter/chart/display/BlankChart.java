@@ -20,7 +20,6 @@ package org.daxplore.presenter.chart.display;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * A blank chart that can be displayed as a placeholder when waiting for a real

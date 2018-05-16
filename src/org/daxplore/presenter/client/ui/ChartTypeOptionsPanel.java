@@ -18,6 +18,8 @@
  */
 package org.daxplore.presenter.client.ui;
 
+import java.util.List;
+
 import org.daxplore.presenter.client.event.QueryUpdateEvent;
 import org.daxplore.presenter.client.event.QueryUpdateHandler;
 import org.daxplore.presenter.client.event.SelectionUpdateEvent;
@@ -25,6 +27,7 @@ import org.daxplore.presenter.client.json.Settings;
 import org.daxplore.presenter.client.json.shared.UITexts;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
+import org.daxplore.presenter.shared.QuestionMetadata;
 
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -54,7 +57,8 @@ import com.google.web.bindery.event.shared.EventBus;
  */
 public class ChartTypeOptionsPanel extends Composite implements QueryUpdateHandler, ValueChangeHandler<Boolean> {
 
-	private EventBus eventBus;
+	private final EventBus eventBus;
+	private final QuestionMetadata questionMetadata;
 	
 	private QueryDefinition queryDefinition;
 	
@@ -63,8 +67,10 @@ public class ChartTypeOptionsPanel extends Composite implements QueryUpdateHandl
 	private boolean showMeanButtons, showTimeButtons;
 	
 	@Inject
-	protected ChartTypeOptionsPanel(EventBus eventBus, UITexts uiTexts) {
+	protected ChartTypeOptionsPanel(EventBus eventBus, UITexts uiTexts, QuestionMetadata questionMetadata) {
 		this.eventBus = eventBus;
+		
+		this.questionMetadata = questionMetadata;
 		
 		this.showMeanButtons = Settings.getBool("typebuttons");
 		this.showTimeButtons = Settings.getBool("timebuttons");
@@ -129,31 +135,34 @@ public class ChartTypeOptionsPanel extends Composite implements QueryUpdateHandl
 	public void onQueryUpdate(QueryUpdateEvent event) {
 		queryDefinition = event.getQueryDefinition();
 		
-		if(showTimeButtons) {
-			if (queryDefinition.hasSecondary()) {
-				showSecondaryButton.setEnabledWithTitleChange(true);
-				dontShowSecondaryButton.setEnabledWithTitleChange(true);
-				boolean secondary = queryDefinition.hasFlag(QueryFlag.SECONDARY);
-				showSecondaryButton.setValue(secondary, false);
-				dontShowSecondaryButton.setValue(!secondary, false);
-			} else {
-				showSecondaryButton.setEnabledWithTitleChange(false);
-				dontShowSecondaryButton.setEnabledWithTitleChange(false);
-			}
-		}
+		//TODO create new chart option controls implemented in js/d3
 		
-		if (showMeanButtons) {
-			if (queryDefinition.hasMean()) {
-				useMeanButton.setEnabledWithTitleChange(true);
-				useAverageButton.setEnabledWithTitleChange(true);
-				boolean mean = queryDefinition.hasFlag(QueryFlag.MEAN);
-				useMeanButton.setValue(mean, false);
-				useAverageButton.setValue(!mean, false);
-			} else {
-				useMeanButton.setEnabledWithTitleChange(false);
-				useAverageButton.setEnabledWithTitleChange(false);
-			}
-		}
+		//     then remove all old controls
+//		if(showTimeButtons) {
+//			if (queryDefinition.hasSecondary()) {
+//				showSecondaryButton.setEnabledWithTitleChange(true);
+//				dontShowSecondaryButton.setEnabledWithTitleChange(true);
+//				boolean secondary = queryDefinition.hasFlag(QueryFlag.SECONDARY);
+//				showSecondaryButton.setValue(secondary, false);
+//				dontShowSecondaryButton.setValue(!secondary, false);
+//			} else {
+//				showSecondaryButton.setEnabledWithTitleChange(false);
+//				dontShowSecondaryButton.setEnabledWithTitleChange(false);
+//			}
+//		}
+//		
+//		if (showMeanButtons) {
+//			if (queryDefinition.hasMean()) {
+//				useMeanButton.setEnabledWithTitleChange(true);
+//				useAverageButton.setEnabledWithTitleChange(true);
+//				boolean mean = queryDefinition.hasFlag(QueryFlag.MEAN);
+//				useMeanButton.setValue(mean, false);
+//				useAverageButton.setValue(!mean, false);
+//			} else {
+//				useMeanButton.setEnabledWithTitleChange(false);
+//				useAverageButton.setEnabledWithTitleChange(false);
+//			}
+//		}
 	}
 	
 	/**
@@ -197,6 +206,30 @@ public class ChartTypeOptionsPanel extends Composite implements QueryUpdateHandl
 		public void setEnabledWithTitleChange(boolean enabled) {
 			setEnabled(enabled);
 			setTitle(enabled ? titleEnabled : titleDisabled);
+		}
+	}
+
+	/**
+	 * @return
+	 */
+	public QueryFlag getTimepointCountSelection() {
+		if (queryDefinition == null) {
+			return QueryFlag.TIMEPOINTS_ONE;
+		}
+		
+		List<Integer> questionTPs = questionMetadata.getTimepointIndexes(queryDefinition.getQuestionID());
+		List<Integer> perpsectiveTPs = questionMetadata.getTimepointIndexes(queryDefinition.getPerspectiveID());
+		int questionTPCount = questionTPs.size();
+		int perspectiveTPCount = questionTPs.size();
+		int minTPs = Math.min(questionTPCount, perspectiveTPCount);
+		
+		// TODO read selection and return result
+		if (minTPs == 1) {
+			return QueryFlag.TIMEPOINTS_ONE;
+		} else if (minTPs == 2) {
+			return QueryFlag.TIMEPOINTS_TWO;
+		} else {
+			return QueryFlag.TIMEPOINTS_ALL;
 		}
 	}
 }

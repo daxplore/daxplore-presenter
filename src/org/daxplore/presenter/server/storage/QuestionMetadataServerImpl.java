@@ -150,17 +150,7 @@ public class QuestionMetadataServerImpl implements QuestionMetadata {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean hasSecondary(String column) {
-		//TODO update to new data structure or remove?
-		JSONObject question = getQuestion(column);
-		return question.containsKey("hasOld") && (Boolean)question.get("hasOld"); 
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean hasMean(String column) {
+	public boolean useFreqChart(String column) {
 		//TODO update to new data structure or remove?
 		JSONObject question = getQuestion(column);
 		return question.containsKey("hasMean") && (Boolean)question.get("hasMean"); 
@@ -170,7 +160,7 @@ public class QuestionMetadataServerImpl implements QuestionMetadata {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean hasMeanLine(String questionID) {
+	public boolean useMeanChart(String questionID) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -179,7 +169,7 @@ public class QuestionMetadataServerImpl implements QuestionMetadata {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean hasDichotomizedLine(String questionID) {
+	public boolean useDichotomizedChart(String questionID) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -209,5 +199,14 @@ public class QuestionMetadataServerImpl implements QuestionMetadata {
 	public double getMeanReferenceValue(String column) {
 		JSONObject question = getQuestion(column);
 		return (Double)question.get("mean_reference"); 
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<Integer> getTimepointIndexes(String questionID) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -68,7 +68,7 @@ public class ExternalLegend extends Composite {
 				String boxColor = BarColors.getChartColorSet(queryDefinition.getPerspectiveOptionCount()).getPrimary();
 				html.append(legendRow(text, boxColor, printerMode));
 			}
-		} else if (queryDefinition.hasFlag(QueryFlag.DICHLINE)) {
+		} else if (queryDefinition.hasFlag(QueryFlag.DICHOTOMIZED)) {
 			html.append("<div class=\"daxplore-ExternalLegend\"></div>");
 		} else {
 			html.append("<table class=\"daxplore-ExternalLegend\">");
@@ -118,7 +118,7 @@ public class ExternalLegend extends Composite {
 	@Override
 	protected void onAttach() {
 		super.onAttach();
-		if (queryDefinition.hasFlag(QueryFlag.DICHLINE)) {
+		if (queryDefinition != null && queryDefinition.hasFlag(QueryFlag.DICHOTOMIZED)) {
 			generateDichTimeLineLegend();
 		}
 	}

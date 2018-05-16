@@ -7,12 +7,50 @@
 /*** ChartPanelView.java ***/
 
 	.daxplore-ChartPanel {
- 		border: 1px solid #D4D4D4;
+/*  		border: 1px solid #D4D4D4; */
 	}
 	
 	.daxplore-ChartScrollPanel {
 		overflow-y: hidden !important;
 	}
+	
+	.chart-header-panel {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+   }
+   
+   .chart-tabs {
+   	display: flex;
+   }
+   
+   .chart-tab {
+   	padding: 7px 14px 7px 14px;
+   	border: 1px solid #D4D4D4;
+   	white-space: nowrap;
+   	color: #666;
+		cursor: pointer;
+		user-select: none;
+   }
+   
+   .chart-tab-selected {
+   	color: black;
+   	border-bottom: none;
+   }
+   
+   .chart-tab-spacing {
+   	width: 20px;
+   	border-bottom: 1px solid #D4D4D4;
+   }
+   .chart-tab-remainder {
+   	border-bottom: 1px solid #D4D4D4;
+   	width: 100%;
+   }
+   
+   .chart-container {
+   	border: 1px solid #D4D4D4;
+    	border-top: none;
+   }
 	
 /*** GChart ***/
 
@@ -132,12 +170,5 @@
 		margin-top: 2px;
 		color: #333;
 		font-size: 13px;
-	}
-	
-/*** Query Active Animation ***/
-	.daxplore-QueryActiveAnimation {
-		position: relative;
-		left: -35px;
-		top: 25px;	
 	}
 	

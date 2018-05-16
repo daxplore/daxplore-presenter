@@ -21,7 +21,6 @@ package org.daxplore.presenter.client.inject;
 import org.daxplore.presenter.chart.ChartPanelPresenter;
 import org.daxplore.presenter.chart.ChartPanelView;
 import org.daxplore.presenter.chart.display.ChartFactory;
-import org.daxplore.presenter.chart.display.QueryActiveAnimation;
 import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.chart.resources.ChartResources;
 import org.daxplore.presenter.chart.resources.ChartTexts;
@@ -70,7 +69,6 @@ public class PresentationModule extends AbstractGinModule {
 		/* chart */
 		bind(ChartPanelPresenter.class).in(Singleton.class);
 		bind(ChartPanelView.class).in(Singleton.class);
-		bind(QueryActiveAnimation.class).in(Singleton.class);
 
 		/* chart.display */
 		bind(ChartFactory.class).in(Singleton.class);

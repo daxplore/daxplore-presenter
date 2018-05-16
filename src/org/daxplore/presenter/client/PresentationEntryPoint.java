@@ -18,8 +18,10 @@
  */
 package org.daxplore.presenter.client;
 
+import org.daxplore.presenter.chart.display.BarColors;
 import org.daxplore.presenter.client.inject.PresentationInjector;
 import org.daxplore.presenter.client.ui.StagePanel;
+import org.daxplore.presenter.shared.SharedTools;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -58,11 +60,15 @@ public class PresentationEntryPoint implements EntryPoint {
 			presenter.showDefaultChart();
 		}
 		
-		generateExternalElements();
+		String lineColorsJSON = "[\"" + SharedTools.join(BarColors.getChartColorsPrimaryHex(), "\",\"") + "\"]";
+		String hoverColorsJSON = "[\"" + SharedTools.join(BarColors.getChartColorsPrimaryHoverHex(), "\",\"") + "\"]";
+		
+		generateExternalElements(lineColorsJSON, hoverColorsJSON);
 	}
 	
-	public final native void generateExternalElements() /*-{
+	public final native void generateExternalElements(String lineColorsJSON, String hoverColorsJSON) /*-{
 		$wnd.generateQuestionPanel();
 		$wnd.generatePerspectivePanel();
+		$wnd.generateChartPanel(lineColorsJSON, hoverColorsJSON);
 	}-*/;
 }

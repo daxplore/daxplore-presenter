@@ -22,6 +22,7 @@ import org.daxplore.presenter.chart.resources.ChartConfig;
 import org.daxplore.presenter.chart.resources.ChartTexts;
 import org.daxplore.presenter.client.json.shared.UITexts;
 import org.daxplore.presenter.shared.QueryDefinition;
+import org.daxplore.presenter.shared.QuestionMetadata;
 
 import com.google.inject.Inject;
 
@@ -32,15 +33,17 @@ public class ChartFactory {
 	private final ChartTexts chartTexts;
 	private final ChartConfig chartConfig;
 	private final UITexts uiTexts;
+	private final QuestionMetadata questionMetadata;
 
 	/**
 	 * Instantiates a new chart factory.
 	 */
 	@Inject
-	protected ChartFactory(ChartTexts chartTexts, ChartConfig chartConfig, UITexts uiTexts) {
+	protected ChartFactory(ChartTexts chartTexts, ChartConfig chartConfig, UITexts uiTexts, QuestionMetadata questionMetadata) {
 		this.chartTexts = chartTexts;
 		this.chartConfig = chartConfig;
 		this.uiTexts = uiTexts;
+		this.questionMetadata = questionMetadata;
 	}
 
 	/**
@@ -67,7 +70,7 @@ public class ChartFactory {
 	 * @return the chart
 	 */
 	public MeanChart createMeanChart(QueryDefinition queryDefinition, boolean printerMode) {
-		return new MeanChart(chartTexts, chartConfig, uiTexts, queryDefinition, printerMode);
+		return new MeanChart(chartTexts, chartConfig, uiTexts, questionMetadata, queryDefinition, printerMode);
 	}
 
 	/**

@@ -18,7 +18,6 @@
  */
 package org.daxplore.presenter.client;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -37,7 +36,6 @@ import org.daxplore.presenter.client.event.SetWarningBannerHandler;
 import org.daxplore.presenter.client.json.Groups;
 import org.daxplore.presenter.client.json.Perspectives;
 import org.daxplore.presenter.client.json.Prefix;
-import org.daxplore.presenter.client.json.Settings;
 import org.daxplore.presenter.client.model.StatDataServerModel;
 import org.daxplore.presenter.client.ui.ChartTypeOptionsPanel;
 import org.daxplore.presenter.client.ui.PerspectivePanel;
@@ -116,31 +114,16 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 	 */
 	private void makeQuery(boolean setHistory) {
 		List<QueryFlag> flags = new LinkedList<>();
+		
 		String questionID = questionPanel.getQuestionID();
 		String perspectiveID = perspectivePanel.getQuestionID();
 		List<Integer> perspectiveOptions = perspectivePanel.getPerspectiveOptions();
 		
-		if(questionMetadata.hasSecondary(questionID)
-				&& questionMetadata.hasSecondary(perspectiveID)
-				&& optionsPanel.useSecondarySelected()) {
-			flags.add(QueryFlag.SECONDARY);
-		}
-		
+		flags.add(chartPanelPresenter.getSelectedChartType());
+		flags.add(optionsPanel.getTimepointCountSelection());
+
 		if(perspectiveOptions.size()==0 || perspectivePanel.useTotalSelected()) {
 			flags.add(QueryFlag.TOTAL);
-		}
-		
-		//TODO this sets line to be the default, then mean. The default should be set in the producer instead
-		if (questionMetadata.hasMeanLine(questionID)) {
-			flags.add(QueryFlag.MEANLINE);
-		} else if(questionMetadata.hasDichotomizedLine(questionID)) {
-			flags.add(QueryFlag.DICHLINE);
-		} else if (questionMetadata.hasMean(questionID)) {
-			flags.add(QueryFlag.MEAN);
-		}
-		
-		if(questionMetadata.hasMeanReferenceValue(questionID)){
-			flags.add(QueryFlag.MEAN_REFERENCE);
 		}
 		
 		QueryDefinition queryDefinition =
@@ -182,29 +165,31 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 	}
 
 	public void showDefaultChart() {
-		String firstQuestionID = "";
-		for(int i=0; i<groups.getGroupCount(); i++) {
-			List<String> questionIDs = groups.getQuestionIDs(i);
-			if(questionIDs.size()>0) {
-				firstQuestionID = questionIDs.get(0);
-				break;
-			}
-		}
-		String firstPerspectiveID = perspectives.getQuestionIDs().get(0);
-		List<Integer> selectedOptions = new ArrayList<>(0);
-		int selectedPerspectiveOptions = Math.min(questionMetadata.getOptionCount(firstPerspectiveID), Settings.getInt("defaultSelectedPerspectiveOptions"));
-		for(int i=0; i<selectedPerspectiveOptions; i++) {
-			selectedOptions.add(i);
-		}
-		ArrayList<QueryFlag> flags = new ArrayList<>(0);
-		//TODO this sets line to be the default, then mean. The default should be set in the producer instead
-		if (questionMetadata.hasMeanLine(firstQuestionID)) {
-			flags.add(QueryFlag.MEANLINE);
-		} else if (questionMetadata.hasMean(firstQuestionID)) {
-			flags.add(QueryFlag.MEAN);
-		}
-		QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, firstQuestionID, firstPerspectiveID, selectedOptions, flags);
-		eventBus.fireEvent(new QueryUpdateEvent(queryDefinition));
+		makeQuery(true);
+		//TODO remove this function?
+//		String firstQuestionID = "";
+//		for(int i=0; i<groups.getGroupCount(); i++) {
+//			List<String> questionIDs = groups.getQuestionIDs(i);
+//			if(questionIDs.size()>0) {
+//				firstQuestionID = questionIDs.get(0);
+//				break;
+//			}
+//		}
+//		String firstPerspectiveID = perspectives.getQuestionIDs().get(0);
+//		List<Integer> selectedOptions = new ArrayList<>(0);
+//		int selectedPerspectiveOptions = Math.min(questionMetadata.getOptionCount(firstPerspectiveID), Settings.getInt("defaultSelectedPerspectiveOptions"));
+//		for(int i=0; i<selectedPerspectiveOptions; i++) {
+//			selectedOptions.add(i);
+//		}
+//		ArrayList<QueryFlag> flags = new ArrayList<>(0);
+//		//TODO this sets line to be the default, then mean. The default should be set in the producer instead
+//		if (questionMetadata.hasMeanLine(firstQuestionID)) {
+//			flags.add(QueryFlag.MEANLINE);
+//		} else if (questionMetadata.hasMean(firstQuestionID)) {
+//			flags.add(QueryFlag.MEAN);
+//		}
+//		QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, firstQuestionID, firstPerspectiveID, selectedOptions, flags);
+//		eventBus.fireEvent(new QueryUpdateEvent(queryDefinition));
 	}
 	
 	/**
@@ -277,7 +262,7 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		QueryDefinition queryDefinition = event.getQueryDefinition();
 		chartPanelPresenter.onQueryReady(queryDefinition, event.getQueryData());
 		ExternalLegend legend = chartPanelPresenter.getExternalLegend();
-		if (queryDefinition.hasFlag(QueryFlag.MEAN_REFERENCE) && queryDefinition.hasMeanReferenceValue()) {
+		if (questionMetadata.hasMeanReferenceValue(queryDefinition.getQuestionID())) {
 			legend.addReferenceValue(queryDefinition.getMeanReferenceValue());
 		}
 		stagePanel.setLegend(legend);
