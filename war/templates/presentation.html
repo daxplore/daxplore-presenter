@@ -3,15 +3,15 @@
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<base href="{0}" target="_blank">
-		
+
 		<link rel="stylesheet" href="css/normalize.css">
 		<link rel="stylesheet" href="css/daxplore-common.css">
 		<link rel="stylesheet" href="css/presentation.css">
 		<link rel="stylesheet" href="css/daxplore-widgets.css">
 		<link rel="stylesheet" href="css/daxplore-chart.css">
-		
+
 		<title>{1}</title>
-		
+
 		<script type="text/javascript" charset="UTF-8">
 			var prefix = "{2}";
 			var perspectives = {3};
@@ -21,21 +21,22 @@
 			var usertexts = {7};
 		</script>
 
+		<script type="text/javascript" src="js/modernizr-ES5Array.js"></script>
 		<script type="text/javascript" src="https://d3js.org/d3.v4.js"></script>
 		<script type="text/javascript" src="js/presenter-question-picker-d3.js"></script>
 		<script type="text/javascript" src="js/presenter-chart-panel.js"></script>
-		<script type="text/javascript" src="js/presenter-perspective-chooser-d3.js"></script>
+		<script type="text/javascript" src="js/presenter-perspective-picker-d3.js"></script>
 		<script type="text/javascript" src="js/presenter-chart-dichtimeline-d3.js"></script>
-		
+
 		<script type="text/javascript" src="gwtPresentation/gwtPresentation.nocache.js"></script>
 		<script type="text/javascript">{8}</script>
 	</head>
-	
+
 	<body>
 		<!-- add GWT history support -->
 		<iframe src="javascript:'" id="__gwt_historyFrame" tabIndex='-1'
 			style="position:absolute; width:0; height:0; border:0"></iframe>
-		
+
 		<div class="pagecontainer">
 			<div class="general-warning-section" id="ID-general-warning"></div>
 			<div class="stagePanel" id="ID-StagePanel"></div>

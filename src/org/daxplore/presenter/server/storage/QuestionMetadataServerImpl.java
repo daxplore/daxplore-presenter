@@ -20,11 +20,13 @@ package org.daxplore.presenter.server.storage;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 import org.daxplore.presenter.shared.QuestionMetadata;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ContainerFactory;
@@ -146,6 +148,16 @@ public class QuestionMetadataServerImpl implements QuestionMetadata {
 		return opts.size();
 	}
 
+	/**
+	 * {@inherhitDoc} 
+	 */
+	@Override
+	public List<QueryFlag> getDisplayTypes(String questionID) {
+		List<QueryFlag> flags = new ArrayList<>();
+		// TODO 		
+		return flags;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

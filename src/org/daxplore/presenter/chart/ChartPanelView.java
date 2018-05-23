@@ -18,18 +18,7 @@
  */
 package org.daxplore.presenter.chart;
 
-import org.daxplore.presenter.chart.display.Chart;
-import org.daxplore.presenter.chart.resources.ChartConfig;
-
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.core.client.Scheduler.ScheduledCommand;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
@@ -68,7 +57,7 @@ public class ChartPanelView extends SimplePanel {
 //	private SimplePanel dichPanel = new SimplePanel();
 
 	@Inject
-	protected ChartPanelView(ChartConfig chartConfig) {
+	protected ChartPanelView() {
 //		this.setStylePrimaryName("daxplore-ChartContainerPanel");
 //		
 //		freqPanel.setWidget(new HTML("freq panel"));

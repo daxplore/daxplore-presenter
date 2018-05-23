@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 import org.daxplore.presenter.shared.QuestionMetadata;
 
 import com.google.gwt.core.client.JavaScriptObject;
@@ -114,6 +115,13 @@ public class QuestionMetadataClientImpl implements QuestionMetadata {
 		return getQuestion(questionID).getTimepointIndexes();
 	}
 
+	/**
+	 * {@inherhitDoc} 
+	 */
+	public List<QueryFlag> getDisplayTypes(String questionID) {
+		return getQuestion(questionID).getDisplayTypes();
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

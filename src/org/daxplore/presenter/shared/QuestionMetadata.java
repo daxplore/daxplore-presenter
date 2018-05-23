@@ -20,6 +20,8 @@ package org.daxplore.presenter.shared;
 
 import java.util.List;
 
+import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
+
 /**
  * Gives access to localized meta-data for the questions that are
  * defined for the site.
@@ -96,6 +98,8 @@ public interface QuestionMetadata {
 	 * @return a list of timepoint indexes
 	 */
 	public List<Integer> getTimepointIndexes(String questionID);
+	
+	public List<QueryFlag> getDisplayTypes(String questionID);
 
 	/**
 	 * Check if a question should be displayed as a freq chart.

@@ -28,10 +28,9 @@
 			</g:HorizontalPanel>
 		</g:VerticalPanel>
 				
-		<g:VerticalPanel ui:field="sidebarArea" stylePrimaryName='daxplore-SidebarArea'>
-			<g:SimplePanel ui:field='legendPanel'/>
-			<client:DescriptionPanelLegend ui:field='descriptionPanelLegend' styleName="{style.description}"/>
-		</g:VerticalPanel>
-		
+		<g:SimplePanel ui:field="sidebarArea" stylePrimaryName='daxplore-SidebarArea' >
+		    <g:SimplePanel stylePrimaryName='daxplore-ExternalLegend'></g:SimplePanel>
+		</g:SimplePanel>
+
 	</g:HorizontalPanel>
 </ui:UiBinder>

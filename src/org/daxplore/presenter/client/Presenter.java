@@ -18,6 +18,7 @@
  */
 package org.daxplore.presenter.client;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,6 +37,7 @@ import org.daxplore.presenter.client.event.SetWarningBannerHandler;
 import org.daxplore.presenter.client.json.Groups;
 import org.daxplore.presenter.client.json.Perspectives;
 import org.daxplore.presenter.client.json.Prefix;
+import org.daxplore.presenter.client.json.Settings;
 import org.daxplore.presenter.client.model.StatDataServerModel;
 import org.daxplore.presenter.client.ui.ChartTypeOptionsPanel;
 import org.daxplore.presenter.client.ui.PerspectivePanel;
@@ -119,10 +121,16 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		String perspectiveID = perspectivePanel.getQuestionID();
 		List<Integer> perspectiveOptions = perspectivePanel.getPerspectiveOptions();
 		
-		flags.add(chartPanelPresenter.getSelectedChartType());
+		QueryFlag selectedChartType = chartPanelPresenter.getSelectedChartType();
+		
+		List<QueryFlag> displaytTypes = questionMetadata.getDisplayTypes(questionID);
+		if (!displaytTypes.contains(selectedChartType)) {
+			selectedChartType = displaytTypes.get(0);
+		}
+		flags.add(selectedChartType);
 		flags.add(optionsPanel.getTimepointCountSelection());
 
-		if(perspectiveOptions.size()==0 || perspectivePanel.useTotalSelected()) {
+		if(perspectiveOptions.size()==0 || perspectivePanel.isTotalSelected()) {
 			flags.add(QueryFlag.TOTAL);
 		}
 		
@@ -165,7 +173,7 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 	}
 
 	public void showDefaultChart() {
-		makeQuery(true);
+//		makeQuery(true);
 		//TODO remove this function?
 //		String firstQuestionID = "";
 //		for(int i=0; i<groups.getGroupCount(); i++) {
@@ -183,10 +191,14 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 //		}
 //		ArrayList<QueryFlag> flags = new ArrayList<>(0);
 //		//TODO this sets line to be the default, then mean. The default should be set in the producer instead
-//		if (questionMetadata.hasMeanLine(firstQuestionID)) {
-//			flags.add(QueryFlag.MEANLINE);
-//		} else if (questionMetadata.hasMean(firstQuestionID)) {
+//		if (questionMetadata.useMeanChart(firstQuestionID)) {
 //			flags.add(QueryFlag.MEAN);
+//		}
+//		if (questionMetadata.useFreqChart(firstQuestionID)) {
+//			flags.add(QueryFlag.FREQUENCY);
+//		}
+//		if (questionMetadata.useDichotomizedChart(firstQuestionID)) {
+//			flags.add(QueryFlag.DICHOTOMIZED);
 //		}
 //		QueryDefinition queryDefinition = new QueryDefinition(questionMetadata, firstQuestionID, firstPerspectiveID, selectedOptions, flags);
 //		eventBus.fireEvent(new QueryUpdateEvent(queryDefinition));

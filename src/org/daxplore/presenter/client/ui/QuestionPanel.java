@@ -23,8 +23,8 @@ import org.daxplore.presenter.client.event.QueryUpdateHandler;
 import org.daxplore.presenter.client.event.SelectionUpdateEvent;
 import org.daxplore.presenter.client.json.Groups;
 import org.daxplore.presenter.shared.QueryDefinition;
-import org.daxplore.presenter.shared.QuestionMetadata;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -39,72 +39,12 @@ import com.google.web.bindery.event.shared.EventBus;
 public class QuestionPanel extends Composite implements QueryUpdateHandler {
 	
 	private final EventBus eventBus;
-	private String questionID;
 	
 	@Inject
 	protected QuestionPanel(EventBus eventBus, Groups groups) {
 		this.eventBus = eventBus;
 		QueryUpdateEvent.register(eventBus, this);
 		exportQuestionCallback();
-
-		questionID = groups.getQuestionIDs(0).get(0);
-		
-//		treeRoot = new Tree(uiResources, false);
-//		
-//		Label header = new Label(uiTexts.pickAQuestionHeader());
-//		header.addStyleName("daxplore-QuestionPanel-header");
-//		vp.add(header);
-//		vp.setCellHeight(header, "30px");
-//
-//		// Set up questiontree
-//
-//		treeRoot.addSelectionHandler(new QuestionSelectionHandler());
-//		treeRoot.addOpenHandler(new GroupOpenHandler());
-//		
-//		for (int i = 0; i < groups.getGroupCount(); i++) {
-//			String txt = groups.getGroupName(i);
-//			Groups.Type type = groups.getGroupType(i);
-//			SafeHtmlBuilder html = new SafeHtmlBuilder();
-//
-//			switch(type) {
-//			case GROUP:
-//				html.appendHtmlConstant("<span class=\"daxplore-QuestionPanel-branch\">&nbsp;");
-//				html.appendEscaped(txt);
-//				html.appendHtmlConstant("&nbsp;</span>");
-//				GroupItem gr = new GroupItem(html.toSafeHtml());
-//				List<String> qlist = groups.getQuestionIDs(i);
-//				for (String q : qlist) {
-//					html = new SafeHtmlBuilder();
-//					html.appendHtmlConstant("&nbsp;");
-//					html.appendEscaped(questions.getShortText(q));
-//					if(questions.hasSecondary(q)) {
-//						html.appendHtmlConstant("&nbsp;<span class=\"super\">");
-//						html.appendEscaped(uiTexts.secondaryFlag());
-//						html.appendHtmlConstant("</span>");
-//					}
-//					html.appendHtmlConstant("&nbsp;");
-//					QuestionTreeItem qi = new QuestionTreeItem(html.toSafeHtml(), q);
-//					qi.setTitle(questions.getFullText(q));
-//					gr.addItem(qi);
-//				}
-//				treeRoot.addItem(gr);
-//				break;
-//			case HEADER:
-//				html.appendHtmlConstant("<span class=\"daxplore-QuestionPanel-subheader\">&nbsp;");
-//				html.appendEscaped(txt);
-//				html.appendHtmlConstant("&nbsp;</span>");
-//				TreeItem item = new HeaderItem(html.toSafeHtml());
-//				treeRoot.addItem(item);
-//				break;
-//			default:
-//				break;
-//			}
-//		}
-//
-//		vp.add(treeRoot);
-//		vp.setCellVerticalAlignment(treeRoot, HasVerticalAlignment.ALIGN_TOP);
-//		vp.setWidth("100%");
-//		initWidget(vp);
 	}
 	
 	/**
@@ -113,43 +53,34 @@ public class QuestionPanel extends Composite implements QueryUpdateHandler {
 	 * @return the questionID
 	 */
 	public String getQuestionID() {
-		return questionID;
+		return getQuestionNative();
 	}
+	
+	protected native String getQuestionNative() /*-{
+		return $wnd.getSelectedQuestion();
+	}-*/;
 	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void onQueryUpdate(QueryUpdateEvent event) {
-		setQueryDefinition(event.getQueryDefinition());
-	}
-
-	/**
-	 * Set a new query definition, updating which group is open and
-	 * what question is selected.
-	 * 
-	 * @param queryDefinition
-	 *            the new query definition
-	 */
-	public void setQueryDefinition(QueryDefinition queryDefinition) {
-		questionID = queryDefinition.getQuestionID();
+		String questionID = event.getQueryDefinition().getQuestionID();
 		setQueryDefinitionNative(questionID);
 	}
-	
+
 	protected native void setQueryDefinitionNative(String questionID) /*-{
 		$wnd.questionSetQueryDefinition(questionID);
 	}-*/;
 
-	protected void gwtQuestionCallback(String question) {
-		this.questionID = question;
-		
+	protected void gwtQuestionCallback() {
 		eventBus.fireEvent(new SelectionUpdateEvent());
 	}
 	
 	protected native void exportQuestionCallback() /*-{
 		var that = this;
-		$wnd.gwtQuestionCallback = $entry(function(question) {
-			that.@org.daxplore.presenter.client.ui.QuestionPanel::gwtQuestionCallback(Ljava/lang/String;)(question);
+		$wnd.gwtQuestionCallback = $entry(function() {
+			that.@org.daxplore.presenter.client.ui.QuestionPanel::gwtQuestionCallback()();
 		});
 	}-*/;
 }

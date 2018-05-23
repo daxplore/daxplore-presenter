@@ -53,22 +53,22 @@ public class PresentationEntryPoint implements EntryPoint {
 		rootPanel.add(stagePanel);
 		Presenter presenter = injector.getPresenter();
 		String href = Window.Location.getHref();
+		
+		String lineColorsJSON = "[\"" + SharedTools.join(BarColors.getChartColorsPrimaryHex(), "\",\"") + "\"]";
+		String hoverColorsJSON = "[\"" + SharedTools.join(BarColors.getChartColorsPrimaryHoverHex(), "\",\"") + "\"]";
+		
+		generateExternalElements(lineColorsJSON, hoverColorsJSON);
 		if (href.contains("#")) {
 			String base64 = href.substring(href.lastIndexOf("#") + 1, href.length());
 			presenter.restore(base64, true);
 		} else {
 			presenter.showDefaultChart();
 		}
-		
-		String lineColorsJSON = "[\"" + SharedTools.join(BarColors.getChartColorsPrimaryHex(), "\",\"") + "\"]";
-		String hoverColorsJSON = "[\"" + SharedTools.join(BarColors.getChartColorsPrimaryHoverHex(), "\",\"") + "\"]";
-		
-		generateExternalElements(lineColorsJSON, hoverColorsJSON);
 	}
 	
 	public final native void generateExternalElements(String lineColorsJSON, String hoverColorsJSON) /*-{
 		$wnd.generateQuestionPanel();
 		$wnd.generatePerspectivePanel();
-		$wnd.generateChartPanel(lineColorsJSON, hoverColorsJSON);
+		$wnd.generateChartPanel(JSON.parse(lineColorsJSON), JSON.parse(hoverColorsJSON));
 	}-*/;
 }

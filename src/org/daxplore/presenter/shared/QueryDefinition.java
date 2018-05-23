@@ -297,10 +297,9 @@ public class QueryDefinition {
 			}
 		}
 		
-		if(flags.length > 0){
+		if(flags != null && flags.length > 0){
 			out.add("f=" + QueryFlag.encodeFlags(flags));
 		}
-		
 		return SharedTools.join(out, "&");
 	}
 	

@@ -48,17 +48,11 @@ import com.google.web.bindery.event.shared.EventBus;
 public class PerspectivePanel implements QueryUpdateHandler {
 
 	private final EventBus eventBus;
-	
-	private String perspectiveID;
-	private boolean useTotalSelected;
-	private List<Integer> selectedOptions = new ArrayList<>();
 
 	@Inject
 	protected PerspectivePanel(EventBus eventBus, Perspectives perspectives) {
 		this.eventBus = eventBus;
 		QueryUpdateEvent.register(eventBus, this);
-		
-		perspectiveID = perspectives.getQuestionIDs().get(0);
 		
 		exportPerspectiveCallback();
 	}
@@ -70,17 +64,9 @@ public class PerspectivePanel implements QueryUpdateHandler {
 	 * @return the current perspective's questionID
 	 */
 	public String getQuestionID() {
-		return perspectiveID;
+		return getSelectedPerspectiveNative();
 	}
 
-	/**
-	 * Get the query flags defined by the perspective.
-	 * 
-	 * @return the flags
-	 */
-	public boolean useTotalSelected() {
-		return useTotalSelected;
-	}
 
 	/**
 	 * Get the selected perspective options.
@@ -88,8 +74,33 @@ public class PerspectivePanel implements QueryUpdateHandler {
 	 * @return the perspective options
 	 */
 	public List<Integer> getPerspectiveOptions() {
-		return selectedOptions;
+		String options = getPerspectiveOptionsNative();
+		List<Integer> optionList = new ArrayList<>();
+		int i = 0;
+		for (String s : options.split(",")) {
+			if (Boolean.parseBoolean(s)) {
+				optionList.add(i);
+			}
+			i++;
+		}
+		return optionList;
 	}
+	
+	public boolean isTotalSelected() {
+		return isPerspectiveTotalSelectedNative();
+	}
+
+	protected native String getSelectedPerspectiveNative() /*-{
+		return $wnd.getSelectedPerspective();
+	}-*/;
+
+	protected native String getPerspectiveOptionsNative() /*-{
+		return $wnd.getPerspectiveOptions();
+	}-*/;
+	
+	protected native boolean isPerspectiveTotalSelectedNative() /*-{
+		return $wnd.isPerspectiveTotalSelected();
+	}-*/;
 
 	/**
 	 * {@inheritDoc}
@@ -107,9 +118,9 @@ public class PerspectivePanel implements QueryUpdateHandler {
 	 *            the new query definition
 	 */
 	public void setQueryDefinition(QueryDefinition queryDefinition) {
-		perspectiveID = queryDefinition.getPerspectiveID();
-		selectedOptions = queryDefinition.getUsedPerspectiveOptions();
-		useTotalSelected = queryDefinition.hasFlag(QueryFlag.TOTAL);
+		String perspectiveID = queryDefinition.getPerspectiveID();
+		List<Integer> selectedOptions = queryDefinition.getUsedPerspectiveOptions();
+		boolean useTotalSelected = queryDefinition.hasFlag(QueryFlag.TOTAL);
 		
 		// TODO check if actually updated
 		StringBuilder sb = new StringBuilder("[");
@@ -128,29 +139,14 @@ public class PerspectivePanel implements QueryUpdateHandler {
 		$wnd.perspectiveSetQueryDefinition(perspectiveID, JSON.parse(options), total);
 	}-*/;
 	
-	protected void gwtPerspectiveCallback(String perspective, String options, boolean total) {
-		this.perspectiveID = perspective;
-		
-		List<Integer> optionList = new ArrayList<>();
-		int i = 0;
-		for (String s : options.split(",")) {
-			if (Boolean.parseBoolean(s)) {
-				optionList.add(i);
-			}
-			i++;
-		}
-		
-		selectedOptions = optionList;
-
-		this.useTotalSelected = total;
-		
+	protected void gwtPerspectiveCallback() {
 		eventBus.fireEvent(new SelectionUpdateEvent());
 	}
 	
 	protected native void exportPerspectiveCallback() /*-{
 		var that = this;
-		$wnd.gwtPerspectiveCallback = $entry(function(perspective, options, total) {
-			that.@org.daxplore.presenter.client.ui.PerspectivePanel::gwtPerspectiveCallback(Ljava/lang/String;Ljava/lang/String;Z)(perspective, options, total);
+		$wnd.gwtPerspectiveCallback = $entry(function() {
+			that.@org.daxplore.presenter.client.ui.PerspectivePanel::gwtPerspectiveCallback()();
 		});
 	}-*/;
 }

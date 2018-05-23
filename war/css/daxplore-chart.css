@@ -1,29 +1,29 @@
 /*** ChartWrapPanel.java ***/
-	
+
 	.daxplore-ChartWrapPanel {
 		padding-right: 7px;
 	}
-	
+
 /*** ChartPanelView.java ***/
 
 	.daxplore-ChartPanel {
 /*  		border: 1px solid #D4D4D4; */
 	}
-	
+
 	.daxplore-ChartScrollPanel {
 		overflow-y: hidden !important;
 	}
-	
+
 	.chart-header-panel {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
    }
-   
+
    .chart-tabs {
    	display: flex;
    }
-   
+
    .chart-tab {
    	padding: 7px 14px 7px 14px;
    	border: 1px solid #D4D4D4;
@@ -32,12 +32,12 @@
 		cursor: pointer;
 		user-select: none;
    }
-   
+
    .chart-tab-selected {
    	color: black;
    	border-bottom: none;
    }
-   
+
    .chart-tab-spacing {
    	width: 20px;
    	border-bottom: 1px solid #D4D4D4;
@@ -46,12 +46,12 @@
    	border-bottom: 1px solid #D4D4D4;
    	width: 100%;
    }
-   
+
    .chart-container {
    	border: 1px solid #D4D4D4;
     	border-top: none;
    }
-	
+
 /*** GChart ***/
 
 	.gchart-GChart {
@@ -60,21 +60,21 @@
 		padding-left: 15px;
 		padding-top: 10px;
 		padding-bottom: 10px;
-		margin: 0px;	
+		margin: 0px;
 	}
-	
+
 	.gchart-GChart-compare {
 		padding-bottom: 15px;
 	}
-	
+
 	.gchart-GChart-mean {
 		padding-bottom: 20px;
 	}
-	
+
 	.gwt-Image[src$='gchart.gif'] {
 /* 		z-index: 100 !important; */
 	}
-	
+
 	.gwt-Image[src$='daxplore-bar-blank.gif'], .gwt-Image[src^='/pixel/'] {
 		border-radius: 2px 2px 0 0;
 	}
@@ -98,26 +98,26 @@
 		padding-right: 5px;
 		padding-left: 5px;
 	}
-	
+
 	.daxplore-ExternalLegend div {
 		width: 1.1em;
 		height: 1.1em;
 		border-radius: 2px;
 	}
-	
+
 	.daxplore-ExternalLegend-hiddenCount {
 		color: #888888;
 		font-size: 80%;
 		text-align: center;
 		padding-top: 3px;
 	}
-	
+
 	.daxplore-ExternalLegendHeader {
 		font-weight: bold;
 		padding-bottom: 2px;
 		padding-left: 9px;
 	}
-	
+
 	.daxplore-LegendReference {
 	    border-bottom: medium dashed;
 	    margin-top: 15px;
@@ -127,14 +127,14 @@
 	    padding-right: 3px;
 	    float: left;
 	}
-	
+
 	.dich-legend-row {
 		white-space: nowrap;
 		margin-bottom: 4px;
 		width: auto !important;
 		cursor: default;
 	}
-	
+
 	.dich-legend-marker {
 	    width: 1.1em;
 	    height: 1.1em;
@@ -142,11 +142,11 @@
 	    display: inline-block;
 	    vertical-align: middle;
 	}
-	
+
 	.dich-legend-text {
 		margin-left: 5px;
 	}
-	
+
 /*** External header ***/
 
 	.daxplore-ExternalHeader {
@@ -171,4 +171,11 @@
 		color: #333;
 		font-size: 13px;
 	}
-	
+
+	/*** JS based chart panel  ***/
+	.chart-panel {
+		border: 1px solid #D4D4D4;
+		border-top: none;
+		padding-top: 10px;
+    padding-bottom: 10px;
+	}

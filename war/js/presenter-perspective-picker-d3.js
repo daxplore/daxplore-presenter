@@ -1,5 +1,5 @@
 (function(exports) {
-  
+
   var initialized = false;
   var selected_perspective = -1;
   var perspective_options = [];
@@ -9,24 +9,24 @@
   var has_remainder = false;
   var collapsed = true;
   var fixed_width = null;
-  
+
   document.addEventListener("DOMContentLoaded", function(e) {
     d3.selectAll('body').append('img')
       .classed('img-preload', true)
       .attr('src', '/img/perspective-checkbox-empty.png');
   });
-  
+
   exports.perspectiveSetQueryDefinition = function(perspectiveID, options, total) {
     selected_perspective = perspectives.indexOf(perspectiveID);
     selected_options = options;
     total_selected = total;
-    
+
     if (initialized) {
       updateCheckboxes(false);
     }
   }
 
-  exports.generatePerspectivePanel = function() {  
+  exports.generatePerspectivePanel = function() {
     d3.select('.daxplore-PerspectivePanel').html(
         "<div class='perspective-header'>"
       + usertexts.perspectivesHeader
@@ -59,18 +59,31 @@
       + "  </div>"
       + "</div>"
     );
-    
+
     window.setTimeout(popuplatePerspectivePanel, 1);
   }
-  
+
+  exports.getSelectedPerspective = function() {
+    return perspectives[selected_perspective];
+  }
+
+  exports.getPerspectiveOptions = function() {
+    return selected_options.join(',', true);
+  }
+
+  exports.isPerspectiveTotalSelected = function() {
+    return total_selected;
+  }
+
+
   function popuplatePerspectivePanel() {
     var variable_list = d3.select('.pervarpicker-variables');
-    
+
     if (variable_list.empty()) {
       window.setTimeout(popuplatePerspectivePanel, 10);
       return;
     }
-    
+
     var perspective_shorttexts = [];
     perspectives.forEach(function(p) {
       questions.some(function(q) {
@@ -81,7 +94,7 @@
         }
       })
     });
-    
+
     variable_list
       .selectAll('.pervarpicker-varoption')
       .data(perspective_shorttexts)
@@ -91,7 +104,7 @@
         .classed('no-select', true)
         .on('click', function(d, i) { setSelectedPerspective(i); })
         .text(function(d) {return d});
-    
+
     d3.selectAll('.peropt-all-button')
       .on('click', function() {
         for (var i=0; i<selected_options.length; i++) {
@@ -100,7 +113,7 @@
         updateCheckboxes(true);
       })
       .text(usertexts.perspectivesAllButton);
-      
+
     d3.selectAll('.peropt-none-button')
       .on('click', function() {
         for (var i=0; i<selected_options.length; i++) {
@@ -124,17 +137,17 @@
         }
         updateElements();
       });
-          
+
     initializeSelection();
     initialized = true;
-    
+
     // hack to force initial gwt sizing to work
     // TODO replace when the resizing system is moved to pure js
     for (var i=2; i<=12; i++) {
       setTimeout(initializeSelection, Math.pow(2, i));
     }
   }
-  
+
   function initializeSelection() {
     if (selected_perspective === -1) {
       setSelectedPerspective(0);
@@ -142,11 +155,11 @@
       setSelectedPerspective(selected_perspective);
     }
   }
-  
+
   function setSelectedPerspective(index) {
     var changed = selected_perspective != index;
     selected_perspective = index;
-    
+
     if (changed) {
       selected_options = [];
       var i = 0;
@@ -155,16 +168,16 @@
         i++;
       });
     }
-    
-    updateCheckboxes(changed);
+
+    updateCheckboxes(changed && initialized);
   }
-  
+
   function updateCheckboxes(fireGwtEvent) {
-      
+
     d3.selectAll('.pervarpicker-varoption')
       .classed('pervarpicker-varoption-selected', function(d, i) { return i == selected_perspective; });
-      
-    var show_select_total = settings.showSelectTotal; 
+
+    var show_select_total = settings.showSelectTotal;
     var option_count = selected_options.length + (show_select_total ? 1 : 0);
     var per_column_setting = settings.perspectiveCheckboxesPerColumn;
     var max_columns = 3;
@@ -182,7 +195,7 @@
     var first_column_data = [];
     var second_column_data = [];
     var third_column_data = [];
-    
+
     for (var i = 0; i < selected_options.length; i++) {
       var option = {text: perspective_options[selected_perspective][i], selected: selected_options[i], index: i};
       if (i < per_column) {
@@ -193,17 +206,17 @@
         third_column_data.push(option);
       }
     }
-    
+
     //TODO add total
-    
-    
+
+
     // First column
     var first_col_options = d3.select('.peropt-col-one')
       .selectAll('.peropt-checkbox')
       .data(first_column_data);
-    
+
     first_col_options.exit().remove();
-    
+
     first_col_options.enter()
       .append('div')
         .classed('peropt-checkbox', true)
@@ -211,19 +224,19 @@
            selected_options[d.index] = !selected_options[d.index];
            updateCheckboxes(true);
          });
-    
+
     d3.select('.peropt-col-one').selectAll('.peropt-checkbox')
       .classed('peropt-checkbox-selected', function(d) { return d.selected; })
       .text(function(d) { return d.text; });
-    
-      
+
+
     // Second column
     var second_col_options = d3.select('.peropt-col-two')
       .selectAll('.peropt-checkbox')
       .data(second_column_data);
-  
+
     second_col_options.exit().remove();
-  
+
     second_col_options.enter()
       .append('div')
         .classed('peropt-checkbox', true)
@@ -231,19 +244,19 @@
            selected_options[d.index] = !selected_options[d.index];
            updateCheckboxes(true);
          });
-  
+
     d3.select('.peropt-col-two').selectAll('.peropt-checkbox')
       .classed('peropt-checkbox-selected', function(d) { return d.selected; })
       .text(function(d) { return d.text; });
 
-      
+
     // Third column
     var first_col_options = d3.select('.peropt-col-three')
       .selectAll('.peropt-checkbox')
       .data(third_column_data);
-  
+
     first_col_options.exit().remove();
-  
+
     first_col_options.enter()
       .append('div')
         .classed('peropt-checkbox', true)
@@ -251,11 +264,11 @@
            selected_options[d.index] = !selected_options[d.index];
            updateCheckboxes(true);
          });
-  
+
     d3.select('.peropt-col-three').selectAll('.peropt-checkbox')
       .classed('peropt-checkbox-selected', function(d) { return d.selected; })
       .text(function(d) { return d.text; });
-    
+
     var has_checked_box = false;
     for (var i=0; i<selected_options.length; i++) {
       if (selected_options[i]) {
@@ -263,11 +276,11 @@
         break;
       }
     }
-    
+
     if (fireGwtEvent && has_checked_box) {
-      gwtPerspectiveCallback(perspectives[selected_perspective], selected_options.join(',', true), false);
+      gwtPerspectiveCallback();
     }
-    
+
     // hack to handle IE display bugs
     var isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
     if (isIE) {
@@ -277,25 +290,25 @@
       d3.select('.perspective-options')
         .style('height', options_height + 'px');
     }
-        
+
     updateElements();
   }
-  
+
   function updateElements() {
     d3.select('.perspective-picker')
       .style('width', fixed_width + 'px');
-    
+
     d3.select('.peropt-more-button')
       .style('visibility', function() {
         return has_remainder ? null : 'hidden';
       })
       .text(collapsed ? 'Visa fler >' : '< Visa färre ');
-    
+
     d3.select('.peropt-bottom-padding')
       .style('height', function() {
         return has_remainder ? null : '0px';
       });
-      
+
     d3.select('.daxplore-DescriptionPanelBottom')
       .interrupt().transition()
         .style('color', collapsed ? 'black': 'hsl(0, 0%, 70%)');
@@ -304,7 +317,7 @@
       .interrupt().transition()
         .style('opacity', collapsed ? 0 : 1)
         .style('width', collapsed ? '0px' : null);
- 
-  }  
-  
+
+  }
+
 })(window);

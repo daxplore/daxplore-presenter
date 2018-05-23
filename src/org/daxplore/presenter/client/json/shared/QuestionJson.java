@@ -18,8 +18,11 @@
  */
 package org.daxplore.presenter.client.json.shared;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArrayInteger;
@@ -63,7 +66,7 @@ public class QuestionJson extends JavaScriptObject {
 	 */
 	public final native boolean useFrequencyChart() /*-{
 		for (var i=0; i<this.displaytypes.length; i++) {
-			if(this.displaytypes[i] == "FREQ") {
+			if(this.displaytypes[i] == "FREQUENCY") {
 				return true;
 			}	
 		}
@@ -91,7 +94,7 @@ public class QuestionJson extends JavaScriptObject {
 	 */
 	public final native boolean useDichotomizedChart() /*-{
 		for (var i=0; i<this.displaytypes.length; i++) {
-			if(this.displaytypes[i] == "DICH") {
+			if(this.displaytypes[i] == "DICHOTOMIZED") {
 				return true;
 			}	
 		}
@@ -222,4 +225,19 @@ public class QuestionJson extends JavaScriptObject {
 	private final native JsArrayInteger getDichSelectedNative() /*-{
 		return this.dichselected;
 	}-*/;
+
+
+	public final List<QueryFlag> getDisplayTypes() {
+		List<String> displaytypes = JsonTools.jsArrayAsList(getDisplayTypesNative());
+		List<QueryFlag> flags = new ArrayList<>(displaytypes.size());
+		for (String type : displaytypes) {
+			flags.add(QueryFlag.valueOf(type));
+		}
+		return flags;
+	}
+	
+	private final native JsArrayString getDisplayTypesNative() /*-{
+		return this.displaytypes;
+	}-*/;
+
 }

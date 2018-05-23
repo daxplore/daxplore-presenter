@@ -1,5 +1,5 @@
 (function(exports) {
-  
+
   var initialized = false;
   var open_group = -1;
   var selected_question = groups[0].questions[0];
@@ -9,7 +9,7 @@
   var element_transition = d3.transition()
     .duration(100)
     .ease(d3.easeLinear);
-  
+
   for (var i=0; i < questions.length; i++) {
     var q = questions[i];
     shorttext_map[q.column] = q.short;
@@ -22,7 +22,7 @@
     }
   }
 
-  exports.generateQuestionPanel = function() {  
+  exports.generateQuestionPanel = function() {
     d3.select('.daxplore-QuestionPanel').html(
         "<div class='question-header'>"
       +  usertexts.questionsHeader
@@ -47,7 +47,7 @@
         } else {
           open_group = i;
         }
-        updateTree(false);
+        updateTree();
       });
 
     headers.append('div')
@@ -73,35 +73,34 @@
         .classed('question-question', true)
         .text(function(d) { return shorttext_map[d]; })
         .on('click', function (d) {
-          var changed = selected_question != d;
-          selected_question = d;
-          updateTree(changed);
+//          var changed = selected_question != d;
+//          if (changed) {
+            console.log(d);
+            selected_question = d;
+            gwtQuestionCallback();
+//          }
         });
 
     open_group = group_map[selected_question];
-    updateTree(false);
+    updateTree();
 
     // hack to force initial sizing to work
     for (var i=2; i<=12; i++) {
-      setTimeout(function () { updateTree(false); }, Math.pow(2, i));
+      setTimeout(updateTree, Math.pow(2, i));
     }
   }
-  
+
+  exports.getSelectedQuestion = function() {
+    return selected_question;
+  }
+
   exports.questionSetQueryDefinition = function(questionID) {
-    var changed = selected_question != questionID;
-    if (changed) {
-      selected_question = questionID;
-      open_group = group_map[questionID];
-      updateTree(false);
-    }
+    selected_question = questionID;
+    open_group = group_map[selected_question];
+    updateTree();
   }
 
-  function updateTree(fireGwtEvent) {
-
-    if (fireGwtEvent) {
-      gwtQuestionCallback(selected_question);
-    }
-
+  function updateTree() {
     // EXPAND/CONTRACT SECTIONS
     var sections = d3.selectAll('.question-section-questions');
     sections.interrupt().selectAll('*').interrupt();
@@ -113,8 +112,8 @@
         }
         return "0px";
       });
-    
-    
+
+
     // OUTLINE SELECTED SECTION
     d3.selectAll('.question-section-GROUP')
       .classed('above-selected', function (d, i) { return i == open_group-1; })
@@ -122,8 +121,8 @@
 
     d3.select('.question-picker')
       .classed('above-selected', open_group == 0);
-    
-    
+
+
     // TURN ARROWS
     var arrows = d3.selectAll('.question-group-arrow');
     arrows.interrupt().selectAll('*').interrupt();
@@ -135,12 +134,12 @@
         }
         return 'rotate(0turn)';
       });
-    
+
 
     // SELECT QUESTION
     d3.selectAll('.question-question')
       .classed('selected', function (d) { return d == selected_question; });
-    
+
   }
 
 })(window);

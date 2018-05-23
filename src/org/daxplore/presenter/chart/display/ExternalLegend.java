@@ -93,7 +93,7 @@ public class ExternalLegend extends Composite {
 	}
 	
 	private ExternalLegend() {
-		initWidget(new HTML(""));
+		initWidget(new HTML("<div class='daxplore-ExternalLegend'></div>"));
 	}
 	
 	public static ExternalLegend getEmptyLegend() {

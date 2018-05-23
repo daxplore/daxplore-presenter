@@ -4,11 +4,6 @@
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gchart-2.7/gchart.jar"/>
-	<classpathentry kind="lib" path="lib/aopalliance.jar"/>
-	<classpathentry kind="lib" path="lib/gin-1.5-post-gwt-2.2.jar"/>
-	<classpathentry kind="lib" path="lib/guice-assistedinject-snapshot.jar"/>
-	<classpathentry kind="lib" path="lib/guice-snapshot.jar"/>
-	<classpathentry kind="lib" path="lib/javax.inject.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/json_simple-1.1.jar" sourcepath="lib/sources/json_simple-1.1-all"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/opencsv-2.3.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
@@ -17,5 +12,10 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-io-2.4.jar" sourcepath="lib/sources/commons-io-2.4-sources.jar"/>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/gin-2.1.2/aopalliance.jar"/>
+	<classpathentry kind="lib" path="lib/gin-2.1.2/gin-2.1.2.jar"/>
+	<classpathentry kind="lib" path="lib/gin-2.1.2/guice-3.0.jar"/>
+	<classpathentry kind="lib" path="lib/gin-2.1.2/guice-assistedinject-3.0.jar"/>
+	<classpathentry kind="lib" path="lib/gin-2.1.2/javax.inject.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

@@ -16,139 +16,103 @@
  */
 package org.daxplore.presenter.chart;
 
-import org.daxplore.presenter.chart.display.BarColors;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.daxplore.presenter.chart.display.Chart;
-import org.daxplore.presenter.chart.display.ChartFactory;
 import org.daxplore.presenter.chart.display.ExternalLegend;
+import org.daxplore.presenter.client.event.SelectionUpdateEvent;
 import org.daxplore.presenter.shared.QueryData;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 import org.daxplore.presenter.shared.SharedTools;
 
+import com.google.gwt.event.logical.shared.ResizeEvent;
+import com.google.gwt.event.logical.shared.ResizeHandler;
+import com.google.gwt.user.client.Window;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 
-public class ChartPanelPresenter  {
-	private ChartFactory chartFactory;
-	private ChartPanelView view;
+public class ChartPanelPresenter implements ResizeHandler {
+	private final EventBus eventBus;
 	private Chart chart;
 	
 	@Inject
-	public ChartPanelPresenter(ChartPanelView view) {
-//		this.chartFactory = chartFactory;
-		this.view = view;
-//		view.setChart(new BlankChart());
+	public ChartPanelPresenter(EventBus eventBus) {
+		this.eventBus = eventBus;
+		exportChartPanelCallback();
 	}
 
 	public void onQueryReady(QueryDefinition queryDefinition, QueryData queryData) {
 		
+		Window.addResizeHandler(this);
+	
 		QueryFlag chartType = QueryFlag.NULL;
 		chartType = queryDefinition.hasFlag(QueryFlag.FREQUENCY) ? QueryFlag.FREQUENCY : chartType;
 		chartType = queryDefinition.hasFlag(QueryFlag.MEAN) ? QueryFlag.MEAN : chartType;
 		chartType = queryDefinition.hasFlag(QueryFlag.DICHOTOMIZED) ? QueryFlag.DICHOTOMIZED : chartType;
 		
-		String selectedChart = chartType.name();
+		QueryFlag timepoints = QueryFlag.NULL;
+		timepoints = queryDefinition.hasFlag(QueryFlag.TIMEPOINTS_ONE) ? QueryFlag.TIMEPOINTS_ONE : timepoints;
+		timepoints = queryDefinition.hasFlag(QueryFlag.TIMEPOINTS_TWO) ? QueryFlag.TIMEPOINTS_TWO : timepoints;
+		timepoints = queryDefinition.hasFlag(QueryFlag.TIMEPOINTS_ALL) ? QueryFlag.TIMEPOINTS_ALL : timepoints;
+		
 		String statJson = queryData.getJson();
 		String selectedOptionsJson = "[" + SharedTools.join(queryDefinition.getUsedPerspectiveOptions(), ",") + "]";
 		
-		setQueryDefinitionNative(selectedChart, statJson, selectedOptionsJson);
+		String dichSubtitle = "";
+		if (chartType == QueryFlag.DICHOTOMIZED) {
+			List<String> optionTexts = queryDefinition.getQuestionOptionTexts();
+			List<String> usedDichTexts = new LinkedList<>();
+			for (Integer i : queryDefinition.getDichotomizedSelectedOptions()) {
+				usedDichTexts.add(optionTexts.get(i));
+			}
+			dichSubtitle = "";//uiTexts.dichotomizedSubtitle(usedDichTexts);
+		}
 		
-//		List<QueryFlag> chartTabs = new LinkedList<>();
-//		
-//		String questionID = queryDefinition.getQuestionID();
-//		if (questionMetadata.useFreqChart(questionID)) {
-//			chartTabs.add(QueryFlag.FREQUENCY);
-//		}
-//		if (questionMetadata.useMeanChart(questionID)) {
-//			chartTabs.add(QueryFlag.MEAN);
-//		}
-//		if (questionMetadata.useDichotomizedChart(questionID)) {
-//			chartTabs.add(QueryFlag.DICHOTOMIZED);
-//		}
-//		
+		setQueryDefinitionNative(chartType.name(), timepoints.name(), statJson, selectedOptionsJson, dichSubtitle);
+	}
+	
+	public QueryFlag getSelectedChartType() {
+		return QueryFlag.valueOf(getSelectedTabNative());
+	}
+	
+	protected native String getSelectedTabNative() /*-{
+		return $wnd.getSelectedTab();
+	}-*/;
 
-//		
-//		QueryFlag timepoints = QueryFlag.NULL;
-//		timepoints = queryDefinition.hasFlag(QueryFlag.TIMEPOINTS_ONE) ? QueryFlag.TIMEPOINTS_ONE : chartType;
-//		timepoints = queryDefinition.hasFlag(QueryFlag.TIMEPOINTS_TWO) ? QueryFlag.TIMEPOINTS_TWO : chartType;
-//		timepoints = queryDefinition.hasFlag(QueryFlag.TIMEPOINTS_ALL) ? QueryFlag.TIMEPOINTS_ALL : chartType;
-//		
-//		switch (chartType) {
-//		case FREQUENCY:
-//			switch (timepoints) {
-//			case TIMEPOINTS_ONE:
-//				BarChart barChart = chartFactory.createBarChart(queryDefinition, false);
-//				barChart.addData(queryData);
-//				view.setChart(barChart);
-//				chart = barChart;
-//				break;
-//			case TIMEPOINTS_TWO:
-//				BarChartCompare barChartCompare = chartFactory.createBarChartCompare(queryDefinition, false);
-//				barChartCompare.addData(queryData);
-//				view.setChart(barChartCompare);
-//				chart = barChartCompare;
-//				break;
-//			case TIMEPOINTS_ALL:
-//				// TODO show multiple timepoints frequency chart
-//				break;
-//				//$CASES-OMITTED$
-//			default:
-//				// TODO handle invalid combination
-//				break;
-//			}
-//			break;
-//		case MEAN:
-//			switch (timepoints) {
-//			case TIMEPOINTS_ONE:
-//				MeanChart meanChart = chartFactory.createMeanChart(queryDefinition, false);
-//				meanChart.addData(queryData);
-//				view.setChart(meanChart);
-//				chart = meanChart;
-//				break;
-//			case TIMEPOINTS_TWO:
-//				// TODO add options two bar comparison for mean chart?
-//				// currently: fall through to TIMEPOINTS_ALL
-//			case TIMEPOINTS_ALL:
-//				// TODO add mean lines over time, probably based on dichline
-//				break;
-//				//$CASES-OMITTED$
-//			default:
-//				// TODO handle invalid combination
-//				break;
-//			}
-//			break;
-//		case DICHOTOMIZED:
-//			DichLineChart dichLineChart = chartFactory.createDichLineChart(queryDefinition, false);
-//			dichLineChart.addData(queryData);
-//			view.setChart(dichLineChart);
-//			chart = dichLineChart;
-//			break;
-//			//$CASES-OMITTED$
-//		default:
-//			// TODO handle invalid combination
-//			break;
-//		
-//		}
-	}
-	
-	public ChartPanelView getView() {
-		return view;
-	}
-	
 	public ExternalLegend getExternalLegend() {
 		// TODO figure out how to handle legends
 		return ExternalLegend.getEmptyLegend();
 //		return chart.getExternalLegend();
 	}
 
+	
+	protected native void setQueryDefinitionNative(String chartType, String timepoints, String statJson, String selectedOptionsJson, String dichSubtitle) /*-{
+		$wnd.chartSetQueryDefinition(chartType, timepoints, JSON.parse(statJson), JSON.parse(selectedOptionsJson), dichSubtitle);
+	}-*/;
+
+	protected void gwtChartPanelCallback() {
+		eventBus.fireEvent(new SelectionUpdateEvent());
+	}
+
+	protected native void exportChartPanelCallback() /*-{
+		var that = this;
+		$wnd.gwtChartPanelCallback = $entry(function() {
+			that.@org.daxplore.presenter.chart.ChartPanelPresenter::gwtChartPanelCallback()();
+		});
+	}-*/;
+
 	/**
-	 * @return
+	 * {@inheritDoc}
 	 */
-	public QueryFlag getSelectedChartType() {
-		// TODO look at selected tab
-		return QueryFlag.DICHOTOMIZED;
+	@Override
+	public void onResize(ResizeEvent event) {
+		updateChartSize();
 	}
 	
-	protected native void setQueryDefinitionNative(String selectedChart, String statJson, String selectedOptionsJson) /*-{
-		$wnd.chartSetQueryDefinition(selectedChart, statJson, selectedOptionsJson);
+	protected native void updateChartSize() /*-{
+		$wnd.updateChartPanelSize();
 	}-*/;
+	
 }
