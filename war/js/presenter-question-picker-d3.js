@@ -75,7 +75,6 @@
         .on('click', function (d) {
 //          var changed = selected_question != d;
 //          if (changed) {
-            console.log(d);
             selected_question = d;
             gwtQuestionCallback();
 //          }

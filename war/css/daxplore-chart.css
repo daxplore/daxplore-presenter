@@ -7,7 +7,7 @@
 /*** ChartPanelView.java ***/
 
 	.daxplore-ChartPanel {
-/*  		border: 1px solid #D4D4D4; */
+/*  		border: 1px solid #BBB; */
 	}
 
 	.daxplore-ChartScrollPanel {
@@ -26,7 +26,7 @@
 
    .chart-tab {
    	padding: 7px 14px 7px 14px;
-   	border: 1px solid #D4D4D4;
+   	border: 1px solid #BBB;
    	white-space: nowrap;
    	color: #666;
 		cursor: pointer;
@@ -40,15 +40,15 @@
 
    .chart-tab-spacing {
    	width: 20px;
-   	border-bottom: 1px solid #D4D4D4;
+   	border-bottom: 1px solid #BBB;
    }
    .chart-tab-remainder {
-   	border-bottom: 1px solid #D4D4D4;
+   	border-bottom: 1px solid #BBB;
    	width: 100%;
    }
 
    .chart-container {
-   	border: 1px solid #D4D4D4;
+   	border: 1px solid #BBB;
     	border-top: none;
    }
 
@@ -128,14 +128,18 @@
 	    float: left;
 	}
 
-	.dich-legend-row {
+	.legend-row {
 		white-space: nowrap;
 		margin-bottom: 4px;
 		width: auto !important;
 		cursor: default;
 	}
 
-	.dich-legend-marker {
+	.legend-row-missing-data {
+		margin-top: 30px;
+	}
+
+	.legend-marker {
 	    width: 1.1em;
 	    height: 1.1em;
 	    border-radius: 2px;
@@ -143,7 +147,7 @@
 	    vertical-align: middle;
 	}
 
-	.dich-legend-text {
+	.legend-text {
 		margin-left: 5px;
 	}
 
@@ -172,10 +176,28 @@
 		font-size: 13px;
 	}
 
+	.daxplore-ExternalHeader-freq-tooltip {
+		height: 14px;
+		margin-top: 1px;
+		margin-bottom: 1px;
+	}
+
 	/*** JS based chart panel  ***/
 	.chart-panel {
-		border: 1px solid #D4D4D4;
+		border: 1px solid #BBB;
 		border-top: none;
-		padding-top: 10px;
-    padding-bottom: 10px;
+	}
+
+	.chart-scroll {
+		overflow-x: auto;
+	}
+
+	/*** JS based frequency chart ***/
+	.frequency-x-axis .tick line {
+		stroke: none !important;
+	}
+
+	.frequency-x-axis .tick text {
+		fill: black !important;
+		font-size: 13px !important;
 	}

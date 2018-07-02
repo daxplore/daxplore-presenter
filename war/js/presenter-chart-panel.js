@@ -9,17 +9,18 @@
   var initialQuestion = groups[0].questions[0];
   var selectedTab = question_map[initialQuestion].displaytypes[0];
 
-  var dich_lineColors, dich_hoverColors;
+  var primaryColors, hoverColors;
 
-  exports.generateChartPanel = function(dich_lineColors_input, dich_hoverColors_input) {
-    dich_lineColors = dich_lineColors_input;
-    dich_hoverColors = dich_hoverColors_input;
+  exports.generateChartPanel = function(primaryColors_input, hoverColors_input) {
+    primaryColors = primaryColors_input;
+    hoverColors = hoverColors_input;
 
     d3.select('.daxplore-ChartPanel').html(
       "<div class='daxplore-ExternalHeader'>" +
-      "  <div class='daxplore-ExternalHeader-header'>Top header</div>" +
-      "  <div class='daxplore-ExternalHeader-sub'>Middle header</div>" +
-      "  <div class='daxplore-ExternalHeader-dichsub'>Bottom header</div>" +
+      "  <div class='daxplore-ExternalHeader-header'></div>" +
+      "  <div class='daxplore-ExternalHeader-sub'></div>" +
+      "  <div class='daxplore-ExternalHeader-dichsub'></div>" +
+      "  <div class='daxplore-ExternalHeader-freq-tooltip'></div>" +
       "</div>" +
       "<div class='chart-tabs'>" +
       "  <div class='chart-tab-spacing frequency'></div>" +
@@ -34,8 +35,6 @@
     );
 
     var displaytypes = question_map[initialQuestion].displaytypes;
-    console.log(displaytypes);
-    console.log(d3.selectAll('.chart-tab'));
     d3.selectAll('.chart-tab')
       .on("click",
         function() {
@@ -74,6 +73,13 @@
     d3.select('.daxplore-ExternalHeader-header').text(questionMeta.short);
     d3.select('.daxplore-ExternalHeader-sub').text(questionMeta.text);
     d3.select('.daxplore-ExternalHeader-dichsub').text(dichSubtitle);
+    d3.select('.daxplore-ExternalHeader-freq-tooltip').text("");
+
+    // reset any side scroll set by previous charts
+    d3.select('.chart-panel')
+      .classed('chart-scroll', false)
+      .style('width', null);
+
 
     var displaytypes = question_map[questionID].displaytypes;
     d3.selectAll('.chart-tab')
@@ -102,10 +108,11 @@
         case "FREQUENCY":
           switch (timepoints) {
             case "TIMEPOINTS_ONE":
-              break;
             case "TIMEPOINTS_TWO":
-              break;
             case "TIMEPOINTS_ALL":
+              // TODO temporary hardcoded timepoint
+              generateFrequencyChart(primaryColors, hoverColors, stat, selected_options, 4);
+              generateFrequencyLegend();
               break;
           }
           break;
@@ -124,7 +131,7 @@
             case "TIMEPOINTS_ONE":
             case "TIMEPOINTS_TWO":
             case "TIMEPOINTS_ALL":
-              generateDichTimeLineChart(selected_options, stat, dich_lineColors, dich_hoverColors);
+              generateDichTimeLineChart(selected_options, stat, primaryColors, hoverColors);
               generateDichTimeLineLegend();
               break;
           }
@@ -144,6 +151,7 @@
   exports.updateChartPanelSize = function() {
     switch (selectedTab) {
       case "FREQUENCY":
+        updateFreqChartSize(350);
         break;
       case "MEAN":
         break;

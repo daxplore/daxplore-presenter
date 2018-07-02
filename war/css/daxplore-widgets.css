@@ -9,7 +9,7 @@
 		width:100%;
 		height: 35px;
 	}
-	
+
 	.daxplore-WarningBanner-text{
 		font-size: small;
 	    background-position: left center;
@@ -18,28 +18,28 @@
 	    padding-left: 23px;
 	    margin-right: 50px;
 	}
-	
+
 	.daxplore-WarningBanner-close{
 		position: absolute;
 		right: 10px;
 		top: 5px;
 	}
-	
+
 
 /*** OptionsPanel.java ***/
 
 	.daxplore-OptionsPanel{
 		padding-top: 10px;
-		padding-right: 5px;	
+		padding-right: 5px;
 		padding-bottom: 10px;
 	}
-	
+
 	.daxplore-OptionsPanel tr,td,tbody{
 		padding-top: 0;
-		padding-right: 0;	
+		padding-right: 0;
 		padding-bottom: 0;
 	}
-	
+
 
 /*** CheckPanel.java && SelectPanel.java ***/
 
@@ -48,12 +48,12 @@
 		padding-bottom: 5px;
 		white-space: nowrap;
 	}
-	
+
 	.daxplore-PerspectiveCheckboxes-description {
 		text-align: center;
 		margin-top: -5px;
 	}
-	
+
 	.daxplore-PerspectiveQuestionList-header {
 		font-weight: bold;
 		padding-bottom: 5px;
@@ -66,18 +66,17 @@
 		margin: 22px 0 0 10px;
 		padding: 8px 5px 8px 8px;
 		max-width: 500px;
-		float: right;
 	}
-	
+
 	 .daxplore-DescriptionPanelLegend {
 	 	width: 200px;
 	 }
-	
+
 	.daxplore-DescriptionPanelBottom p, .daxplore-DescriptionPanelLegend p {
 		margin-top: 1px;
 		margin-bottom: 1px;
 	}
-	
+
 	.daxplore-DescriptionPanelBottom ul, .daxplore-DescriptionPanelLegend ul {
 		margin: 0;
 		padding-left: 20px;
@@ -95,13 +94,13 @@
 		background-color: #EAEAEA;
 		border-color: #EAEAEA;
 	}
-	
+
 	.daxplore-ImageButton:active {
 		background-color: #DADADA !important;
 		border-color: #DADADA !important;
 	}
-	
-	
+
+
 /*** Embed Popup ***/
 	.daxplore-EmbedPopup {
 		padding: 3px;
@@ -111,67 +110,67 @@
 		border-radius: 5px;
 		z-index: 1000 !important;
 	}
-	
+
 	.daxplore-EmbedPopup-header{
 		font-weight: bold;
 	}
-	
+
 	.gwt-DisclosurePanel .header {
 		outline: 0;
 	}
-	
+
 	.gwt-Button::-moz-focus-inner {
 		border: 0;
 	}
-	
+
 	.daxplore-EmbedPopup-textarea {
 		width: 400px;
 		min-width: 400px;
 		max-width: 400px;
-		
+
 		height: 7em;
 		min-height: 7em;
 		max-height: 7em;
 	}
-	
+
 	.daxplore-EmbedPopup-iframeSpot {
 		border: none;
 		overflow: hidden;
 	}
-	
-	
+
+
 	/*** Pure d3 js perspective picker ***/
-  
+
 	.img-preload {
 		position: absolute;
 		top: -9999px;
 		left: -9999px;
 		opacity: 0;
 	}
-    
+
 	.perspective-button {
 		z-index: 1;
 		color: #999;
 	}
-	
+
 	.daxplore-PerspectivePanel {
 	   display: flex;
     	flex-direction: column;
 		float: left;
 	}
-	
+
 	.perspective-header {
 		color: #888;
 		font-weight: bold;
 		padding-top: 10px;
 		padding-bottom: 7px;
 	}
-	
+
   .perspective-picker {
 		display: flex;
 		flex-direction: row;
 	}
-	
+
 	.perspective-varpicker {
 		display: flex;
 		flex-direction: column;
@@ -190,7 +189,7 @@
 		border-top: 1px dashed #DDD;
 		border-right: 1px solid #ABABAB;
 	}
-	
+
 	.pervarpicker-bottom-padding {
 		position: relative;
 		min-height: 10px;
@@ -198,12 +197,12 @@
 		border-right: 1px solid #ABABAB;
 		border-bottom: 1px dashed #DDD;
 	}
-	
+
 	.pervarpicker-right-border-extender {
 		flex: 1;
 		border-right: 1px solid #ABABAB;
 	}
-	
+
 	.pervarpicker-varoption:before {
 		content: url('/img/perspective-radio-empty.png');
 		padding-left: 7px;
@@ -214,18 +213,18 @@
 	.pervarpicker-varoption {
 		display: flex;
 		align-items: center;
-		
+
 		border-left: 1px dashed #DDD;
 		border-right: 1px solid #ABABAB;
 		padding: 5px;
 		padding-right: 10px;
 		cursor: pointer;
 	}
-	
+
 	.pervarpicker-varoption-selected:before {
 		content: url('/img/perspective-radio-filled.png');
-	}	
-	
+	}
+
 	.pervarpicker-varoption-selected {
 		border-top: 1px solid #ABABAB;
 		border-left: 1px solid #ABABAB;
@@ -239,13 +238,13 @@
 	.pervarpicker-varoption:hover {
 		color: #444;
 	}
-	
+
 	.perspective-options {
 		position: relative;
 		display: flex;
 		flex-direction: column;
 		background-color: white;
-		
+
 		border-top: solid 1px #ABABAB;
 		border-right: solid 1px #ABABAB;
 		border-bottom: solid 1px #ABABAB;
@@ -256,23 +255,23 @@
 		display: flex;
 		flex-direction: row;
 	}
-	
+
 	.peropt-extra-columns {
 		overflow: hidden;
 		display: flex;
 		flex-direction: row;
 	}
-	
+
 	.peropt-bottom-padding {
 		height: 31px;
 	}
-	
+
 	.peropt-more-wrapper {
 		position: absolute;
     right: 2px;
 		bottom: 2px;
 	}
-	
+
 	.peropt-checkbox {
 		display: flex;
 		align-items: center;
@@ -281,36 +280,36 @@
 		cursor: pointer;
 		white-space: nowrap;
 	}
-	
+
 	.peropt-checkbox:before {
 		content: url('/img/perspective-checkbox-empty.png');
 		padding-left: 7px;
 		padding-right: 5px;
 		padding-top: 3px;
 	}
-	
+
 	.peropt-checkbox-selected:before {
 		content: url('/img/perspective-checkbox-filled.png');
 	}
-	
+
 	.peropt-checkbox:hover {
 		color: #444;
 	}
-	
-	
+
+
 	/*** Pure d3 js question picker ***/
-	
+
 	.daxplore-QuestionPanel {
 		margin-right: 5px; /* if changed here, also change in StagePanel.java */
 	}
-	
+
 	.question-header {
 		white-space: nowrap;
 		color: #888;
 		font-weight: bold;
 		padding-bottom: 7px;
 	}
-	
+
 	.question-picker {
 		border-top: 1px dashed #DDD;
 	}
@@ -344,7 +343,7 @@
 		justify-content: space-between;
 		padding: 9px;
 
-		cursor: pointer;	
+		cursor: pointer;
 	}
 
 	.question-section-header-text {
@@ -365,7 +364,7 @@
 	.question-group-arrow {
 		align-self: center;
 	}
-	
+
 	.question-group-arrow:after {
 		content: url('/img/question-expand-arrow.png');
 	}
@@ -380,7 +379,7 @@
 	}
 
 	.question-question {
-	   display: flex;
+		display: flex;
 		align-items: center;
 		cursor: pointer;
 		white-space: nowrap;
@@ -404,21 +403,20 @@
 	.question-question.selected:before {
 		content: url('/img/perspective-radio-filled.png');
 	}
-	
-	
+
+
 	/*** Dich line chart in d3 ***/
-	.point-tooltip { 
-	  position: absolute;     
-	  text-align: left;    
+	.point-tooltip {
+	  position: absolute;
+	  text-align: left;
 	  height: auto;
 	  width: auto;
-	  white-space: nowrap; 
+	  white-space: nowrap;
 	  font: 11px sans-serif;
-	  border: 0px;    
-	  border-radius: 4px;     
-	  pointer-events: none; 
+	  border: 0px;
+	  border-radius: 4px;
+	  pointer-events: none;
 	  padding: 4px;
 	  z-index: 100;
 	  font-weight: bold;
 	}
-

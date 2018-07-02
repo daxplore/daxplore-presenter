@@ -1,10 +1,10 @@
 (function(exports) {
 
   // CONSTANTS
+  // TODO move to setting in producer
   // if chart width is smaller than this, embed it it a scrollpanel
   var chartWidthScrollBreakpoint = 600;
 
-  //
   var chartwrapperBB, yAxisWidth, xAxisHeight, margin, width, height;
   var chart, chart_g;
 
@@ -154,7 +154,7 @@
   function computeDimensions(width_total, height_total) {
     yAxisWidth = 35;
     xAxisHeight = 24;
-    margin = {top: 10, right: 13, bottom: xAxisHeight, left: yAxisWidth + 10};
+    margin = {top: 25, right: 13, bottom: xAxisHeight, left: yAxisWidth + 10};
     width = width_total - margin.left - margin.right;
     height = height_total - margin.top - margin.bottom;
   }
@@ -202,7 +202,7 @@
   }
 
   function updateChartElements() {
-        // X SCALE
+    // X SCALE
     var x_scale = d3.scaleBand()
       .range([0, width])
       .paddingInner(0.3)
@@ -340,9 +340,6 @@
         .attr("fill", color)
         .attr("stroke", color)
         .attr("d", pointSymbol.size(pointSize))
-        .attr("transform", function(d) {
-          return "translate(" + (x_scale(d.timepoint) + x_bandwidth/2) + "," + y_scale(d.percentage) + ")";
-        })
         .on("mouseover",
           function(d) {
             tooltipOver(option.index);
@@ -431,10 +428,11 @@
   }
 
   exports.generateDichTimeLineChart = function(selectedOptions, stat, lineColors_input, hoverColors_input) {
+    // console.log(stat);
     // TODO initizalize once, not every time
     lineColors = lineColors_input;
     hoverColors = hoverColors_input;
-    computeDimensions(600, 300);
+    computeDimensions(chartWidthScrollBreakpoint, 300);
     generateChartElements();
 
     perspective = stat.p;
@@ -487,19 +485,20 @@
   exports.generateDichTimeLineLegend = function() {
     // GENERATE LEGEND
     var legend = d3.select('.daxplore-ExternalLegend')
-      .style("margin-top", (height/3) + "px")
+      .style("margin-top", (height/2) + "px")
       .style("margin-left", "4px");
 
-    d3.selectAll('.dich-legend-row').remove();
-    var option = legend.selectAll(".dich-legend-row")
+    legend.html("");
+
+    var option = legend.selectAll(".legend-row")
       .data(current_options)
       .enter()
         .append("div")
-        .attr("class", function(d) { return "dich-legend-row dich-legend-row-" + d.index; })
+        .attr("class", function(d) { return "legend-row legend-row-" + d.index; })
         .html(function(option) {
-           return "<span class='dich-legend-marker' style='background-color: "
+           return "<span class='legend-marker' style='background-color: "
                   + z_scale_color(option.id) + ";'>&nbsp</span>"
-                  + "<span class='dich-legend-text'>" + option.id + "</span>";
+                  + "<span class='legend-text'>" + option.id + "</span>";
         })
       .on("mouseover",
         function(d) {

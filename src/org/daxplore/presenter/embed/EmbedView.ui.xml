@@ -3,9 +3,9 @@
 	xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:chart="urn:import:org.daxplore.presenter.chart.display">
-	
+
 	<ui:style type='org.daxplore.presenter.embed.EmbedView.EmbedStyle'>
-		.chartArea { border: 1px solid #D4D4D4; }
+		.chartArea { border: 1px solid #BBB; }
 		.transparent { background: none transparent !important; }
 		.opaque { background-color: white !important; }
 
@@ -13,16 +13,16 @@
 			margin-top: -15px;
 		}
 	</ui:style>
-	
+
 	<g:HorizontalPanel ui:field="main">
 		<g:VerticalPanel ui:field="chartArea" styleName='{style.chartArea}'>
 			<chart:ExternalHeader ui:field="header" />
 			<g:SimplePanel ui:field="chartContainerPanel"/>
 		</g:VerticalPanel>
-				
+
 		<g:VerticalPanel styleName='{style.sidebarArea}' ui:field="sidebarArea">
 			<g:SimplePanel ui:field='legendPanel'/>
 		</g:VerticalPanel>
 	</g:HorizontalPanel>
-	
+
 </ui:UiBinder>

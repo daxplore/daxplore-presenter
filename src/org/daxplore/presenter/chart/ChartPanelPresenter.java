@@ -22,6 +22,7 @@ import java.util.List;
 import org.daxplore.presenter.chart.display.Chart;
 import org.daxplore.presenter.chart.display.ExternalLegend;
 import org.daxplore.presenter.client.event.SelectionUpdateEvent;
+import org.daxplore.presenter.client.json.shared.UITexts;
 import org.daxplore.presenter.shared.QueryData;
 import org.daxplore.presenter.shared.QueryDefinition;
 import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
@@ -35,11 +36,13 @@ import com.google.web.bindery.event.shared.EventBus;
 
 public class ChartPanelPresenter implements ResizeHandler {
 	private final EventBus eventBus;
+	private final UITexts uiTexts;
 	private Chart chart;
 	
 	@Inject
-	public ChartPanelPresenter(EventBus eventBus) {
+	public ChartPanelPresenter(EventBus eventBus, UITexts uiTexts) {
 		this.eventBus = eventBus;
+		this.uiTexts = uiTexts;
 		exportChartPanelCallback();
 	}
 
@@ -67,7 +70,7 @@ public class ChartPanelPresenter implements ResizeHandler {
 			for (Integer i : queryDefinition.getDichotomizedSelectedOptions()) {
 				usedDichTexts.add(optionTexts.get(i));
 			}
-			dichSubtitle = "";//uiTexts.dichotomizedSubtitle(usedDichTexts);
+			dichSubtitle = uiTexts.dichotomizedSubtitle(usedDichTexts);
 		}
 		
 		setQueryDefinitionNative(chartType.name(), timepoints.name(), statJson, selectedOptionsJson, dichSubtitle);

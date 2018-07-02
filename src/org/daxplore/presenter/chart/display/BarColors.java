@@ -61,13 +61,13 @@ public class BarColors {
 	};
 	
 	private static final BarColors meanReferenceColors = new BarColors(
-			Color.hslToHex(0, 0, 0.40),
-			Color.hslToHex(0, 0, 0.30),
-			Color.hslToHex(0, 0, 0),
-			Color.hslToHex(0, 0, 0),
-			Color.hslToHex(0, 0, 0),
-			Color.hslToHex(0, 0, 0),
-			Color.hslToHex(0, 0, 0.85));
+		Color.hslToHex(0, 0, 0.40),
+		Color.hslToHex(0, 0, 0.30),
+		Color.hslToHex(0, 0, 0),
+		Color.hslToHex(0, 0, 0),
+		Color.hslToHex(0, 0, 0),
+		Color.hslToHex(0, 0, 0),
+		Color.hslToHex(0, 0, 0.85));
 	
 	private static List<String> chartColorPrimaryHex;
 	private static List<String> chartColorPrimaryHoverHex;

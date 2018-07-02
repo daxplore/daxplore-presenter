@@ -18,9 +18,12 @@
  */
 package org.daxplore.presenter.shared;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+import org.daxplore.presenter.shared.QueryDefinition.QueryFlag;
 
 /**
  * @author daniel
@@ -142,5 +145,16 @@ public class QuestionMetadataMock implements QuestionMetadata {
 	public List<Integer> getTimepointIndexes(String questionID) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<QueryFlag> getDisplayTypes(String questionID) {
+		List<QueryFlag> flags = new ArrayList<>(2);
+		flags.add(QueryFlag.FREQUENCY);
+		flags.add(QueryFlag.DICHOTOMIZED);
+		return flags;
 	}
 }

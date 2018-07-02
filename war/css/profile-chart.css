@@ -17,7 +17,7 @@
 }
 
 .content-row {
-	
+
 }
 
 .chart-row {
@@ -42,7 +42,7 @@
 .header {
   padding-bottom: 10px;
 }
-     
+
 /* https://codepen.io/ericrasch/pen/zjDBx */
 /* Select Box Styles: bavotasan.com Method (with special adaptations by ericrasch.com) */
 /* Source: http://bavotasan.com/2011/style-select-box-using-only-css/ */
@@ -54,7 +54,7 @@
 
 .header-select {
   background: transparent;
-  padding: 5px; /* If you add too much padding here, the options won't show in IE */     
+  padding: 5px; /* If you add too much padding here, the options won't show in IE */
   border: 1px solid #ddd;
   font-size: 16px;
   font-weight: bold;
@@ -87,7 +87,7 @@
 
 /* text font needs to be duplicated here and in list.js for sizing to work correctly */
 text {
-  font: 12px sans-serif; 
+  font: 12px sans-serif;
 }
 
 .y path,
@@ -95,26 +95,26 @@ text {
   visibility: hidden;
 }
 
-.tooltipdiv { 
-  position: absolute;     
-  text-align: right;    
+.tooltipdiv {
+  position: absolute;
+  text-align: right;
   height: auto;
   width: auto;
-  white-space: nowrap; 
+  white-space: nowrap;
   font: 12px sans-serif;
-  border: 0px;    
-  border-radius: 8px;     
-  pointer-events: none; 
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
   padding: 6px;
   z-index: 100;
 }
 
 .arrow-left {
   position: absolute;
-  width: 0; 
-  height: 0; 
+  width: 0;
+  height: 0;
   border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent; 
+  border-bottom: 10px solid transparent;
   border-right: 10px solid;
   z-index: 100;
 }
@@ -131,7 +131,7 @@ text {
 
 .description {
   align-self: center;
-/*   border: 1px solid #d4d4d4; */
+/*   border: 1px solid #BBB; */
   width: 280px;
   padding: 5px;
   margin-left: 5px;
@@ -148,4 +148,3 @@ text {
 .description ul {
   padding-left: 20px;
 }
-        
