@@ -29,6 +29,8 @@
       "  <div class='chart-tab mean'>Genomsnitt</div>" +
       "  <div class='chart-tab-spacing dichotomized'></div>" +
       "  <div class='chart-tab dichotomized'>Dikotomiserat</div>" +
+      "  <div class='chart-tab-spacing mean'></div>" +
+      "  <div class='chart-tab mean'>Genomsnitt</div>" +
       "  <div class='chart-tab-remainder'></div>" +
       "</div>" +
       "<div class='chart-panel'></div>"
@@ -40,7 +42,7 @@
         function() {
           var classes = this.classList;
           for (var i=0; i<classes.length; i++) {
-            if (classes[i] === "frequency" ||  classes[i] === "mean" || classes[i] === "dichotomized") {
+            if (classes[i] === "frequency" ||  classes[i] === "mean" || classes[i] === "dichotomized" || classes[i] === "mean") {
               setSelectedTab(classes[i].toUpperCase());
             }
           }
@@ -71,7 +73,9 @@
 
     questionMeta = question_map[questionID];
     d3.select('.daxplore-ExternalHeader-header').text(questionMeta.short);
-    d3.select('.daxplore-ExternalHeader-sub').text(questionMeta.text);
+    if (questionMeta.short != questionMeta.text) {
+      d3.select('.daxplore-ExternalHeader-sub').text(questionMeta.text);
+    }
     d3.select('.daxplore-ExternalHeader-dichsub').text(dichSubtitle);
     d3.select('.daxplore-ExternalHeader-freq-tooltip').text("");
 
@@ -119,7 +123,8 @@
         case "MEAN":
           switch (timepoints) {
             case "TIMEPOINTS_ONE":
-              break;
+              generateMeanChart(selected_options, stat);
+              generateMeanLegend();
             case "TIMEPOINTS_TWO":
               break;
             case "TIMEPOINTS_ALL":
@@ -154,6 +159,7 @@
         updateFreqChartSize(350);
         break;
       case "MEAN":
+        updateMeanChartSize(350); // TODO allow more height instead of vertical scroll
         break;
       case "DICHOTOMIZED":
         updateDichTimeLineChartSize(350);

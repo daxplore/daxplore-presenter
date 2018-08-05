@@ -5,7 +5,8 @@
   // if chart width is smaller than this, embed it it a scrollpanel
   var chartWidthScrollBreakpoint = 600;
 
-  var chartwrapperBB, yAxisWidth, xAxisHeight, margin, width, height;
+  // CHART VARIABLES
+  var yAxisWidth, xAxisHeight, margin, width, height;
   var chart, chart_g;
 
   // INITIALIZE STATIC RESOURCES
@@ -428,7 +429,6 @@
   }
 
   exports.generateDichTimeLineChart = function(selectedOptions, stat, lineColors_input, hoverColors_input) {
-    // console.log(stat);
     // TODO initizalize once, not every time
     lineColors = lineColors_input;
     hoverColors = hoverColors_input;

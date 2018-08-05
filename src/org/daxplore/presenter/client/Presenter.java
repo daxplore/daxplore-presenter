@@ -274,9 +274,10 @@ SetWarningBannerHandler, CloseWarningBannerHandler, QueryUpdateHandler, QueryRea
 		QueryDefinition queryDefinition = event.getQueryDefinition();
 		chartPanelPresenter.onQueryReady(queryDefinition, event.getQueryData());
 		ExternalLegend legend = chartPanelPresenter.getExternalLegend();
-		if (questionMetadata.hasMeanReferenceValue(queryDefinition.getQuestionID())) {
-			legend.addReferenceValue(queryDefinition.getMeanReferenceValue());
-		}
+		// handle in JS 
+//		if (questionMetadata.hasMeanReferenceValue(queryDefinition.getQuestionID())) {
+//			legend.addReferenceValue(queryDefinition.getMeanReferenceValue());
+//		}
 		stagePanel.setLegend(legend);
 		stagePanel.setDescription(queryDefinition.getQuestionID(), queryDefinition.getPerspectiveID());
 	}

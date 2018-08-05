@@ -279,7 +279,7 @@
           var percentage = d.end - d.start;
           if (d.key != "MISSING_DATA") {
             d3.select(".daxplore-ExternalHeader-freq-tooltip")
-              .text( percentageFormat(percentage) + ' av gruppen "' + d.option + '" svarade "' + d.key + '" år ' + usertexts["timepoint" + tp] + '.')
+              .text( percentageFormat(percentage) + ' av gruppen "' + d.option + '" svarade "' + d.key + (timepoints.length >= 2 ? '" år ' + usertexts["timepoint" + tp] : "" ) + '.')
               .style("color", barStrokeColor(d.key, tpIndex).darker(0.5));
           } else if (percentage > 0) {
             d3.select(".daxplore-ExternalHeader-freq-tooltip")
