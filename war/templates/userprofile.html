@@ -49,72 +49,71 @@
         }
 
         if (q.use_mean_reference) {
-       	  mean_reference_map[q.column] = q.mean_reference;
-    	  }
+          mean_reference_map[q.column] = q.mean_reference;
+        }
       }
 
       initiateHelpers(mean_reference_map, shorttext_map, usertexts, description_map, direction_map);
-      
+
       function headerChange(select) {
         updateSelectorOption(select.value);
       }
 
       document.addEventListener("DOMContentLoaded", function(e) {
         d3.select(".save-image")
-      		.text(usertexts.imageSaveButton);
-	
-	      generateGrid(locale, q_ids, mean_reference_map, shorttext_map, usertexts, description_map, direction_map);
-	        
-	      generateListChart(q_ids, mean_reference_map, shorttext_map, usertexts, description_map, direction_map, 0);
-	      
-	      addGridUpdateCallback(function(names, means) {
-	    		setChartData(names, means); 
-	      });
-		      
+          .text(usertexts.imageSaveButton);
+
+        generateGrid(locale, q_ids, mean_reference_map, shorttext_map, usertexts, description_map, direction_map);
+
+        generateListChart(q_ids, mean_reference_map, shorttext_map, usertexts, description_map, direction_map, 0);
+
+        addGridUpdateCallback(function(names, means) {
+          setChartData(names, means);
+        });
       });
     </script>
 
   </head>
 
   <body>
-     <div class="grid-main">
-     	<div class="grid-row">
-          <span class="grid"></span>
-        	 <div class='grid-column-right'>
-        	 	<div class='grid-buttons'>
-	        		<span class="add-column-button dashed-button" onClick="addColumn()"></span>
-					<span class="save-grid-image-button dashed-button"></span>
-				</div>
-	        	<div class='grid-info'>
-		      	<table class='grid-legend'>
-			        	<tr><td class='grid-legend-symbol cell-good'></td><td class='grid-legend-text good'></td></tr>
-			        	<tr><td class='grid-legend-symbol cell-avg'></td><td class='grid-legend-text avg'></td></tr>
-			        	<tr><td class='grid-legend-symbol cell-bad'></td><td class='grid-legend-text bad'></td></tr>
-		        	</table>
-		        	<div id='grid-description' class='description'></div>
-	        	 </div>
-        	 </div>
-     	</div>
-     	<div class="chart-row">
-       <div class="column-left">
-         <div class="header">
-           <div class="header-select-div">
-             <select class="header-select" onchange="headerChange(this)">
-             </select>
-           </div>
-         </div>
-         <div class="chart-wrapper">
-           <svg class="chart"></svg>
-           <div class="tooltipdiv"></div>
-           <div class="arrow-left"></div>
-         </div>
-       </div>
-       <div class="column-right">
-         <span class="save-image dashed-button" onClick="generateImage()"></span>
-         <div class="description-wrapper">
-           <div id='chart-description' class="description"></div>
-         </div>
-       </div>
+    <div class="grid-main">
+      <div class="grid-row">
+        <span class="grid"></span>
+        <div class='grid-column-right'>
+          <div class='grid-buttons'>
+            <span class="add-column-button dashed-button" onClick="addColumn()"></span>
+            <span class="save-grid-image-button dashed-button"></span>
+          </div>
+          <div class='grid-info'>
+            <table class='grid-legend'>
+              <tr><td class='grid-legend-symbol cell-good'></td><td class='grid-legend-text good'></td></tr>
+              <tr><td class='grid-legend-symbol cell-avg'></td><td class='grid-legend-text avg'></td></tr>
+              <tr><td class='grid-legend-symbol cell-bad'></td><td class='grid-legend-text bad'></td></tr>
+            </table>
+            <div id='grid-description' class='description'></div>
+          </div>
+        </div>
+      </div>
+      <div class="chart-row">
+        <div class="column-left">
+          <div class="header">
+            <div class="header-select-div">
+              <select class="header-select" onchange="headerChange(this)">
+              </select>
+            </div>
+          </div>
+          <div class="chart-wrapper">
+            <svg class="chart"></svg>
+            <div class="tooltipdiv"></div>
+            <div class="arrow-left"></div>
+          </div>
+        </div>
+        <div class="column-right">
+          <span class="save-image dashed-button" onClick="generateImage()"></span>
+          <div class="description-wrapper">
+            <div id='chart-description' class="description"></div>
+          </div>
+        </div>
       </div>
     </div>
 
