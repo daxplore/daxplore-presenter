@@ -1,20 +1,20 @@
 (function(exports) {
   var mean_references, shorttexts, usertexts, descriptions, directions;
-      
+
   var colors = {};
 
-  colors.good    = "hsl(95, 38%, 64%)";
-  colors.average = "hsl(58, 60%, 62%)";
-  colors.bad     = "hsl( 5, 38%, 72%)";
+  colors.good    = "#509a5c";
+  colors.average = "#c5c2bd";
+  colors.bad     = "#d13d40";
 
   colors.good_hover    = "hsl(95, 38%, 57%)";
-  colors.average_hover = "hsl(60, 60%, 51%)";
+  colors.average_hover = "hsl(60, 0%, 51%)";
   colors.bad_hover     = "hsl( 5, 38%, 67%)";
 
   colors.good_text    = "hsl(95, 38%, 34%)";
-  colors.average_text = "hsl(60, 60%, 31%)",
+  colors.average_text = "hsl(60, 0%, 31%)",
   colors.bad_text     = "hsl( 5, 38%, 42%)";
-  
+
   exports.initiateHelpers =
   function(
     references_map,
@@ -29,7 +29,7 @@
       directions = directions_map;
   };
 
-  exports.colorForValue = 
+  exports.colorForValue =
   function(value, reference, direction) {
     if (direction == "LOW") {
       var diff = reference - value;
@@ -79,7 +79,7 @@
       return colors.average_text;
     }
   };
-  
+
   exports.setDescriptionShort =
   function(element, q_id) {
     var shorttext = shorttexts[q_id];
@@ -87,14 +87,14 @@
     var description = descriptions[q_id];
     element.html(header + description);
   }
-      
+
   exports.setDescriptionFull =
   function(element, group_name, q_id, mean) {
     var shorttext = shorttexts[q_id];
     var description = descriptions[q_id];
     var reference = mean_references[q_id];
     var direction = directions[q_id];
-    
+
     element.transition()
       .duration(0)
         .style("opacity", 1);
@@ -118,5 +118,5 @@
 
     element.html(header + subheader + referenceComparison + description);
   };
-  
+
 })(window);

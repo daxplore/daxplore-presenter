@@ -6,11 +6,11 @@
 
 .grid-row {
 	display: flex;
-	
+
 }
 
 .grid-column-left {
-	
+
 }
 
 .grid-column-right {
@@ -23,7 +23,7 @@
 }
 
 .grid-info {
-	
+
 }
 
 .rowtext, .grid-legend-text {
@@ -103,7 +103,7 @@
 }
 
 .header-cell > div {
-  transform: 
+  transform:
     translate(9px, 35px)
     rotate(-0.125turn);
   width: 30px;
@@ -120,18 +120,17 @@
 }
 
 .cell-good {
-	background: #C8EA7C !important;
+	background: hsl(130, 32%, 60%) !important;
 }
 
 .cell-avg {
-	background: #FFEE81 !important;
+	background: hsl(0, 0%, 85%) !important;
 }
 
 .cell-bad {
-	background: #FBC3BD !important;
+	background: hsl(359, 62%, 70%) !important;
 }
 
 .add-column-button:hover {
 	border-color: rgb(85, 85, 85);
 }
-
