@@ -63,6 +63,8 @@
         d3.select(".save-image")
           .text(usertexts.imageSaveButton);
 
+        generateUserPasteSection();
+
         generateGrid(locale, q_ids, mean_reference_map, shorttext_map, usertexts, description_map, direction_map);
 
         generateListChart(q_ids, mean_reference_map, shorttext_map, usertexts, description_map, direction_map, 0);
@@ -86,11 +88,34 @@
           </div>
           <div class='grid-info'>
             <table class='grid-legend'>
-              <tr><td class='grid-legend-symbol cell-good'></td><td class='grid-legend-text good'></td></tr>
-              <tr><td class='grid-legend-symbol cell-avg'></td><td class='grid-legend-text avg'></td></tr>
-              <tr><td class='grid-legend-symbol cell-bad'></td><td class='grid-legend-text bad'></td></tr>
+              <tr><td class='grid-legend-symbol cell-good-reference'></td><td class='grid-legend-text good'></td></tr>
+              <tr><td class='grid-legend-symbol cell-avg-reference'></td><td class='grid-legend-text avg'></td></tr>
+              <tr><td class='grid-legend-symbol cell-bad-reference'></td><td class='grid-legend-text bad'></td></tr>
             </table>
             <div id='grid-description' class='description'></div>
+          </div>
+        </div>
+      </div>
+      <div class="user-paste-data">
+        <div class="user-paste-data-header">
+          <div class="user-paste-data-header-arrow-wrapper">
+            <div class="user-paste-data-header-arrow" style="transform: rotate(0deg);"></div>
+          </div>
+          <div class="user-paste-data-header-text">
+            H&auml;r kan du kopiera in data fr&aring;n en COPSOQ-rapport
+          </div>
+        </div>
+        <div class="user-paste-data-content-wrapper">
+          <div class="user-paste-data-content">
+            <div class="user-paste-data-description">
+              Kopiera och klistra in en tabell fr&aring;n en COPSOQ-rapport i textf&auml;ltet, s&aring; genereras tabellen och diagrammet nedan automatiskt.
+            </div>
+            <textarea class='user-paste-data-textarea'></textarea>
+            <div class='user-paste-data-submit-wrapper'>
+              <span class='user-paste-data-submit-explanation'>V&auml;lj en kolumn och l&auml;s in din data:</span>
+              <select class='user-paste-data-submit-column-select'></select>
+              <span class='user-paste-data-submit-button dashed-button'>L&auml;s in data</span>
+            </div>
           </div>
         </div>
       </div>

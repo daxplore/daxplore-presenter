@@ -1,3 +1,84 @@
+.user-paste-data {
+	min-width: 500px;
+	display: inline-block;
+	font: 12px sans-serif;
+	color: #444;
+	border: 1px solid #DDD;
+	padding: 10px;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.user-paste-data-header {
+	display: flex;
+	flex-direction: row;
+	cursor: pointer;
+	white-space: nowrap;
+	align-items: center;
+}
+
+.user-paste-data-header:hover {
+	color: black;
+}
+
+.user-paste-data-header-arrow-wrapper {
+	display: flex;
+}
+
+.user-paste-data-header-arrow {
+	align-self: center;
+	margin-right: 10px;
+}
+
+.user-paste-data-header-arrow:before {
+	content: url('/img/question-expand-arrow.png');
+}
+
+.user-paste-data-header-text {
+	font-weight: bold;
+}
+
+.user-paste-data-description {
+	width: 360px;
+}
+
+.user-paste-data-content-wrapper {
+	height: 0px;
+	overflow: hidden;
+}
+
+.user-paste-data-content {
+	padding: 10px;
+	padding-bottom: 0px;
+}
+
+.user-paste-data-submit-wrapper {
+	display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: flex-end;
+	margin-top: 10px;
+}
+
+.user-paste-data-submit-explanation {
+	margin-right: 10px;
+}
+
+.user-paste-data-submit-column-select {
+	background: transparent;
+  padding: 5px;
+  border: 1px solid #ddd;
+  text-indent: 0px;
+	margin-right: 10px;
+}
+
+.user-paste-data-textarea {
+	color: #444;
+	width: 100%;
+	height: 400px;
+	margin-top: 10px;
+	resize: none;
+}
 
 .grid-main > .chart-row {
 	height: 600px;
@@ -129,6 +210,18 @@
 
 .cell-bad {
 	background: hsl(359, 62%, 70%) !important;
+}
+
+.cell-good-reference {
+	background: #509a5c !important;
+}
+
+.cell-avg-reference {
+	background: #c5c2bd !important;
+}
+
+.cell-bad-reference {
+	background: #d13d40 !important;
 }
 
 .add-column-button:hover {

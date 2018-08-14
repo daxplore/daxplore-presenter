@@ -1,25 +1,25 @@
 (function(exports) {
 
   var first_update = true;
-  
+
   var q_ids, means, mean_references, perspective_options, usertexts, descriptions, directions;
   var selected_option = 0, selected_q_ids = [];
-  var charwrapperBB, xAxisTopHeight, xAxisBottomHeight, margin, width, height;
+  var chartwrapperBB, xAxisTopHeight, xAxisBottomHeight, margin, width, height;
   var chart, x_scale, y_scale;
   var yAxisWidth;
 
   var element_transition = d3.transition()
       .duration(300)
       .ease(d3.easeLinear);
-  
+
   var lastHoveredBar = 0;
 
   // FUNCTIONS
-  
+
   function getQid(i) {
       return selected_q_ids[i];
   }
-  
+
   function getMean(i, selected_option) {
       return means[q_ids.indexOf(getQid(i))][selected_option];
   }
@@ -43,6 +43,7 @@
   }
 
   function tooltipOver(i) {
+    computeDimensions();
     lastHoveredBar = i;
     var tooltipdiv = d3.select(".tooltipdiv");
 
@@ -54,8 +55,8 @@
         shorttexts[getQid(i)] + ": <b>" + d3.format("d")(getMean(i, selected_option)) + "</b><br>"
         + usertexts.listReferenceValue + ": <b>" + d3.format("d")(mean_references[getQid(i)]) + "</b>")
       .style("background", colorHoverForValue(getMean(i, selected_option), mean_references[getQid(i)],  directions[getQid(i)]))
-      .style("left", (charwrapperBB.left + x_scale(Math.max(getMean(i, selected_option), mean_references[getQid(i)])) + yAxisWidth + 14) + "px")
-      .style("top", charwrapperBB.top +  y_scale(getQid(i)) + y_scale.bandwidth()/2 - tooltipdiv.node().getBoundingClientRect().height/2 + "px");
+      .style("left", (chartwrapperBB.left + x_scale(Math.max(getMean(i, selected_option), mean_references[getQid(i)])) + yAxisWidth + 14) + "px")
+      .style("top", chartwrapperBB.top +  y_scale(getQid(i)) + y_scale.bandwidth()/2 - tooltipdiv.node().getBoundingClientRect().height/2 + "px");
 
     var arrowleft = d3.select(".arrow-left");
 
@@ -65,8 +66,8 @@
 
     arrowleft
       .style("border-right-color", colorHoverForValue(getMean(i, selected_option), mean_references[getQid(i)],  directions[getQid(i)]))
-      .style("left", (charwrapperBB.left + x_scale(Math.max(getMean(i, selected_option), mean_references[getQid(i)])) + yAxisWidth + 4) + "px")
-      .style("top", charwrapperBB.top +  y_scale(getQid(i)) + y_scale.bandwidth()/2 - arrowleft.node().getBoundingClientRect().height/2 + "px");
+      .style("left", (chartwrapperBB.left + x_scale(Math.max(getMean(i, selected_option), mean_references[getQid(i)])) + yAxisWidth + 4) + "px")
+      .style("top", chartwrapperBB.top +  y_scale(getQid(i)) + y_scale.bandwidth()/2 - arrowleft.node().getBoundingClientRect().height/2 + "px");
 
     setDescriptionFull(d3.select("#chart-description"), perspective_options[selected_option], getQid(i), getMean(i, selected_option));
   }
@@ -87,32 +88,37 @@
   // CHART ELEMENTS
 
   function computeDimensions() {
-    charwrapperBB = d3.select(".chart-wrapper").node().getBoundingClientRect();
+    var wrapperClientBB = d3.select(".chart-wrapper").node().getBoundingClientRect();
+    chartwrapperBB = {};
+    chartwrapperBB.left   = wrapperClientBB.left + pageXOffset;
+    chartwrapperBB.top    = wrapperClientBB.top + pageYOffset;
+    chartwrapperBB.width  = wrapperClientBB.width;
+    chartwrapperBB.height = wrapperClientBB.height;
     xAxisTopHeight = 30;
     xAxisBottomHeight = 24;
     margin = {top: 0, right: 13, bottom: xAxisTopHeight + xAxisBottomHeight, left: 0};
-    width = charwrapperBB.width - margin.left - margin.right;
-    height = charwrapperBB.height - margin.top - margin.bottom;
+    width = chartwrapperBB.width - margin.left - margin.right;
+    height = chartwrapperBB.height - margin.top - margin.bottom;
   }
-  
+
   function generateChartElements() {
-      
+
     // CHART
     var chart = d3.select(".chart")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom);
-    
+
     // WHITE BACKGROUND
     chart.append("rect")
       .attr("width", "100%")
       .attr("height", "100%")
       .attr("fill", "white");
-    
+
     // Y AXIS
     yAxisElement = chart.append("g")
       .classed("y", true)
       .classed("axis", true);
-    
+
     yAxisReferenceElement = chart.append("g")
       .classed('y', true)
       .classed('axis', true)
@@ -124,7 +130,7 @@
     .append("text")
       .classed('x-top-description', true)
       .text(usertexts.listXAxisDescription);
-    
+
     // X AXIS BOTTOM
     chart.append("g")
       .attr("class", "x axis bottom")
@@ -133,7 +139,7 @@
       .attr("text-anchor", "middle")
       .style("text-anchor", "middle")
       .text(usertexts.listXAxisDescription);
-    
+
     // Hide save image button in IE11 because of a known svg bug
     // https://connect.microsoft.com/IE/feedbackdetail/view/925655
     var isIE11 = /Trident.*rv[ :]*11\./.test(navigator.userAgent);
@@ -142,36 +148,36 @@
        .style('display', 'none');
     }
   }
-  
-  
+
+
   function updateChartElements() {
-    
+
     if (first_update) {
       var el_trans = d3.transition().duration(0);
     } else {
       var el_trans = element_transition;
     }
-    
+
     var chart = d3.selectAll('.chart');
-    
+
     var paddingInner = 0.3;
     var paddingOuter = 0.4;
     var maxBandwidth = 50;
-    
+
     // rearranged equation from d3's source file band.js, ignoring the floor call
     // https://github.com/d3/d3-scale/blob/fd07dd8ceeaeaec612f675050ac134243b406f64/src/band.js#L26
     var yHeightWithMaxBand = Math.max(1, selected_q_ids.length - paddingInner + paddingOuter * 2) * maxBandwidth / (1 - paddingInner);
-    
+
     var yStop = Math.min(height - xAxisBottomHeight, yHeightWithMaxBand + xAxisTopHeight);
-    
-    
+
+
     // CALCULATE Y SCALE
     y_scale = d3.scaleBand()
       .range([xAxisTopHeight, yStop])
       .paddingInner(paddingInner)
       .paddingOuter(paddingOuter)
       .domain(selected_q_ids);
-    
+
 
     // UPDATE Y AXIS
     yAxisScale = y_scale.copy();
@@ -179,22 +185,22 @@
     var yAxis = d3.axisLeft()
       .tickSize(3)
       .scale(yAxisScale);
-    
+
     oldYAxisWidth = Math.max(50, yAxisReferenceElement.node().getBBox().width);
     yAxisReferenceElement.call(yAxis);
     yAxisWidth = Math.max(50, yAxisReferenceElement.node().getBBox().width);
-    
+
     if (first_update) {
       oldYAxisWidth = yAxisWidth;
     }
-    
+
     yAxisElement.interrupt().selectAll('*').interrupt();
-    
+
     yAxisElement
       .transition(el_trans)
         .attr("transform", "translate(" + yAxisWidth + ", 0)")
         .call(yAxis);
-    
+
     yAxisElement.selectAll(".y.axis text")
       .on("mouseover",
         function(d, i) {
@@ -206,59 +212,59 @@
           tooltipOut();
           setToNormalColor(i);
         });
-    
-    
+
+
     // CALCULATE X SCALE
     x_scale = d3.scaleLinear()
       .domain([0, 100]) // TODO define range in producer
       .range([0, width - yAxisWidth]);
-    
-    
+
+
     // UPDATE X AXIS TOP
     var xAxisTop = d3.axisTop()
       .scale(x_scale)
       .ticks(20, "d")
       .tickSizeInner(0);
-        
+
     var x_axis_top = d3.selectAll("g.x.axis.top");
-    
+
     x_axis_top.interrupt().selectAll('*').interrupt();
-    
+
     x_axis_top.transition(el_trans)
       .attr("transform", "translate(" + yAxisWidth + "," + xAxisTopHeight + ")")
       .call(xAxisTop);
-        
+
     d3.selectAll(".x-top-description")
       .transition(el_trans)
         .attr("transform", "translate(" + (width - yAxisWidth)/2 + ", -20)");
 
-    
+
     // UPDATE X AXIS BOTTOM
     var xAxisBottom = d3.axisBottom()
       .scale(x_scale)
       .ticks(20, "d")
       .tickSizeInner(-(yStop - xAxisTopHeight));
-    
-    var x_axis_bottom = d3.selectAll("g.x.axis.bottom"); 
-    
+
+    var x_axis_bottom = d3.selectAll("g.x.axis.bottom");
+
     x_axis_bottom.interrupt().selectAll('*').interrupt();
-    
+
     x_axis_bottom.transition(el_trans)
       .attr("transform", "translate(" + yAxisWidth + "," + (yStop) + ")")
       .call(xAxisBottom);
-    
+
     d3.selectAll(".x-bottom-description")
       .transition(el_trans)
       .attr("transform", "translate(" + (width - yAxisWidth)/2 + ", 28)")
-      
-      
+
+
     // BARS
     var bars = chart.selectAll(".bar")
       .data(selected_q_ids);
-    
+
     // remove old bars
     bars.exit().remove();
-    
+
     // add new bars
     bars.enter().append("g")
       .classed('bar', true)
@@ -283,30 +289,30 @@
 
     // animate all bars into position
     bars = d3.selectAll('.bar');
-    
+
     bars.interrupt().selectAll('*').interrupt();
-    
+
     bars
       .transition(el_trans)
       .attr("transform", function(d, i) { return "translate(" + (yAxisWidth + 1) + "," + y_scale(d) + ")"; });
-    
+
     bars.select(".barrect")
       .transition(el_trans)
         .style("fill", function(d, i) {return colorForValue(getMean(i, selected_option), mean_references[getQid(i)], directions[getQid(i)]); })
         .attr("height", y_scale.bandwidth())
         .attr("width", function(d, i) { return x_scale(getMean(i, selected_option)) + 1; });
-    
+
     // REFERENCE LINES
     var referenceWidth = 2;
     var referenceExtraHeight = 4;
     var referenceHeight = y_scale.bandwidth() + referenceExtraHeight;
-    
+
     var references = chart.selectAll(".reference")
       .data(selected_q_ids);
-    
+
     // remove old reference lines
     references.exit().remove();
-    
+
     // add new reference lines
     references.enter().append("g")
       .classed('reference', true)
@@ -334,27 +340,27 @@
         .attr("width", referenceWidth + 2)
         .attr("height", referenceHeight + 2)
         .attr("opacity", "0");
-    
+
     // update all reference lines
-    
+
     references = d3.selectAll('.reference');
-    
+
     references.interrupt().selectAll('*').interrupt();
-    
+
     references
       .transition(el_trans)
         .attr("transform", function(d, i) { return "translate(" + (yAxisWidth + x_scale(mean_references[d]) - referenceWidth/2) + "," + (y_scale(d) - referenceExtraHeight/2) + ")"; });
-    
+
     references.select('.reference-line')
       .transition(el_trans)
         .attr("width", referenceWidth)
         .attr("height", referenceHeight);
-    
+
     references.selectAll('.reference-line-box')
       .transition(el_trans)
       .attr("width", referenceWidth + 2)
       .attr("height", referenceHeight + 2)
-    
+
     // repopulate the description box and reset the tooltip
     if (selected_q_ids.length > 0) {
       tooltipOver(Math.min(lastHoveredBar, selected_q_ids.length -1));
@@ -363,36 +369,36 @@
         .style('opacity', '0');
     }
     tooltipOut();
-    
-    
+
+
     // HEADER SELECT
     var header_select_div = d3.select(".header-select-div");
     var header_select = d3.select(".header-select");
-    
+
     var options = header_select.selectAll('option')
         .data(perspective_options, function(d) { return d; });
-    
+
     options.exit().remove();
-    
+
     options.enter()
       .append('option')
         .text(function(d) { return d; })
         .attr("value", function(d, i) { return i });
-    
+
     var bar_area_width = (width - yAxisWidth);
     var select_width = header_select.node().getBoundingClientRect().width;
 
     header_select_div.interrupt();
-    
+
     header_select_div
       .transition(el_trans)
         .style("margin-left", yAxisWidth + bar_area_width/2 - select_width/2 + "px");
-    
+
     header_select.node().selectedIndex = selected_option;
-    
-    
+
+
     // FINISH
-    updateStyles(); 
+    updateStyles();
   }
 
   function updateStyles() {
@@ -415,7 +421,7 @@
     d3.selectAll(".reference rect, .reference path")
       .style("fill", "#444");
   }
-  
+
   function get_selected_q_ids(means, selected_option) {
     var selected = [];
     q_ids.forEach(function(q_id, i) {
@@ -458,12 +464,12 @@
     perspective_options = perspective_options_array;
     means = means_array;
     selected_q_ids = get_selected_q_ids(means, selected_option);
-    
+
     updateSelectorOption(selected_option);
-    
+
     first_update = false;
   }
-  
+
   exports.updateSelectorOption = function(selected_selected_option) {
     selected_option = selected_selected_option;
     selected_q_ids = get_selected_q_ids(means, selected_option);
@@ -479,7 +485,7 @@
     var chartHeight = d3.select('.x.axis.top').node().getBoundingClientRect().height
                     + d3.select('.x.axis.bottom').node().getBoundingClientRect().height
                     + 10;  // constant to fudge the result
-    
+
     var doctype = '<?xml version="1.0" standalone="no"?>'
       + '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';
 
@@ -504,10 +510,10 @@
         .attr("height", chartHeight)
         .style("visibility", "hidden");
       var canvas_chart = canvas_chart_selection.node();
-  
+
       var chart_ctx = canvas_chart.getContext('2d');
       chart_ctx.drawImage(img, 0, 0);
-  
+
       var header_text = perspective_options[selected_option];
       var header_padding_top = 5;
       var header_font_size = 16;
@@ -562,4 +568,3 @@
     img.src = url;
   }
 })(window);
-
