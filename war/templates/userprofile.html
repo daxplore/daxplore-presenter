@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/daxplore-common.css">
     <link rel="stylesheet" href="css/profile-chart.css">
     <link rel="stylesheet" href="css/userprofile.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
 
     <script type="text/javascript" charset="UTF-8">
       var prefix = "{2}";
@@ -106,16 +107,39 @@
           </div>
         </div>
         <div class="user-paste-data-content-wrapper">
-          <div class="user-paste-data-content">
-            <div class="user-paste-data-description">
-              Kopiera och klistra in en tabell fr&aring;n en COPSOQ-rapport i textf&auml;ltet, s&aring; genereras tabellen och diagrammet nedan automatiskt.
+          <div>
+            <div class="user-paste-data-content">
+              <div class="user-paste-data-description">
+                Kopiera och klistra in en tabell fr&aring;n en COPSOQ-rapport i textf&auml;ltet, s&aring; genereras tabellen och diagrammet nedan automatiskt.
+              </div>
+              <textarea class='user-paste-data-textarea'></textarea>
+              <div class='user-paste-data-submit-wrapper'>
+                <span class='user-paste-data-submit-explanation'>V&auml;lj en kolumn och l&auml;s in din data:</span>
+                <select class='user-paste-data-submit-column-select'></select>
+                <span class='user-paste-data-submit-button dashed-button'>L&auml;s in data</span>
+              </div>
             </div>
-            <textarea class='user-paste-data-textarea'></textarea>
-            <div class='user-paste-data-submit-wrapper'>
-              <span class='user-paste-data-submit-explanation'>V&auml;lj en kolumn och l&auml;s in din data:</span>
-              <select class='user-paste-data-submit-column-select'></select>
-              <span class='user-paste-data-submit-button dashed-button'>L&auml;s in data</span>
-            </div>
+          </div>
+          <div  class="user-paste-data-error-log-wrapper">
+            <div class="user-paste-data-error-log">
+              <div class="user-paste-data-error-log-header">
+                <i class="fas fa-exclamation-triangle user-paste-data-error-log-header-icon"></i>
+                &nbsp;Lyckades inte läsa in alla rader
+              </div>
+              <div class="user-paste-data-error-text-area">
+                <div class="user-paste-data-error-text-number-bounds-errors">
+                  <span>Värde utanför COPSOQ-skalans intervall (0-100):</span>
+                </div>
+                <div class="user-paste-data-error-text-no-number-errors">
+                  <span>Kunde inte hitta något numeriskt värde i slutet av raden:</span>
+                </div>
+                <div class="user-paste-data-error-text-multiple-rows-errors">
+                </div>
+                <div class="user-paste-data-error-text-no-row-errors">
+                  <span>Kunde inte matcha raden till någon COPSOQ-skala:</span>
+                </div>
+              </div>
+            </diV>
           </div>
         </div>
       </div>

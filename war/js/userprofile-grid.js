@@ -226,9 +226,14 @@
 
         var rows = d3.select('.user-paste-data-textarea').node().value.split('\n');
         var importedTexts = new Array(usermeans.length);
+        var importedMeanStrings = new Array(usermeans.length);
         var importedMeans = new Array(usermeans.length);
         var matchedRows = new Array(rows.length);
-        var importErrors = [];
+
+        var numberBoundsErrors = [];
+        var notANumberErrors = [];
+        var multiMatchErrors = [];
+        var noMatchErrors = [];
 
         // parse text and numbers
         for (var i=0; i<rows.length; i++) {
@@ -239,16 +244,15 @@
           var lastWhitespace = row.search(/\s[^\s]*$/);
           if (lastWhitespace > 0) {
             importedTexts[i] = row.substring(0, lastWhitespace + 1).trim();
-            var meanString = row.substring(lastWhitespace + 1, row.length).trim();
-            importedMeans[i] = Number(meanString.replace(',', '.'));
+            importedMeanStrings[i] = row.substring(lastWhitespace + 1, row.length).trim();
+            importedMeans[i] = Number(importedMeanStrings[i].replace(',', '.'));
           }
         }
 
         // check for matches
         for (var regIndex=0; regIndex<userImportRegexes.length; regIndex++) {
           var matchRow = -1;
-          var matchCount = 0;
-          var matchText = "";
+          var matchedRowTexts = [];
           for (var importRow=0; importRow<importedTexts.length; importRow++) {
             if (typeof importedTexts[importRow] === 'undefined') {
               continue;
@@ -256,35 +260,122 @@
             var textLC = importedTexts[importRow].toLowerCase();
             if (textLC.length > 0) {
               if (textLC.search(userImportRegexes[regIndex]) >= 0) {
-                if (matchCount > 0) {
-                    matchText += ', ';
-                }
-                matchText += '"' + importedTexts[importRow] + '"';
-                matchCount++;
+                matchedRowTexts.push(importedTexts[importRow] + ' ' + importedMeanStrings[importRow]);
                 matchedRows[importRow] = true;
                 matchRow = importRow;
               }
             }
           }
-          if (matchCount === 1 && typeof matchText != 'undefined') {
+          matchedRowTexts = matchedRowTexts.filter(function(value, index, self) {return self.indexOf(value) === index});
+          if (matchedRowTexts.length == 1) {
             if ((typeof importedMeans[matchRow] != 'number' || isNaN(importedMeans[matchRow])) && typeof rows[matchRow] != 'undefined' && rows[matchRow].length > 0) {
-              importErrors.push('Kunde inte tolka siffran i slutet av raden: "' + rows[matchRow].trim() + '".');
+              notANumberErrors.push(rows[matchRow].trim());
+            } else if (importedMeans[matchRow] < 0 || importedMeans[matchRow] > 100) {
+              numberBoundsErrors.push(rows[matchRow].trim());
             } else {
               usermeans[regIndex][selectedGroupIndex] = importedMeans[matchRow];
             }
-          } else if (matchCount > 1) {
-            importErrors.push('Skalan "' + shorttextsMap[q_ids[regIndex]] + '" matchades av flera rader: ' + matchText + '.');
+          } else if (matchedRowTexts.length > 1) {
+            multiMatchErrors.push({scale: shorttextsMap[q_ids[regIndex]], matchedRowTexts: matchedRowTexts});
           }
         }
 
         // generate errors for unmatched rows
         for (var i=0; i<matchedRows.length; i++) {
           if (typeof matchedRows[i] == 'undefined' && typeof rows[i] != 'undefined' && rows[i].length > 0) {
-            importErrors.push('Kunde inte hitta någon match för raden: "' + rows[i] + '"');
+            noMatchErrors.push(rows[i]);
           }
         }
 
-        console.log(importErrors.join('\n'));
+        // ADD NUMBER OUT OF BOUNDS ERRORS
+        d3.select('.user-paste-data-error-text-number-bounds-errors')
+          .style('display', numberBoundsErrors.length > 0 ? 'block' : 'none');
+
+        var numberBoundsErrorRows = d3.select('.user-paste-data-error-text-number-bounds-errors')
+          .selectAll('.user-paste-data-error-row')
+          .data(numberBoundsErrors);
+
+        numberBoundsErrorRows.exit().remove();
+
+        numberBoundsErrorRows.enter()
+          .append('div')
+          .classed('user-paste-data-error-row', true)
+          .text(function(d) { return d; });
+
+        numberBoundsErrorRows
+          .text(function(d) { return d; })
+
+        // ADD NO NUMBER FOUND ERRORS
+        d3.select('.user-paste-data-error-text-no-number-errors')
+          .style('display', notANumberErrors.length > 0 ? 'block' : 'none');
+
+        var notANumberErrorRows = d3.select('.user-paste-data-error-text-no-number-errors')
+          .selectAll('.user-paste-data-error-row')
+          .data(notANumberErrors);
+
+        notANumberErrorRows.exit().remove();
+
+        notANumberErrorRows.enter()
+          .append('div')
+          .classed('user-paste-data-error-row', true)
+          .text(function(d) { return d; });
+
+        notANumberErrorRows
+          .text(function(d) { return d; })
+
+        // ADD MULTIPLE MATCHES ERRORS
+        d3.select('.user-paste-data-error-text-multiple-rows-errors')
+          .style('display', multiMatchErrors.length > 0 ? 'block' : 'none');
+
+        var multipleMatchErrorGroups = d3.select('.user-paste-data-error-text-multiple-rows-errors')
+          .selectAll('.user-paste-data-error-multiple-match-group')
+          .data(multiMatchErrors);
+
+        multipleMatchErrorGroups.exit().remove();
+
+        var multipleMatchContentFunction = function (d) {
+          var group = d3.select(this);
+          group.text('');
+
+          group.append('div')
+            .text('Skalan "' + d.scale + '" matchades av flera rader:' );
+
+          d.matchedRowTexts.forEach(function (r) {
+            group.append('div')
+              .classed('user-paste-data-error-row', true)
+              .text(r);
+          })
+        };
+
+        multipleMatchErrorGroups.enter()
+          .append('div')
+          .classed('user-paste-data-error-multiple-match-group', true)
+          .each(multipleMatchContentFunction);
+
+        multipleMatchErrorGroups
+          .each(multipleMatchContentFunction);
+
+        // ADD NO MATCH ERRORS
+        d3.select('.user-paste-data-error-text-no-row-errors')
+          .style('display', noMatchErrors.length > 0 ? 'block' : 'none');
+
+        var noMatchErrorRows = d3.select('.user-paste-data-error-text-no-row-errors')
+          .selectAll('.user-paste-data-error-row')
+          .data(noMatchErrors);
+
+        noMatchErrorRows.exit().remove();
+
+        noMatchErrorRows.enter()
+          .append('div')
+          .classed('user-paste-data-error-row', true)
+          .text(function(d) { return d; });
+
+        noMatchErrorRows
+          .text(function(d) { return d; })
+
+        // SHOW/HIDE ERROR LOG
+        d3.select('.user-paste-data-error-log-wrapper')
+          .style('display',  numberBoundsErrors.length + notANumberErrors.length + multiMatchErrors.length + noMatchErrors.length > 0 ? 'flex' : 'none');
 
         generateColumns(usernames, usermeans);
         callCallbacks();

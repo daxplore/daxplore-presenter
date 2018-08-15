@@ -1,11 +1,10 @@
 .user-paste-data {
-	min-width: 500px;
 	display: inline-block;
 	font: 12px sans-serif;
 	color: #444;
 	border: 1px solid #DDD;
 	padding: 10px;
-	margin-top: 20px;
+	margin-top: 30px;
 	margin-bottom: 20px;
 }
 
@@ -43,13 +42,17 @@
 }
 
 .user-paste-data-content-wrapper {
+	display: flex;
 	height: 0px;
 	overflow: hidden;
 }
 
 .user-paste-data-content {
+	width: 450px;
 	padding: 10px;
 	padding-bottom: 0px;
+	display: flex;
+	flex-direction: column;
 }
 
 .user-paste-data-submit-wrapper {
@@ -74,11 +77,62 @@
 
 .user-paste-data-textarea {
 	color: #444;
-	width: 100%;
+	flex: 1;
 	height: 400px;
+	padding: 10px;
 	margin-top: 10px;
 	resize: none;
 }
+
+.user-paste-data-error-log-wrapper {
+	height: 100%;
+	display: none;
+}
+
+.user-paste-data-error-log {
+	width: 450px;
+	margin: 10px 10px 20px 20px;
+	padding: 10px;
+	display: flex;
+  flex-direction: column;
+}
+
+
+.user-paste-data-error-log-header {
+	padding-left: 5px;
+	font-weight: bold;
+}
+
+.user-paste-data-error-log-header-icon {
+	color: #d13d40;
+}
+
+.user-paste-data-error-text-area {
+	border: 1px solid #ddd;
+  flex: 1;
+	padding: 0px 10px 10px 10px;
+  margin-top: 10px;
+  overflow-y: scroll;
+}
+
+.user-paste-data-error-text-number-bounds-errors,
+.user-paste-data-error-text-no-number-errors,
+.user-paste-data-error-text-no-row-errors {
+	margin-top: 10px;
+	display: none;
+}
+
+.user-paste-data-error-multiple-match-group {
+	margin-top: 10px;
+}
+
+.user-paste-data-error-row {
+	margin-top: 3px;
+	margin-left: 10px;
+	white-space: nowrap;
+	font-style: italic;
+}
+
 
 .grid-main > .chart-row {
 	height: 600px;
