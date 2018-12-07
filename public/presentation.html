@@ -1,45 +1,64 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<!-- Set up basic page properties -->
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-
 		<title>Daxplore Presenter</title>
 		<link rel="icon" href="favicon.ico">
 
+		<!-- Import stylesheets -->
+		<!--Normalize  all browser default css values: https://necolas.github.io/normalize.css/ -->
+		<link rel="stylesheet" href="css/normalize.css">
+
+		<!-- Style for different Daxplore components -->
+		<link rel="stylesheet" href="css/daxplore-common.css">
+		<link rel="stylesheet" href="css/presentation.css">
+		<link rel="stylesheet" href="css/daxplore-widgets.css">
+		<link rel="stylesheet" href="css/daxplore-chart.css">
+
+		<!-- Import library dependencies -->
+		<!-- Use d3 to design all charts, interactive elements and manipulate the DOM: https://d3js.org/ -->
 		<script type="text/javascript" src="https://d3js.org/d3.v5.min.js"></script>
+		<!-- Use Axios to download data from the server: https://github.com/axios/axios -->
 		<script type="text/javascript" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+		<!-- Use Modernizr to polyfill features for older browsers -->
 		<script type="text/javascript" src="js/modernizr-ES5Array.js"></script>
 
-		<script type="text/javascript" src="js/presenter-question-picker-d3.js"></script>
+		<!-- Import Daxplore helpers -->
+		<script type="text/javascript" src="js/profile-helpers.js"></script>
+
+		<!-- Import Daxplore Explorer elements -->
 		<script type="text/javascript" src="js/presenter-chart-panel.js"></script>
+		<script type="text/javascript" src="js/presenter-question-picker-d3.js"></script>
 		<script type="text/javascript" src="js/presenter-perspective-picker-d3.js"></script>
+
+		<!-- Import Daxplore Charts  -->
 		<script type="text/javascript" src="js/presenter-chart-frequency-d3.js"></script>
 		<script type="text/javascript" src="js/presenter-chart-dichtimeline-d3.js"></script>
-		<script type="text/javascript" src="js/profile-helpers.js"></script>
 		<script type="text/javascript" src="js/presenter-chart-mean-d3.js"></script>
 
+		<!-- Use Axios to download all needed metadata files from the server -->
 		<script type="text/javascript" charset="UTF-8">
+			// Define functions for all metadata files to be downloaded
 			function getGroups() { return axios.get('./data/groups.json') }
 			function getPerspectives() { return axios.get('./data/perspectives.json') }
 			function getQuestions() { return axios.get('./data/perspectives.json') }
 			function getSettings() { return axios.get('./data/settings.json') }
 			function getUsertexts() { return axios.get('./data/usertexts.json') }
 
+			// Make a batch Axios request to download all metadata asynchronously
 			axios.all([getGroups(), getPerspectives(), getQuestions(), getSettings(), getUsertexts()])
 			.then(axios.spread(function (groupsResponse, perspectivesResponse, questionsResponse, settingsResponse, usertextsResponse) {
+				// Get the downloaded metadata
 				let groups = groupsResponse.data
 				let perspectives = perspectivesResponse.data
 				let questions = questionsResponse.data
 				let settings = settingsResponse.data
 				let usertexts = usertextsResponse.data
+
+				// Initialize elements that depend on the metadata
 			}));
 		</script>
-
-		<link rel="stylesheet" href="css/normalize.css">
-		<link rel="stylesheet" href="css/daxplore-common.css">
-		<link rel="stylesheet" href="css/presentation.css">
-		<link rel="stylesheet" href="css/daxplore-widgets.css">
-		<link rel="stylesheet" href="css/daxplore-chart.css">
 	</head>
 
 	<body>
