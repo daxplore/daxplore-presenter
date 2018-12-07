@@ -2,27 +2,14 @@
 <html>
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-		<base href="{0}" target="_blank">
 
-		<link rel="stylesheet" href="css/normalize.css">
-		<link rel="stylesheet" href="css/daxplore-common.css">
-		<link rel="stylesheet" href="css/presentation.css">
-		<link rel="stylesheet" href="css/daxplore-widgets.css">
-		<link rel="stylesheet" href="css/daxplore-chart.css">
+		<title>Daxplore Presenter</title>
+		<link rel="icon" href="favicon.ico">
 
-		<title>{1}</title>
-
-		<script type="text/javascript" charset="UTF-8">
-			var prefix = "{2}";
-			var perspectives = {3};
-			var questions = {4};
-			var groups = {5};
-			var settings = {6};
-			var usertexts = {7};
-		</script>
-
+		<script type="text/javascript" src="https://d3js.org/d3.v5.min.js"></script>
+		<script type="text/javascript" src="https://unpkg.com/axios/dist/axios.min.js"></script>
 		<script type="text/javascript" src="js/modernizr-ES5Array.js"></script>
-		<script type="text/javascript" src="https://d3js.org/d3.v5.js"></script>
+
 		<script type="text/javascript" src="js/presenter-question-picker-d3.js"></script>
 		<script type="text/javascript" src="js/presenter-chart-panel.js"></script>
 		<script type="text/javascript" src="js/presenter-perspective-picker-d3.js"></script>
@@ -31,15 +18,31 @@
 		<script type="text/javascript" src="js/profile-helpers.js"></script>
 		<script type="text/javascript" src="js/presenter-chart-mean-d3.js"></script>
 
-		<script type="text/javascript" src="gwtPresentation/gwtPresentation.nocache.js"></script>
-		<script type="text/javascript">{8}</script>
+		<script type="text/javascript" charset="UTF-8">
+			function getGroups() { return axios.get('./data/groups.json') }
+			function getPerspectives() { return axios.get('./data/perspectives.json') }
+			function getQuestions() { return axios.get('./data/perspectives.json') }
+			function getSettings() { return axios.get('./data/settings.json') }
+			function getUsertexts() { return axios.get('./data/usertexts.json') }
+
+			axios.all([getGroups(), getPerspectives(), getQuestions(), getSettings(), getUsertexts()])
+			.then(axios.spread(function (groupsResponse, perspectivesResponse, questionsResponse, settingsResponse, usertextsResponse) {
+				let groups = groupsResponse.data
+				let perspectives = perspectivesResponse.data
+				let questions = questionsResponse.data
+				let settings = settingsResponse.data
+				let usertexts = usertextsResponse.data
+			}));
+		</script>
+
+		<link rel="stylesheet" href="css/normalize.css">
+		<link rel="stylesheet" href="css/daxplore-common.css">
+		<link rel="stylesheet" href="css/presentation.css">
+		<link rel="stylesheet" href="css/daxplore-widgets.css">
+		<link rel="stylesheet" href="css/daxplore-chart.css">
 	</head>
 
 	<body>
-		<!-- add GWT history support -->
-		<iframe src="javascript:'" id="__gwt_historyFrame" tabIndex='-1'
-			style="position:absolute; width:0; height:0; border:0"></iframe>
-
 		<div class="pagecontainer">
 			<div class="general-warning-section" id="ID-general-warning"></div>
 			<div class="stagePanel" id="ID-StagePanel"></div>
