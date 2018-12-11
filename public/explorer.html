@@ -67,6 +67,7 @@
 
   <body>
 
+    <!-- Error message if JavaScript is disabled -->
     <noscript>
       <div class="noscript">
         <p class="warning-sub">
@@ -75,17 +76,92 @@
       </div>
     </noscript>
 
+    <!-- Structural top level div for Explorer -->
     <div class="daxplore-explorer">
-      <div class="question-panel"></div>
+
+      <!-- Contains question picker, polulated by explorer-question-picker.js -->
+      <div class="question-panel">
+        <div class="question-header"></div>
+        <div class="question-picker no-select"></div>
+      </div>
+
+      <!-- Structural column that contains the chart and bottom panels -->
       <div class="chart-perspective-column">
-        <div class="chart-panel"></div>
-        <div class="bottom-panel">
-          <div class="perspective-panel"></div>
+
+        <!-- Contains chart titles, tabs and chart. -->
+        <!-- Populated by explorer-chart-panel.js and different chart-*.js classes -->
+        <div class="chart-panel">
+
+          <!-- The header section of the chart with placeholders for -->
+          <!-- divs that are populated by different chart-*.js -->
+          <div class="daxplore-ExternalHeader">
+            <div class="daxplore-ExternalHeader-header"></div>
+            <div class="daxplore-ExternalHeader-sub"></div>
+            <div class="daxplore-ExternalHeader-dichsub"></div>
+            <div class="daxplore-ExternalHeader-freq-tooltip"></div>
+          </div>
+
+          <!-- Tabs used to select the chart to display when there are multiple -->
+          <!-- supported charts for a given question/perspective combination -->
+          <!-- Managed/populated by TODO --->
+          <div class="chart-tabs">
+            <div class="chart-tab-spacing frequency"></div>
+            <div class="chart-tab frequency chart-tab-selected">Frequencies</div>
+            <div class="chart-tab-spacing mean"></div>
+            <div class="chart-tab mean">Means</div>
+            <div class="chart-tab-spacing dichotomized"></div>
+            <div class="chart-tab dichotomized">Dichotomized</div>
+            <div class="chart-tab-remainder"></div>
+          </div>
+
+          <!-- Wrapper for the actual chart, populated by different chart-*.js -->
+          <div class="chart"></div>
+        </div>
+
+        <!-- Structural row that contains the perspective and description panels -->
+        <div class="perspective-description-row">
+
+          <!-- Contains perspective picker, polulated by explorer-perspective-picker.js -->
+          <div class="perspective-panel">
+            <div class="perspective-header"></div>
+            <div class="perspective-picker">
+              <div class="perspective-varpicker">
+                <div class="pervarpicker-border-wrapper">
+                  <div class="pervarpicker-top-padding"></div>
+                  <div class="pervarpicker-variables"></div>
+                  <div class="pervarpicker-bottom-padding"></div>
+                </div>
+                <div class="pervarpicker-right-border-extender"></div>
+              </div>
+              <div class="perspective-options">
+                <div class="peropt-buttons">
+                  <span class="peropt-all-button  perspective-button dashed-button"></span>
+                  <span class="peropt-none-button perspective-button dashed-button"></span>
+                </div>
+                <div class="peropt-columns">
+                  <div class="peropt-col-one"></div>
+                  <div class="peropt-extra-columns">
+                    <div class="peropt-col-two"></div>
+                    <div class="peropt-col-three"></div>
+                  </div>
+                </div>
+                <div class="peropt-bottom-padding"></div>
+                <div class="peropt-more-wrapper">
+                  <span class="peropt-more-button perspective-button dashed-button"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contains description panel, populated by TODO -->
           <div class="description-panel"></div>
         </div>
       </div>
-      <div class="sidebar-column">
-    </div>
 
+      <!-- Structural column that contains the legend -->
+      <div class="sidebar-column">
+        <!-- Contains the chart legend, populated by different chart-*.js -->
+        <div class="legend"></div>
+      </div>
   </body>
 </html>
