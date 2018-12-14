@@ -1,13 +1,14 @@
 (function(exports) {
 
-  var question_map = {};
-  for (var i=0; i < questions.length; i ++) {
-    var q = questions[i];
-    question_map[q.column] = q;
-  }
-
-  var initialQuestion = groups[0].questions[0];
-  var selectedTab = question_map[initialQuestion].displaytypes[0];
+// TODO
+  // var question_map = {};
+  // for (var i=0; i < questions.length; i ++) {
+  //   var q = questions[i];
+  //   question_map[q.column] = q;
+  // }
+  //
+  // var initialQuestion = groups[0].questions[0];
+  // var selectedTab = question_map[initialQuestion].displaytypes[0];
 
   var primaryColors, hoverColors;
 

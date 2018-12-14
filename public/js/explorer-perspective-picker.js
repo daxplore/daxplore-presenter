@@ -10,8 +10,10 @@
   var collapsed = true;
   var fixed_width = null;
 
+  var questions, perspectives, usertexts, settings
+
   document.addEventListener("DOMContentLoaded", function(e) {
-    d3.selectAll('body').append('img')
+    d3.select('body').append('img')
       .classed('img-preload', true)
       .attr('src', '/img/perspective-checkbox-empty.png');
   });
@@ -26,63 +28,16 @@
     }
   }
 
-  exports.generatePerspectivePanel = function() {
-    d3.select('.daxplore-PerspectivePanel').html(
-        "<div class='perspective-header'>"
-      + usertexts.perspectivesHeader
-      + "</div>"
-      + "<div class='perspective-picker'>"
-      + "  <div class='perspective-varpicker'>"
-      + "    <div class='pervarpicker-border-wrapper'>"
-      + "      <div class='pervarpicker-top-padding'></div>"
-      + "      <div class='pervarpicker-variables'></div>"
-      + "      <div class='pervarpicker-bottom-padding'></div>"
-      + "    </div>"
-      + "    <div class='pervarpicker-right-border-extender'></div>"
-      + "  </div>"
-      + "  <div class='perspective-options'>"
-      + "    <div class='peropt-buttons'>"
-      + "      <span class='peropt-all-button  perspective-button dashed-button'></span>"
-      + "      <span class='peropt-none-button perspective-button dashed-button'></span>"
-      + "    </div>"
-      + "    <div class='peropt-columns'>"
-      + "      <div class='peropt-col-one'></div>"
-      + "      <div class='peropt-extra-columns'>"
-      + "        <div class='peropt-col-two'></div>"
-      + "        <div class='peropt-col-three'></div>"
-      + "      </div>"
-      + "    </div>"
-      + "    <div class='peropt-bottom-padding'></div>"
-      + "    <div class='peropt-more-wrapper'>"
-      + "      <span class='peropt-more-button perspective-button dashed-button'></span>"
-      + "    </div>"
-      + "  </div>"
-      + "</div>"
-    );
+  exports.generatePerspectivePanel = function(questions_in, perspectives_in, usertexts_in, settings_in) {
+    questions = questions_in
+    perspectives = perspectives_in
+    usertexts = usertexts_in
+    settings = settings_in
 
-    window.setTimeout(popuplatePerspectivePanel, 1);
-  }
+    d3.select('.perspective-header')
+      .text(usertexts.perspectiveHeader)
 
-  exports.getSelectedPerspective = function() {
-    return perspectives[selected_perspective];
-  }
-
-  exports.getPerspectiveOptions = function() {
-    return selected_options.join(',', true);
-  }
-
-  exports.isPerspectiveTotalSelected = function() {
-    return total_selected;
-  }
-
-
-  function popuplatePerspectivePanel() {
-    var variable_list = d3.select('.pervarpicker-variables');
-
-    if (variable_list.empty()) {
-      window.setTimeout(popuplatePerspectivePanel, 10);
-      return;
-    }
+    var variable_list = d3.select('.pervarpicker-variables')
 
     var perspective_shorttexts = [];
     perspectives.forEach(function(p) {
@@ -143,9 +98,21 @@
 
     // hack to force initial gwt sizing to work
     // TODO replace when the resizing system is moved to pure js
-    for (var i=2; i<=12; i++) {
-      setTimeout(initializeSelection, Math.pow(2, i));
-    }
+    // for (var i=2; i<=12; i++) {
+    //   setTimeout(initializeSelection, Math.pow(2, i));
+    // }
+  }
+
+  exports.getSelectedPerspective = function() {
+    return perspectives[selected_perspective];
+  }
+
+  exports.getPerspectiveOptions = function() {
+    return selected_options.join(',', true);
+  }
+
+  exports.isPerspectiveTotalSelected = function() {
+    return total_selected;
   }
 
   function initializeSelection() {
@@ -278,7 +245,8 @@
     }
 
     if (fireGwtEvent && has_checked_box) {
-      gwtPerspectiveCallback();
+      // TODO replace with callback to js page handler
+      //gwtPerspectiveCallback();
     }
 
     // hack to handle IE display bugs

@@ -15,12 +15,12 @@
   var timepoints_map = {};
   var percentage_format = d3.format(".0%");
 
-  for (var i=0; i < questions.length; i ++) {
-    var q = questions[i];
-    dichselected_map[q.column] = q.dichselected;
-    options_map[q.column] = q.options;
-    timepoints_map[q.column] = q.timepoints;
-  }
+  // for (var i=0; i < questions.length; i ++) {
+  //   var q = questions[i];
+  //   dichselected_map[q.column] = q.dichselected;
+  //   options_map[q.column] = q.options;
+  //   timepoints_map[q.column] = q.timepoints;
+  // }
 
   var pointSymbol = d3.symbol().type(d3.symbolCircle);
   var pointSize = 40;

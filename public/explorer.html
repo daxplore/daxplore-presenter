@@ -46,7 +46,7 @@
       // Define functions for all metadata files to be downloaded
       function getGroups() { return axios.get('data/groups.json') }
       function getPerspectives() { return axios.get('data/perspectives.json') }
-      function getQuestions() { return axios.get('data/perspectives.json') }
+      function getQuestions() { return axios.get('data/questions.json') }
       function getSettings() { return axios.get('data/settings.json') }
       function getUsertexts() { return axios.get('data/usertexts.json') }
 
@@ -61,6 +61,8 @@
         let usertexts = usertextsResponse.data
 
         // Initialize elements that depend on the metadata
+        generateQuestionPanel(questions, groups, usertexts, settings)
+        generatePerspectivePanel(questions, perspectives, usertexts, settings)
       }));
     </script>
   </head>

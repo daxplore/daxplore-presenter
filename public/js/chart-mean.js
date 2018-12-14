@@ -23,10 +23,10 @@
   var question_map = {};
   var percentage_format = d3.format(".0%");
 
-  for (var i=0; i < questions.length; i++) {
-    var q = questions[i];
-    question_map[q.column] = q ;
-  }
+  // for (var i=0; i < questions.length; i++) {
+  //   var q = questions[i];
+  //   question_map[q.column] = q ;
+  // }
 
 
   // INTERNAL FUNCTIONS

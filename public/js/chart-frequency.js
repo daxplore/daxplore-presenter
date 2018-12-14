@@ -9,11 +9,12 @@
   var chart, chart_g;
 
   // INITIALIZE STATIC RESOURCES
-  var questionMap = {};
-  for (var i=0; i < questions.length; i ++) {
-    var q = questions[i];
-    questionMap[q.column] = q;
-  }
+  // TODO
+  // var questionMap = {};
+  // for (var i=0; i < questions.length; i ++) {
+  //   var q = questions[i];
+  //   questionMap[q.column] = q;
+  // }
 
   var percentageFormat = d3.format(".0%");
 

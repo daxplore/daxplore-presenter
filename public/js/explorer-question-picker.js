@@ -2,33 +2,37 @@
 
   var initialized = false;
   var open_group = -1;
-  var selected_question = groups[0].questions[0];
-  var shorttext_map = [];
-  var group_map = [];
+
+
 
   var element_transition = d3.transition()
     .duration(100)
     .ease(d3.easeLinear);
 
-  for (var i=0; i < questions.length; i++) {
-    var q = questions[i];
-    shorttext_map[q.column] = q.short;
-  }
+  var questions, perspectives, usertexts, settings
+  var shorttext_map = [], group_map = []
+  var selected_question
 
-  for (var i=0; i < groups.length; i++) {
-    var gqs = groups[i].questions;
-    for (var q=0; q < gqs.length; q++) {
-      group_map[gqs[q]] = i;
+  exports.generateQuestionPanel = function(questions_in, groups_in, usertexts_in, settings_in) {
+    questions = questions_in
+    groups = groups_in
+    usertexts = usertexts_in
+    settings = settings_in
+
+    var selected_question = groups[0].questions[0];
+    for (var i=0; i < questions.length; i++) {
+      var q = questions[i];
+      shorttext_map[q.column] = q.short;
     }
-  }
 
-  exports.generateQuestionPanel = function() {
-    d3.select('.daxplore-QuestionPanel').html(
-        "<div class='question-header'>"
-      +  usertexts.questionsHeader
-      +  "</div>"
-      +  "<div class='question-picker no-select'></div>"
-    );
+    for (var i=0; i < groups.length; i++) {
+      var gqs = groups[i].questions;
+      for (var q=0; q < gqs.length; q++) {
+        group_map[gqs[q]] = i;
+      }
+    }
+
+    d3.select('.question-header').text(usertexts.questionsHeader)
 
     var sections = d3.select('.question-picker')
       .selectAll('.question-section')
@@ -76,7 +80,8 @@
 //          var changed = selected_question != d;
 //          if (changed) {
             selected_question = d;
-            gwtQuestionCallback();
+            // TODO replace with callback to js page handler
+            //gwtQuestionCallback();
 //          }
         });
 
