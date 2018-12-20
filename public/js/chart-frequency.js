@@ -2,14 +2,15 @@
   // CONSTANTS
   var chartHeight = 350
 
-  var primaryColors, hoverColors
+  var primaryColors // TODO unused: , hoverColors
   var missingDataColor = d3.hsl('#BBB')
-  var chartwrapperBB, yAxisWidth, xAxisHeight, margin, width, height
-  var chart, chart_g
+  var yAxisWidth, xAxisHeight, margin, width, height // TODO unused: , chartwrapperBB
+  var chart, chartG
 
   // INITIALIZE STATIC RESOURCES
+  var usertexts
+  var questionMap = {}
   // TODO
-  // var questionMap = {};
   // for (var i=0; i < questions.length; i ++) {
   //   var q = questions[i];
   //   questionMap[q.column] = q;
@@ -26,12 +27,13 @@
   var x, y, z
 
   // EXPORTED FUNCTIONS
-  exports.generateFrequencyChart = function (primaryColors_input, hoverColors_input, stat, selectedPerspectiveOptionIndices_input, selectedTimepoint_input) {
+  exports.generateFrequencyChart = function (usertextsInput, primaryColorsInput, hoverColorsInput, stat, selectedPerspectiveOptionIndicesInput, selectedTimepointInput) {
+    usertexts = usertextsInput
     // TODO initizalize once, not every time
-    primaryColors = primaryColors_input
-    hoverColors = hoverColors_input
+    primaryColors = primaryColorsInput
+    // TODO unsused: hoverColors = hoverColorsInput
 
-    selectedPerspectiveOptionIndices = selectedPerspectiveOptionIndices_input
+    selectedPerspectiveOptionIndices = selectedPerspectiveOptionIndicesInput
 
     perspective = stat.p
     question = stat.q
@@ -65,7 +67,7 @@
           stackData['MISSING_DATA'] = 1
         } else {
           for (var j = 0; j < optionKeys.length; j++) {
-            stackData[optionKeys[j]] = total != 0 ? currentTimeData[i][j] / total : 0
+            stackData[optionKeys[j]] = total !== 0 ? currentTimeData[i][j] / total : 0
           }
         }
         tpdata.push(stackData)
@@ -79,17 +81,18 @@
 
     z.domain(optionKeys)
 
-    selectedTimepoint = selectedTimepoint_input
+    selectedTimepoint = selectedTimepointInput
 
     // TODO this is completely recalculated in updateFreqChartSize, should not be needed
     computeDimensions(600, chartHeight) // 600 is an arbitrary number which is overwritten later
     generateChartElements()
     calculateTPWidths()
     // updateChartElements();
-    updateFreqChartSize(chartHeight)
+    // TODO structure project in way that does not depend on adding functions to window
+    window.updateFreqChartSize(chartHeight)
   }
 
-  exports.updateFreqChartSize = function (height_total) {
+  exports.updateFreqChartSize = function (heightTotal) {
     // 2. width for chart to use is max of:
     // a. room remaining of window width after QP, SA, margins, (scroll bar?)
     // b. max of
@@ -130,7 +133,6 @@
     var longestPerspectiveOptionTextLength = 0
     d3.select('.frequency-x-axis').selectAll('text')
       .each(function () {
-        console.log(this)
         if (this.getBBox().width > longestPerspectiveOptionTextLength) {
           longestPerspectiveOptionTextLength = this.getBBox().width
         }
@@ -145,16 +147,17 @@
     var chartNeededWidth = Math.max(minWidthBasedOnBars, minWidthBasedOnTickTexts)
 
     var lockWidth = widthForChart < chartNeededWidth
+    var chartWidth
     if (lockWidth) {
-      var chartWidth = chartNeededWidth
+      chartWidth = chartNeededWidth
     } else {
-      var chartWidth = widthForChart
+      chartWidth = widthForChart
     }
     d3.select('.chart-panel')
       .classed('chart-scroll', lockWidth)
       .style('width', function () { return lockWidth ? widthForChart + 'px' : null })
 
-    computeDimensions(chartWidth, height_total)
+    computeDimensions(chartWidth, heightTotal)
 
     chart
       .attr('width', width + margin.left + margin.right)
@@ -173,7 +176,8 @@
 
     var rows = [].concat(questionMap[question].options).reverse()
 
-    var option = legend.selectAll('.legend-row')
+    // Add legend options
+    legend.selectAll('.legend-row')
       .data(rows)
       .enter()
         .append('div')
@@ -246,7 +250,7 @@
       var tp = timepoints[tpIndex]
       var tpdata = data[tp]
 
-      var freqBars = chart_g
+      var freqBars = chartG
        .selectAll('.freq-bar-' + tp)
        .data(d3.stack().keys(optionKeys)(tpdata))
        .enter().append('g')
@@ -277,7 +281,7 @@
           highlightedPerspectiveOption = d.option
           setSelectedTimepoint(d.timepoint)
           var percentage = d.end - d.start
-          if (d.key != 'MISSING_DATA') {
+          if (d.key !== 'MISSING_DATA') {
             d3.select('.daxplore-ExternalHeader-freq-tooltip')
               .text(percentageFormat(percentage) + ' av gruppen "' + d.option + '" svarade "' + d.key + (timepoints.length >= 2 ? '" år ' + usertexts['timepoint' + tp] : '') + '.')
               .style('color', barStrokeColor(d.key, tpIndex).darker(0.5))
@@ -314,7 +318,7 @@
       //    });
 
       // console.log(timepoints);
-      chart_g.selectAll('.freq-bar-timetick-wrapper-' + tp)
+      chartG.selectAll('.freq-bar-timetick-wrapper-' + tp)
         .data(selectedPerspectiveOptions)
           .enter().append('g')
             .classed('freq-bar-timetick-wrapper-' + tp, true)
@@ -326,9 +330,10 @@
     updateStyles()
   }
 
-  function setSelectedTimepoint (selectedTimepoint_input, instantAnimation = false) {
-    var timepointChanged = selectedTimepoint != selectedTimepoint_input
-    selectedTimepoint = selectedTimepoint_input
+  function setSelectedTimepoint (selectedTimepointInput, instantAnimation = false) {
+    // TODO unused:
+    // var timepointChanged = selectedTimepoint !== selectedTimepointInput
+    selectedTimepoint = selectedTimepointInput
     calculateTPWidths(selectedTimepoint)
     var transitionTime = instantAnimation ? 0 : 300
 
@@ -387,7 +392,7 @@
     if (key === 'MISSING_DATA') {
       var color = missingDataColor
     } else {
-      var color = d3.hsl(z(key)).darker(0.3)
+      color = d3.hsl(z(key)).darker(0.3)
     }
     var lightness = color.l
     var targetDiff = asymptoticLightnessTarget - lightness
@@ -409,39 +414,38 @@
   function calculateTPWidths () {
     tpWidths = []
     var selectedTPIndex = timepoints.indexOf(selectedTimepoint)
-    if (selectedTPIndex === -1) {
-      console.log('Invalid selected tp.', 'question:', question, '/ perspective:', perspective, '/ selectedTimepoint:', selectedTimepoint)
-    }
+    // if (selectedTPIndex === -1) {
+    //   console.log('Invalid selected tp.', 'question:', question, '/ perspective:', perspective, '/ selectedTimepoint:', selectedTimepoint)
+    // }
     var unselectedSize = 0.4
     for (var tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
-      tpWidths.push(selectedTPIndex - tpIndex == 0 ? 1 : unselectedSize)
+      tpWidths.push(selectedTPIndex - tpIndex === 0 ? 1 : unselectedSize)
     }
     // Adjust the widths so they sum up to 1
     var totalWidth = tpWidths.reduce(function (a, b) { return a + b })
     tpWidthsAdditive = []
     var widthSum = 0
-    for (var tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
-      var tp = timepoints[tpIndex]
+    for (tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
       tpWidths[tpIndex] /= totalWidth
       widthSum += tpWidths[tpIndex]
       tpWidthsAdditive[tpIndex] = widthSum
     }
   }
 
-  function computeDimensions (width_total, height_total) {
+  function computeDimensions (widthTotal, heightTotal) {
     yAxisWidth = 35
     xAxisHeight = 24
     margin = { top: 20, right: 13, bottom: xAxisHeight + 40, left: yAxisWidth + 10 }
-    width = width_total - margin.left - margin.right
-    height = height_total - margin.top - margin.bottom
+    width = widthTotal - margin.left - margin.right
+    height = heightTotal - margin.top - margin.bottom
   }
 
   function generateChartElements () {
     chart = d3.select('.chart-panel').append('svg')
     chart
       .classed('frequency-chart', true)
-        .attr('width', width + margin.left + margin.right)
-        .attr('height', height + margin.top + margin.bottom)
+      .attr('width', width + margin.left + margin.right)
+      .attr('height', height + margin.top + margin.bottom)
 
     // WHITE BACKGROUND
     chart.append('rect')
@@ -450,15 +454,15 @@
       .attr('fill', 'white')
 
     // MARGIN ADJUSTED CHART ELEMENT
-    chart_g = chart.append('g')
+    chartG = chart.append('g')
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
     // Y AXIS
-    yAxisElement = chart_g.append('g')
+    chartG.append('g')
       .attr('class', 'axis frequency-y-axis')
 
     // X AXIS
-    chart_g.append('g')
+    chartG.append('g')
       .attr('class', 'axis frequency-x-axis')
 
     updateStyles()

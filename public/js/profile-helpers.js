@@ -1,5 +1,5 @@
 (function (exports) {
-  var mean_references, shorttexts, usertexts, descriptions, directions
+  var meanReferences, shorttexts, usertexts, descriptions, directions
 
   var colors = {}
 
@@ -7,34 +7,34 @@
   colors.average = '#c5c2bd'
   colors.bad = '#d13d40'
 
-  colors.good_hover = 'hsl(95, 38%, 57%)'
-  colors.average_hover = 'hsl(60, 0%, 51%)'
-  colors.bad_hover = 'hsl( 5, 38%, 67%)'
+  colors.goodHover = 'hsl(95, 38%, 57%)'
+  colors.averageHover = 'hsl(60, 0%, 51%)'
+  colors.badHover = 'hsl( 5, 38%, 67%)'
 
-  colors.good_text = 'hsl(95, 38%, 34%)'
-  colors.average_text = 'hsl(60, 0%, 31%)',
-  colors.bad_text = 'hsl( 5, 38%, 42%)'
+  colors.goodText = 'hsl(95, 38%, 34%)'
+  colors.averageText = 'hsl(60, 0%, 31%)'
+  colors.badText = 'hsl( 5, 38%, 42%)'
 
   exports.initiateHelpers =
   function (
-    references_map,
-    shorttexts_map,
-    usertexts_map,
-    descriptions_map,
-    directions_map) {
-    mean_references = references_map
-    shorttexts = shorttexts_map
-    usertexts = usertexts_map
-    descriptions = descriptions_map
-    directions = directions_map
+    referencesMap,
+    shorttextsMap,
+    usertextsMap,
+    descriptionsMap,
+    directionsMap) {
+    meanReferences = referencesMap
+    shorttexts = shorttextsMap
+    usertexts = usertextsMap
+    descriptions = descriptionsMap
+    directions = directionsMap
   }
 
   exports.colorForValue =
   function (value, reference, direction) {
-    if (direction == 'LOW') {
+    if (direction === 'LOW') {
       var diff = reference - value
     } else {
-      var diff = value - reference
+      diff = value - reference
     }
 
     if (diff < -5) {
@@ -48,10 +48,10 @@
 
   exports.colorHoverForValue =
   function (value, reference, direction) {
-    if (direction == 'LOW') {
+    if (direction === 'LOW') {
       var diff = reference - value
     } else {
-      var diff = value - reference
+      diff = value - reference
     }
 
     if (diff < -5) {
@@ -65,10 +65,10 @@
 
   exports.colorTextForValue =
   function (value, reference, direction) {
-    if (direction == 'LOW') {
+    if (direction === 'LOW') {
       var diff = reference - value
     } else {
-      var diff = value - reference
+      diff = value - reference
     }
 
     if (diff < -5) {
@@ -81,37 +81,38 @@
   }
 
   exports.setDescriptionShort =
-  function (element, q_id) {
-    var shorttext = shorttexts[q_id]
+  function (element, qiD) {
+    var shorttext = shorttexts[qiD]
     var header = "<span class='description-header'>" + shorttext + '</span><br>'
-    var description = descriptions[q_id]
+    var description = descriptions[qiD]
     element.html(header + description)
   }
 
   exports.setDescriptionFull =
-  function (element, group_name, q_id, mean) {
-    var shorttext = shorttexts[q_id]
-    var description = descriptions[q_id]
-    var reference = mean_references[q_id]
-    var direction = directions[q_id]
+  function (element, groupName, qiD, mean) {
+    var shorttext = shorttexts[qiD]
+    var description = descriptions[qiD]
+    var reference = meanReferences[qiD]
+    var direction = directions[qiD]
 
     element.transition()
       .duration(0)
         .style('opacity', 1)
 
-    var color = colorTextForValue(mean, reference, direction)
-    var header = "<span class='description-header'>" + group_name + '</span><br><b>' + shorttext + ': ' + d3.format('d')(mean) + '</b><br>'
+    // TODO don't use window.?
+    var color = window.colorTextForValue(mean, reference, direction)
+    var header = "<span class='description-header'>" + groupName + '</span><br><b>' + shorttext + ': ' + d3.format('d')(mean) + '</b><br>'
     var subheader = '<b>' + usertexts.listReferenceValue + ': ' + d3.format('d')(reference) + '</b><br>'
 
     var trueDiff = mean - reference
-    var diff = direction == 'LOW' ? reference - mean : trueDiff
+    var diff = direction === 'LOW' ? reference - mean : trueDiff
 
     if (diff < -5) {
       var referenceComparison = usertexts.listReferenceWorse
     } else if (diff > 5) {
-      var referenceComparison = usertexts.listReferenceBetter
+      referenceComparison = usertexts.listReferenceBetter
     } else {
-      var referenceComparison = usertexts.listReferenceComparable
+      referenceComparison = usertexts.listReferenceComparable
     }
 
     referenceComparison = '<span style="color: ' + color + '; font-weight: bold">' + referenceComparison + ': ' + d3.format('+d')(trueDiff) + '</span></b><br><br>'

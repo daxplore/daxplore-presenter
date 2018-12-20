@@ -9,6 +9,7 @@
   var chart, chartG
 
   // INITIALIZE STATIC RESOURCES
+  var usertexts
   var dichselectedMap = {}
   var optionsMap = {}
   var timepointsMap = {}
@@ -31,7 +32,7 @@
 
   // INSTANCE SPECIFIC VARIABLES
 
-  var lineColors, hoverColors
+  var lineColors // TODO unused: , hoverColors
   var question, perspective
   var currentOptions
   var zScaleColor
@@ -41,18 +42,18 @@
   function fadeOthers (focusedIndex) {
     unfadeAll()
     for (var i = 0; i < currentOptions.length; i++) {
-      var option_index = currentOptions[i].index
+      var optionIndex = currentOptions[i].index
 
-      var row = d3.select('.dich-legend-row-' + option_index)
+      var row = d3.select('.dich-legend-row-' + optionIndex)
       row.interrupt().selectAll('*').interrupt()
 
-      var lineMain = d3.selectAll('.line.dataset-' + option_index)
+      var lineMain = d3.selectAll('.line.dataset-' + optionIndex)
       lineMain.interrupt().selectAll('*').interrupt()
 
-      var pointMain = d3.selectAll('.dich-point.dataset-' + option_index)
+      var pointMain = d3.selectAll('.dich-point.dataset-' + optionIndex)
       pointMain.interrupt().selectAll('*').interrupt()
 
-      if (option_index != focusedIndex) {
+      if (optionIndex !== focusedIndex) {
         row.transition(fadeTransition)
             .style('opacity', 0.6)
 
@@ -71,8 +72,8 @@
 
   function unfadeAll () {
     for (var i = 0; i < currentOptions.length; i++) {
-      var option_index = currentOptions[i].index
-      var row = d3.select('.dich-legend-row-' + option_index)
+      var optionIndex = currentOptions[i].index
+      var row = d3.select('.dich-legend-row-' + optionIndex)
       row.interrupt().selectAll('*').interrupt()
       row
         .transition(fadeTransition)
@@ -149,15 +150,15 @@
       .attr('opacity', '0')
   }
 
-  function computeDimensions (width_total, height_total) {
+  function computeDimensions (widthTotal, heightTotal) {
     yAxisWidth = 35
     xAxisHeight = 24
     margin = { top: 25, right: 13, bottom: xAxisHeight, left: yAxisWidth + 10 }
-    width = width_total - margin.left - margin.right
-    height = height_total - margin.top - margin.bottom
+    width = widthTotal - margin.left - margin.right
+    height = heightTotal - margin.top - margin.bottom
   }
 
-  function generateChartElements () {
+  function generateChartElements (usertexts) {
     // CHART
     chart = d3.select('.chart-panel').append('svg')
     chart
@@ -176,7 +177,7 @@
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
     // Y AXIS
-    yAxisElement = chartG.append('g')
+    chartG.append('g')
       .attr('class', 'axis dichtime-y-axis')
 
     // X AXIS
@@ -201,17 +202,17 @@
 
   function updateChartElements () {
     // X SCALE
-    var x_scale = d3.scaleBand()
+    var xScale = d3.scaleBand()
       .range([0, width])
       .paddingInner(0.3)
       .paddingOuter(0)
       .domain(timepointsMap[perspective])
 
-    var x_bandwidth = x_scale.bandwidth()
+    var xBandwidth = xScale.bandwidth()
 
     // Y SCALE
     // TODO use a dynamic scale or min/max points set in producer
-    var y_scale = d3.scaleLinear()
+    var yScale = d3.scaleLinear()
       .range([height, 0])
       .domain([0, 1])
 
@@ -220,23 +221,25 @@
     zScaleColor = d3.scaleOrdinal(lineColors)
       .domain(optionsMap[perspective])
 
-    z_scale_hover_color = d3.scaleOrdinal(hoverColors)
-      .domain(optionsMap[perspective])
+    // TODO unused z scale hover color?
+    // var zScaleHoverColor = d3.scaleOrdinal(hoverColors)
+    //   .domain(optionsMap[perspective])
 
-    var z_scale_symbol = d3
-      .scaleOrdinal([d3.symbolCircle, d3.symbolDiamond, d3.symbolSquare, d3.symbolTriangle, d3.symbolStar, d3.symbolCross, d3.symbolWye])
-      .domain(optionsMap[perspective])
+    // TODO unused z scale symbol?
+    // var zScaleSymbol = d3
+    //   .scaleOrdinal([d3.symbolCircle, d3.symbolDiamond, d3.symbolSquare, d3.symbolTriangle, d3.symbolStar, d3.symbolCross, d3.symbolWye])
+    //   .domain(optionsMap[perspective])
 
     // LINE TEMPLATE
     var line = d3.line()
       .curve(d3.curveLinear)
-      .x(function (d) { return x_scale(d.timepoint) + x_scale.bandwidth() / 2 })
+      .x(function (d) { return xScale(d.timepoint) + xScale.bandwidth() / 2 })
       .y(function (d) {
-        return y_scale(d.percentage)
+        return yScale(d.percentage)
       })
 
     // UPDATE X AXIS
-    var xAxis = d3.axisBottom(x_scale)
+    var xAxis = d3.axisBottom(xScale)
       .tickFormat(function (d) {
         return usertexts['timepoint' + d]
       })
@@ -250,7 +253,7 @@
       .call(xAxis)
 
     // UPDATE Y AXIS
-    var yAxis = d3.axisLeft(y_scale)
+    var yAxis = d3.axisLeft(yScale)
       .tickFormat(d3.format('.0%'))
       .tickSize(0)
       .tickSizeInner(width)
@@ -278,7 +281,7 @@
 
     //     currentOptions.forEach(function(option) {
     //       var color = zScaleColor(option.id);
-    //       var hover_color = z_scale_hover_color(option.id);
+    //       var hover_color = zScaleHoverColor(option.id);
     //
 
     // Connect the points with lines
@@ -346,7 +349,7 @@
 
       chartG.selectAll('.dich-point.dataset-' + option.index)
         .attr('transform', function (d) {
-          return 'translate(' + (x_scale(d.timepoint) + x_bandwidth / 2) + ',' + y_scale(d.percentage) + ')'
+          return 'translate(' + (xScale(d.timepoint) + xBandwidth / 2) + ',' + yScale(d.percentage) + ')'
         })
     })
 
@@ -383,7 +386,7 @@
 
       chartG.selectAll('.dich-point-cover.dataset-' + option.index)
         .attr('transform', function (d) {
-          return 'translate(' + (x_scale(d.timepoint) + x_bandwidth / 2) + ',' + y_scale(d.percentage) + ')'
+          return 'translate(' + (xScale(d.timepoint) + xBandwidth / 2) + ',' + yScale(d.percentage) + ')'
         })
     })
 
@@ -412,17 +415,18 @@
       chartG.selectAll('.point-tooltip-' + option.index)
           .attr('transform', function (d) {
             return 'translate(' +
-            (x_scale(d.timepoint) + x_bandwidth / 2 - this.getComputedTextLength() / 2) + ',' +
-            (y_scale(d.percentage) + 3.5) + ')'
+            (xScale(d.timepoint) + xBandwidth / 2 - this.getComputedTextLength() / 2) + ',' +
+            (yScale(d.percentage) + 3.5) + ')'
           })
           .style('display', 'none')
     })
   }
 
-  exports.generateDichTimeLineChart = function (selectedOptions, stat, lineColors_input, hoverColors_input) {
+  exports.generateDichTimeLineChart = function (selectedOptions, stat, usertextsInput, lineColorsInput, hoverColorsInput) {
     // TODO initizalize once, not every time
-    lineColors = lineColors_input
-    hoverColors = hoverColors_input
+    usertexts = usertextsInput
+    lineColors = lineColorsInput
+    // TODO unused: hoverColors = hoverColorsInput
     computeDimensions(chartWidthScrollBreakpoint, 300)
     generateChartElements()
 
@@ -434,28 +438,27 @@
     var options = []
     selectedOptions.forEach(function (option, i) {
       var values = []
-      timepointsMap[perspective].forEach(function (t) {
-        var timepoint = t
-        if (typeof stat.freq[t] !== 'undefined') {
-          var freq = stat.freq[t][option]
+      timepointsMap[perspective].forEach(function (timepoint) {
+        if (typeof stat.freq[timepoint] !== 'undefined') {
+          var freq = stat.freq[timepoint][option]
           var selected = dichselectedMap[question]
-          var selected_count = 0
-          var total_count = 0
+          var selectedCount = 0
+          var totalCount = 0
           for (var i = 0; i < freq.length; i++) {
             if (freq[i] > 0) {
-              total_count += freq[i]
+              totalCount += freq[i]
               for (var j = 0; j < selected.length; j++) {
-                if (i == selected[j]) {
-                  selected_count += freq[i]
+                if (i === selected[j]) {
+                  selectedCount += freq[i]
                 }
               }
             }
           }
-          if (total_count > 0) {
+          if (totalCount > 0) {
             values.push({
-              timepoint: t,
-              percentage: (selected_count / total_count),
-              count: total_count,
+              timepoint: timepoint,
+              percentage: (selectedCount / totalCount),
+              count: totalCount,
             })
           }
         }
@@ -481,7 +484,8 @@
 
     legend.html('')
 
-    var option = legend.selectAll('.legend-row')
+    // Add legend options
+    legend.selectAll('.legend-row')
       .data(currentOptions)
       .enter()
         .append('div')
@@ -505,7 +509,7 @@
     updateStyles()
   }
 
-  exports.updateDichTimeLineChartSize = function (height_total) {
+  exports.updateDichTimeLineChartSize = function (heightTotal) {
     var calcWidth = document.documentElement.clientWidth - // window width
               d3.select('.daxplore-QuestionPanel').node().offsetWidth - // tree sidebar
               5 - // tree margin (if changed here, needs to be changed in css)
@@ -521,7 +525,7 @@
     }
     var horizontalMinWidth = Math.max(headerBlockWidth, bottomBlockWidth)
 
-    var calcWidth = Math.max(calcWidth, horizontalMinWidth)
+    calcWidth = Math.max(calcWidth, horizontalMinWidth)
 
     var lockWidth = calcWidth < chartWidthScrollBreakpoint
     if (lockWidth) {
@@ -531,7 +535,7 @@
       .classed('chart-scroll', lockWidth)
       .attr('width', function () { return lockWidth ? chartWidthScrollBreakpoint + 'px' : null })
 
-    computeDimensions(calcWidth, height_total)
+    computeDimensions(calcWidth, heightTotal)
 
     chart
       .attr('width', width + margin.left + margin.right)

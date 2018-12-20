@@ -1,5 +1,6 @@
 (function (exports) {
-  var q_ids, mean_references, shorttextsMap, usertexts, descriptions, directions
+  // TODO unused: descriptions
+  var qIDs, meanReferences, shorttextsMap, usertexts, directions
 
   var userImportRegexes = [
     /kvantitativ/g,
@@ -30,8 +31,6 @@
     /sömn/g,
   ]
 
-  //
-
   var systemdata
   var usernames = []
   var usermeans = []
@@ -45,10 +44,10 @@
   function colorClassForValue (value, reference, direction) {
     if (typeof value !== 'number' || isNaN(value)) { return '' }
 
-    if (direction == 'LOW') {
+    if (direction === 'LOW') {
       var diff = reference - value
     } else {
-      var diff = value - reference
+      diff = value - reference
     }
 
     if (diff < -5) {
@@ -65,13 +64,13 @@
     var names = []
     for (var i = 0; i < usernames.length; i++) {
       var name = usernames[i]
-      while (names.indexOf(name) != -1) {
+      while (names.indexOf(name) !== -1) {
         name += ' '
       }
       names.push(name)
     }
 
-    for (var i = 0; i < callbackFunctions.length; i++) {
+    for (i = 0; i < callbackFunctions.length; i++) {
       callbackFunctions[i](names, usermeans)
     }
   }
@@ -86,11 +85,11 @@
             .append('span')
               .append('input')
                 .classed('header-cell-input', true)
-                .attr('tabindex', function (d, i) { return 1 + i * (q_ids.length + 1) })
+                .attr('tabindex', function (d, i) { return 1 + i * (qIDs.length + 1) })
                 .attr('placeholder', function (d, i) { return 'Grupp ' + (i + 1) })
                 .on('input', function (d, i, t) {
-                  el = t[i]
-                  if (typeof el.value === 'undefined' || el.value == '') {
+                  var el = t[i]
+                  if (typeof el.value === 'undefined' || el.value === '') {
                     usernames[i] = el.placeholder
                   } else {
                     usernames[i] = el.value
@@ -102,10 +101,10 @@
 
     // create a cell in each row for each column
     gridRows.selectAll('.grid-cell').remove()
-    var cells = gridRows.selectAll('.grid-cell')
+    gridRows.selectAll('.grid-cell')
       .data(function (row) {
         return usernames.map(function (column, i) {
-          return { q_id: row.q_id, reference: row.reference, col_index: i, row_index: row.index, mean: usermeans[row.index][i] }
+          return { qID: row.qID, reference: row.reference, col_index: i, row_index: row.index, mean: usermeans[row.index][i] }
         })
       })
       .enter()
@@ -113,23 +112,24 @@
         .classed('grid-cell', true)
         .append('input')
           .attr('value', function (d) { return isNaN(d.mean) ? null : String(d.mean).replace('.', ',') })
-          .attr('class', function (d) { return isNaN(d.mean) ? 'null' : colorClassForValue(d.mean, mean_references[d.q_id], directions[d.q_id]) })
-          .attr('tabindex', function (d, i) { return 2 + d.row_index + d.col_index * (1 + q_ids.length) })
-          .attr('pattern', '[0-9]+([\.,][0-9]+)?')
+          .attr('class', function (d) { return isNaN(d.mean) ? 'null' : colorClassForValue(d.mean, meanReferences[d.qID], directions[d.qID]) })
+          .attr('tabindex', function (d, i) { return 2 + d.row_index + d.col_index * (1 + qIDs.length) })
+          .attr('pattern', '[0-9]+([\\.,][0-9]+)?') // TODO added extra escape backslash, check it works
           .attr('step', 0.1)
           .on('focus', function (d) {
-            setDescriptionShort(d3.select('#grid-description'), d.q_id)
+            // TODO don't use window.?
+            window.setDescriptionShort(d3.select('#grid-description'), d.qID)
           })
           .on('focusout', function (d, i, t) {
-            el = t[i]
-            val = parseFloat(el.value.replace(',', '.'))
+            var el = t[i]
+            var val = parseFloat(el.value.replace(',', '.'))
             if (typeof val !== 'number' || isNaN(val)) {
               el.value = ''
               return
             }
 
-            min = 0
-            max = 100
+            var min = 0
+            var max = 100
 
             val = Math.min(Math.max(val, min), max)
 
@@ -140,14 +140,14 @@
             }
 
             d3.select(el)
-                .attr('class', colorClassForValue(val, mean_references[d.q_id], directions[d.q_id]))
+                .attr('class', colorClassForValue(val, meanReferences[d.qID], directions[d.qID]))
           })
           .on('input', function (d, i, t) {
-            el = t[i]
-            val = parseFloat(el.value.replace(',', '.'))
+            var el = t[i]
+            var val = parseFloat(el.value.replace(',', '.'))
 
-            min = 0
-            max = 100
+            var min = 0
+            var max = 100
 
             val = Math.min(Math.max(val, min), max)
 
@@ -160,7 +160,7 @@
             callCallbacks()
 
             d3.select(el)
-                .attr('class', colorClassForValue(val, mean_references[d.q_id], directions[d.q_id]))
+                .attr('class', colorClassForValue(val, meanReferences[d.qID], directions[d.qID]))
           })
 
     callCallbacks()
@@ -194,7 +194,8 @@
   }
 
   exports.generateUserPasteSection = function () {
-    addGridUpdateCallback(updateUserCopyGroupNameDropdown)
+    // TOOD don't use window.?
+    window.addGridUpdateCallback(updateUserCopyGroupNameDropdown)
     d3.select('.user-paste-data-header')
       .on('click', function () {
         userPasteSectionOpen = !userPasteSectionOpen
@@ -234,7 +235,7 @@
         var noMatchErrors = []
 
         // parse text and numbers
-        for (var i = 0; i < rows.length; i++) {
+        for (i = 0; i < rows.length; i++) {
           var row = rows[i]
           if (typeof row !== 'undefined' && row.length > 0) {
             row = row.trim()
@@ -265,7 +266,7 @@
             }
           }
           matchedRowTexts = matchedRowTexts.filter(function (value, index, self) { return self.indexOf(value) === index })
-          if (matchedRowTexts.length == 1) {
+          if (matchedRowTexts.length === 1) {
             if ((typeof importedMeans[matchRow] !== 'number' || isNaN(importedMeans[matchRow])) && typeof rows[matchRow] !== 'undefined' && rows[matchRow].length > 0) {
               notANumberErrors.push(rows[matchRow].trim())
             } else if (importedMeans[matchRow] < 0 || importedMeans[matchRow] > 100) {
@@ -274,12 +275,12 @@
               usermeans[regIndex][selectedGroupIndex] = importedMeans[matchRow]
             }
           } else if (matchedRowTexts.length > 1) {
-            multiMatchErrors.push({ scale: shorttextsMap[q_ids[regIndex]], matchedRowTexts: matchedRowTexts })
+            multiMatchErrors.push({ scale: shorttextsMap[qIDs[regIndex]], matchedRowTexts: matchedRowTexts })
           }
         }
 
         // generate errors for unmatched rows
-        for (var i = 0; i < matchedRows.length; i++) {
+        for (i = 0; i < matchedRows.length; i++) {
           if (typeof matchedRows[i] === 'undefined' && typeof rows[i] !== 'undefined' && rows[i].length > 0) {
             noMatchErrors.push(rows[i])
           }
@@ -398,19 +399,19 @@
   exports.generateGrid =
     function (
       locale,
-      q_ids_array,
-      references_map,
-      shorttexts_map,
-      usertexts_map,
-      descriptions_array,
-      directions_map
+      qIDsArray,
+      referencesMap,
+      shorttextsMapInput,
+      usertextsMap,
+      // TODO unused: descriptionsArray,
+      directionsMap
     ) {
-      q_ids = q_ids_array
-      mean_references = references_map
-      shorttextsMap = shorttexts_map
-      usertexts = usertexts_map
-      descriptions = descriptions_array
-      directions = directions_map
+      qIDs = qIDsArray
+      meanReferences = referencesMap
+      shorttextsMap = shorttextsMapInput
+      usertexts = usertextsMap
+      // TODO unused: descriptions = descriptionsArray
+      directions = directionsMap
 
       d3.select('.add-column-button')
           .text('+ Lägg till grupp')
@@ -418,7 +419,7 @@
       if (Modernizr.promises && Modernizr.svgforeignobject) {
         d3.select('.save-grid-image-button')
             .text('Spara som bild')
-            .on('click', saveGridImage)
+            .on('click', window.saveGridImage) // TODO don't use window.?
       } else {
         d3.select('.save-grid-image-button')
             .remove()
@@ -428,21 +429,21 @@
       d3.select('.grid-legend-text.avg').text(usertexts.listReferenceComparable)
       d3.select('.grid-legend-text.bad').text(usertexts.listReferenceWorse)
 
-      if (q_ids.length > 0) {
-        setDescriptionShort(d3.select('#grid-description'), q_ids[0])
+      if (qIDs.length > 0) {
+        window.setDescriptionShort(d3.select('#grid-description'), qIDs[0]) // TODO don't use window.?
       }
 
       usernames.push('Grupp 1')
 
-      usermeans = q_ids.map(function (q_id, i) {
+      usermeans = qIDs.map(function (qID, i) {
         return [NaN]
       })
 
-      systemdata = q_ids.map(function (q_id, i) {
+      systemdata = qIDs.map(function (qID, i) {
         return {
-          q_id: q_id,
+          qID: qID,
           index: i,
-          reference: references_map[q_id],
+          reference: referencesMap[qID],
         }
       })
 
@@ -468,14 +469,14 @@
           .data(systemdata)
           .enter()
             .append('tr')
-              .attr('class', function (d) { return 'gridrow-' + d.q_id })
+              .attr('class', function (d) { return 'gridrow-' + d.qID })
               .on('mouseover', function (d, i) {
-                setDescriptionShort(d3.select('#grid-description'), d.q_id)
+                window.setDescriptionShort(d3.select('#grid-description'), d.qID) // TODO don't use window.?
               })
 
       gridRows.append('td')
           .classed('rowtext', true)
-          .text(function (d) { return shorttextsMap[d.q_id] })
+          .text(function (d) { return shorttextsMap[d.qID] })
 
       generateColumns(usernames, usermeans)
     }
@@ -490,20 +491,20 @@
           return
         }
       }
-      gridclone.select('.gridrow-' + d.q_id).remove()
+      gridclone.select('.gridrow-' + d.qID).remove()
       removed++
     })
 
-    if (removed == systemdata.length) {
+    if (removed === systemdata.length) {
       gridclone = d3.select(d3.select('.grid').node().cloneNode(true))
     }
 
     d3.select('body')
       .append('div')
-	    .style('position', 'absolute')
-	    .style('left', '-9999px')
-	    .style('top', '-9999px')
-	    .append(function () { return gridclone.node() })
+        .style('position', 'absolute')
+        .style('left', '-9999px')
+        .style('top', '-9999px')
+        .append(function () { return gridclone.node() })
 
     gridclone
       .selectAll('.header-cell')
@@ -521,93 +522,96 @@
               .style('width', 'auto')
               .text(function (name) { return name })
 
-    var text_test = d3.select('body')
+    var textTest = d3.select('body')
       .append('span')
       .classed('text-width-test', true)
 
-    var max_title_width = 0
+    var maxTitleWidth = 0
     for (var i = 0; i < usernames.length; i++) {
-      text_test
+      textTest
         .text(usernames[i])
-      max_title_width = Math.max(max_title_width, text_test.node().offsetWidth)
+      maxTitleWidth = Math.max(maxTitleWidth, textTest.node().offsetWidth)
     }
-    title_height = text_test.node().offsetHeight
-    text_test.remove()
+    var titleHeight = textTest.node().offsetHeight
+    textTest.remove()
 
-    var rotation_angle = 2 * Math.PI * 1 / 8
-    var header_height = gridclone.select('.grid-header').node().offsetHeight
-    var true_header_height = max_title_width * Math.sin(rotation_angle) + title_height * Math.cos(rotation_angle)
-    var height_offset = true_header_height - header_height
+    var rotationAngle = 2 * Math.PI * 1 / 8
+    var headerHeight = gridclone.select('.grid-header').node().offsetHeight
+    var trueHeaderHeight = maxTitleWidth * Math.sin(rotationAngle) + titleHeight * Math.cos(rotationAngle)
+    var heightOffset = trueHeaderHeight - headerHeight
 
     // true_header height represents a square of the longest header
     // estimate width based on the largest title being the rightmost header.
     // This could be computed more accurately by for each header calculating:
     // vertical overflow = true header width - width of columns to the right
-    var chart_width = gridclone.node().offsetWidth + true_header_height - 20
+    var chartWidth = gridclone.node().offsetWidth + trueHeaderHeight - 20
 
-    var top_margin = 3 + (height_offset > 0 ? height_offset : 0)
+    var topMargin = 3 + (heightOffset > 0 ? heightOffset : 0)
     gridclone
-      .style('padding-top', top_margin + 'px')
+      .style('padding-top', topMargin + 'px')
       .style('padding-bottom', 1 + 'px')
 
-    if (height_offset > 0) {
-      height_offset = 0
+    if (heightOffset > 0) {
+      heightOffset = 0
     }
 
     gridclone.selectAll('.header-cell-input')
       .style('border', 'none')
 
-    domtoimage.toPng(gridclone.node(), { bgcolor: 'white' })
+    // TODO don't use window.?
+    window.domtoimage.toPng(gridclone.node(), { bgcolor: 'white' })
       .then(function (dataUrl) {
         gridclone.remove()
-        generateAndSaveImage(dataUrl, chart_width, height_offset)
-      })
-      ['catch'](function (error) {
-        console.error('Failed to generate image', error)
+        generateAndSaveImage(dataUrl, chartWidth, heightOffset)
+      })['catch'](function (error) {
+        if (error) { // TODO standard-js forces if(error) (see handle-callback-error)
+          // TODO error handling: console.error('Failed to generate image', error)
+        }
       })
   }
 
-  var generateAndSaveImage = function (dataUrl, minWidth, height_offset) {
+  var generateAndSaveImage = function (dataUrl, minWidth, heightOffset) {
     var img = new Image()
     img.onload = function () {
-      var h_margin = 10
-      var chart_width = Math.max(minWidth, img.width + 2 * h_margin)
-      var top_margin = 10
-      var bottom_margin = 20
-      var canvas_height = img.height + height_offset + top_margin + bottom_margin
+      var hMargin = 10
+      var chartWidth = Math.max(minWidth, img.width + 2 * hMargin)
+      var topMargin = 10
+      var bottomMargin = 20
+      var canvasHeight = img.height + heightOffset + topMargin + bottomMargin
 
-      var canvas_chart_selection = d3.select('body').append('canvas')
-        .attr('width', chart_width)
-        .attr('height', canvas_height)
+      var canvasChartSelection = d3.select('body').append('canvas')
+        .attr('width', chartWidth)
+        .attr('height', canvasHeight)
         .style('visibility', 'visible')
-      var canvas_chart = canvas_chart_selection.node()
-      var ctx = canvas_chart.getContext('2d')
+      var canvasChart = canvasChartSelection.node()
+      var ctx = canvasChart.getContext('2d')
 
-      var source_text = usertexts.imageWaterStamp
-      var source_font_height = 11
-      ctx.font = source_font_height + 'px sans-serif'
-      var source_text_width = ctx.measureText(source_text).width
+      var sourceText = usertexts.imageWaterStamp
+      var sourceFontHeight = 11
+      ctx.font = sourceFontHeight + 'px sans-serif'
+      var sourceTextWidth = ctx.measureText(sourceText).width
 
-      if (source_text_width + 2 * h_margin > chart_width) {
-        generateAndSaveImage(dataUrl, source_text_width + 2 * h_margin, height_offset)
-        canvas_chart_selection.remove()
+      if (sourceTextWidth + 2 * hMargin > chartWidth) {
+        generateAndSaveImage(dataUrl, sourceTextWidth + 2 * hMargin, heightOffset)
+        canvasChartSelection.remove()
         return
       }
 
       ctx.fillStyle = 'white'
-      ctx.fillRect(0, 0, chart_width, canvas_height)
+      ctx.fillRect(0, 0, chartWidth, canvasHeight)
       ctx.fillStyle = 'black'
 
-      ctx.drawImage(img, h_margin, top_margin + height_offset)
+      ctx.drawImage(img, hMargin, topMargin + heightOffset)
 
       ctx.fillStyle = '#555'
-      ctx.fillText(source_text, h_margin, canvas_height - 5)
+      ctx.fillText(sourceText, hMargin, canvasHeight - 5)
 
-      canvas_chart.toBlob(function (blob) {
-        saveAs(blob, 'profildiagram' + '.png')
+      canvasChart.toBlob(function (blob) {
+        // TODO don't use window.?
+        window.saveAs(blob, 'profildiagram' + '.png')
       })
 
-      canvas_chart_selection.remove()
+      canvasChartSelection.remove()
     }
 
     img.src = dataUrl

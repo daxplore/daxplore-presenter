@@ -14,5 +14,6 @@ module.exports = {
   "globals": {
     "axios": true,
     "d3": true,
+    "Modernizr": true,
   }
 }

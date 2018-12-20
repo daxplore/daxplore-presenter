@@ -1,42 +1,22 @@
 (function (exports) {
-// TODO
-  // var question_map = {};
-  // for (var i=0; i < questions.length; i ++) {
-  //   var q = questions[i];
-  //   question_map[q.column] = q;
-  // }
-  //
-  // var initialQuestion = groups[0].questions[0];
-  // var selectedTab = question_map[initialQuestion].displaytypes[0];
+  var questionMap = {}
+  var initialQuestion, selectedTab
 
   var primaryColors, hoverColors
 
-  exports.generateChartPanel = function (primaryColors_input, hoverColors_input) {
-    primaryColors = primaryColors_input
-    hoverColors = hoverColors_input
+  exports.generateChartPanel = function (questions, groups, primaryColorsInput, hoverColorsInput) {
+    primaryColors = primaryColorsInput
+    hoverColors = hoverColorsInput
 
-    d3.select('.daxplore-ChartPanel').html(
-      "<div class='daxplore-ExternalHeader'>" +
-      "  <div class='daxplore-ExternalHeader-header'></div>" +
-      "  <div class='daxplore-ExternalHeader-sub'></div>" +
-      "  <div class='daxplore-ExternalHeader-dichsub'></div>" +
-      "  <div class='daxplore-ExternalHeader-freq-tooltip'></div>" +
-      '</div>' +
-      "<div class='chart-tabs'>" +
-      "  <div class='chart-tab-spacing frequency'></div>" +
-      "  <div class='chart-tab frequency chart-tab-selected'>Frekvenser</div>" +
-      "  <div class='chart-tab-spacing mean'></div>" +
-      "  <div class='chart-tab mean'>Genomsnitt</div>" +
-      "  <div class='chart-tab-spacing dichotomized'></div>" +
-      "  <div class='chart-tab dichotomized'>Dikotomiserat</div>" +
-      "  <div class='chart-tab-spacing mean'></div>" +
-      "  <div class='chart-tab mean'>Genomsnitt</div>" +
-      "  <div class='chart-tab-remainder'></div>" +
-      '</div>' +
-      "<div class='chart-panel'></div>"
-    )
+    for (var i = 0; i < questions.length; i++) {
+      var q = questions[i]
+      questionMap[q.column] = q
+    }
 
-    var displaytypes = question_map[initialQuestion].displaytypes
+    initialQuestion = groups[0].questions[0]
+    selectedTab = questionMap[initialQuestion].displaytypes[0]
+
+    var displaytypes = questionMap[initialQuestion].displaytypes
     d3.selectAll('.chart-tab')
       .on('click',
         function () {
@@ -66,14 +46,14 @@
     return selectedTab
   }
 
-  exports.chartSetQueryDefinition = function (charttype, timepoints, stat, selected_options, dichSubtitle) {
+  exports.chartSetQueryDefinition = function (charttype, timepoints, stat, selectedOptions, dichSubtitle) {
     selectedTab = charttype
     var questionID = stat['q']
-    var perspectiveID = stat['p']
+    // TODO unused: var perspectiveID = stat['p']
 
-    questionMeta = question_map[questionID]
+    var questionMeta = questionMap[questionID]
     d3.select('.daxplore-ExternalHeader-header').text(questionMeta.short)
-    if (questionMeta.short != questionMeta.text) {
+    if (questionMeta.short !== questionMeta.text) {
       d3.select('.daxplore-ExternalHeader-sub').text(questionMeta.text)
     }
     d3.select('.daxplore-ExternalHeader-dichsub').text(dichSubtitle)
@@ -84,7 +64,7 @@
       .classed('chart-scroll', false)
       .style('width', null)
 
-    var displaytypes = question_map[questionID].displaytypes
+    var displaytypes = questionMap[questionID].displaytypes
     d3.selectAll('.chart-tab')
       .classed('chart-tab-selected', function (d, i, tabs) { return tabs[i].classList.contains(selectedTab.toLowerCase()) })
 
@@ -114,16 +94,19 @@
       case 'TIMEPOINTS_TWO':
       case 'TIMEPOINTS_ALL':
         // TODO temporary hardcoded timepoint
-        generateFrequencyChart(primaryColors, hoverColors, stat, selected_options, 4)
-        generateFrequencyLegend()
+        // TODO use something other than window.?
+        window.generateFrequencyChart(primaryColors, hoverColors, stat, selectedOptions, 4)
+        window.generateFrequencyLegend()
         break
       }
       break
     case 'MEAN':
       switch (timepoints) {
       case 'TIMEPOINTS_ONE':
-        generateMeanChart(selected_options, stat)
-        generateMeanLegend()
+        // TODO use something else than window.?
+        window.generateMeanChart(selectedOptions, stat)
+        window.generateMeanLegend()
+        break
       case 'TIMEPOINTS_TWO':
         break
       case 'TIMEPOINTS_ALL':
@@ -135,13 +118,15 @@
       case 'TIMEPOINTS_ONE':
       case 'TIMEPOINTS_TWO':
       case 'TIMEPOINTS_ALL':
-        generateDichTimeLineChart(selected_options, stat, primaryColors, hoverColors)
-        generateDichTimeLineLegend()
+        // TODO use something other than window.?
+        window.generateDichTimeLineChart(selectedOptions, stat, primaryColors, hoverColors)
+        window.generateDichTimeLineLegend()
         break
       }
       break
     }
-    updateChartPanelSize()
+    // TODO use something other than window?
+    window.updateChartPanelSize()
   }
 
   function setSelectedTab (tab) {
@@ -149,19 +134,24 @@
       return
     }
     selectedTab = tab
-    gwtChartPanelCallback(tab)
+    // TODO replace gwt callback with js callback
+    // gwtChartPanelCallback(tab)
   }
 
   exports.updateChartPanelSize = function () {
     switch (selectedTab) {
     case 'FREQUENCY':
-      updateFreqChartSize(350)
+    // TODO use something other than window?
+      window.updateFreqChartSize(350)
       break
     case 'MEAN':
-      updateMeanChartSize(350) // TODO allow more height instead of vertical scroll
+    // TODO use something other than window?
+    // TODO allow more height instead of vertical scroll
+      window.updateMeanChartSize(350)
       break
     case 'DICHOTOMIZED':
-      updateDichTimeLineChartSize(350)
+    // TODO use something other than window?
+      window.updateDichTimeLineChartSize(350)
       break
     }
   }

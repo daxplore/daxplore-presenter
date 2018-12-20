@@ -1,25 +1,25 @@
 (function (exports) {
-  var options_map = {}
-  var timepoints_map = {}
+  var optionsMap = {}
+  var timepointsMap = {}
+  var chartSvg
 
-  for (var i = 0; i < questions.length; i++) {
-    var q = questions[i]
-    timepoints_map[q.column] = q.timepoints
-    options_map[q.column] = q.options
-  }
+  exports.generateMeanTimeLineChart = function (questions, selectedOptions, statJson) {
+    for (var i = 0; i < questions.length; i++) {
+      var q = questions[i]
+      timepointsMap[q.column] = q.timepoints
+      optionsMap[q.column] = q.options
+    }
 
-  var chart_svg
-
-  exports.generateMeanTimeLineChart = function (selectedOptions, statJson) {
     var stat = JSON.parse(statJson)
     var perspective = stat.p
-    var question = stat.q
+    // TODO unused
+    // var question = stat.q
 
     var panel = d3.select('.line-chart-panel')
-    //     if (typeof chart_svg == 'undefined') {
-    chart_svg = panel.append('svg')
+    //     if (typeof chartSvg == 'undefined') {
+    chartSvg = panel.append('svg')
     //     } else {
-    //       panel.append(chart_svg);
+    //       panel.append(chartSvg);
     //     }
     //     var g = svg.append('g');
 
@@ -28,19 +28,19 @@
     //     var height = svg.attr("height") - margin.top - margin.bottom;
     var width = 600
     var height = 300
-    chart_svg.attr('width', (width + margin.left + margin.right) + 'px')
-    chart_svg.attr('height', (height + margin.top + margin.bottom + 20) + 'px')
+    chartSvg.attr('width', (width + margin.left + margin.right) + 'px')
+    chartSvg.attr('height', (height + margin.top + margin.bottom + 20) + 'px')
 
-    var g = chart_svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+    var g = chartSvg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
     // TODO check actually delivered time points in statJson data?
     // TODO generate timepoint texts in daxplore export file to experiment with that as an array here
-    console.log(timepoints_map[perspective])
+    // console.log(timepointsMap[perspective])
     var x = d3.scaleBand()
       .range([0, width])
       .paddingInner(0.3)
       .paddingOuter(0)
-      .domain(timepoints_map[perspective])
+      .domain(timepointsMap[perspective])
 
     // TODO use a dynamic scale or min/max points set in producer
     var y = d3.scaleLinear()
@@ -48,7 +48,7 @@
       .domain([0, 10])
 
     var z = d3.scaleOrdinal(d3.schemeCategory10)
-      .domain(options_map[perspective])
+      .domain(optionsMap[perspective])
 
     var line = d3.line()
       .curve(d3.curveLinear)
@@ -59,18 +59,15 @@
     selectedOptions.forEach(function (i) {
       // TODO check actually delivered time points in statJson data?
       var values = []
-      timepoints_map[perspective].forEach(function (t) {
-        var timepoint = t
-        var mean = stat.mean[t].mean[i]
-        var count = stat.mean[t].count[i]
+      timepointsMap[perspective].forEach(function (timepoint) {
         values.push({
-          timepoint: t,
-          mean: stat.mean[t].mean[i],
-          count: stat.mean[t].count[i],
+          timepoint: timepoint,
+          mean: stat.mean[timepoint].mean[i],
+          count: stat.mean[timepoint].count[i],
         })
       })
       options.push({
-        id: options_map[perspective][i],
+        id: optionsMap[perspective][i],
         values: values,
       })
     })
@@ -111,15 +108,15 @@
     //       .call(d3.axisBottom(x));
     //
     //      console.log(options);
-    //      console.log(timepoints_map);
+    //      console.log(timepointsMap);
     //
-    //     var timepoints = timepoints_map[question];
+    //     var timepoints = timepointsMap[question];
     //
     //     var panel = d3.select('.line-chart-panel');
-    // //     if (typeof chart_svg == 'undefined') {
-    //       chart_svg = panel.append('svg');
+    // //     if (typeof chartSvg == 'undefined') {
+    //       chartSvg = panel.append('svg');
     // //     } else {
-    // //       panel.append(chart_svg);
+    // //       panel.append(chartSvg);
     // //     }
     // //     var g = svg.append('g');
     //
@@ -128,10 +125,10 @@
     // //     var height = svg.attr("height") - margin.top - margin.bottom;
     //     var width = 600;
     //     var height = 300;
-    //     chart_svg.attr('width', (width + margin.left + margin.right) + 'px');
-    //     chart_svg.attr('height', (height + margin.top + margin.bottom + 20) + 'px');
+    //     chartSvg.attr('width', (width + margin.left + margin.right) + 'px');
+    //     chartSvg.attr('height', (height + margin.top + margin.bottom + 20) + 'px');
     //
-    //     var g = chart_svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    //     var g = chartSvg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     //
     //     var pt = d3.timeParse("%d-%b-%y");
     //

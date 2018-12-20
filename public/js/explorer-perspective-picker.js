@@ -1,13 +1,13 @@
 (function (exports) {
   var initialized = false
-  var selected_perspective = -1
-  var perspective_options = []
-  var selected_options = []
-  var has_total = false
-  var total_selected = false
-  var has_remainder = false
+  var selectedPerspective = -1
+  var perspectiveOptions = []
+  var selectedOptions = []
+  // TODO unused: var hasTotal = false
+  var totalSelected = false
+  var hasRemainder = false
   var collapsed = true
-  var fixed_width = null
+  var fixedWidth = null
 
   var questions, perspectives, usertexts, settings
 
@@ -18,40 +18,40 @@
   })
 
   exports.perspectiveSetQueryDefinition = function (perspectiveID, options, total) {
-    selected_perspective = perspectives.indexOf(perspectiveID)
-    selected_options = options
-    total_selected = total
+    selectedPerspective = perspectives.indexOf(perspectiveID)
+    selectedOptions = options
+    totalSelected = total
 
     if (initialized) {
       updateCheckboxes(false)
     }
   }
 
-  exports.generatePerspectivePanel = function (questions_in, perspectives_in, usertexts_in, settings_in) {
-    questions = questions_in
-    perspectives = perspectives_in
-    usertexts = usertexts_in
-    settings = settings_in
+  exports.generatePerspectivePanel = function (questionsInput, perspectivesInput, usertextsInput, settingsInput) {
+    questions = questionsInput
+    perspectives = perspectivesInput
+    usertexts = usertextsInput
+    settings = settingsInput
 
     d3.select('.perspective-header')
       .text(usertexts.perspectiveHeader)
 
-    var variable_list = d3.select('.pervarpicker-variables')
+    var variableList = d3.select('.pervarpicker-variables')
 
-    var perspective_shorttexts = []
+    var perspectiveShorttexts = []
     perspectives.forEach(function (p) {
       questions.some(function (q) {
         if (p === q.column) {
-          perspective_shorttexts.push(q.short)
-          perspective_options.push(q.options)
+          perspectiveShorttexts.push(q.short)
+          perspectiveOptions.push(q.options)
           return true
         }
       })
     })
 
-    variable_list
+    variableList
       .selectAll('.pervarpicker-varoption')
-      .data(perspective_shorttexts)
+      .data(perspectiveShorttexts)
       .enter()
         .append('div')
         .classed('pervarpicker-varoption', true)
@@ -61,8 +61,8 @@
 
     d3.selectAll('.peropt-all-button')
       .on('click', function () {
-        for (var i = 0; i < selected_options.length; i++) {
-          selected_options[i] = true
+        for (var i = 0; i < selectedOptions.length; i++) {
+          selectedOptions[i] = true
         }
         updateCheckboxes(true)
       })
@@ -70,8 +70,8 @@
 
     d3.selectAll('.peropt-none-button')
       .on('click', function () {
-        for (var i = 0; i < selected_options.length; i++) {
-          selected_options[i] = false
+        for (var i = 0; i < selectedOptions.length; i++) {
+          selectedOptions[i] = false
         }
         updateCheckboxes(true)
       })
@@ -80,14 +80,14 @@
     d3.selectAll('.peropt-more-button')
       .text(collapsed ? usertexts.perspectivesMoreButton + '>' : '<' + usertexts.perspectivesLessButton)
       .style('visibility', function () {
-        return has_remainder ? null : 'hidden'
+        return hasRemainder ? null : 'hidden'
       })
       .on('click', function () {
         collapsed = !collapsed
         if (collapsed) {
-          fixed_width = null
+          fixedWidth = null
         } else {
-          fixed_width = d3.select('.perspective-picker').node().offsetWidth
+          fixedWidth = d3.select('.perspective-picker').node().offsetWidth
         }
         updateElements()
       })
@@ -103,34 +103,34 @@
   }
 
   exports.getSelectedPerspective = function () {
-    return perspectives[selected_perspective]
+    return perspectives[selectedPerspective]
   }
 
   exports.getPerspectiveOptions = function () {
-    return selected_options.join(',', true)
+    return selectedOptions.join(',', true)
   }
 
   exports.isPerspectiveTotalSelected = function () {
-    return total_selected
+    return totalSelected
   }
 
   function initializeSelection () {
-    if (selected_perspective === -1) {
+    if (selectedPerspective === -1) {
       setSelectedPerspective(0)
     } else {
-      setSelectedPerspective(selected_perspective)
+      setSelectedPerspective(selectedPerspective)
     }
   }
 
   function setSelectedPerspective (index) {
-    var changed = selected_perspective != index
-    selected_perspective = index
+    var changed = selectedPerspective !== index
+    selectedPerspective = index
 
     if (changed) {
-      selected_options = []
+      selectedOptions = []
       var i = 0
-      perspective_options[selected_perspective].forEach(function (option) {
-        selected_options.push(i < settings.defaultSelectedPerspectiveOptions)
+      perspectiveOptions[selectedPerspective].forEach(function (option) {
+        selectedOptions.push(i < settings.defaultSelectedPerspectiveOptions)
         i++
       })
     }
@@ -140,52 +140,52 @@
 
   function updateCheckboxes (fireGwtEvent) {
     d3.selectAll('.pervarpicker-varoption')
-      .classed('pervarpicker-varoption-selected', function (d, i) { return i == selected_perspective })
+      .classed('pervarpicker-varoption-selected', function (d, i) { return i === selectedPerspective })
 
-    var show_select_total = settings.showSelectTotal
-    var option_count = selected_options.length + (show_select_total ? 1 : 0)
-    var per_column_setting = settings.perspectiveCheckboxesPerColumn
-    var max_columns = 3
-    var columns = Math.min(max_columns, Math.ceil(option_count / per_column_setting))
-    var per_column = Math.ceil(option_count / columns)
-    has_remainder = columns > 1
+    var showSelectTotal = settings.showSelectTotal
+    var optionCount = selectedOptions.length + (showSelectTotal ? 1 : 0)
+    var perColumnSetting = settings.perspectiveCheckboxesPerColumn
+    var maxColumns = 3
+    var columns = Math.min(maxColumns, Math.ceil(optionCount / perColumnSetting))
+    var perColumn = Math.ceil(optionCount / columns)
+    hasRemainder = columns > 1
     if (collapsed) {
       d3.select('.peropt-extra-columns')
         .style('width', '0px')
     }
-    if (!has_remainder) {
+    if (!hasRemainder) {
       collapsed = true
     }
 
-    var first_column_data = []
-    var second_column_data = []
-    var third_column_data = []
+    var firstColumnData = []
+    var secondColumnData = []
+    var thirdColumnData = []
 
-    for (var i = 0; i < selected_options.length; i++) {
-      var option = { text: perspective_options[selected_perspective][i], selected: selected_options[i], index: i }
-      if (i < per_column) {
-        first_column_data.push(option)
-      } else if (i < per_column * 2) {
-        second_column_data.push(option)
+    for (var i = 0; i < selectedOptions.length; i++) {
+      var option = { text: perspectiveOptions[selectedPerspective][i], selected: selectedOptions[i], index: i }
+      if (i < perColumn) {
+        firstColumnData.push(option)
+      } else if (i < perColumn * 2) {
+        secondColumnData.push(option)
       } else {
-        third_column_data.push(option)
+        thirdColumnData.push(option)
       }
     }
 
     // TODO add total
 
     // First column
-    var first_col_options = d3.select('.peropt-col-one')
+    var firstColOptions = d3.select('.peropt-col-one')
       .selectAll('.peropt-checkbox')
-      .data(first_column_data)
+      .data(firstColumnData)
 
-    first_col_options.exit().remove()
+    firstColOptions.exit().remove()
 
-    first_col_options.enter()
+    firstColOptions.enter()
       .append('div')
         .classed('peropt-checkbox', true)
         .on('click', function (d) {
-          selected_options[d.index] = !selected_options[d.index]
+          selectedOptions[d.index] = !selectedOptions[d.index]
           updateCheckboxes(true)
         })
 
@@ -194,17 +194,17 @@
       .text(function (d) { return d.text })
 
     // Second column
-    var second_col_options = d3.select('.peropt-col-two')
+    var secondColOptions = d3.select('.peropt-col-two')
       .selectAll('.peropt-checkbox')
-      .data(second_column_data)
+      .data(secondColumnData)
 
-    second_col_options.exit().remove()
+    secondColOptions.exit().remove()
 
-    second_col_options.enter()
+    secondColOptions.enter()
       .append('div')
         .classed('peropt-checkbox', true)
         .on('click', function (d) {
-          selected_options[d.index] = !selected_options[d.index]
+          selectedOptions[d.index] = !selectedOptions[d.index]
           updateCheckboxes(true)
         })
 
@@ -213,17 +213,17 @@
       .text(function (d) { return d.text })
 
     // Third column
-    var first_col_options = d3.select('.peropt-col-three')
+    var thirdColOptions = d3.select('.peropt-col-three')
       .selectAll('.peropt-checkbox')
-      .data(third_column_data)
+      .data(thirdColumnData)
 
-    first_col_options.exit().remove()
+    thirdColOptions.exit().remove()
 
-    first_col_options.enter()
+    thirdColOptions.enter()
       .append('div')
         .classed('peropt-checkbox', true)
         .on('click', function (d) {
-          selected_options[d.index] = !selected_options[d.index]
+          selectedOptions[d.index] = !selectedOptions[d.index]
           updateCheckboxes(true)
         })
 
@@ -231,15 +231,15 @@
       .classed('peropt-checkbox-selected', function (d) { return d.selected })
       .text(function (d) { return d.text })
 
-    var has_checked_box = false
-    for (var i = 0; i < selected_options.length; i++) {
-      if (selected_options[i]) {
-        has_checked_box = true
+    var hasCheckedBox = false
+    for (i = 0; i < selectedOptions.length; i++) {
+      if (selectedOptions[i]) {
+        hasCheckedBox = true
         break
       }
     }
 
-    if (fireGwtEvent && has_checked_box) {
+    if (fireGwtEvent && hasCheckedBox) {
       // TODO replace with callback to js page handler
       // gwtPerspectiveCallback();
     }
@@ -247,11 +247,11 @@
     // hack to handle IE display bugs
     var isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g)
     if (isIE) {
-      var options_height = Math.max(
+      var optionsHeight = Math.max(
         d3.select('.pervarpicker-border-wrapper').node().offsetHeight,
-        62 + 24 * first_column_data.length)
+        62 + 24 * firstColumnData.length)
       d3.select('.perspective-options')
-        .style('height', options_height + 'px')
+        .style('height', optionsHeight + 'px')
     }
 
     updateElements()
@@ -259,17 +259,17 @@
 
   function updateElements () {
     d3.select('.perspective-picker')
-      .style('width', fixed_width + 'px')
+      .style('width', fixedWidth + 'px')
 
     d3.select('.peropt-more-button')
       .style('visibility', function () {
-        return has_remainder ? null : 'hidden'
+        return hasRemainder ? null : 'hidden'
       })
       .text(collapsed ? 'Visa fler >' : '< Visa färre ')
 
     d3.select('.peropt-bottom-padding')
       .style('height', function () {
-        return has_remainder ? null : '0px'
+        return hasRemainder ? null : '0px'
       })
 
     d3.select('.daxplore-DescriptionPanelBottom')

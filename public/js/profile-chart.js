@@ -1,13 +1,16 @@
 (function (exports) {
-  var first_update = true
+  var firstUpdate = true
 
-  var q_ids, means, mean_references, perspective_options, usertexts, descriptions, directions
-  var selected_option = 0; var selected_q_ids = []
+  var qIDs, means, meanReferences, perspectiveOptions, usertexts, directions
+  // TODO unused: descriptions
+  var shorttexts // TODO initialize
+  var selectedOption = 0
+  var selectedQIDs = []
   var chartwrapperBB, xAxisTopHeight, xAxisBottomHeight, margin, width, height
-  var chart, x_scale, y_scale
+  var xScale, yScale, yAxisElement, yAxisReferenceElement // TODO unused: chart
   var yAxisWidth
 
-  var element_transition = d3.transition()
+  var elementTransition = d3.transition()
       .duration(300)
       .ease(d3.easeLinear)
 
@@ -16,16 +19,16 @@
   // FUNCTIONS
 
   function getQid (i) {
-    return selected_q_ids[i]
+    return selectedQIDs[i]
   }
 
-  function getMean (i, selected_option) {
-    return means[q_ids.indexOf(getQid(i))][selected_option]
+  function getMean (i, selectedOption) {
+    return means[qIDs.indexOf(getQid(i))][selectedOption]
   }
 
   function setToNormalColor (i) {
     d3.select('#barrect-' + getQid(i))
-      .style('fill', colorForValue(getMean(i, selected_option), mean_references[getQid(i)], directions[getQid(i)]))
+      .style('fill', window.colorForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)])) // TODO don't use window.?
     d3.selectAll('.q-' + getQid(i))
       .classed('bar-hover', false)
     d3.selectAll('.y.axis .tick')
@@ -34,11 +37,11 @@
 
   function setToHoverColor (i) {
     d3.select('#barrect-' + getQid(i))
-      .style('fill', colorHoverForValue(getMean(i, selected_option), mean_references[getQid(i)], directions[getQid(i)]))
+      .style('fill', window.colorHoverForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)])) // TODO don't use window.?
     d3.selectAll('.q-' + getQid(i))
       .classed('bar-hover', true)
     d3.selectAll('.y.axis .tick')
-      .classed('bar-hover', function (d, index) { return i == index })
+      .classed('bar-hover', function (d, index) { return i === index })
   }
 
   function tooltipOver (i) {
@@ -51,11 +54,11 @@
       .style('opacity', 1)
 
     tooltipdiv.html(
-      shorttexts[getQid(i)] + ': <b>' + d3.format('d')(getMean(i, selected_option)) + '</b><br>' +
-        usertexts.listReferenceValue + ': <b>' + d3.format('d')(mean_references[getQid(i)]) + '</b>')
-      .style('background', colorHoverForValue(getMean(i, selected_option), mean_references[getQid(i)], directions[getQid(i)]))
-      .style('left', (chartwrapperBB.left + x_scale(Math.max(getMean(i, selected_option), mean_references[getQid(i)])) + yAxisWidth + 14) + 'px')
-      .style('top', chartwrapperBB.top + y_scale(getQid(i)) + y_scale.bandwidth() / 2 - tooltipdiv.node().getBoundingClientRect().height / 2 + 'px')
+      shorttexts[getQid(i)] + ': <b>' + d3.format('d')(getMean(i, selectedOption)) + '</b><br>' +
+        usertexts.listReferenceValue + ': <b>' + d3.format('d')(meanReferences[getQid(i)]) + '</b>')
+      .style('background', window.colorHoverForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)])) // TODO don't use window.?
+      .style('left', (chartwrapperBB.left + xScale(Math.max(getMean(i, selectedOption), meanReferences[getQid(i)])) + yAxisWidth + 14) + 'px')
+      .style('top', chartwrapperBB.top + yScale(getQid(i)) + yScale.bandwidth() / 2 - tooltipdiv.node().getBoundingClientRect().height / 2 + 'px')
 
     var arrowleft = d3.select('.arrow-left')
 
@@ -64,11 +67,12 @@
       .style('opacity', 1)
 
     arrowleft
-      .style('border-right-color', colorHoverForValue(getMean(i, selected_option), mean_references[getQid(i)], directions[getQid(i)]))
-      .style('left', (chartwrapperBB.left + x_scale(Math.max(getMean(i, selected_option), mean_references[getQid(i)])) + yAxisWidth + 4) + 'px')
-      .style('top', chartwrapperBB.top + y_scale(getQid(i)) + y_scale.bandwidth() / 2 - arrowleft.node().getBoundingClientRect().height / 2 + 'px')
+      .style('border-right-color', window.colorHoverForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)])) // TODO don't use window.?
+      .style('left', (chartwrapperBB.left + xScale(Math.max(getMean(i, selectedOption), meanReferences[getQid(i)])) + yAxisWidth + 4) + 'px')
+      .style('top', chartwrapperBB.top + yScale(getQid(i)) + yScale.bandwidth() / 2 - arrowleft.node().getBoundingClientRect().height / 2 + 'px')
 
-    setDescriptionFull(d3.select('#chart-description'), perspective_options[selected_option], getQid(i), getMean(i, selected_option))
+    // TODO don't use window.?
+    window.setDescriptionFull(d3.select('#chart-description'), perspectiveOptions[selectedOption], getQid(i), getMean(i, selectedOption))
   }
 
   function tooltipOut () {
@@ -147,10 +151,10 @@
   }
 
   function updateChartElements () {
-    if (first_update) {
-      var el_trans = d3.transition().duration(0)
+    if (firstUpdate) {
+      var elTransition = d3.transition().duration(0)
     } else {
-      var el_trans = element_transition
+      elTransition = elementTransition
     }
 
     var chart = d3.selectAll('.chart')
@@ -161,36 +165,36 @@
 
     // rearranged equation from d3's source file band.js, ignoring the floor call
     // https://github.com/d3/d3-scale/blob/fd07dd8ceeaeaec612f675050ac134243b406f64/src/band.js#L26
-    var yHeightWithMaxBand = Math.max(1, selected_q_ids.length - paddingInner + paddingOuter * 2) * maxBandwidth / (1 - paddingInner)
+    var yHeightWithMaxBand = Math.max(1, selectedQIDs.length - paddingInner + paddingOuter * 2) * maxBandwidth / (1 - paddingInner)
 
     var yStop = Math.min(height - xAxisBottomHeight, yHeightWithMaxBand + xAxisTopHeight)
 
     // CALCULATE Y SCALE
-    y_scale = d3.scaleBand()
+    yScale = d3.scaleBand()
       .range([xAxisTopHeight, yStop])
       .paddingInner(paddingInner)
       .paddingOuter(paddingOuter)
-      .domain(selected_q_ids)
+      .domain(selectedQIDs)
 
     // UPDATE Y AXIS
-    yAxisScale = y_scale.copy()
-    yAxisScale.domain(selected_q_ids.map(function (q_id) { return shorttexts[q_id] }))
+    var yAxisScale = yScale.copy()
+    yAxisScale.domain(selectedQIDs.map(function (qID) { return shorttexts[qID] }))
     var yAxis = d3.axisLeft()
       .tickSize(3)
       .scale(yAxisScale)
 
-    oldYAxisWidth = Math.max(50, yAxisReferenceElement.node().getBBox().width)
+    var oldYAxisWidth = Math.max(50, yAxisReferenceElement.node().getBBox().width)
     yAxisReferenceElement.call(yAxis)
     yAxisWidth = Math.max(50, yAxisReferenceElement.node().getBBox().width)
 
-    if (first_update) {
+    if (firstUpdate) {
       oldYAxisWidth = yAxisWidth
     }
 
     yAxisElement.interrupt().selectAll('*').interrupt()
 
     yAxisElement
-      .transition(el_trans)
+      .transition(elTransition)
         .attr('transform', 'translate(' + yAxisWidth + ', 0)')
         .call(yAxis)
 
@@ -207,49 +211,49 @@
         })
 
     // CALCULATE X SCALE
-    x_scale = d3.scaleLinear()
+    xScale = d3.scaleLinear()
       .domain([0, 100]) // TODO define range in producer
       .range([0, width - yAxisWidth])
 
     // UPDATE X AXIS TOP
     var xAxisTop = d3.axisTop()
-      .scale(x_scale)
+      .scale(xScale)
       .ticks(20, 'd')
       .tickSizeInner(0)
 
-    var x_axis_top = d3.selectAll('g.x.axis.top')
+    var xAxisTopElement = d3.selectAll('g.x.axis.top')
 
-    x_axis_top.interrupt().selectAll('*').interrupt()
+    xAxisTopElement.interrupt().selectAll('*').interrupt()
 
-    x_axis_top.transition(el_trans)
+    xAxisTopElement.transition(elTransition)
       .attr('transform', 'translate(' + yAxisWidth + ',' + xAxisTopHeight + ')')
       .call(xAxisTop)
 
     d3.selectAll('.x-top-description')
-      .transition(el_trans)
+      .transition(elTransition)
         .attr('transform', 'translate(' + (width - yAxisWidth) / 2 + ', -20)')
 
     // UPDATE X AXIS BOTTOM
     var xAxisBottom = d3.axisBottom()
-      .scale(x_scale)
+      .scale(xScale)
       .ticks(20, 'd')
       .tickSizeInner(-(yStop - xAxisTopHeight))
 
-    var x_axis_bottom = d3.selectAll('g.x.axis.bottom')
+    var xAxisBottomElement = d3.selectAll('g.x.axis.bottom')
 
-    x_axis_bottom.interrupt().selectAll('*').interrupt()
+    xAxisBottomElement.interrupt().selectAll('*').interrupt()
 
-    x_axis_bottom.transition(el_trans)
+    xAxisBottomElement.transition(elTransition)
       .attr('transform', 'translate(' + yAxisWidth + ',' + (yStop) + ')')
       .call(xAxisBottom)
 
     d3.selectAll('.x-bottom-description')
-      .transition(el_trans)
+      .transition(elTransition)
       .attr('transform', 'translate(' + (width - yAxisWidth) / 2 + ', 28)')
 
     // BARS
     var bars = chart.selectAll('.bar')
-      .data(selected_q_ids)
+      .data(selectedQIDs)
 
     // remove old bars
     bars.exit().remove()
@@ -257,21 +261,22 @@
     // add new bars
     bars.enter().append('g')
       .classed('bar', true)
-      .attr('transform', function (d, i) { return 'translate(' + (oldYAxisWidth + 1) + ',' + y_scale(d) + ')' })
+      .attr('transform', function (d, i) { return 'translate(' + (oldYAxisWidth + 1) + ',' + yScale(d) + ')' })
       .append('rect')
         .classed('barrect', true)
-        .attr('height', y_scale.bandwidth())
-        .style('fill', function (d, i) { return colorForValue(getMean(i, selected_option), mean_references[getQid(i)], directions[getQid(i)]) })
-        .attr('width', function (d, i) { return first_update ? x_scale(getMean(i, selected_option)) + 1 : 0 })
+        .attr('height', yScale.bandwidth())
+        // TODO don't use window.?
+        .style('fill', function (d, i) { return window.colorForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)]) })
+        .attr('width', function (d, i) { return firstUpdate ? xScale(getMean(i, selectedOption)) + 1 : 0 })
         .on('mouseover',
           function (d) {
-            var i = selected_q_ids.indexOf(d)
+            var i = selectedQIDs.indexOf(d)
             tooltipOver(i)
             setToHoverColor(i)
           })
         .on('mouseout',
           function (d) {
-            var i = selected_q_ids.indexOf(d)
+            var i = selectedQIDs.indexOf(d)
             tooltipOut()
             setToNormalColor(i)
           })
@@ -282,22 +287,23 @@
     bars.interrupt().selectAll('*').interrupt()
 
     bars
-      .transition(el_trans)
-      .attr('transform', function (d, i) { return 'translate(' + (yAxisWidth + 1) + ',' + y_scale(d) + ')' })
+      .transition(elTransition)
+      .attr('transform', function (d, i) { return 'translate(' + (yAxisWidth + 1) + ',' + yScale(d) + ')' })
 
     bars.select('.barrect')
-      .transition(el_trans)
-        .style('fill', function (d, i) { return colorForValue(getMean(i, selected_option), mean_references[getQid(i)], directions[getQid(i)]) })
-        .attr('height', y_scale.bandwidth())
-        .attr('width', function (d, i) { return x_scale(getMean(i, selected_option)) + 1 })
+      .transition(elTransition)
+        // TODO don't use window.?
+        .style('fill', function (d, i) { return window.colorForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)]) })
+        .attr('height', yScale.bandwidth())
+        .attr('width', function (d, i) { return xScale(getMean(i, selectedOption)) + 1 })
 
     // REFERENCE LINES
     var referenceWidth = 2
     var referenceExtraHeight = 4
-    var referenceHeight = y_scale.bandwidth() + referenceExtraHeight
+    var referenceHeight = yScale.bandwidth() + referenceExtraHeight
 
     var references = chart.selectAll('.reference')
-      .data(selected_q_ids)
+      .data(selectedQIDs)
 
     // remove old reference lines
     references.exit().remove()
@@ -307,17 +313,17 @@
       .classed('reference', true)
       .on('mouseover',
         function (d) {
-          var i = selected_q_ids.indexOf(d)
+          var i = selectedQIDs.indexOf(d)
           tooltipOver(i)
           setToHoverColor(i)
         })
       .on('mouseout',
         function (d) {
-          var i = selected_q_ids.indexOf(d)
+          var i = selectedQIDs.indexOf(d)
           tooltipOut()
           setToNormalColor(i)
         })
-      .attr('transform', function (d, i) { return 'translate(' + (yAxisWidth + x_scale(mean_references[getQid(i)]) - referenceWidth / 2) + ',' + (y_scale(d) - referenceExtraHeight / 2) + ')' })
+      .attr('transform', function (d, i) { return 'translate(' + (yAxisWidth + xScale(meanReferences[getQid(i)]) - referenceWidth / 2) + ',' + (yScale(d) - referenceExtraHeight / 2) + ')' })
       .style('shape-rendering', 'crispEdges')
       .append('rect')
         .classed('reference-line', true)
@@ -337,22 +343,22 @@
     references.interrupt().selectAll('*').interrupt()
 
     references
-      .transition(el_trans)
-        .attr('transform', function (d, i) { return 'translate(' + (yAxisWidth + x_scale(mean_references[d]) - referenceWidth / 2) + ',' + (y_scale(d) - referenceExtraHeight / 2) + ')' })
+      .transition(elTransition)
+        .attr('transform', function (d, i) { return 'translate(' + (yAxisWidth + xScale(meanReferences[d]) - referenceWidth / 2) + ',' + (yScale(d) - referenceExtraHeight / 2) + ')' })
 
     references.select('.reference-line')
-      .transition(el_trans)
+      .transition(elTransition)
         .attr('width', referenceWidth)
         .attr('height', referenceHeight)
 
     references.selectAll('.reference-line-box')
-      .transition(el_trans)
+      .transition(elTransition)
       .attr('width', referenceWidth + 2)
       .attr('height', referenceHeight + 2)
 
     // repopulate the description box and reset the tooltip
-    if (selected_q_ids.length > 0) {
-      tooltipOver(Math.min(lastHoveredBar, selected_q_ids.length - 1))
+    if (selectedQIDs.length > 0) {
+      tooltipOver(Math.min(lastHoveredBar, selectedQIDs.length - 1))
     } else {
       d3.selectAll('#chart-description')
         .style('opacity', '0')
@@ -360,11 +366,11 @@
     tooltipOut()
 
     // HEADER SELECT
-    var header_select_div = d3.select('.header-select-div')
-    var header_select = d3.select('.header-select')
+    var headerSelectDiv = d3.select('.header-select-div')
+    var headerSelect = d3.select('.header-select')
 
-    var options = header_select.selectAll('option')
-        .data(perspective_options, function (d) { return d })
+    var options = headerSelect.selectAll('option')
+        .data(perspectiveOptions, function (d) { return d })
 
     options.exit().remove()
 
@@ -373,16 +379,16 @@
         .text(function (d) { return d })
         .attr('value', function (d, i) { return i })
 
-    var bar_area_width = (width - yAxisWidth)
-    var select_width = header_select.node().getBoundingClientRect().width
+    var barAreaWidth = (width - yAxisWidth)
+    var selectWidth = headerSelect.node().getBoundingClientRect().width
 
-    header_select_div.interrupt()
+    headerSelectDiv.interrupt()
 
-    header_select_div
-      .transition(el_trans)
-        .style('margin-left', yAxisWidth + bar_area_width / 2 - select_width / 2 + 'px')
+    headerSelectDiv
+      .transition(elTransition)
+        .style('margin-left', yAxisWidth + barAreaWidth / 2 - selectWidth / 2 + 'px')
 
-    header_select.node().selectedIndex = selected_option
+    headerSelect.node().selectedIndex = selectedOption
 
     // FINISH
     updateStyles()
@@ -409,11 +415,11 @@
       .style('fill', '#444')
   }
 
-  function get_selected_q_ids (means, selected_option) {
+  function getSelectedQIDs (means, selectedOption) {
     var selected = []
-    q_ids.forEach(function (q_id, i) {
-      if (!isNaN(means[i][selected_option]) && means[i][selected_option] != -1) {
-        selected.push(q_id)
+    qIDs.forEach(function (qID, i) {
+      if (!isNaN(means[i][selectedOption]) && means[i][selectedOption] !== -1) {
+        selected.push(qID)
       }
     })
     return selected
@@ -423,21 +429,21 @@
 
   exports.generateListChart =
     function (
-      q_ids_array,
-      references_map,
-      shorttexts_map,
-      usertexts_map,
-      descriptions_map,
-      directions_map,
-      selected_selected_option) {
-      q_ids = q_ids_array
-      mean_references = references_map
-      shorttexts = shorttexts_map
-      usertexts = usertexts_map
-      descriptions = descriptions_map
-      directions = directions_map
+      qIDsArray,
+      referencesMap,
+      shorttextsMap,
+      usertextsMap,
+      // TODO unused: descriptionsMap,
+      directionsMap,
+      selectedSelectedOption) {
+      qIDs = qIDsArray
+      meanReferences = referencesMap
+      shorttexts = shorttextsMap
+      usertexts = usertextsMap
+      // TODO unused: descriptions = descriptionsMap
+      directions = directionsMap
 
-      selected_option = selected_selected_option
+      selectedOption = selectedSelectedOption
 
       computeDimensions()
 
@@ -445,19 +451,20 @@
       updateStyles()
     }
 
-  exports.setChartData = function (perspective_options_array, means_array) {
-    perspective_options = perspective_options_array
-    means = means_array
-    selected_q_ids = get_selected_q_ids(means, selected_option)
+  exports.setChartData = function (perspectiveOptionsArray, meansArray) {
+    perspectiveOptions = perspectiveOptionsArray
+    means = meansArray
+    selectedQIDs = getSelectedQIDs(means, selectedOption)
 
-    updateSelectorOption(selected_option)
+    // TODO don't use window.?
+    window.updateSelectorOption(selectedOption)
 
-    first_update = false
+    firstUpdate = false
   }
 
-  exports.updateSelectorOption = function (selected_selected_option) {
-    selected_option = selected_selected_option
-    selected_q_ids = get_selected_q_ids(means, selected_option)
+  exports.updateSelectorOption = function (selectedSelectedOption) {
+    selectedOption = selectedSelectedOption
+    selectedQIDs = getSelectedQIDs(means, selectedOption)
 
     updateChartElements()
     updateStyles()
@@ -478,76 +485,77 @@
 
     var source = (new XMLSerializer()).serializeToString(svg)
 
-    var blob = new Blob([ doctype + source], { type: 'image/svg+xml;charset=utf-8' })
+    var blob = new Blob([doctype + source], { type: 'image/svg+xml;charset=utf-8' })
 
     var url = window.URL.createObjectURL(blob)
 
-    var img_selection = d3.select('body').append('img')
+    var imgSelection = d3.select('body').append('img')
       .attr('width', chartWidth)
       .attr('height', chartHeight)
       .style('visibility', 'hidden')
 
-    img = img_selection.node()
+    var img = imgSelection.node()
 
     img.onload = function () {
-      var canvas_chart_selection = d3.select('body').append('canvas')
+      var canvasChartSelection = d3.select('body').append('canvas')
         .attr('width', chartWidth)
         .attr('height', chartHeight)
         .style('visibility', 'hidden')
-      var canvas_chart = canvas_chart_selection.node()
+      var canvasChart = canvasChartSelection.node()
 
-      var chart_ctx = canvas_chart.getContext('2d')
-      chart_ctx.drawImage(img, 0, 0)
+      var chartCtx = canvasChart.getContext('2d')
+      chartCtx.drawImage(img, 0, 0)
 
-      var header_text = perspective_options[selected_option]
-      var header_padding_top = 5
-      var header_font_size = 16
-      var header_padding_bottom = 10
-      var header_font = 'bold ' + header_font_size + 'px sans-serif'
-      var header_height = header_padding_top + header_font_size + header_padding_bottom
+      var headerText = perspectiveOptions[selectedOption]
+      var headerPaddingTop = 5
+      var headerFontSize = 16
+      var headerPaddingBottom = 10
+      var headerFont = 'bold ' + headerFontSize + 'px sans-serif'
+      var headerHeight = headerPaddingTop + headerFontSize + headerPaddingBottom
 
-      var img_margin = { top: 10, right: 20, bottom: 20, left: 10 }
+      var imgMargin = { top: 10, right: 20, bottom: 20, left: 10 }
 
-      var complete_width = img_margin.left + chartWidth + img_margin.right
-      var complete_height = img_margin.top + header_height + chartHeight + img_margin.bottom
-      var canvas_complete_selection = d3.select('body').append('canvas')
-        .attr('width', complete_width + 'px')
-        .attr('height', complete_height + 'px')
+      var completeWidth = imgMargin.left + chartWidth + imgMargin.right
+      var completeHeight = imgMargin.top + headerHeight + chartHeight + imgMargin.bottom
+      var canvasCompleteSelection = d3.select('body').append('canvas')
+        .attr('width', completeWidth + 'px')
+        .attr('height', completeHeight + 'px')
         .style('visibility', 'hidden')
 
-      var canvas_complete = canvas_complete_selection.node()
+      var canvasComplete = canvasCompleteSelection.node()
 
-      var ctx = canvas_complete_selection.node().getContext('2d')
+      var ctx = canvasCompleteSelection.node().getContext('2d')
 
       ctx.fillStyle = 'white'
-      ctx.fillRect(0, 0, complete_width, complete_height)
+      ctx.fillRect(0, 0, completeWidth, completeHeight)
       ctx.fillStyle = 'black'
 
-      ctx.font = header_font
+      ctx.font = headerFont
 
-      var header_width = ctx.measureText(header_text).width
+      var headerWidth = ctx.measureText(headerText).width
 
-      var bar_area_width = (width - yAxisWidth)
-      var header_horizontal_shift = yAxisWidth + bar_area_width / 2 - header_width / 2
+      var barAreaWidth = (width - yAxisWidth)
+      var headerHorizontalShift = yAxisWidth + barAreaWidth / 2 - headerWidth / 2
 
-      ctx.fillText(header_text, header_horizontal_shift + img_margin.left, header_padding_top + header_font_size + img_margin.top)
+      ctx.fillText(headerText, headerHorizontalShift + imgMargin.left, headerPaddingTop + headerFontSize + imgMargin.top)
 
-      var source_text = usertexts.imageWaterStamp
-      var source_font_height = 11
-      ctx.font = source_font_height + 'px sans-serif'
+      var sourceText = usertexts.imageWaterStamp
+      var sourceFontHeight = 11
+      ctx.font = sourceFontHeight + 'px sans-serif'
       ctx.fillStyle = '#555'
-      var source_text_width = ctx.measureText(source_text).width
-      ctx.fillText(source_text, 5, complete_height - 5)
+      // TODO unused: var sourceTextWidth = ctx.measureText(sourceText).width
+      ctx.fillText(sourceText, 5, completeHeight - 5)
 
-      ctx.drawImage(canvas_chart, img_margin.left, img_margin.top + header_height)
+      ctx.drawImage(canvasChart, imgMargin.left, imgMargin.top + headerHeight)
 
-      canvas_complete.toBlob(function (blob) {
-        saveAs(blob, header_text + '.png')
+      canvasComplete.toBlob(function (blob) {
+        // TODO don't use window.?
+        window.saveAs(blob, headerText + '.png')
       })
 
-      img_selection.remove()
-      canvas_chart_selection.remove()
-      canvas_complete_selection.remove()
+      imgSelection.remove()
+      canvasChartSelection.remove()
+      canvasCompleteSelection.remove()
     }
 
     img.src = url
