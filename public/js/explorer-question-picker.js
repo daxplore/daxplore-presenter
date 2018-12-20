@@ -16,7 +16,7 @@
     groups = groupsInput
     usertexts = usertextsInput
 
-    var selectedQuestion = groups[0].questions[0]
+    selectedQuestion = groups[0].questions[0]
     for (var i = 0; i < questions.length; i++) {
       var q = questions[i]
       shorttextMap[q.column] = q.short
@@ -75,18 +75,20 @@
         .classed('question-question', true)
         .text(function (d) { return shorttextMap[d] })
         .on('click', function (d) {
-          //          var changed = selectedQuestion != d;
-          //          if (changed) {
+          // var changed = selectedQuestion !== d
+          // if (changed) {
           selectedQuestion = d
+          updateTree()
           // TODO replace with callback to js page handler
-          // gwtQuestionCallback();
-          //          }
+          // gwtQuestionCallback()
+          // }
         })
 
     openGroup = groupMap[selectedQuestion]
     updateTree()
 
     // hack to force initial sizing to work
+    // TODO handle in different way
     for (i = 2; i <= 12; i++) {
       setTimeout(updateTree, Math.pow(2, i))
     }
@@ -137,6 +139,8 @@
 
     // SELECT QUESTION
     d3.selectAll('.question-question')
-      .classed('selected', function (d) { return d === selectedQuestion })
+      .classed('selected', function (d) {
+        return d === selectedQuestion
+      })
   }
 })(window)
