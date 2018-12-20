@@ -138,7 +138,7 @@
     updateCheckboxes(changed && initialized)
   }
 
-  function updateCheckboxes (fireGwtEvent) {
+  function updateCheckboxes (fireUpdateEvent) {
     d3.selectAll('.pervarpicker-varoption')
       .classed('pervarpicker-varoption-selected', function (d, i) { return i === selectedPerspective })
 
@@ -231,15 +231,15 @@
       .classed('peropt-checkbox-selected', function (d) { return d.selected })
       .text(function (d) { return d.text })
 
-    var hasCheckedBox = false
-    for (i = 0; i < selectedOptions.length; i++) {
-      if (selectedOptions[i]) {
-        hasCheckedBox = true
-        break
-      }
-    }
+    // var hasCheckedBox = false
+    // for (i = 0; i < selectedOptions.length; i++) {
+    //   if (selectedOptions[i]) {
+    //     hasCheckedBox = true
+    //     break
+    //   }
+    // }
 
-    if (fireGwtEvent && hasCheckedBox) {
+    if (fireUpdateEvent) { //  TODO removed update limiter: && hasCheckedBox
       // TODO replace with callback to js page handler
       // gwtPerspectiveCallback();
     }
