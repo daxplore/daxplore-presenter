@@ -1,22 +1,24 @@
 (function (exports) {
   var questionMap = {}
   var initialQuestion, selectedTab
-
   var primaryColors, hoverColors
 
+  // Initialize the chart panel
+  // TODO fix constructor
   exports.generateChartPanel = function (questions, groups, primaryColorsInput, hoverColorsInput) {
     primaryColors = primaryColorsInput
     hoverColors = hoverColorsInput
 
+    // Unpack the data
     for (var i = 0; i < questions.length; i++) {
       var q = questions[i]
       questionMap[q.column] = q
     }
-
     initialQuestion = groups[0].questions[0]
     selectedTab = questionMap[initialQuestion].displaytypes[0]
-
     var displaytypes = questionMap[initialQuestion].displaytypes
+
+    // Add click events to the tabs
     d3.selectAll('.chart-tab')
       .on('click',
         function () {
@@ -28,23 +30,27 @@
           }
         })
 
+    // Apply special classes to style the tabs
+    // TODO duplicate code, used again in chartSetQUeeryDefinition function, should probably be unified
     d3.selectAll('.chart-tab, .chart-tab-spacing')
-        .style('display', function (d, i, tabs) {
-          if (displaytypes.length <= 1) {
-            return 'none'
-          }
-          for (var j = 0; j < displaytypes.length; j++) {
-            if (tabs[i].classList.contains(displaytypes[j].toLowerCase())) {
-              return 'block'
-            }
-          }
+      .style('display', function (d, i, tabs) {
+        if (displaytypes.length <= 1) {
           return 'none'
-        })
+        }
+        for (var j = 0; j < displaytypes.length; j++) {
+          if (tabs[i].classList.contains(displaytypes[j].toLowerCase())) {
+            return 'block'
+          }
+        }
+        return 'none'
+      })
   }
 
-  exports.getSelectedTab = function () {
-    return selectedTab
-  }
+  // Getter for selected tab
+  // TODO unused?
+  // exports.getSelectedTab = function () {
+  //   return selectedTab
+  // }
 
   exports.chartSetQueryDefinition = function (charttype, timepoints, stat, selectedOptions, dichSubtitle) {
     selectedTab = charttype
