@@ -433,14 +433,12 @@
       referencesMap,
       shorttextsMap,
       usertextsMap,
-      // TODO unused: descriptionsMap,
       directionsMap,
       selectedSelectedOption) {
       qIDs = qIDsArray
       meanReferences = referencesMap
       shorttexts = shorttextsMap
       usertexts = usertextsMap
-      // TODO unused: descriptions = descriptionsMap
       directions = directionsMap
 
       selectedOption = selectedSelectedOption

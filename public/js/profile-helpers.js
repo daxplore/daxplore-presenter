@@ -55,11 +55,11 @@
     }
 
     if (diff < -5) {
-      return colors.bad_hover
+      return colors.badHover
     } else if (diff > 5) {
-      return colors.good_hover
+      return colors.goodHover
     } else {
-      return colors.average_hover
+      return colors.averageHover
     }
   }
 
@@ -72,11 +72,11 @@
     }
 
     if (diff < -5) {
-      return colors.bad_text
+      return colors.badText
     } else if (diff > 5) {
-      return colors.good_text
+      return colors.goodText
     } else {
-      return colors.average_text
+      return colors.averageText
     }
   }
 

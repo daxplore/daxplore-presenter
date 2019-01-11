@@ -1,95 +1,60 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <!-- This page was generated using the free and open source project Daxplore. -->
+    <!-- For usage information, license terms and contact information please visit: -->
+    <!-- https://github.com/daxplore -->
+
+    <!-- Set up basic page properties -->
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <base href="{0}" target="_blank">
-    <title>{1}</title>
-    
+    <title>Daxplore Presenter: Profile</title>
+    <link rel="icon" href="favicon.ico">
+
+    <!-- Import stylesheets -->
+    <!--Normalize  all browser default css values: https://necolas.github.io/normalize.css/ -->
     <link rel="stylesheet" href="css/normalize.css">
+
+    <!-- Style for different Daxplore components -->
     <link rel="stylesheet" href="css/daxplore-common.css">
     <link rel="stylesheet" href="css/profile-chart.css">
-    
-    <script type="text/javascript" charset="UTF-8">
-      var prefix = "{2}";
-      var perspective = "{3}";
-      var questions = {4};
-      var settings = {5};
-      var usertexts = {6};
-      var data = {7};
-    </script>
-    
-    <script type="text/javascript">{7}</script>
-    
-    <script type="text/javascript" src="https://d3js.org/d3.v4.js"></script>
-    
-    <script type="text/javascript" src="js/canvas-toBlob.js"></script>
-    <script type="text/javascript" src="js/FileSaver.js"></script>
+
+    <!-- Import library dependencies -->
+    <!-- Use Modernizr to polyfill features for older browsers: https://modernizr.com -->
+    <script type="text/javascript" src="js/libraries/modernizr-ES5Array.js"></script>
+    <script type="text/javascript" src="js/libraries/modernizr-URLSearchParams.js"></script>
+    <!-- Use d3 to design all charts, interactive elements and manipulate the DOM: https://d3js.org/ -->
+    <script type="text/javascript" src="https://d3js.org/d3.v5.min.js"></script>
+    <!-- Use Axios to download data from the server: https://github.com/axios/axios -->
+    <script type="text/javascript" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- Use Canvas to Blob to turn canvas data into blob data that can saved -->
+    <script type="text/javascript" src="js/libraries/canvas-toBlob.js"></script>
+    <!-- Use File Saver to save data as local files -->
+    <script type="text/javascript" src="js/libraries/FileSaver.js"></script>
+
+    <!-- Import Daxplore helpers -->
     <script type="text/javascript" src="js/profile-helpers.js"></script>
+
+
+    <!-- Import Daxplore Chart -->
     <script type="text/javascript" src="js/profile-chart.js"></script>
-    
+
+    <!-- Profile Core is used to set up and manage profile.html  -->
+    <script type="text/javascript" src="js/profile-core.js"></script>
+
     <script type="text/javascript">
-      var unpacked_data = {};
-      var q_ids = [];
-      var means = [];
-      
-      for (var i = 0; i < data.length; i++) {
-        var d = data[i];
-        
-        var q_id = d.q;
-        q_ids.push(q_id);
-        
-        var mean_array = d.mean["0"].mean;
-        means.push(mean_array);
-      }
-      
-      var perspective_options = [];
-      var shorttext_map = {};
-      var description_map = {};
-      var direction_map = {};
-      var mean_reference_map = {};
-
-      for (var i=0; i < questions.length; i ++) {
-        var q = questions[i];
-        shorttext_map[q.column] = q.short;
-        description_map[q.column] = unescape(q.description);
-        
-        if ("gooddirection" in q) {
-          direction_map[q.column] = q.gooddirection;
-        }
-        
-        if (q.column === perspective) {
-          perspective_options = q.options;
-        }
-        
-        if (q.use_mean_reference) {
-        	 mean_reference_map[q.column] = q.mean_reference;
-     	  }
-      }
-      
-      initiateHelpers(mean_reference_map, shorttext_map, usertexts, description_map, direction_map);
-
-      function headerChange(select) {
-        updateSelectorOption(select.value);
-      }
-
-      document.addEventListener("DOMContentLoaded", function(e) {
-        d3.select(".save-image")
-        	.text(usertexts.imageSaveButton);
-            
-        generateListChart(q_ids, mean_reference_map, shorttext_map, usertexts, description_map, direction_map, 0);
-        setChartData(perspective_options, means);
-      });
+      // TODO don't use window.?
+      window.initializeProfile()
     </script>
-  
+
   </head>
-  
+
   <body>
      <div class="chart-main">
      	<div class="chart-row">
        <div class="column-left">
          <div class="header">
            <div class="header-select-div">
-             <select class="header-select" onchange="headerChange(this)">
+             <select class="header-select" onchange="window.headerChange(this)"> <!-- TODO don't use .window? -->
              </select>
            </div>
          </div>
