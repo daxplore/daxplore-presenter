@@ -21,8 +21,10 @@
     <link rel="stylesheet" href="css/daxplore-chart.css">
 
     <!-- Import library dependencies -->
-    <!-- Use Modernizr to polyfill features for older browsers: https://modernizr.com -->
-    <script type="text/javascript" src="js/libraries/modernizr-ES5Array.js"></script>
+    <!-- Import shims and polyfills for older browsers-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.7/es5-shim.min.js"></script>
+    <script type="text/javascript" src="js/libraries/es6-promise.auto.js"></script>
+    <script src="https://unpkg.com/@ungap/url-search-params"></script>
     <!-- Use d3 to design all charts, interactive elements and manipulate the DOM: https://d3js.org/ -->
     <script type="text/javascript" src="https://d3js.org/d3.v5.min.js"></script>
     <!-- Use Axios to download data from the server: https://github.com/axios/axios -->
