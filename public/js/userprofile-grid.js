@@ -1,7 +1,10 @@
+// TODO Userprofile is hardcoded specifically for COPSOQ in Swedish. Probably not
+// meaningful to generalize into something useful for other projects. Should
+// most likely be moved to separate repo.
 (function (exports) {
-  // TODO unused: descriptions
   var qIDs, meanReferences, shorttextsMap, usertexts, directions
 
+  // TODO externalize or keep hardcoded in separate repo?
   var userImportRegexes = [
     /kvantitativ/g,
     /tempo|takt/g,
@@ -398,25 +401,22 @@
 
   exports.generateGrid =
     function (
-      locale,
       qIDsArray,
       referencesMap,
       shorttextsMapInput,
       usertextsMap,
-      // TODO unused: descriptionsArray,
       directionsMap
     ) {
       qIDs = qIDsArray
       meanReferences = referencesMap
       shorttextsMap = shorttextsMapInput
       usertexts = usertextsMap
-      // TODO unused: descriptions = descriptionsArray
       directions = directionsMap
 
       d3.select('.add-column-button')
           .text('+ Lägg till grupp')
 
-      if (Modernizr.promises && Modernizr.svgforeignobject) {
+      if (Modernizr.svgforeignobject) {
         d3.select('.save-grid-image-button')
             .text('Spara som bild')
             .on('click', window.saveGridImage) // TODO don't use window.?
@@ -448,8 +448,7 @@
       })
 
       // GRID FORM
-      var form = d3.select('.grid').append('form')
-          .attr('lang', locale)
+      var form = d3.select('.grid').append('form').attr('lang', 'sv')
       var table = form.append('table')
       var thead = table.append('thead')
       tbody = table.append('tbody')

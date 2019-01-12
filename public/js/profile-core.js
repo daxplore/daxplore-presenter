@@ -30,6 +30,34 @@
       const usertexts = usertextsResponse.data
       const listview = listviewResponse.data
 
+      // TODO do data parsing as a Promise, to prevent blocing of the rest of the data download?
+      var perspectiveOptions = []
+      const shorttextMap = {}
+      const descriptionMap = {}
+      const directionMap = {}
+      const meanReferenceMap = {}
+
+      for (let i = 0; i < questions.length; i++) {
+        let q = questions[i]
+        shorttextMap[q.column] = q.short
+        descriptionMap[q.column] = unescape(q.description)
+
+        if ('gooddirection' in q) {
+          directionMap[q.column] = q.gooddirection
+        }
+
+        if (q.column === perspective) {
+          perspectiveOptions = q.options
+        }
+
+        if (q.use_mean_reference) {
+          meanReferenceMap[q.column] = q.mean_reference
+        }
+      }
+
+      // TODO don't use .window?
+      window.initiateHelpers(meanReferenceMap, shorttextMap, usertexts, descriptionMap, directionMap)
+
       // Get the data used in the listview
       function getQuestionData (questionID) { return axios.get('data/questions/' + questionID + '.json') }
       let variableRequests = listview.map(function (qID) { return getQuestionData(qID) })
@@ -47,33 +75,6 @@
             }
           }
         })
-
-        var perspectiveOptions = []
-        var shorttextMap = {}
-        var descriptionMap = {}
-        var directionMap = {}
-        var meanReferenceMap = {}
-
-        for (let i = 0; i < questions.length; i++) {
-          let q = questions[i]
-          shorttextMap[q.column] = q.short
-          descriptionMap[q.column] = unescape(q.description)
-
-          if ('gooddirection' in q) {
-            directionMap[q.column] = q.gooddirection
-          }
-
-          if (q.column === perspective) {
-            perspectiveOptions = q.options
-          }
-
-          if (q.use_mean_reference) {
-            meanReferenceMap[q.column] = q.mean_reference
-          }
-        }
-
-        // TODO don't use .window?
-        window.initiateHelpers(meanReferenceMap, shorttextMap, usertexts, descriptionMap, directionMap)
 
         if (document.readyState === 'loading') {
           document.addEventListener('DOMContentLoaded', function (e) {
