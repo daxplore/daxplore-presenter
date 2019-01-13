@@ -66,7 +66,6 @@
   }
 
   exports.headerChange = function (select) {
-    // TODO don't use .window?
     daxplore.profile.updateSelectorOption(select.value)
   }
 })(window.daxplore = window.daxplore || {})
