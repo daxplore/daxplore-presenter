@@ -1,4 +1,8 @@
-(function (exports) {
+(function (namespace) {
+  namespace.chart = namespace.chart || {}
+  namespace.chart.dichtimeline = namespace.chart.dichtimeline || {}
+  const exports = namespace.chart.dichtimeline
+
   // CONSTANTS
   // TODO move to setting in producer
   // if chart width is smaller than this, embed it it a scrollpanel
@@ -422,7 +426,7 @@
     })
   }
 
-  exports.generateDichTimeLineChart = function (selectedOptions, stat, usertextsInput, lineColorsInput, hoverColorsInput) {
+  exports.generateChart = function (selectedOptions, stat, usertextsInput, lineColorsInput, hoverColorsInput) {
     // TODO initizalize once, not every time
     usertexts = usertextsInput
     lineColors = lineColorsInput
@@ -476,7 +480,7 @@
     updateStyles()
   }
 
-  exports.generateDichTimeLineLegend = function () {
+  exports.generateLegend = function () {
     // GENERATE LEGEND
     var legend = d3.select('.daxplore-ExternalLegend')
       .style('margin-top', (height / 2) + 'px')
@@ -509,7 +513,7 @@
     updateStyles()
   }
 
-  exports.updateDichTimeLineChartSize = function (heightTotal) {
+  exports.updateSize = function (heightTotal) {
     var calcWidth = document.documentElement.clientWidth - // window width
               d3.select('.daxplore-QuestionPanel').node().offsetWidth - // tree sidebar
               5 - // tree margin (if changed here, needs to be changed in css)
@@ -543,4 +547,4 @@
 
     updateChartElements()
   }
-})(window)
+})(window.daxplore = window.daxplore || {})

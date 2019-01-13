@@ -1,4 +1,7 @@
-(function (exports) {
+(function (namespace) {
+  namespace.explorer = namespace.explorer || {}
+  const exports = namespace.explorer
+
   exports.initializeExplorer = function () {
     // Use Axios to download all needed metadata files from the server
     // Define functions for all metadata files to be downloaded
@@ -19,10 +22,9 @@
       let usertexts = usertextsResponse.data
 
       // Initialize elements that depend on the metadata
-      // TODO don't use windows.?
-      window.generateQuestionPanel(questions, groups, usertexts, settings)
-      window.generatePerspectivePanel(questions, perspectives, usertexts, settings)
-      window.generateChartPanel(questions, groups, null, null) // TODO fix constructor
+      daxplore.explorer.generateQuestionPicker(questions, groups, usertexts, settings)
+      daxplore.explorer.generatePerspectivePicker(questions, perspectives, usertexts, settings)
+      daxplore.explorer.generateChartPanel(questions, groups, null, null) // TODO fix constructor
     }))
   }
-})(window)
+})(window.daxplore = window.daxplore || {})

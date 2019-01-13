@@ -1,7 +1,10 @@
 // TODO Userprofile is hardcoded specifically for COPSOQ in Swedish. Probably not
 // meaningful to generalize into something useful for other projects. Should
 // most likely be moved to separate repo.
-(function (exports) {
+(function (namespace) {
+  namespace.userprofile = namespace.userprofile || {}
+  const exports = namespace.userprofile
+
   var qIDs, meanReferences, shorttextsMap, usertexts, directions
 
   // TODO externalize or keep hardcoded in separate repo?
@@ -120,8 +123,8 @@
           .attr('pattern', '[0-9]+([\\.,][0-9]+)?') // TODO added extra escape backslash, check it works
           .attr('step', 0.1)
           .on('focus', function (d) {
-            // TODO don't use window.?
-            window.setDescriptionShort(d3.select('#grid-description'), d.qID)
+
+            daxplore.profile.setDescriptionShort(d3.select('#grid-description'), d.qID)
           })
           .on('focusout', function (d, i, t) {
             var el = t[i]
@@ -197,8 +200,7 @@
   }
 
   exports.generateUserPasteSection = function () {
-    // TOOD don't use window.?
-    window.addGridUpdateCallback(updateUserCopyGroupNameDropdown)
+    daxplore.userprofile.addGridUpdateCallback(updateUserCopyGroupNameDropdown)
     d3.select('.user-paste-data-header')
       .on('click', function () {
         userPasteSectionOpen = !userPasteSectionOpen
@@ -419,7 +421,7 @@
       if (Modernizr.svgforeignobject) {
         d3.select('.save-grid-image-button')
             .text('Spara som bild')
-            .on('click', window.saveGridImage) // TODO don't use window.?
+            .on('click', daxplore.userprofile.saveGridImage)
       } else {
         d3.select('.save-grid-image-button')
             .remove()
@@ -430,7 +432,7 @@
       d3.select('.grid-legend-text.bad').text(usertexts.listReferenceWorse)
 
       if (qIDs.length > 0) {
-        window.setDescriptionShort(d3.select('#grid-description'), qIDs[0]) // TODO don't use window.?
+        daxplore.profile.setDescriptionShort(d3.select('#grid-description'), qIDs[0])
       }
 
       usernames.push('Grupp 1')
@@ -470,7 +472,7 @@
             .append('tr')
               .attr('class', function (d) { return 'gridrow-' + d.qID })
               .on('mouseover', function (d, i) {
-                window.setDescriptionShort(d3.select('#grid-description'), d.qID) // TODO don't use window.?
+                daxplore.profile.setDescriptionShort(d3.select('#grid-description'), d.qID)
               })
 
       gridRows.append('td')
@@ -557,8 +559,7 @@
     gridclone.selectAll('.header-cell-input')
       .style('border', 'none')
 
-    // TODO don't use window.?
-    window.domtoimage.toPng(gridclone.node(), { bgcolor: 'white' })
+    domtoimage.toPng(gridclone.node(), { bgcolor: 'white' })
       .then(function (dataUrl) {
         gridclone.remove()
         generateAndSaveImage(dataUrl, chartWidth, heightOffset)
@@ -606,8 +607,7 @@
       ctx.fillText(sourceText, hMargin, canvasHeight - 5)
 
       canvasChart.toBlob(function (blob) {
-        // TODO don't use window.?
-        window.saveAs(blob, 'profildiagram' + '.png')
+        saveAs(blob, 'profildiagram' + '.png')
       })
 
       canvasChartSelection.remove()
@@ -615,4 +615,4 @@
 
     img.src = dataUrl
   }
-})(window)
+})(window.daxplore = window.daxplore || {})

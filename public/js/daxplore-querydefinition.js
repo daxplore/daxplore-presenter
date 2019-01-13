@@ -1,5 +1,8 @@
-// Export functions to encode and decode query definitions
-(function (exports) {
+// Functions to encode and decode query definitions
+(function (namespace) {
+  namespace.querydefinition = namespace.querydefinition || {}
+  const exports = namespace.querydefinition
+
   // Check if a string contains a normal integer, allowing leading zeroes
   // https://stackoverflow.com/questions/10834796/validate-that-a-string-is-a-positive-integer
   function isNormalInteger (str) {
@@ -38,7 +41,7 @@
   }
 
   // Takes a query definition string and returns a query definition object
-  exports.parseQueryDefinitionString = function (queryString) {
+  exports.parseString = function (queryString) {
     // Decode string from base64
     const decodedString = atob(queryString)
 
@@ -69,7 +72,7 @@
   }
 
   // Takes query definition elements and creates an encoded query definition string
-  exports.createQueryDefinitionString = function (question, perspective, perspectiveOptions, flags) {
+  exports.encodeString = function (question, perspective, perspectiveOptions, flags) {
     const queryDefinitionItems = []
 
     // Add q=question if it exists
@@ -95,4 +98,4 @@
     // Join query definition parts with & and encode to base64
     return btoa(queryDefinitionItems.join('&'))
   }
-})(window)
+})(window.daxplore = window.daxplore || {})

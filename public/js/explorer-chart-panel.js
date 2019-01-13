@@ -1,4 +1,7 @@
-(function (exports) {
+(function (namespace) {
+  namespace.explorer = namespace.explorer || {}
+  const exports = namespace.explorer
+
   var questionMap = {}
   var initialQuestion, selectedTab
   var primaryColors, hoverColors
@@ -100,18 +103,16 @@
       case 'TIMEPOINTS_TWO':
       case 'TIMEPOINTS_ALL':
         // TODO temporary hardcoded timepoint
-        // TODO use something other than window.?
-        window.generateFrequencyChart(primaryColors, hoverColors, stat, selectedOptions, 4)
-        window.generateFrequencyLegend()
+        daxplore.chart.frequency.generateChart(primaryColors, hoverColors, stat, selectedOptions, 4)
+        daxplore.chart.frequency.generateLegend()
         break
       }
       break
     case 'MEAN':
       switch (timepoints) {
       case 'TIMEPOINTS_ONE':
-        // TODO use something else than window.?
-        window.generateMeanChart(selectedOptions, stat)
-        window.generateMeanLegend()
+        daxplore.chart.mean.generateChart(selectedOptions, stat)
+        daxplore.chart.mean.generateLegend()
         break
       case 'TIMEPOINTS_TWO':
         break
@@ -124,15 +125,13 @@
       case 'TIMEPOINTS_ONE':
       case 'TIMEPOINTS_TWO':
       case 'TIMEPOINTS_ALL':
-        // TODO use something other than window.?
-        window.generateDichTimeLineChart(selectedOptions, stat, primaryColors, hoverColors)
-        window.generateDichTimeLineLegend()
+        daxplore.chart.dichtimeline.generateChart(selectedOptions, stat, primaryColors, hoverColors)
+        daxplore.chart.dichtimeline.generateLegend()
         break
       }
       break
     }
-    // TODO use something other than window?
-    window.updateChartPanelSize()
+    daxplore.explorer.updateChartPanelSize()
   }
 
   function setSelectedTab (tab) {
@@ -147,18 +146,15 @@
   exports.updateChartPanelSize = function () {
     switch (selectedTab) {
     case 'FREQUENCY':
-    // TODO use something other than window?
-      window.updateFreqChartSize(350)
+      daxplore.chart.frequency.updateSize(350)
       break
     case 'MEAN':
-    // TODO use something other than window?
     // TODO allow more height instead of vertical scroll
-      window.updateMeanChartSize(350)
+      daxplore.chart.mean.updateSize(350)
       break
     case 'DICHOTOMIZED':
-    // TODO use something other than window?
-      window.updateDichTimeLineChartSize(350)
+      daxplore.chart.dichtimeline.updateSize(350)
       break
     }
   }
-})(window)
+})(window.daxplore = window.daxplore || {})

@@ -1,4 +1,7 @@
-(function (exports) {
+(function (namespace) {
+  namespace.explorer = namespace.explorer || {}
+  const exports = namespace.explorer
+
   var initialized = false
   var selectedPerspective = -1
   var perspectiveOptions = []
@@ -27,7 +30,7 @@
     }
   }
 
-  exports.generatePerspectivePanel = function (questionsInput, perspectivesInput, usertextsInput, settingsInput) {
+  exports.generatePerspectivePicker = function (questionsInput, perspectivesInput, usertextsInput, settingsInput) {
     questions = questionsInput
     perspectives = perspectivesInput
     usertexts = usertextsInput
@@ -107,7 +110,7 @@
   }
 
   exports.getPerspectiveOptions = function () {
-    return selectedOptions.join(',', true)
+    return selectedOptions.slice() // use slice to return as copy
   }
 
   exports.isPerspectiveTotalSelected = function () {
@@ -281,4 +284,4 @@
         .style('opacity', collapsed ? 0 : 1)
         .style('width', collapsed ? '0px' : null)
   }
-})(window)
+})(window.daxplore = window.daxplore || {})

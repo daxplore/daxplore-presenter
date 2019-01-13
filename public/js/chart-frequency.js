@@ -1,4 +1,8 @@
-(function (exports) {
+(function (namespace) {
+  namespace.chart = namespace.chart || {}
+  namespace.chart.frequency = namespace.chart.frequency || {}
+  const exports = namespace.chart.frequency
+
   // CONSTANTS
   var chartHeight = 350
 
@@ -27,7 +31,7 @@
   var x, y, z
 
   // EXPORTED FUNCTIONS
-  exports.generateFrequencyChart = function (usertextsInput, primaryColorsInput, hoverColorsInput, stat, selectedPerspectiveOptionIndicesInput, selectedTimepointInput) {
+  exports.generateChart = function (usertextsInput, primaryColorsInput, hoverColorsInput, stat, selectedPerspectiveOptionIndicesInput, selectedTimepointInput) {
     usertexts = usertextsInput
     // TODO initizalize once, not every time
     primaryColors = primaryColorsInput
@@ -88,11 +92,10 @@
     generateChartElements()
     calculateTPWidths()
     // updateChartElements();
-    // TODO structure project in way that does not depend on adding functions to window
-    window.updateFreqChartSize(chartHeight)
+    daxplore.chart.frequency.updateSize(chartHeight)
   }
 
-  exports.updateFreqChartSize = function (heightTotal) {
+  exports.updateSize = function (heightTotal) {
     // 2. width for chart to use is max of:
     // a. room remaining of window width after QP, SA, margins, (scroll bar?)
     // b. max of
@@ -166,7 +169,7 @@
     updateChartElements()
   }
 
-  exports.generateFrequencyLegend = function () {
+  exports.generateLegend = function () {
     // GENERATE LEGEND
     var legend = d3.select('.daxplore-ExternalLegend')
       .style('margin-top', (height / 2) + 'px')
@@ -482,4 +485,4 @@
       .style('font', '12px sans-serif')
       .style('cursor', 'default')
   }
-})(window)
+})(window.daxplore = window.daxplore || {})

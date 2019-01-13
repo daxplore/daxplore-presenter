@@ -1,19 +1,19 @@
-(function (exports) {
+(function (namespace) {
+  namespace.userprofile = namespace.userprofile || {}
+  const exports = namespace.userprofile
+
   function populateUserProfileDOM (qIDs, usertexts, meanReferenceMap, shorttextMap, descriptionMap, directionMap) {
     d3.select('.save-image')
       .text(usertexts.imageSaveButton)
 
-    // TODO don't use .window?
-    window.generateUserPasteSection()
+    daxplore.userprofile.generateUserPasteSection()
 
-    // TODO don't use .window?
-    window.generateGrid(qIDs, meanReferenceMap, shorttextMap, usertexts, directionMap)
+    daxplore.userprofile.generateGrid(qIDs, meanReferenceMap, shorttextMap, usertexts, directionMap)
 
-    // TODO don't use .window?
-    window.generateListChart(qIDs, meanReferenceMap, shorttextMap, usertexts, directionMap, 0)
+    daxplore.profile.generateListChart(qIDs, meanReferenceMap, shorttextMap, usertexts, directionMap, 0)
 
-    window.addGridUpdateCallback(function (names, means) {
-      window.setChartData(names, means)
+    daxplore.userprofile.addGridUpdateCallback(function (names, means) {
+      daxplore.profile.setChartData(names, means)
     })
   }
 
@@ -53,8 +53,7 @@
         }
       }
 
-      // TODO don't use .window?
-      window.initiateHelpers(meanReferenceMap, shorttextMap, usertexts, descriptionMap, directionMap)
+      daxplore.profile.initializeHelpers(meanReferenceMap, shorttextMap, usertexts, descriptionMap, directionMap)
 
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function (e) {
@@ -65,8 +64,9 @@
       }
     }))
   }
+
   exports.headerChange = function (select) {
     // TODO don't use .window?
-    window.updateSelectorOption(select.value)
+    daxplore.profile.updateSelectorOption(select.value)
   }
-})(window)
+})(window.daxplore = window.daxplore || {})

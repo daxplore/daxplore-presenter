@@ -1,4 +1,8 @@
-(function (exports) {
+(function (namespace) {
+  namespace.chart = namespace.chart || {}
+  namespace.chart.mean = namespace.chart.mean || {}
+  const exports = namespace.chart.mean
+
   // CONSTANTS
   // TODO move to setting in producer
   // if chart width is smaller than this, embed it it a scrollpanel
@@ -86,7 +90,7 @@
 
   // EXPORTED FUNCTIONS
 
-  exports.generateMeanChart = function (usertextsInput, selectedOptionsInput, stat) {
+  exports.generateChart = function (usertextsInput, selectedOptionsInput, stat) {
     usertexts = usertextsInput
     computeDimensions(chartWidthScrollBreakpoint, 300)
     generateChartElements()
@@ -226,8 +230,7 @@
         .classed('barrect', true)
         .attr('height', yScale.bandwidth())
         .style('fill', function (option) {
-          // TODO import in other way than window?
-          return window.colorForValue(option.mean, questionReferenceValue, questionGoodDirection)
+          return daxplore.profile.colorForValue(option.mean, questionReferenceValue, questionGoodDirection)
         })
         .attr('width', function (option) { return firstUpdate ? xScale(option.mean) + 1 : 0 })
         // .on("mouseover",
@@ -251,13 +254,12 @@
     bars
       .transition(elTrans)
       .attr('transform', function (option) {
-        // TODO import in other way than window?
         return 'translate(' + (yAxisWidth + 1) + ',' + yScale(option.index) + ')'
       })
 
     bars.select('.barrect')
       .transition(elTrans)
-        .style('fill', function (option) { return window.colorForValue(option.mean, questionReferenceValue, questionGoodDirection) })
+        .style('fill', function (option) { return daxplore.profile.colorForValue(option.mean, questionReferenceValue, questionGoodDirection) })
         .attr('height', yScale.bandwidth())
         .attr('width', function (option) { return xScale(option.mean) + 1 })
 
@@ -403,7 +405,7 @@
       .style('fill', '#444')
   }
 
-  exports.generateMeanLegend = function () {
+  exports.generateLegend = function () {
     // GENERATE LEGEND
     var legend = d3.select('.daxplore-ExternalLegend')
       .style('margin-top', '0px')
@@ -412,7 +414,7 @@
     legend.html('')
   }
 
-  exports.updateMeanChartSize = function (heightTotal) {
+  exports.updateSize = function (heightTotal) {
     var calcWidth = document.documentElement.clientWidth - // window width
               d3.select('.daxplore-QuestionPanel').node().offsetWidth - // tree sidebar
               5 - // tree margin (if changed here, needs to be changed in css)
@@ -446,4 +448,4 @@
 
     updateChartElements()
   }
-})(window)
+})(window.daxplore = window.daxplore || {})

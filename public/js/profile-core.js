@@ -1,11 +1,13 @@
-(function (exports) {
+(function (namespace) {
+  namespace.profile = namespace.profile || {}
+  const exports = namespace.profile
+
   function populateProfileDOM (usertexts, qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, perspectiveOptions, means) {
     d3.select('.save-image')
       .text(usertexts.imageSaveButton)
 
-    // TODO don't use .window?
-    window.generateListChart(qIDs, meanReferenceMap, shorttextMap, usertexts, directionMap, 0)
-    window.setChartData(perspectiveOptions, means)
+    daxplore.profile.generateListChart(qIDs, meanReferenceMap, shorttextMap, usertexts, directionMap, 0)
+    daxplore.profile.setChartData(perspectiveOptions, means)
   }
 
   exports.initializeProfile = function () {
@@ -55,8 +57,7 @@
         }
       }
 
-      // TODO don't use .window?
-      window.initiateHelpers(meanReferenceMap, shorttextMap, usertexts, descriptionMap, directionMap)
+      daxplore.profile.initializeHelpers(meanReferenceMap, shorttextMap, usertexts, descriptionMap, directionMap)
 
       // Get the data used in the listview
       function getQuestionData (questionID) { return axios.get('data/questions/' + questionID + '.json') }
@@ -88,7 +89,6 @@
   }
 
   exports.headerChange = function (select) {
-    // TODO don't use .window?
-    window.updateSelectorOption(select.value)
+    daxplore.profile.updateSelectorOption(select.value)
   }
-})(window)
+})(window.daxplore = window.daxplore || {})

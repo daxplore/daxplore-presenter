@@ -41,8 +41,7 @@
     <script type="text/javascript" src="js/profile-core.js"></script>
 
     <script type="text/javascript">
-      // TODO don't use window.?
-      window.initializeProfile()
+      daxplore.profile.initializeProfile()
     </script>
 
   </head>
@@ -53,7 +52,7 @@
        <div class="column-left">
          <div class="header">
            <div class="header-select-div">
-             <select class="header-select" onchange="window.headerChange(this)"> <!-- TODO don't use .window? -->
+             <select class="header-select" onchange="daxplore.profile.headerChange(this)">
              </select>
            </div>
          </div>
@@ -64,7 +63,7 @@
          </div>
        </div>
        <div class="column-right">
-         <span class="dashed-button save-image" onClick="generateImage()"></span>
+         <span class="dashed-button save-image" onClick="daxplore.profile.generateImage()"></span>
          <div class="description-wrapper">
            <div id='chart-description' class="description"></div>
          </div>

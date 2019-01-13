@@ -1,4 +1,7 @@
-(function (exports) {
+(function (namespace) {
+  namespace.explorer = namespace.explorer || {}
+  const exports = namespace.explorer
+
   // TODO unused: var initialized = false
   var openGroup = -1
 
@@ -11,7 +14,7 @@
   var groupMap = []
   var selectedQuestion
 
-  exports.generateQuestionPanel = function (questionsInput, groupsInput, usertextsInput) {
+  exports.generateQuestionPicker = function (questionsInput, groupsInput, usertextsInput) {
     questions = questionsInput
     groups = groupsInput
     usertexts = usertextsInput
@@ -94,6 +97,7 @@
     }
   }
 
+  // TODO unused?
   exports.getSelectedQuestion = function () {
     return selectedQuestion
   }
@@ -143,4 +147,4 @@
         return d === selectedQuestion
       })
   }
-})(window)
+})(window.daxplore = window.daxplore || {})

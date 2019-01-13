@@ -1,4 +1,7 @@
-(function (exports) {
+(function (namespace) {
+  namespace.profile = namespace.profile || {}
+  const exports = namespace.profile
+
   var firstUpdate = true
 
   var qIDs, means, meanReferences, perspectiveOptions, usertexts, directions
@@ -28,7 +31,7 @@
 
   function setToNormalColor (i) {
     d3.select('#barrect-' + getQid(i))
-      .style('fill', window.colorForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)])) // TODO don't use window.?
+      .style('fill', daxplore.profile.colorForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)]))
     d3.selectAll('.q-' + getQid(i))
       .classed('bar-hover', false)
     d3.selectAll('.y.axis .tick')
@@ -37,7 +40,7 @@
 
   function setToHoverColor (i) {
     d3.select('#barrect-' + getQid(i))
-      .style('fill', window.colorHoverForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)])) // TODO don't use window.?
+      .style('fill', daxplore.profile.colorHoverForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)]))
     d3.selectAll('.q-' + getQid(i))
       .classed('bar-hover', true)
     d3.selectAll('.y.axis .tick')
@@ -56,7 +59,7 @@
     tooltipdiv.html(
       shorttexts[getQid(i)] + ': <b>' + d3.format('d')(getMean(i, selectedOption)) + '</b><br>' +
         usertexts.listReferenceValue + ': <b>' + d3.format('d')(meanReferences[getQid(i)]) + '</b>')
-      .style('background', window.colorHoverForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)])) // TODO don't use window.?
+      .style('background', daxplore.profile.colorHoverForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)]))
       .style('left', (chartwrapperBB.left + xScale(Math.max(getMean(i, selectedOption), meanReferences[getQid(i)])) + yAxisWidth + 14) + 'px')
       .style('top', chartwrapperBB.top + yScale(getQid(i)) + yScale.bandwidth() / 2 - tooltipdiv.node().getBoundingClientRect().height / 2 + 'px')
 
@@ -67,12 +70,11 @@
       .style('opacity', 1)
 
     arrowleft
-      .style('border-right-color', window.colorHoverForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)])) // TODO don't use window.?
+      .style('border-right-color', daxplore.profile.colorHoverForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)]))
       .style('left', (chartwrapperBB.left + xScale(Math.max(getMean(i, selectedOption), meanReferences[getQid(i)])) + yAxisWidth + 4) + 'px')
       .style('top', chartwrapperBB.top + yScale(getQid(i)) + yScale.bandwidth() / 2 - arrowleft.node().getBoundingClientRect().height / 2 + 'px')
 
-    // TODO don't use window.?
-    window.setDescriptionFull(d3.select('#chart-description'), perspectiveOptions[selectedOption], getQid(i), getMean(i, selectedOption))
+    daxplore.profile.setDescriptionFull(d3.select('#chart-description'), perspectiveOptions[selectedOption], getQid(i), getMean(i, selectedOption))
   }
 
   function tooltipOut () {
@@ -265,8 +267,7 @@
       .append('rect')
         .classed('barrect', true)
         .attr('height', yScale.bandwidth())
-        // TODO don't use window.?
-        .style('fill', function (d, i) { return window.colorForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)]) })
+        .style('fill', function (d, i) { return daxplore.profile.colorForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)]) })
         .attr('width', function (d, i) { return firstUpdate ? xScale(getMean(i, selectedOption)) + 1 : 0 })
         .on('mouseover',
           function (d) {
@@ -292,8 +293,7 @@
 
     bars.select('.barrect')
       .transition(elTransition)
-        // TODO don't use window.?
-        .style('fill', function (d, i) { return window.colorForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)]) })
+        .style('fill', function (d, i) { return daxplore.profile.colorForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)]) })
         .attr('height', yScale.bandwidth())
         .attr('width', function (d, i) { return xScale(getMean(i, selectedOption)) + 1 })
 
@@ -454,8 +454,7 @@
     means = meansArray
     selectedQIDs = getSelectedQIDs(means, selectedOption)
 
-    // TODO don't use window.?
-    window.updateSelectorOption(selectedOption)
+    daxplore.profile.updateSelectorOption(selectedOption)
 
     firstUpdate = false
   }
@@ -547,8 +546,7 @@
       ctx.drawImage(canvasChart, imgMargin.left, imgMargin.top + headerHeight)
 
       canvasComplete.toBlob(function (blob) {
-        // TODO don't use window.?
-        window.saveAs(blob, headerText + '.png')
+        saveAs(blob, headerText + '.png')
       })
 
       imgSelection.remove()
@@ -558,4 +556,4 @@
 
     img.src = url
   }
-})(window)
+})(window.daxplore = window.daxplore || {})

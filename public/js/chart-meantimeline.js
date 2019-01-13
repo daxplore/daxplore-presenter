@@ -1,9 +1,13 @@
-(function (exports) {
+(function (namespace) {
+  namespace.chart = namespace.chart || {}
+  namespace.chart.meantimeline = namespace.chart.meantimeline || {}
+  const exports = namespace.chart.meantimeline
+
   var optionsMap = {}
   var timepointsMap = {}
   var chartSvg
 
-  exports.generateMeanTimeLineChart = function (questions, selectedOptions, statJson) {
+  exports.generateChart = function (questions, selectedOptions, statJson) {
     for (var i = 0; i < questions.length; i++) {
       var q = questions[i]
       timepointsMap[q.column] = q.timepoints
@@ -272,4 +276,4 @@
 //       return d;
 //     }
 //   }
-})(window)
+})(window.daxplore = window.daxplore || {})
