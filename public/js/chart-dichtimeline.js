@@ -13,18 +13,12 @@
   var chart, chartG
 
   // INITIALIZE STATIC RESOURCES
+  // TODO actually initialize
   var usertexts
-  var dichselectedMap = {}
-  var optionsMap = {}
-  var timepointsMap = {}
+  var dichselectedMap
+  var optionsMap
+  var timepointsMap
   var percentageFormat = d3.format('.0%')
-
-  // for (var i=0; i < questions.length; i ++) {
-  //   var q = questions[i];
-  //   dichselectedMap[q.column] = q.dichselected;
-  //   optionsMap[q.column] = q.options;
-  //   timepointsMap[q.column] = q.timepoints;
-  // }
 
   var pointSymbol = d3.symbol().type(d3.symbolCircle)
   var pointSize = 40
@@ -426,7 +420,11 @@
     })
   }
 
-  exports.generateChart = function (selectedOptions, stat, usertextsInput, lineColorsInput, hoverColorsInput) {
+  exports.generateChart = function (selectedOptions, stat, usertextsInput, dichselectedMapInput, optionsMapInput, timepointsMapInput, lineColorsInput, hoverColorsInput) {
+    dichselectedMap = dichselectedMapInput
+    optionsMap = optionsMapInput
+    timepointsMap = timepointsMapInput
+
     // TODO initizalize once, not every time
     usertexts = usertextsInput
     lineColors = lineColorsInput

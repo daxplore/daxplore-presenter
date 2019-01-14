@@ -5,14 +5,17 @@
   var questionMap = {}
   var initialQuestion, selectedTab
   var primaryColors, hoverColors
-  var usertexts
+  var usertexts, dichselectedMap, optionsMap, timepointsMap
 
   // Initialize the chart panel
   // TODO fix constructor
-  exports.generateChartPanel = function (questions, groups, primaryColorsInput, hoverColorsInput, usertextsInput) {
+  exports.generateChartPanel = function (questions, groups, primaryColorsInput, hoverColorsInput, usertextsInput, dichselectedMapInput, optionsMapInput, timepointsMapInput) {
     primaryColors = primaryColorsInput
     hoverColors = hoverColorsInput
     usertexts = usertextsInput
+    dichselectedMap = dichselectedMapInput
+    optionsMap = optionsMapInput
+    timepointsMap = timepointsMapInput
 
     // Unpack the data
     for (var i = 0; i < questions.length; i++) {
@@ -96,6 +99,9 @@
         .selectAll(function () { return this.childNodes })
         .remove()
 
+    const primaryColors = ['#9DC680', '#80AFC6', '#8B8BCB', '#AB8BCB', '#C68680', '#CBA46C', '#CBCB6C']
+    const hoverColors = ['#D5F0C2', '#C2E0F0', '#C2C2F0', '#D9C2F0', '#F0C6C2', '#F0DDC2', '#F0F0C2']
+
     // Select chart to displaytypes
     switch (selectedTab) {
     case 'FREQUENCY':
@@ -126,7 +132,7 @@
       case 'TIMEPOINTS_ONE':
       case 'TIMEPOINTS_TWO':
       case 'TIMEPOINTS_ALL':
-        daxplore.chart.dichtimeline.generateChart(selectedOptions, stat, primaryColors, hoverColors)
+        daxplore.chart.dichtimeline.generateChart(selectedOptions, stat, usertexts, dichselectedMap, optionsMap, timepointsMap, primaryColors, hoverColors)
         daxplore.chart.dichtimeline.generateLegend()
         break
       }

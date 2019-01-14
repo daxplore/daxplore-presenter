@@ -5,6 +5,9 @@
   var groups, perspectives, questions, settings, usertexts
   const questionData = {}
   const questionMap = {}
+  const dichselectedMap = {}
+  const optionsMap = {}
+  const timepointsMap = {}
 
   exports.initializeExplorer = function () {
     // Get initial query definition from hash
@@ -32,6 +35,9 @@
       for (var i = 0; i < questions.length; i++) {
         var q = questions[i]
         questionMap[q.column] = q
+        dichselectedMap[q.column] = q.dichselected
+        optionsMap[q.column] = q.options
+        timepointsMap[q.column] = q.timepoints
       }
 
       // Download all question data
@@ -59,7 +65,7 @@
         // Initialize elements that depend on the metadata
         daxplore.explorer.generateQuestionPicker(questions, groups, usertexts, settings)
         daxplore.explorer.generatePerspectivePicker(questions, perspectives, usertexts, settings)
-        daxplore.explorer.generateChartPanel(questions, groups, null, null, usertexts) // TODO fix constructor
+        daxplore.explorer.generateChartPanel(questions, groups, null, null, usertexts, dichselectedMap, optionsMap, timepointsMap) // TODO fix constructor
 
         daxplore.explorer.questionSetQueryDefinition(queryDefinition.question)
         let totalSelected = queryDefinition.flags.indexOf('TOTAL') !== -1
@@ -67,7 +73,7 @@
 
         // TODO don't use hardcoded chart type and timepoint enum
         const stat = questionData[queryDefinition.question][queryDefinition.perspective]
-        daxplore.explorer.chartSetQueryDefinition('MEAN', 'TIMEPOINTS_ONE', stat, queryDefinition.perspectiveOptions, 'TODO')
+        daxplore.explorer.chartSetQueryDefinition('DICHOTOMIZED', 'TIMEPOINTS_ONE', stat, queryDefinition.perspectiveOptions, 'TODO')
       })
     }))
   }
@@ -80,6 +86,8 @@
     const perspectiveOptions = daxplore.explorer.getSelectedPerspectiveOptions()
     const totalSelected = daxplore.explorer.isPerspectiveTotalSelected()
     const tab = daxplore.explorer.getSelectedTab()
-    console.log(question, perspective, perspectiveOptions, totalSelected, tab)
+    // console.log(question, perspective, perspectiveOptions, totalSelected, tab)
+    const stat = questionData[question][perspective]
+    daxplore.explorer.chartSetQueryDefinition(tab, 'TIMEPOINTS_ONE', stat, perspectiveOptions, 'TODO')
   }
 })(window.daxplore = window.daxplore || {})
