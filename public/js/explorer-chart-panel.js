@@ -5,12 +5,14 @@
   var questionMap = {}
   var initialQuestion, selectedTab
   var primaryColors, hoverColors
+  var usertexts
 
   // Initialize the chart panel
   // TODO fix constructor
-  exports.generateChartPanel = function (questions, groups, primaryColorsInput, hoverColorsInput) {
+  exports.generateChartPanel = function (questions, groups, primaryColorsInput, hoverColorsInput, usertextsInput) {
     primaryColors = primaryColorsInput
     hoverColors = hoverColorsInput
+    usertexts = usertextsInput
 
     // Unpack the data
     for (var i = 0; i < questions.length; i++) {
@@ -50,10 +52,9 @@
   }
 
   // Getter for selected tab
-  // TODO unused?
-  // exports.getSelectedTab = function () {
-  //   return selectedTab
-  // }
+  exports.getSelectedTab = function () {
+    return selectedTab
+  }
 
   exports.chartSetQueryDefinition = function (charttype, timepoints, stat, selectedOptions, dichSubtitle) {
     selectedTab = charttype
@@ -111,7 +112,7 @@
     case 'MEAN':
       switch (timepoints) {
       case 'TIMEPOINTS_ONE':
-        daxplore.chart.mean.generateChart(selectedOptions, stat)
+        daxplore.chart.mean.generateChart(usertexts, questionMap, selectedOptions, stat)
         daxplore.chart.mean.generateLegend()
         break
       case 'TIMEPOINTS_TWO':
@@ -141,6 +142,7 @@
     selectedTab = tab
     // TODO replace gwt callback with js callback
     // gwtChartPanelCallback(tab)
+    daxplore.explorer.selectionUpdateCallback()
   }
 
   exports.updateChartPanelSize = function () {

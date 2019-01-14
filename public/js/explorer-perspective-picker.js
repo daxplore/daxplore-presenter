@@ -20,9 +20,15 @@
       .attr('src', '/img/perspective-checkbox-empty.png')
   })
 
-  exports.perspectiveSetQueryDefinition = function (perspectiveID, options, total) {
-    selectedPerspective = perspectives.indexOf(perspectiveID)
-    selectedOptions = options
+  exports.perspectiveSetQueryDefinition = function (perspectiveID, perspectiveOptionsIntArray, total) {
+    const perspectiveIndex = perspectives.indexOf(perspectiveID)
+    if (perspectiveIndex === -1) { return } // TODO log error?
+    selectedPerspective = perspectiveIndex // TODO validate data?
+    // Remap options from array of ints to array of bools
+    selectedOptions = []
+    for (let i = 0; i < perspectiveOptions[perspectiveIndex].length; i++) {
+      selectedOptions.push(perspectiveOptionsIntArray.indexOf(i) !== -1)
+    }
     totalSelected = total
 
     if (initialized) {
@@ -109,8 +115,14 @@
     return perspectives[selectedPerspective]
   }
 
-  exports.getPerspectiveOptions = function () {
-    return selectedOptions.slice() // use slice to return as copy
+  exports.getSelectedPerspectiveOptions = function () {
+    let selectedOptionsInt = []
+    for (let i = 0; i < selectedOptions.length; i++) {
+      if (selectedOptions[i]) {
+        selectedOptionsInt.push(i)
+      }
+    }
+    return selectedOptionsInt
   }
 
   exports.isPerspectiveTotalSelected = function () {
@@ -126,6 +138,7 @@
   }
 
   function setSelectedPerspective (index) {
+    if (typeof index !== 'number' || index < 0 || index >= perspectives.length) { return } // TODO log error?
     var changed = selectedPerspective !== index
     selectedPerspective = index
 
@@ -245,6 +258,7 @@
     if (fireUpdateEvent) { //  TODO removed update limiter: && hasCheckedBox
       // TODO replace with callback to js page handler
       // gwtPerspectiveCallback();
+      daxplore.explorer.selectionUpdateCallback()
     }
 
     // hack to handle IE display bugs

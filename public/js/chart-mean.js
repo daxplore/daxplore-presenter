@@ -24,14 +24,10 @@
   var yAxisElement, yAxisReferenceElement
 
   // INITIALIZE STATIC RESOURCES
+  // TODO initialize once or keep injecting?
   var usertexts
-  var questionMap = {}
+  var questionMap
   // TODO unused: var percentageFormat = d3.format('.0%')
-
-  // for (var i=0; i < questions.length; i++) {
-  //   var q = questions[i];
-  //   questionMap[q.column] = q ;
-  // }
 
   // INTERNAL FUNCTIONS
 
@@ -90,8 +86,9 @@
 
   // EXPORTED FUNCTIONS
 
-  exports.generateChart = function (usertextsInput, selectedOptionsInput, stat) {
-    usertexts = usertextsInput
+  exports.generateChart = function (usertextsInput, questionMapInput, selectedOptionsInput, stat) {
+    usertexts = usertextsInput // TODO inject once?
+    questionMap = questionMapInput // TODO inject once?
     computeDimensions(chartWidthScrollBreakpoint, 300)
     generateChartElements()
 
@@ -416,15 +413,15 @@
 
   exports.updateSize = function (heightTotal) {
     var calcWidth = document.documentElement.clientWidth - // window width
-              d3.select('.daxplore-QuestionPanel').node().offsetWidth - // tree sidebar
+              d3.select('.question-panel').node().offsetWidth - // tree sidebar
               5 - // tree margin (if changed here, needs to be changed in css)
-              d3.select('.daxplore-SidebarArea').node().offsetWidth - // right sidebar
+              d3.select('.sidebar-column').node().offsetWidth - // right sidebar
               2 - // border of 1px + 1px (if changed here, needs to be changed in css)
               1 // 1px fudge
 
     var headerBlockWidth = d3.select('.daxplore-ExternalHeader').node().offsetWidth
-    var bottomBlockWidth = d3.select('.daxplore-PerspectivePanel').node().offsetWidth
-    var description = d3.select('.daxplore-DescriptionPanelBottom').node()
+    var bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
+    var description = d3.select('.description-panel').node()
     if (description != null) {
       bottomBlockWidth += description.offsetWidth
     }

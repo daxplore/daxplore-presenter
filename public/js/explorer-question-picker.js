@@ -10,6 +10,7 @@
     .ease(d3.easeLinear)
 
   var questions, groups, usertexts
+  const questionIDs = new Set()
   var shorttextMap = []
   var groupMap = []
   var selectedQuestion
@@ -22,6 +23,7 @@
     selectedQuestion = groups[0].questions[0]
     for (var i = 0; i < questions.length; i++) {
       var q = questions[i]
+      questionIDs.add(q.column)
       shorttextMap[q.column] = q.short
     }
 
@@ -85,6 +87,7 @@
           // TODO replace with callback to js page handler
           // gwtQuestionCallback()
           // }
+          daxplore.explorer.selectionUpdateCallback()
         })
 
     openGroup = groupMap[selectedQuestion]
@@ -103,6 +106,7 @@
   }
 
   exports.questionSetQueryDefinition = function (questionID) {
+    if (!questionIDs.has(questionID)) { return } // TODO log error?
     selectedQuestion = questionID
     openGroup = groupMap[selectedQuestion]
     updateTree()
