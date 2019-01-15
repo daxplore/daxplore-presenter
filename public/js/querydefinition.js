@@ -43,7 +43,12 @@
   // Takes a query definition string and returns a query definition object
   exports.parseString = function (queryString) {
     // Decode string from base64
-    const decodedString = atob(queryString)
+    let decodedString = ''
+    try {
+      decodedString = atob(queryString)
+    } catch (e) {
+      // Ignore, compute with empty string, get default empty query object
+    }
 
     // Get key-value mapping
     const urlParams = new URLSearchParams(decodedString)

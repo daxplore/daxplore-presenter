@@ -9,11 +9,17 @@
   const optionsMap = {}
   const timepointsMap = {}
 
-  exports.initializeExplorer = function () {
-    // Get initial query definition from hash
+  function updateFromHash () {
+    // Get query definition string from hash
     let queryDefinition = daxplore.querydefinition.parseString(window.location.hash.slice(1))
-    // console.log(queryDefinition)
+    // Parse the query definition into a (potentially empty or partially empty) query object
+    daxplore.explorer.questionSetQueryDefinition(queryDefinition.question)
+    let totalSelected = queryDefinition.flags.indexOf('TOTAL') !== -1
+    daxplore.explorer.perspectiveSetQueryDefinition(queryDefinition.perspective, queryDefinition.perspectiveOptions, totalSelected)
+    daxplore.explorer.selectionUpdateCallback()
+  }
 
+  exports.initializeExplorer = function () {
     // Use Axios to download all needed metadata files from the server
     // Define functions for all metadata files to be downloaded
     function getGroups () { return axios.get('data/groups.json') }
@@ -67,11 +73,8 @@
         daxplore.explorer.generatePerspectivePicker(questions, perspectives, usertexts, settings)
         daxplore.explorer.generateChartPanel(questions, groups, null, null, usertexts, dichselectedMap, optionsMap, timepointsMap) // TODO fix constructor
 
-        daxplore.explorer.questionSetQueryDefinition(queryDefinition.question)
-        let totalSelected = queryDefinition.flags.indexOf('TOTAL') !== -1
-        daxplore.explorer.perspectiveSetQueryDefinition(queryDefinition.perspective, queryDefinition.perspectiveOptions, totalSelected)
-
-        daxplore.explorer.selectionUpdateCallback()
+        updateFromHash()
+        window.addEventListener("hashchange", updateFromHash, false)
       })
     }))
   }
@@ -131,6 +134,16 @@
     const tab = daxplore.explorer.getSelectedTab()
     // console.log(question, perspective, perspectiveOptions, totalSelected, tab)
     const stat = questionData[question][perspective]
+
+    // TODO move to separate function/file/namespace?
+    // TODO handle all flags
+    let queryHash = daxplore.querydefinition.encodeString(question, perspective, perspectiveOptions, [tab])
+    if (window.location.hash !== queryHash) {
+      // Set the hash of this window
+      window.location.hash = queryHash
+      // Send a message to parents that hold this page in an iframe to allow the outer page to update it's window hash
+      parent.postMessage(queryHash, '*')
+    }
 
     let dichSubtitle = ''
     if (tab === 'DICHOTOMIZED') {
