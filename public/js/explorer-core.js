@@ -74,7 +74,7 @@
         daxplore.explorer.generateChartPanel(questions, groups, null, null, usertexts, dichselectedMap, optionsMap, timepointsMap) // TODO fix constructor
 
         updateFromHash()
-        window.addEventListener("hashchange", updateFromHash, false)
+        window.addEventListener('hashchange', updateFromHash, false)
       })
     }))
   }
