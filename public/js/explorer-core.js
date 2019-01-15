@@ -131,7 +131,11 @@
     const perspective = daxplore.explorer.getSelectedPerspective()
     const perspectiveOptions = daxplore.explorer.getSelectedPerspectiveOptions()
     // const totalSelected = daxplore.explorer.isPerspectiveTotalSelected()
-    const tab = daxplore.explorer.getSelectedTab()
+    // TODO temporary hack, should be handled by tab component
+    let tab = daxplore.explorer.getSelectedTab()
+    if (questionMap[question].displaytypes.indexOf(tab) === -1) {
+      tab = questionMap[question].displaytypes[0]
+    }
     // console.log(question, perspective, perspectiveOptions, totalSelected, tab)
     const stat = questionData[question][perspective]
 

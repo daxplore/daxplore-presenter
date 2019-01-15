@@ -165,8 +165,9 @@
       daxplore.chart.frequency.updateSize(350)
       break
     case 'MEAN':
-    // TODO allow more height instead of vertical scroll
-      daxplore.chart.mean.updateSize(350)
+      // TODO allow more height instead of vertical scroll
+      // TODO hardcoded based on specific chart, should be generalized, though if dynamic perspective picker will move up and down
+      daxplore.chart.mean.updateSize(550)
       break
     case 'DICHOTOMIZED':
       daxplore.chart.dichtimeline.updateSize(350)

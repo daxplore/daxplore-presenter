@@ -143,6 +143,7 @@
       .style('text-anchor', 'middle')
       .text(usertexts.listXAxisDescription)
 
+    // TODO use Modernizr instead of IE-check
     // Hide save image button in IE11 because of a known svg bug
     // https://connect.microsoft.com/IE/feedbackdetail/view/925655
     var isIE11 = /Trident.*rv[ :]*11\./.test(navigator.userAgent)

@@ -411,33 +411,51 @@
     legend.html('')
   }
 
+  // TODO pretty hacky quick fixed solution
   exports.updateSize = function (heightTotal) {
-    var calcWidth = document.documentElement.clientWidth - // window width
+    // 2. width for chart to use is max of:
+    // a. room remaining of window width after QP, SA, margins, (scroll bar?)
+    // b. max of
+    // b.1 room required by header block
+    // b.2 room required by bottom block
+    // 3. calculate min width needed to draw chart
+    // 4. if allocated space in 2. < need in 3.
+    // then: set scroll area width to 2., chart to 3., wrap and scroll
+    // else: set chart to 2, no scroll
+
+    var availableWidth = document.documentElement.clientWidth - // window width
               d3.select('.question-panel').node().offsetWidth - // tree sidebar
               5 - // tree margin (if changed here, needs to be changed in css)
               d3.select('.sidebar-column').node().offsetWidth - // right sidebar
               2 - // border of 1px + 1px (if changed here, needs to be changed in css)
               1 // 1px fudge
+    // TODO - scrollbar width?
 
     var headerBlockWidth = d3.select('.daxplore-ExternalHeader').node().offsetWidth
     var bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
     var description = d3.select('.description-panel').node()
-    if (description != null) {
-      bottomBlockWidth += description.offsetWidth
+    if (description != null && description.offsetWidth > 0) {
+      bottomBlockWidth += 250 // TODO hardcoded
     }
-    var horizontalMinWidth = Math.max(headerBlockWidth, bottomBlockWidth)
+    var topBotNeededWidth = Math.max(headerBlockWidth, bottomBlockWidth)
 
-    calcWidth = Math.max(calcWidth, horizontalMinWidth)
+    var widthForChart = Math.max(availableWidth, topBotNeededWidth)
 
-    var lockWidth = calcWidth < chartWidthScrollBreakpoint
+    // TODO heuristically calculate width needed to display chart without internal overlap
+    var chartNeededWidth = 770 // TODO hardcoded, shouldn't be
+
+    var lockWidth = widthForChart < chartNeededWidth
+    var chartWidth
     if (lockWidth) {
-      calcWidth = chartWidthScrollBreakpoint
+      chartWidth = chartNeededWidth
+    } else {
+      chartWidth = widthForChart
     }
     d3.select('.chart-panel')
       .classed('chart-scroll', lockWidth)
-      .attr('width', function () { return lockWidth ? chartWidthScrollBreakpoint + 'px' : null })
+      .style('width', function () { return lockWidth ? widthForChart + 'px' : null })
 
-    computeDimensions(calcWidth, heightTotal)
+    computeDimensions(chartWidth, heightTotal)
 
     chart
       .attr('width', width + margin.left + margin.right)
