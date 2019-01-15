@@ -13,7 +13,7 @@
 
   // INITIALIZE STATIC RESOURCES
   var usertexts
-  var questionMap = {}
+  var questionMap
   // TODO
   // for (var i=0; i < questions.length; i ++) {
   //   var q = questions[i];
@@ -31,8 +31,9 @@
   var x, y, z
 
   // EXPORTED FUNCTIONS
-  exports.generateChart = function (usertextsInput, primaryColorsInput, hoverColorsInput, stat, selectedPerspectiveOptionIndicesInput, selectedTimepointInput) {
+  exports.generateChart = function (usertextsInput, questionMapInput, primaryColorsInput, hoverColorsInput, stat, selectedPerspectiveOptionIndicesInput, selectedTimepointInput) {
     usertexts = usertextsInput
+    questionMap = questionMapInput
     // TODO initizalize once, not every time
     primaryColors = primaryColorsInput
     // TODO unsused: hoverColors = hoverColorsInput
@@ -44,7 +45,8 @@
     timepoints = questionMap[question].timepoints
     hasMissingData = false
 
-    optionKeys = [...questionMap[question].options, 'MISSING_DATA'] // TODO ES5
+    optionKeys = questionMap[question].options.slice()
+    optionKeys.push('MISSING_DATA')
 
     selectedPerspectiveOptions = []
     selectedPerspectiveOptionIndices.forEach(function (i) {
@@ -107,16 +109,16 @@
     // else: set chart to 2, no scroll
 
     var availableWidth = document.documentElement.clientWidth - // window width
-              d3.select('.daxplore-QuestionPanel').node().offsetWidth - // tree sidebar
+              d3.select('.chart-panel').node().offsetWidth - // tree sidebar
               5 - // tree margin (if changed here, needs to be changed in css)
-              d3.select('.daxplore-SidebarArea').node().offsetWidth - // right sidebar
+              d3.select('.sidebar-column').node().offsetWidth - // right sidebar
               2 - // border of 1px + 1px (if changed here, needs to be changed in css)
               1 // 1px fudge
     // TODO - scrollbar width?
 
     var headerBlockWidth = d3.select('.daxplore-ExternalHeader').node().offsetWidth
-    var bottomBlockWidth = d3.select('.daxplore-PerspectivePanel').node().offsetWidth
-    var description = d3.select('.daxplore-DescriptionPanelBottom').node()
+    var bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
+    var description = d3.select('.description-panel').node()
     if (description != null) {
       bottomBlockWidth += description.offsetWidth
     }
@@ -444,7 +446,7 @@
   }
 
   function generateChartElements () {
-    chart = d3.select('.chart-panel').append('svg')
+    chart = d3.select('.chart').append('svg')
     chart
       .classed('frequency-chart', true)
       .attr('width', width + margin.left + margin.right)

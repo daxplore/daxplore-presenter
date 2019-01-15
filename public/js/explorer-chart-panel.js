@@ -110,6 +110,9 @@
         .selectAll(function () { return this.childNodes })
         .remove()
 
+    d3.select('.daxplore-ExternalHeader-sub, .daxplore-ExternalHeader-dichsub, .daxplore-ExternalHeader-freq-tooltip')
+      .text('')
+
     // Select chart to displaytypes
     switch (selectedTab) {
     case 'FREQUENCY':
@@ -118,7 +121,7 @@
       case 'TIMEPOINTS_TWO':
       case 'TIMEPOINTS_ALL':
         // TODO temporary hardcoded timepoint
-        daxplore.chart.frequency.generateChart(primaryColors, hoverColors, stat, selectedOptions, 4)
+        daxplore.chart.frequency.generateChart(usertexts, questionMap, primaryColors, hoverColors, stat, selectedOptions, 4)
         daxplore.chart.frequency.generateLegend()
         break
       }
