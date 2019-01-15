@@ -41,7 +41,7 @@
 
   function generateChartElements () {
     // CHART
-    chart = d3.select('.chart-panel').append('svg')
+    chart = d3.select('.chart').append('svg')
       .classed('mean-chart', true)
       .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.top + margin.bottom)
