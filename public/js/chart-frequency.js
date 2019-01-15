@@ -100,7 +100,7 @@
     // a. room remaining of window width after QP, SA, margins, (scroll bar?)
     // b. max of
     // b.1 room required by header block
-    // b.2 room required by bootom block
+    // b.2 room required by bottom block
     // 3. calculate min width needed to draw chart
     // 4. if allocated space in 2. < need in 3.
     // then: set scroll area width to 2., chart to 3., wrap and scroll
