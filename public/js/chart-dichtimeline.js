@@ -481,7 +481,7 @@
   exports.generateLegend = function () {
     // GENERATE LEGEND
     var legend = d3.select('.legend')
-      .style('margin-top', (height / 2) + 'px')
+      .style('margin-top', (d3.select('.daxplore-ExternalHeader').node().offsetHeight + height / 2.5) + 'px')
       .style('margin-left', '4px')
 
     legend.html('')
