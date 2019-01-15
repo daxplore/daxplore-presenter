@@ -104,14 +104,14 @@
   function setDecription (questionID, perspectiveID) {
     let html = ''
 
-    let questionDescription = questionMap[questionID].description.trim()
-    if (questionDescription !== null || questionDescription.length > 0) {
+    let questionDescription = questionMap[questionID].description
+    if (questionDescription !== null || questionDescription.trim().length > 0) {
       let title = questionMap[questionID].short
       html += '<b>' + title + '</b><p>' + questionDescription + '</p>'
     }
 
-    let perspectiveDescription = questionMap[perspectiveID].description.trim()
-    if (perspectiveDescription !== null && perspectiveDescription.length > 0) {
+    let perspectiveDescription = questionMap[perspectiveID].description
+    if (perspectiveDescription !== null && perspectiveDescription.trim().length > 0) {
       if (html.length > 0) {
         html += '<hr>'
       }
