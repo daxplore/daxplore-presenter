@@ -48,7 +48,7 @@
    }
 
    .chart-container {
-   	border: 1px solid #BBB;
+   		border: 1px solid #BBB;
     	border-top: none;
    }
 
@@ -183,7 +183,7 @@
 	}
 
 	/*** JS based chart panel  ***/
-	.chart-panel {
+	.chart {
 		border: 1px solid #BBB;
 		border-top: none;
 	}
