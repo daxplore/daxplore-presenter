@@ -93,13 +93,13 @@
 
 /*** External legend ***/
 
-	.daxplore-ExternalLegend {
+	.legend {
 		white-space: nowrap;
 		padding-right: 5px;
 		padding-left: 5px;
 	}
 
-	.daxplore-ExternalLegend div {
+	.legend div {
 		width: 1.1em;
 		height: 1.1em;
 		border-radius: 2px;

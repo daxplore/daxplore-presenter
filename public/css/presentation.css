@@ -8,7 +8,7 @@
 		font-size: small;
 		line-height: 1.1;
 	}
-	
+
 	h1 {
 	  font-size: 2em;
 	  font-weight: bold;
@@ -16,7 +16,7 @@
 	  margin: 40px 0px 70px;
 	  text-align: center;
 	}
-	
+
 	h2 {
 	  font-size: 2em;
 	  font-weight: bold;
@@ -24,16 +24,16 @@
 	  margin-top: 0px;
 	  margin-bottom: 10px;
 	}
-	
+
 	a, a:visited, .gwt-Anchor, .gwt-Anchor:visited {
 		color: #3D748F !important; /*hsl(200, 40%, 40%);*/
 		font-weight: bold;
-		text-decoration: none;	
+		text-decoration: none;
 	}
 	a:hover, .gwt-Anchor:hover {
 		color: #2E576B !important;	/*hsl(200, 40%, 30%)*/
 	}
-	
+
 	.noscript{
 		padding: 20px;
 		font-family: sans-serif;
@@ -48,15 +48,15 @@
 	    margin-left: 0;
 	    padding-left: 23px;
 	}
-	
+
 	.warning-sub-sv{
 		background-image: url("/img/globallinks-lang-sv.gif");
 	}
-	
+
 	.warning-sub-en{
 		background-image: url("/img/globallinks-lang-en.gif");
 	}
-	
+
 	.general-warning-section{
 		width:100%;
 	}
@@ -69,3 +69,7 @@
 		font-size: 0.8em;
 	}
 
+	.daxplore-explorer {
+		display: flex;
+	  flex-direction: row;
+	}

@@ -43,7 +43,7 @@
     settings = settingsInput
 
     d3.select('.perspective-header')
-      .text(usertexts.perspectiveHeader)
+      .text(usertexts.perspectivesHeader)
 
     var variableList = d3.select('.pervarpicker-variables')
 
@@ -289,7 +289,7 @@
         return hasRemainder ? null : '0px'
       })
 
-    d3.select('.daxplore-DescriptionPanelBottom')
+    d3.select('.description-panel')
       .interrupt().transition()
         .style('color', collapsed ? 'black' : 'hsl(0, 0%, 70%)')
 

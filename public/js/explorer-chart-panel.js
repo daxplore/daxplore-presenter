@@ -4,14 +4,17 @@
 
   var questionMap = {}
   var initialQuestion, selectedTab
-  var primaryColors, hoverColors
+  // var primaryColors, hoverColors
+  // TODO hardcoded here as temporary hack, also input in constructor might be temporary
+  const primaryColors = ['#9DC680', '#80AFC6', '#8B8BCB', '#AB8BCB', '#C68680', '#CBA46C', '#CBCB6C']
+  const hoverColors = ['#D5F0C2', '#C2E0F0', '#C2C2F0', '#D9C2F0', '#F0C6C2', '#F0DDC2', '#F0F0C2']
   var usertexts, dichselectedMap, optionsMap, timepointsMap
 
   // Initialize the chart panel
   // TODO fix constructor
   exports.generateChartPanel = function (questions, groups, primaryColorsInput, hoverColorsInput, usertextsInput, dichselectedMapInput, optionsMapInput, timepointsMapInput) {
-    primaryColors = primaryColorsInput
-    hoverColors = hoverColorsInput
+    // primaryColors = primaryColorsInput
+    // hoverColors = hoverColorsInput
     usertexts = usertextsInput
     dichselectedMap = dichselectedMapInput
     optionsMap = optionsMapInput
@@ -52,6 +55,14 @@
         }
         return 'none'
       })
+
+    // TODO handle here or somewhere else?
+    window.addEventListener('resize', daxplore.explorer.updateChartPanelSize)
+    // hack to force initial sizing to work
+    // TODO handle in different way
+    for (i = 2; i <= 12; i++) {
+      setTimeout(daxplore.explorer.updateChartPanelSize, Math.pow(2, i))
+    }
   }
 
   // Getter for selected tab
@@ -95,12 +106,9 @@
       })
 
     // TODO allow for animated updates of same chart type
-    d3.select('.chart-panel')
+    d3.select('.chart')
         .selectAll(function () { return this.childNodes })
         .remove()
-
-    const primaryColors = ['#9DC680', '#80AFC6', '#8B8BCB', '#AB8BCB', '#C68680', '#CBA46C', '#CBCB6C']
-    const hoverColors = ['#D5F0C2', '#C2E0F0', '#C2C2F0', '#D9C2F0', '#F0C6C2', '#F0DDC2', '#F0F0C2']
 
     // Select chart to displaytypes
     switch (selectedTab) {

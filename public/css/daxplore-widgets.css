@@ -28,7 +28,7 @@
 
 /*** OptionsPanel.java ***/
 
-	.daxplore-OptionsPanel{
+	.question-panel {
 		padding-top: 10px;
 		padding-right: 5px;
 		padding-bottom: 10px;
@@ -60,9 +60,9 @@
 		white-space: nowrap;
 	}
 
-/*** DescriptionPanel.java ***/
+/*** DescriptionPanel.java and JS-version ***/
 
-	.daxplore-DescriptionPanelBottom, .daxplore-DescriptionPanelLegend {
+	.description-panel, .daxplore-DescriptionPanelLegend {
 		margin: 22px 0 0 10px;
 		padding: 8px 5px 8px 8px;
 		max-width: 500px;
@@ -72,14 +72,19 @@
 	 	width: 200px;
 	 }
 
-	.daxplore-DescriptionPanelBottom p, .daxplore-DescriptionPanelLegend p {
+	.description-panel p, .daxplore-DescriptionPanelLegend p {
 		margin-top: 1px;
 		margin-bottom: 1px;
 	}
 
-	.daxplore-DescriptionPanelBottom ul, .daxplore-DescriptionPanelLegend ul {
+	.description-panel ul, .daxplore-DescriptionPanelLegend ul {
 		margin: 0;
 		padding-left: 20px;
+	}
+
+	.perspective-description-row {
+		display: flex;
+		justify-content: space-between;
 	}
 
 

@@ -71,11 +71,54 @@
         let totalSelected = queryDefinition.flags.indexOf('TOTAL') !== -1
         daxplore.explorer.perspectiveSetQueryDefinition(queryDefinition.perspective, queryDefinition.perspectiveOptions, totalSelected)
 
-        // TODO don't use hardcoded chart type and timepoint enum
-        const stat = questionData[queryDefinition.question][queryDefinition.perspective]
-        daxplore.explorer.chartSetQueryDefinition('DICHOTOMIZED', 'TIMEPOINTS_ONE', stat, queryDefinition.perspectiveOptions, 'TODO')
+        daxplore.explorer.selectionUpdateCallback()
       })
     }))
+  }
+
+  function dichotomizedSubtitle (optionTexts) {
+    let optCount = optionTexts.length
+    if (optCount === 0) { return '' }
+
+    let subStart = usertexts.dichotomizedSubtitleStart
+    let subEnd = usertexts.dichotomizedSubtitleEnd
+
+    if (optionTexts.length === 1) {
+      return subStart + optionTexts[0] + subEnd
+    }
+
+    let subSeparator = usertexts.dichotomizedSubtitleSeparator
+    let subOr = usertexts.dichotomizedSubtitleOr
+
+    let sub = subStart
+    sub += optionTexts.slice(0, optCount - 1).join(subSeparator)
+    sub += subOr + optionTexts[optCount - 1] + subEnd
+
+    return sub
+  }
+
+  // TODO move to separate file?
+  function setDecription (questionID, perspectiveID) {
+    let html = ''
+
+    let questionDescription = questionMap[questionID].description.trim()
+    if (questionDescription !== null || questionDescription.length > 0) {
+      let title = questionMap[questionID].short
+      html += '<b>' + title + '</b><p>' + questionDescription + '</p>'
+    }
+
+    let perspectiveDescription = questionMap[perspectiveID].description.trim()
+    if (perspectiveDescription !== null && perspectiveDescription.length > 0) {
+      if (html.length > 0) {
+        html += '<hr>'
+      }
+      let title = questionMap[perspectiveID].short
+      html += '<b>' + title + '</b><p>' + perspectiveDescription + '</p>'
+    }
+
+    d3.select('.description-panel')
+      .html(html)
+      .style('display', html.length > 0 ? null : 'none')
   }
 
   // Called by all other elements whenever their state is updated in a way that
@@ -84,10 +127,21 @@
     const question = daxplore.explorer.getSelectedQuestion()
     const perspective = daxplore.explorer.getSelectedPerspective()
     const perspectiveOptions = daxplore.explorer.getSelectedPerspectiveOptions()
-    const totalSelected = daxplore.explorer.isPerspectiveTotalSelected()
+    // const totalSelected = daxplore.explorer.isPerspectiveTotalSelected()
     const tab = daxplore.explorer.getSelectedTab()
     // console.log(question, perspective, perspectiveOptions, totalSelected, tab)
     const stat = questionData[question][perspective]
-    daxplore.explorer.chartSetQueryDefinition(tab, 'TIMEPOINTS_ONE', stat, perspectiveOptions, 'TODO')
+
+    let dichSubtitle = ''
+    if (tab === 'DICHOTOMIZED') {
+      let optionTexts = questionMap[question].options
+      let usedDichTexts = []
+      dichselectedMap[question].forEach(function (i) {
+        usedDichTexts.push(optionTexts[i])
+      })
+      dichSubtitle = dichotomizedSubtitle(usedDichTexts)
+    }
+    setDecription(question, perspective)
+    daxplore.explorer.chartSetQueryDefinition(tab, 'TIMEPOINTS_ONE', stat, perspectiveOptions, dichSubtitle)
   }
 })(window.daxplore = window.daxplore || {})
