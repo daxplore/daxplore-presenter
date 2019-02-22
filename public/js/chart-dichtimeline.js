@@ -550,7 +550,7 @@
     } else {
       chartWidth = widthForChart
     }
-    d3.select('.chart-panel')
+    d3.select('.chart')
       .classed('chart-scroll', lockWidth)
       .style('width', function () { return lockWidth ? widthForChart + 'px' : null })
 

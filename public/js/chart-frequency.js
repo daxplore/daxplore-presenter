@@ -109,7 +109,7 @@
     // else: set chart to 2, no scroll
 
     var availableWidth = document.documentElement.clientWidth - // window width
-              d3.select('.chart-panel').node().offsetWidth - // tree sidebar
+              d3.select('.question-panel').node().offsetWidth - // tree sidebar
               5 - // tree margin (if changed here, needs to be changed in css)
               d3.select('.sidebar-column').node().offsetWidth - // right sidebar
               2 - // border of 1px + 1px (if changed here, needs to be changed in css)
@@ -119,8 +119,8 @@
     var headerBlockWidth = d3.select('.daxplore-ExternalHeader').node().offsetWidth
     var bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
     var description = d3.select('.description-panel').node()
-    if (description != null) {
-      bottomBlockWidth += description.offsetWidth
+    if (description != null && description.offsetWidth > 0) {
+      bottomBlockWidth += 250 // TODO hardcoded
     }
     var topBotNeededWidth = Math.max(headerBlockWidth, bottomBlockWidth)
 
@@ -158,7 +158,7 @@
     } else {
       chartWidth = widthForChart
     }
-    d3.select('.chart-panel')
+    d3.select('.chart')
       .classed('chart-scroll', lockWidth)
       .style('width', function () { return lockWidth ? widthForChart + 'px' : null })
 
@@ -173,7 +173,7 @@
 
   exports.generateLegend = function () {
     // GENERATE LEGEND
-    var legend = d3.select('.daxplore-ExternalLegend')
+    var legend = d3.select('.legend')
       .style('margin-top', (height / 2) + 'px')
       .style('margin-left', '4px')
 
