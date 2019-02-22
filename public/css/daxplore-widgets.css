@@ -209,7 +209,7 @@
 	}
 
 	.pervarpicker-varoption:before {
-		content: url('/img/perspective-radio-empty.png');
+		content: url('../img/perspective-radio-empty.png');
 		padding-left: 7px;
 		padding-right: 5px;
 		padding-top: 2px;
@@ -224,10 +224,11 @@
 		padding: 5px;
 		padding-right: 10px;
 		cursor: pointer;
+		white-space: nowrap;
 	}
 
 	.pervarpicker-varoption-selected:before {
-		content: url('/img/perspective-radio-filled.png');
+		content: url('../img/perspective-radio-filled.png');
 	}
 
 	.pervarpicker-varoption-selected {
@@ -287,14 +288,14 @@
 	}
 
 	.peropt-checkbox:before {
-		content: url('/img/perspective-checkbox-empty.png');
+		content: url('../img/perspective-checkbox-empty.png');
 		padding-left: 7px;
 		padding-right: 5px;
 		padding-top: 3px;
 	}
 
 	.peropt-checkbox-selected:before {
-		content: url('/img/perspective-checkbox-filled.png');
+		content: url('../img/perspective-checkbox-filled.png');
 	}
 
 	.peropt-checkbox:hover {
@@ -371,7 +372,7 @@
 	}
 
 	.question-group-arrow:after {
-		content: url('/img/question-expand-arrow.png');
+		content: url('../img/question-expand-arrow.png');
 	}
 
 	.question-section-questions {
@@ -399,14 +400,14 @@
 	}
 
 	.question-question:before {
-		content: url('/img/perspective-radio-empty.png');
+		content: url('../img/perspective-radio-empty.png');
 		padding-left: 4px;
 		padding-right: 5px;
 		padding-top: 2px;
 	}
 
 	.question-question.selected:before {
-		content: url('/img/perspective-radio-filled.png');
+		content: url('../img/perspective-radio-filled.png');
 	}
 
 

@@ -30,7 +30,7 @@
 }
 
 .user-paste-data-header-arrow:before {
-	content: url('/img/question-expand-arrow.png');
+	content: url('../img/question-expand-arrow.png');
 }
 
 .user-paste-data-header-text {

@@ -17,7 +17,7 @@
   document.addEventListener('DOMContentLoaded', function (e) {
     d3.select('body').append('img')
       .classed('img-preload', true)
-      .attr('src', '/img/perspective-checkbox-empty.png')
+      .attr('src', './img/perspective-checkbox-empty.png')
   })
 
   exports.perspectiveSetQueryDefinition = function (perspectiveID, perspectiveOptionsIntArray, total) {

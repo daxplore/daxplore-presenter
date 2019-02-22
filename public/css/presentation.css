@@ -50,11 +50,11 @@
 	}
 
 	.warning-sub-sv{
-		background-image: url("/img/globallinks-lang-sv.gif");
+		background-image: url("../img/globallinks-lang-sv.gif");
 	}
 
 	.warning-sub-en{
-		background-image: url("/img/globallinks-lang-en.gif");
+		background-image: url("../img/globallinks-lang-en.gif");
 	}
 
 	.general-warning-section{
