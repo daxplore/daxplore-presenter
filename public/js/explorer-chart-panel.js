@@ -110,6 +110,8 @@
         .selectAll(function () { return this.childNodes })
         .remove()
 
+    d3.select('.legend').html('')
+
     d3.select('.daxplore-ExternalHeader-sub, .daxplore-ExternalHeader-dichsub, .daxplore-ExternalHeader-freq-tooltip')
       .text('')
 
