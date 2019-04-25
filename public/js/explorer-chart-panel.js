@@ -41,6 +41,14 @@
           }
         })
 
+    // Set chart tab names
+    d3.select('.chart-tab.freq')
+      .text(usertexts.chartTabFrequencies)
+    d3.select('.chart-tab.mean')
+      .text(usertexts.chartTabMeans)
+    d3.select('.chart-tab.dich')
+      .text(usertexts.chartTabDichotomized)
+
     // Apply special classes to style the tabs
     // TODO duplicate code, used again in chartSetQUeeryDefinition function, should probably be unified
     d3.selectAll('.chart-tab, .chart-tab-spacing')
