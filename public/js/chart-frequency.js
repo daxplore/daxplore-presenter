@@ -286,13 +286,14 @@
           highlightedPerspectiveOption = d.option
           setSelectedTimepoint(d.timepoint)
           var percentage = d.end - d.start
+          var timepointText = usertexts['timepoint' + d.timepoint]
           if (d.key !== 'MISSING_DATA') {
             d3.select('.daxplore-ExternalHeader-freq-tooltip')
-              .text(percentageFormat(percentage) + ' av gruppen "' + d.option + '" svarade "' + d.key + (timepoints.length >= 2 ? '" år ' + usertexts['timepoint' + tp] : '') + '.')
+              .text(percentageFormat(percentage) + ' av gruppen "' + d.option + '" svarade "' + d.key + (timepoints.length >= 2 ? '" år ' + timepointText : '') + '.')
               .style('color', barStrokeColor(d.key, tpIndex).darker(0.5))
           } else if (percentage > 0) {
             d3.select('.daxplore-ExternalHeader-freq-tooltip')
-              .text('Data saknas, färre än 10 deltagare i gruppen "' + d.option + '" svarade år ' + usertexts['timepoint' + tp] + '.')
+              .text('Data saknas, färre än 10 deltagare i gruppen "' + d.option + '" svarade år ' + timepointText + '.')
               .style('color', '#555')
           }
         })

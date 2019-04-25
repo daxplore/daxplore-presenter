@@ -35,7 +35,7 @@
         function () {
           var classes = this.classList
           for (var i = 0; i < classes.length; i++) {
-            if (classes[i] === 'frequency' || classes[i] === 'mean' || classes[i] === 'dichotomized' || classes[i] === 'mean') {
+            if (classes[i] === 'freq' || classes[i] === 'mean' || classes[i] === 'dich') {
               setSelectedTab(classes[i].toUpperCase())
             }
           }
@@ -75,6 +75,18 @@
     var questionID = stat['q']
     // TODO unused: var perspectiveID = stat['p']
 
+    // Clear previous chart, legend and subs
+    // TODO allow for animated updates of same chart type
+    d3.select('.chart')
+        .selectAll(function () { return this.childNodes })
+        .remove()
+
+    d3.select('.legend').html('')
+
+    d3.select('.daxplore-ExternalHeader-sub, .daxplore-ExternalHeader-dichsub, .daxplore-ExternalHeader-freq-tooltip')
+      .text('')
+
+    // Add new content
     var questionMeta = questionMap[questionID]
     d3.select('.daxplore-ExternalHeader-header').text(questionMeta.short)
     if (questionMeta.short !== questionMeta.text) {
@@ -105,19 +117,9 @@
         return 'none'
       })
 
-    // TODO allow for animated updates of same chart type
-    d3.select('.chart')
-        .selectAll(function () { return this.childNodes })
-        .remove()
-
-    d3.select('.legend').html('')
-
-    d3.select('.daxplore-ExternalHeader-sub, .daxplore-ExternalHeader-dichsub, .daxplore-ExternalHeader-freq-tooltip')
-      .text('')
-
     // Select chart to displaytypes
     switch (selectedTab) {
-    case 'FREQUENCY':
+    case 'FREQ':
       switch (timepoints) {
       case 'TIMEPOINTS_ONE':
       case 'TIMEPOINTS_TWO':
@@ -140,7 +142,7 @@
         break
       }
       break
-    case 'DICHOTOMIZED':
+    case 'DICH':
       switch (timepoints) {
       case 'TIMEPOINTS_ONE':
       case 'TIMEPOINTS_TWO':
@@ -166,7 +168,7 @@
 
   exports.updateChartPanelSize = function () {
     switch (selectedTab) {
-    case 'FREQUENCY':
+    case 'FREQ':
       daxplore.chart.frequency.updateSize(350)
       break
     case 'MEAN':
@@ -174,7 +176,7 @@
       // TODO hardcoded based on specific chart, should be generalized, though if dynamic perspective picker will move up and down
       daxplore.chart.mean.updateSize(550)
       break
-    case 'DICHOTOMIZED':
+    case 'DICH':
       daxplore.chart.dichtimeline.updateSize(350)
       break
     }

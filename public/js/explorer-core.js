@@ -150,7 +150,7 @@
     }
 
     let dichSubtitle = ''
-    if (tab === 'DICHOTOMIZED') {
+    if (tab === 'DICH') {
       let optionTexts = questionMap[question].options
       let usedDichTexts = []
       dichselectedMap[question].forEach(function (i) {
