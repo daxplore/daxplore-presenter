@@ -3,6 +3,30 @@
   const exports = namespace.userprofile
 
   function populateUserProfileDOM (qIDs, usertexts, meanReferenceMap, shorttextMap, descriptionMap, directionMap) {
+    d3.select('.user-paste-data-header-text')
+      .text(usertexts.userProfileHeaderText)
+
+    d3.select('.user-paste-data-description')
+      .text(usertexts.userProfilePasteDataDescription)
+
+    d3.select('.user-paste-data-submit-explanation')
+      .text(usertexts.userProfilePasteDataSubmitExplanation)
+
+    d3.select('.user-paste-data-submit-button')
+      .text(usertexts.userPasteDataSubmitButton)
+
+    d3.select('.user-paste-data-error-log-header-text')
+      .text(usertexts.UserProfilePasteDataErrorLogHeader)
+
+    d3.select('.user-paste-data-error-text-number-bounds-errors')
+      .text(usertexts.userPasteDataErrorTextNumberBoundsErrors)
+
+    d3.select('.user-paste-data-error-text-no-number-errors')
+      .text(usertexts.userPasteDataErrorTextNoNumberErrors)
+
+    d3.select('.user-paste-data-error-text-no-row-errors')
+      .text(usertexts.userPasteDataErrorTextNoRowErrors)
+
     d3.select('.save-image')
       .text(usertexts.imageSaveButton)
 

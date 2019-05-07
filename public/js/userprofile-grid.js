@@ -607,7 +607,7 @@
       ctx.fillText(sourceText, hMargin, canvasHeight - 5)
 
       canvasChart.toBlob(function (blob) {
-        saveAs(blob, 'profildiagram' + '.png')
+        saveAs(blob, usertexts.imageTitleProfileChart + '.png')
       })
 
       canvasChartSelection.remove()

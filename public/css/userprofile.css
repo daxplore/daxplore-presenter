@@ -97,8 +97,11 @@
   flex-direction: column;
 }
 
-
 .user-paste-data-error-log-header {
+	padding-left: 5px;
+}
+
+.user-paste-data-error-log-header-text {
 	padding-left: 5px;
 	font-weight: bold;
 }
