@@ -27,16 +27,25 @@
     function getQuestions () { return axios.get('data/questions.json') }
     function getSettings () { return axios.get('data/settings.json') }
     function getUsertexts () { return axios.get('data/usertexts.json') }
+    function getManifest () { return axios.get('data/manifest.json') }
 
     // Make a batch Axios request to download all metadata asynchronously
-    axios.all([getGroups(), getPerspectives(), getQuestions(), getSettings(), getUsertexts()])
-    .then(axios.spread(function (groupsResponse, perspectivesResponse, questionsResponse, settingsResponse, usertextsResponse) {
+    axios.all([getGroups(), getPerspectives(), getQuestions(), getSettings(), getUsertexts(), getManifest()])
+    .then(axios.spread(function (groupsResponse, perspectivesResponse, questionsResponse, settingsResponse, usertextsResponse, manifestResponse) {
       // Get the downloaded metadata
       groups = groupsResponse.data
       perspectives = perspectivesResponse.data
       questions = questionsResponse.data
       settings = settingsResponse.data
       usertexts = usertextsResponse.data
+      manifest = manifestResponse.data
+
+      if (!daxplore.common.hasMatchingDataFileVersions(manifest.dataPackageVersion)) {
+        // The function logs the error as a side effect,
+        // so if the versions don't match all we have to do here is exit
+        // TODO communicate the error directly in the DOM?
+        return
+      }
 
       for (var i = 0; i < questions.length; i++) {
         var q = questions[i]
