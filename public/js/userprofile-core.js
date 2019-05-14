@@ -48,15 +48,24 @@
     function getSettings () { return axios.get('data/settings.json') }
     function getUsertexts () { return axios.get('data/usertexts.json') }
     function getListview () { return axios.get('data/listview.json') }
+    function getManifest () { return axios.get('data/manifest.json') }
 
     // Make a batch Axios request to download all metadata and data asynchronously
-    axios.all([getQuestions(), getSettings(), getUsertexts(), getListview()])
-    .then(axios.spread(function (questionsResponse, settingsResponse, usertextsResponse, listviewResponse) {
+    axios.all([getQuestions(), getSettings(), getUsertexts(), getListview(), getManifest()])
+    .then(axios.spread(function (questionsResponse, settingsResponse, usertextsResponse, listviewResponse, manifestResponse) {
       // Get the downloaded metadata
       const questions = questionsResponse.data
       // const settings = settingsResponse.data
       const usertexts = usertextsResponse.data
       const listview = listviewResponse.data
+      const manifest = manifestResponse.data
+
+      // The function logs the error as a side effect,
+      // so if the versions don't match all we have to do here is exit
+      // TODO communicate the error directly in the DOM?
+      if (!daxplore.common.hasMatchingDataFileVersions(manifest.dataPackageVersion)) {
+        return
+      }
 
       var shorttextMap = {}
       var descriptionMap = {}

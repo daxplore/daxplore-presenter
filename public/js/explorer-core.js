@@ -38,12 +38,12 @@
       questions = questionsResponse.data
       settings = settingsResponse.data
       usertexts = usertextsResponse.data
-      manifest = manifestResponse.data
+      const manifest = manifestResponse.data
 
+      // The function logs the error as a side effect,
+      // so if the versions don't match all we have to do here is exit
+      // TODO communicate the error directly in the DOM?
       if (!daxplore.common.hasMatchingDataFileVersions(manifest.dataPackageVersion)) {
-        // The function logs the error as a side effect,
-        // so if the versions don't match all we have to do here is exit
-        // TODO communicate the error directly in the DOM?
         return
       }
 
