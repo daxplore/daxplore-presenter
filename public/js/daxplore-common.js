@@ -11,7 +11,7 @@
   // Logs any problem as a severe error, aimed at the person deploying Daxplore Presenter
   // Takes the manifest's data version as an argument
   // Returns true if the data files and system use the same version
-  common.hasMatchingDataFileVersions = function(manifestDataVersion) {
+  common.hasMatchingDataFileVersions = function (manifestDataVersion) {
     // Check that the data and code uses the same data format version.
     if (systemDataVersion === manifestDataVersion) {
       return true

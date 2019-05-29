@@ -123,7 +123,6 @@
           .attr('pattern', '[0-9]+([\\.,][0-9]+)?') // TODO added extra escape backslash, check it works
           .attr('step', 0.1)
           .on('focus', function (d) {
-
             daxplore.profile.setDescriptionShort(d3.select('#grid-description'), d.qID)
           })
           .on('focusout', function (d, i, t) {
