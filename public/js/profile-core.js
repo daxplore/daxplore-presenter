@@ -43,11 +43,11 @@
         let location = new URL(window.location.href)
         if (!perspective) {
           location.search = 'perspective=' + perspectives[0]
-          console.error('The URL must contain the perspective paramater, for example:', location.href)
+          daxplore.common.logError('The URL must contain the perspective paramater, for example:', location.href)
         } else {
-          console.error('The used perspective URL paramter is not supported: ?perspective=' + perspective)
+          daxplore.common.logError('The used perspective URL paramter is not supported: ?perspective=' + perspective)
         }
-        console.error('Suggested fix: Use one of the perspectives defined in', new URL('data/perspectives.json', window.location.href).href)
+        daxplore.common.logError('Suggested fix: Use one of the perspectives defined in', new URL('data/perspectives.json', window.location.href).href)
         return
       }
 
