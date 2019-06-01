@@ -34,9 +34,9 @@
   exports.generateChart = function (usertextsInput, questionMapInput, primaryColorsInput, hoverColorsInput, stat, selectedPerspectiveOptionIndicesInput, selectedTimepointInput) {
     usertexts = usertextsInput
     questionMap = questionMapInput
-    // TODO initizalize once, not every time
+    // TODO initialize once, not every time
     primaryColors = primaryColorsInput
-    // TODO unsused: hoverColors = hoverColorsInput
+    // TODO unused: hoverColors = hoverColorsInput
 
     selectedPerspectiveOptionIndices = selectedPerspectiveOptionIndicesInput
 
@@ -58,7 +58,7 @@
       var tp = timepoints[tpIndex]
       var perspectiveOptions = questionMap[perspective].options
       var currentTimeData = stat.freq[tp]
-      var tpdata = []
+      var tpData = []
 
       selectedPerspectiveOptionIndices.forEach(function (i) {
         var total = currentTimeData[i].length > 0 ? currentTimeData[i].reduce(function (a, b) { return a + b }) : 0
@@ -76,9 +76,9 @@
             stackData[optionKeys[j]] = total !== 0 ? currentTimeData[i][j] / total : 0
           }
         }
-        tpdata.push(stackData)
+        tpData.push(stackData)
       })
-      data[tp] = tpdata
+      data[tp] = tpData
     }
 
     z = d3.scaleOrdinal()
@@ -120,7 +120,7 @@
     var bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
     var description = d3.select('.description-panel').node()
     if (description != null && description.offsetWidth > 0) {
-      bottomBlockWidth += 250 // TODO hardcoded
+      bottomBlockWidth += 250 // TODO hard coded
     }
     var topBotNeededWidth = Math.max(headerBlockWidth, bottomBlockWidth)
 
@@ -128,7 +128,7 @@
 
     // heuristically calculate width needed to display chart without internal overlap
     var yAxis = 31 // could be calculated?
-    var outsideMargin = 24 // could be calcluated?
+    var outsideMargin = 24 // could be calculated?
     var innerMarginBars = 25 // could be calculated?
     var innerMarginTexts = 15
     var selectedTimepointCount = timepoints.length
@@ -209,7 +209,7 @@
           .attr('class', 'legend-row legend-row-missing-data')
           .html("<span class='legend-marker' style='background-color: " +
                  missingDataColor + ";'>&nbsp</span>" +
-                 "<span class='legend-text'>" + 'Data saknas' + '</span>')
+                 "<span class='legend-text'>" + 'Data saknas' + '</span>') // TODO externalize text
     }
 
     updateStyles()
@@ -253,11 +253,11 @@
 
     for (var tpIndex = timepoints.length - 1; tpIndex >= 0; tpIndex--) {
       var tp = timepoints[tpIndex]
-      var tpdata = data[tp]
+      var tpData = data[tp]
 
       var freqBars = chartG
        .selectAll('.freq-bar-' + tp)
-       .data(d3.stack().keys(optionKeys)(tpdata))
+       .data(d3.stack().keys(optionKeys)(tpData))
        .enter().append('g')
          .classed('freq-bar-' + tp, true)
          .attr('transform', function (d, i) {
@@ -289,11 +289,11 @@
           var timepointText = usertexts['timepoint' + d.timepoint]
           if (d.key !== 'MISSING_DATA') {
             d3.select('.daxplore-ExternalHeader-freq-tooltip')
-              .text(percentageFormat(percentage) + ' av gruppen "' + d.option + '" svarade "' + d.key + (timepoints.length >= 2 ? '" år ' + timepointText : '') + '.')
+              .text(percentageFormat(percentage) + ' av gruppen "' + d.option + '" svarade "' + d.key + (timepoints.length >= 2 ? '" år ' + timepointText : '') + '.') // TODO externalize text
               .style('color', barStrokeColor(d.key, tpIndex).darker(0.5))
           } else if (percentage > 0) {
             d3.select('.daxplore-ExternalHeader-freq-tooltip')
-              .text('Data saknas, färre än 10 deltagare i gruppen "' + d.option + '" svarade år ' + timepointText + '.')
+              .text('Data saknas, färre än 10 deltagare i gruppen "' + d.option + '" svarade år ' + timepointText + '.') // TODO externalize text
               .style('color', '#555')
           }
         })

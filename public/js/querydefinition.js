@@ -95,7 +95,7 @@
       queryDefinitionItems.push('o=' + perspectiveOptions.join(','))
     }
 
-    // Add f = bitflags for flags
+    // Add f = bit flags for flags
     if (Array.isArray(flags) && flags.length > 0) {
       queryDefinitionItems.push('f=' + encodeQueryDefinitionFlags(flags))
     }

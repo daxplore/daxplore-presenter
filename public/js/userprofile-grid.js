@@ -1,4 +1,4 @@
-// TODO Userprofile is hardcoded specifically for COPSOQ in Swedish. Probably not
+// TODO Userprofile is hard coded specifically for COPSOQ in Swedish. Probably not
 // meaningful to generalize into something useful for other projects. Should
 // most likely be moved to separate repo.
 (function (namespace) {
@@ -7,7 +7,7 @@
 
   var qIDs, meanReferences, shorttextsMap, usertexts, directions
 
-  // TODO externalize or keep hardcoded in separate repo?
+  // TODO externalize or keep hard coded in separate repo?
   var userImportRegexes = [
     /kvantitativ/g,
     /tempo|takt/g,
@@ -66,7 +66,7 @@
   }
 
   function callCallbacks () {
-    // make sure all names are unique for the dropdown
+    // make sure all names are unique for the drop-down
     var names = []
     for (var i = 0; i < usernames.length; i++) {
       var name = usernames[i]
@@ -92,7 +92,7 @@
               .append('input')
                 .classed('header-cell-input', true)
                 .attr('tabindex', function (d, i) { return 1 + i * (qIDs.length + 1) })
-                .attr('placeholder', function (d, i) { return 'Grupp ' + (i + 1) })
+                .attr('placeholder', function (d, i) { return 'Grupp ' + (i + 1) }) // TODO externalize
                 .on('input', function (d, i, t) {
                   var el = t[i]
                   if (typeof el.value === 'undefined' || el.value === '') {
@@ -340,8 +340,9 @@
           var group = d3.select(this)
           group.text('')
 
+          // TODO externalize text
           group.append('div')
-            .text('Skalan "' + d.scale + '" matchades av flera rader:')
+            .text('Skalan "' + d.scale + '" matchades av flera rader:') // TODO externalize text
 
           d.matchedRowTexts.forEach(function (r) {
             group.append('div')
@@ -391,7 +392,7 @@
   }
 
   exports.addColumn = function () {
-    usernames.push('Grupp ' + (usernames.length + 1))
+    usernames.push('Grupp ' + (usernames.length + 1)) // TODO externalize text
 
     usermeans.forEach(function (u) {
       u.push(NaN)
@@ -419,7 +420,7 @@
 
       if (Modernizr.svgforeignobject) {
         d3.select('.save-grid-image-button')
-            .text('Spara som bild')
+            .text('Spara som bild') // TODO externalize text
             .on('click', daxplore.userprofile.saveGridImage)
       } else {
         d3.select('.save-grid-image-button')
@@ -434,7 +435,7 @@
         daxplore.profile.setDescriptionShort(d3.select('#grid-description'), qIDs[0])
       }
 
-      usernames.push('Grupp 1')
+      usernames.push('Grupp 1') // TODO externalize text
 
       usermeans = qIDs.map(function (qID, i) {
         return [NaN]
@@ -462,7 +463,7 @@
           .append('th')
           .classed('rowtext', true)
           .classed('groupname', true)
-          .text('Gruppnamn:')
+          .text('Gruppnamn:') // TODO externalize
 
       // GRID ROWS
       gridRows = tbody.selectAll('tr')

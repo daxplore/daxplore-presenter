@@ -425,7 +425,7 @@
     optionsMap = optionsMapInput
     timepointsMap = timepointsMapInput
 
-    // TODO initizalize once, not every time
+    // TODO initialize once, not every time
     usertexts = usertextsInput
     lineColors = lineColorsInput
     // TODO unused: hoverColors = hoverColorsInput
@@ -494,7 +494,7 @@
         .attr('class', function (d) { return 'legend-row legend-row-' + d.index })
         .html(function (option) {
           return "<span class='legend-marker' style='background-color: " +
-                  zScaleColor(option.id) + ";'>&nbsp</span>" +
+                  zScaleColor(option.id) + ";'>&nbsp;</span>" +
                   "<span class='legend-text'>" + option.id + '</span>'
         })
       .on('mouseover',
@@ -535,13 +535,13 @@
     var bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
     var description = d3.select('.description-panel').node()
     if (description != null && description.offsetWidth > 0) {
-      bottomBlockWidth += 250 // TODO hardcoded
+      bottomBlockWidth += 250 // TODO hard coded
     }
     var topBotNeededWidth = Math.max(headerBlockWidth, bottomBlockWidth)
 
     var widthForChart = Math.max(availableWidth, topBotNeededWidth)
 
-    var chartNeededWidth = 600 // TODO hardcoded, shouldn't be
+    var chartNeededWidth = 600 // TODO hard coded, shouldn't be
 
     var lockWidth = widthForChart < chartNeededWidth
     var chartWidth

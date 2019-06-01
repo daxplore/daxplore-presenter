@@ -110,7 +110,7 @@
   }
 
   // TODO move to separate file?
-  function setDecription (questionID, perspectiveID) {
+  function setDescription (questionID, perspectiveID) {
     let html = ''
 
     let questionDescription = questionMap[questionID].description
@@ -167,7 +167,7 @@
       })
       dichSubtitle = dichotomizedSubtitle(usedDichTexts)
     }
-    setDecription(question, perspective)
+    setDescription(question, perspective)
     daxplore.explorer.chartSetQueryDefinition(tab, 'TIMEPOINTS_ONE', stat, perspectiveOptions, dichSubtitle)
   }
 })(window.daxplore = window.daxplore || {})

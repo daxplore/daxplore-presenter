@@ -84,19 +84,19 @@
   }
 
   exports.setDescriptionShort =
-  function (element, qiD) {
-    var shorttext = shorttexts[qiD]
+  function (element, qID) {
+    var shorttext = shorttexts[qID]
     var header = "<span class='description-header'>" + shorttext + '</span><br>'
-    var description = descriptions[qiD]
+    var description = descriptions[qID]
     element.html(header + description)
   }
 
   exports.setDescriptionFull =
-  function (element, groupName, qiD, mean) {
-    var shorttext = shorttexts[qiD]
-    var description = descriptions[qiD]
-    var reference = meanReferences[qiD]
-    var direction = directions[qiD]
+  function (element, groupName, qID, mean) {
+    var shorttext = shorttexts[qID]
+    var description = descriptions[qID]
+    var reference = meanReferences[qID]
+    var direction = directions[qID]
 
     element.transition()
       .duration(0)

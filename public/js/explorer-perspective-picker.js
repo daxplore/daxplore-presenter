@@ -282,7 +282,7 @@
       .style('visibility', function () {
         return hasRemainder ? null : 'hidden'
       })
-      .text(collapsed ? 'Visa fler >' : '< Visa färre ')
+      .text(collapsed ? 'Visa fler >' : '< Visa färre ') // TODO externalize texts
 
     d3.select('.peropt-bottom-padding')
       .style('height', function () {

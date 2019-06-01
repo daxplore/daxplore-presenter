@@ -43,9 +43,9 @@
         let location = new URL(window.location.href)
         if (!perspective) {
           location.search = 'perspective=' + perspectives[0]
-          daxplore.common.logError('The URL must contain the perspective paramater, for example:', location.href)
+          daxplore.common.logError('The URL must contain the perspective parameter, for example:', location.href)
         } else {
-          daxplore.common.logError('The used perspective URL paramter is not supported: ?perspective=' + perspective)
+          daxplore.common.logError('The used perspective URL paremter is not supported: ?perspective=' + perspective)
         }
         daxplore.common.logError('Suggested fix: Use one of the perspectives defined in', new URL('data/perspectives.json', window.location.href).href)
         return
@@ -60,7 +60,7 @@
         return
       }
 
-      // TODO do data parsing as a Promise, to prevent blocing of the rest of the data download?
+      // TODO do data parsing as a Promise, to prevent blocking of the rest of the data download?
       var perspectiveOptions = []
       const shorttextMap = {}
       const descriptionMap = {}

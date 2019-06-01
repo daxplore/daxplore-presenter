@@ -5,7 +5,7 @@
   var questionMap = {}
   var initialQuestion, selectedTab
   // var primaryColors, hoverColors
-  // TODO hardcoded here as temporary hack, also input in constructor might be temporary
+  // TODO hard coded here as temporary hack, also input in constructor might be temporary
   const primaryColors = ['#9DC680', '#80AFC6', '#8B8BCB', '#AB8BCB', '#C68680', '#CBA46C', '#CBCB6C']
   const hoverColors = ['#D5F0C2', '#C2E0F0', '#C2C2F0', '#D9C2F0', '#F0C6C2', '#F0DDC2', '#F0F0C2']
   var usertexts, dichselectedMap, optionsMap, timepointsMap
@@ -50,7 +50,7 @@
       .text(usertexts.chartTabDichotomized)
 
     // Apply special classes to style the tabs
-    // TODO duplicate code, used again in chartSetQUeeryDefinition function, should probably be unified
+    // TODO duplicate code, used again in chartSetQueryDefinition function, should probably be unified
     d3.selectAll('.chart-tab, .chart-tab-spacing')
       .style('display', function (d, i, tabs) {
         if (displaytypes.length <= 1) {
@@ -78,8 +78,8 @@
     return selectedTab
   }
 
-  exports.chartSetQueryDefinition = function (charttype, timepoints, stat, selectedOptions, dichSubtitle) {
-    selectedTab = charttype
+  exports.chartSetQueryDefinition = function (chartType, timepoints, stat, selectedOptions, dichSubtitle) {
+    selectedTab = chartType
     var questionID = stat['q']
     // TODO unused: var perspectiveID = stat['p']
 
@@ -132,7 +132,7 @@
       case 'TIMEPOINTS_ONE':
       case 'TIMEPOINTS_TWO':
       case 'TIMEPOINTS_ALL':
-        // TODO temporary hardcoded timepoint
+        // TODO temporary hard coded timepoint
         daxplore.chart.frequency.generateChart(usertexts, questionMap, primaryColors, hoverColors, stat, selectedOptions, 4)
         daxplore.chart.frequency.generateLegend()
         break
@@ -169,8 +169,6 @@
       return
     }
     selectedTab = tab
-    // TODO replace gwt callback with js callback
-    // gwtChartPanelCallback(tab)
     daxplore.explorer.selectionUpdateCallback()
   }
 
@@ -181,7 +179,7 @@
       break
     case 'MEAN':
       // TODO allow more height instead of vertical scroll
-      // TODO hardcoded based on specific chart, should be generalized, though if dynamic perspective picker will move up and down
+      // TODO hard coded based on specific chart, should be generalized, though if dynamic perspective picker will move up and down
       daxplore.chart.mean.updateSize(550)
       break
     case 'DICH':

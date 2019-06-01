@@ -70,10 +70,10 @@
       .classed('question-section-questions', true)
       .style('height', '0px')
 
-    var sectionQuestionsInputner = sectionQuestions.append('div')
+    var sectionQuestionsInput = sectionQuestions.append('div')
       .classed('question-section-questions-inner', true)
 
-    sectionQuestionsInputner.selectAll('.question-question')
+    sectionQuestionsInput.selectAll('.question-question')
       .data(function (d) { return d.questions })
       .enter()
         .append('div')

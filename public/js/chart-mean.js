@@ -435,14 +435,14 @@
     var bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
     var description = d3.select('.description-panel').node()
     if (description != null && description.offsetWidth > 0) {
-      bottomBlockWidth += 250 // TODO hardcoded
+      bottomBlockWidth += 250 // TODO hard coded
     }
     var topBotNeededWidth = Math.max(headerBlockWidth, bottomBlockWidth)
 
     var widthForChart = Math.max(availableWidth, topBotNeededWidth)
 
     // TODO heuristically calculate width needed to display chart without internal overlap
-    var chartNeededWidth = 770 // TODO hardcoded, shouldn't be
+    var chartNeededWidth = 770 // TODO hard coded, shouldn't be
 
     var lockWidth = widthForChart < chartNeededWidth
     var chartWidth
