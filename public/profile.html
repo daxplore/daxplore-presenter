@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- This page was generated using the free and open source project Daxplore. -->
+    <!-- For usage information, license terms and contact information please visit: -->
+    <!-- https://github.com/daxplore -->
+
+    <!-- Set up basic page properties -->
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Daxplore Presenter: Profile</title>
+    <link rel="icon" href="favicon.ico">
+
+    <!-- Import style sheets -->
+    <!--Normalize all browser default css values: https://necolas.github.io/normalize.css/ -->
+    <link rel="stylesheet" href="css/normalize/8.0.1/normalize.css">
+    <!-- Style for different Daxplore components -->
+    <link rel="stylesheet" href="css/daxplore-common.css">
+    <link rel="stylesheet" href="css/profile-chart.css">
+
+    <!-- Import library dependencies -->
+    <!-- Import shims and polyfills for older browsers-->
+    <script type="text/javascript" src="js/libraries/es5-shim/4.5.7/es5-shim.min.js"></script>
+    <script type="text/javascript" src="js/libraries/es6-promise/4.2.6/es6-promise.auto.min.js"></script>
+    <script type="text/javascript" src="js/libraries/url-search-params/0.1.2/url-search-params.min.js"></script>
+    <!-- Use d3 to design all charts, interactive elements and manipulate the DOM: https://d3js.org/ -->
+    <script type="text/javascript" src="js/libraries/d3/5.9.2/d3.min.js"></script>
+    <!-- Use axios to download data from the server: https://github.com/axios/axios -->
+    <script type="text/javascript" src="js/libraries/axios/0.19.0/axios.min.js"></script>
+    <!-- Use Canvas to Blob to turn canvas data into blob data that can saved -->
+    <script type="text/javascript" src="js/libraries/canvas-toBlob/2016-05-26/canvas-toBlob.js"></script>
+    <!-- Use File Saver to save data as local files -->
+    <script type="text/javascript" src="js/libraries/FileSaver/2019-05-14/FileSaver.min.js"></script>
+
+    <!-- Import Daxplore helpers -->
+    <script type="text/javascript" src="js/daxplore-common.js"></script>
+    <script type="text/javascript" src="js/profile-helpers.js"></script>
+
+    <!-- Import Daxplore chart -->
+    <script type="text/javascript" src="js/profile-chart.js"></script>
+
+    <!-- Profile Core is used to set up and manage profile.html  -->
+    <script type="text/javascript" src="js/profile-core.js"></script>
+
+    <script type="text/javascript">
+      daxplore.profile.initializeProfile()
+    </script>
+
+  </head>
+
+  <body>
+     <div class="chart-main">
+     	<div class="chart-row">
+       <div class="column-left">
+         <div class="header">
+           <div class="header-select-div">
+             <select class="header-select" onchange="daxplore.profile.headerChange(this)">
+             </select>
+           </div>
+         </div>
+         <div class="chart-wrapper">
+           <svg class="chart"></svg>
+           <div class="tooltipdiv"></div>
+           <div class="arrow-left"></div>
+         </div>
+       </div>
+       <div class="column-right">
+         <span class="dashed-button save-image" onClick="daxplore.profile.generateImage()"></span>
+         <div class="description-wrapper">
+           <div id='chart-description' class="description"></div>
+         </div>
+       </div>
+      </div>
+    </div>
+
+    <noscript>
+      <div class="noscript">
+        <p class="warning-sub">To show this page you must allow it to run JavaScript.</p>
+      </div>
+    </noscript>
+  </body>
+</html>

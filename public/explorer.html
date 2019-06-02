@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- This page was generated using the free and open source project Daxplore. -->
+    <!-- For usage information, license terms and contact information please visit: -->
+    <!-- https://github.com/daxplore -->
+
+    <!-- Set up basic page properties -->
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Daxplore Presenter: Data Explorer</title>
+    <link rel="icon" href="favicon.ico">
+
+    <!-- Import style sheets -->
+    <!-- Normalize all browser default css values: https://necolas.github.io/normalize.css/ -->
+    <link rel="stylesheet" href="css/normalize/8.0.1/normalize.css">
+
+    <!-- Style for different Daxplore components -->
+    <link rel="stylesheet" href="css/daxplore-common.css">
+    <link rel="stylesheet" href="css/presentation.css">
+    <link rel="stylesheet" href="css/daxplore-widgets.css">
+    <link rel="stylesheet" href="css/daxplore-chart.css">
+
+    <!-- Import library dependencies -->
+    <!-- Import shims and polyfills for older browsers-->
+    <script type="text/javascript" src="js/libraries/es5-shim/4.5.7/es5-shim.min.js"></script>
+    <script type="text/javascript" src="js/libraries/es6-promise/4.2.6/es6-promise.auto.min.js"></script>
+    <script type="text/javascript" src="js/libraries/url-search-params/0.1.2/url-search-params.min.js"></script>
+    <!-- Use d3 to design all charts, interactive elements and manipulate the DOM: https://d3js.org/ -->
+    <script type="text/javascript" src="js/libraries/d3/5.9.2/d3.min.js"></script>
+    <!-- Use axios to download data from the server: https://github.com/axios/axios -->
+    <script type="text/javascript" src="js/libraries/axios/0.19.0/axios.min.js"></script>
+
+    <!-- Import Daxplore helpers -->
+    <script type="text/javascript" src="js/daxplore-common.js"></script>
+    <script type="text/javascript" src="js/querydefinition.js"></script>
+    <script type="text/javascript" src="js/profile-helpers.js"></script> <!-- TODO explorer should not have to import profile helpers -->
+
+    <!-- Import Daxplore Explorer elements -->
+    <script type="text/javascript" src="js/explorer-chart-panel.js"></script>
+    <script type="text/javascript" src="js/explorer-question-picker.js"></script>
+    <script type="text/javascript" src="js/explorer-perspective-picker.js"></script>
+    <script type="text/javascript" src="js/explorer-core.js"></script>
+
+    <!-- Import Daxplore Charts  -->
+    <script type="text/javascript" src="js/chart-frequency.js"></script>
+    <script type="text/javascript" src="js/chart-dichtimeline.js"></script>
+    <script type="text/javascript" src="js/chart-mean.js"></script>
+
+    <script type="text/javascript" charset="UTF-8">
+      daxplore.explorer.initializeExplorer()
+    </script>
+  </head>
+
+  <body>
+
+    <!-- Error message if JavaScript is disabled -->
+    <noscript>
+      <div class="noscript">
+        <p class="warning-sub">
+          To show this page you must allow it to run JavaScript.
+        </p>
+      </div>
+    </noscript>
+
+    <!-- Structural top level div for Explorer -->
+    <div class="daxplore-explorer">
+
+      <!-- Contains question picker, populated by explorer-question-picker.js -->
+      <div class="question-panel">
+        <div class="question-header"></div>
+        <div class="question-picker no-select"></div>
+      </div>
+
+      <!-- Structural column that contains the chart and bottom panels -->
+      <div class="chart-perspective-column">
+
+        <!-- Contains chart titles, tabs and chart. -->
+        <!-- Populated by explorer-chart-panel.js and different chart-*.js classes -->
+        <div class="chart-panel">
+
+          <!-- The header section of the chart with placeholders for -->
+          <!-- divs that are populated by different chart-*.js -->
+          <div class="daxplore-ExternalHeader">
+            <div class="daxplore-ExternalHeader-header"></div>
+            <div class="daxplore-ExternalHeader-sub"></div>
+            <div class="daxplore-ExternalHeader-dichsub"></div>
+            <div class="daxplore-ExternalHeader-freq-tooltip"></div>
+          </div>
+
+          <!-- Tabs used to select the chart to display when there are multiple -->
+          <!-- supported charts for a given question/perspective combination -->
+          <!-- Managed/populated by explorer-chart-panel.js --->
+          <div class="chart-tabs">
+            <div class="chart-tab-spacing freq"></div>
+            <div class="chart-tab freq chart-tab-selected"></div>
+            <div class="chart-tab-spacing mean"></div>
+            <div class="chart-tab mean"></div>
+            <div class="chart-tab-spacing dich"></div>
+            <div class="chart-tab dich"></div>
+            <div class="chart-tab-remainder"></div>
+          </div>
+
+          <!-- Wrapper for the actual chart, populated by different chart-*.js -->
+          <div class="chart"></div>
+        </div>
+
+        <!-- Structural row that contains the perspective and description panels -->
+        <div class="perspective-description-row">
+
+          <!-- Contains perspective picker, populated by explorer-perspective-picker.js -->
+          <div class="perspective-panel">
+            <div class="perspective-header"></div>
+            <div class="perspective-picker">
+              <div class="perspective-varpicker">
+                <div class="pervarpicker-border-wrapper">
+                  <div class="pervarpicker-top-padding"></div>
+                  <div class="pervarpicker-variables"></div>
+                  <div class="pervarpicker-bottom-padding"></div>
+                </div>
+                <div class="pervarpicker-right-border-extender"></div>
+              </div>
+              <div class="perspective-options">
+                <div class="peropt-buttons">
+                  <span class="peropt-all-button  perspective-button dashed-button"></span>
+                  <span class="peropt-none-button perspective-button dashed-button"></span>
+                </div>
+                <div class="peropt-columns">
+                  <div class="peropt-col-one"></div>
+                  <div class="peropt-extra-columns">
+                    <div class="peropt-col-two"></div>
+                    <div class="peropt-col-three"></div>
+                  </div>
+                </div>
+                <div class="peropt-bottom-padding"></div>
+                <div class="peropt-more-wrapper">
+                  <span class="peropt-more-button perspective-button dashed-button"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contains description panel, populated by TODO -->
+          <div class="description-panel"></div>
+        </div>
+      </div>
+
+      <!-- Structural column that contains the legend -->
+      <div class="sidebar-column">
+        <!-- Contains the chart legend, populated by different chart-*.js -->
+        <div class="legend"></div>
+      </div>
+  </body>
+</html>

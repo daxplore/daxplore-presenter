@@ -1,0 +1,150 @@
+.chart {
+	overflow: visible !important;
+}
+
+.chart-main {
+  position: fixed !important;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-wrapper {
+	width: 750px;
+}
+
+.content-row {
+
+}
+
+.chart-row {
+	flex: 1;
+	height: 100%;
+	display: flex;
+}
+
+.column-left {
+  height: 100%;
+}
+
+.chart-wrapper {
+  height: 100%;
+}
+
+.column-right {
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  padding-bottom: 10px;
+}
+
+/* https://codepen.io/ericrasch/pen/zjDBx */
+/* Select Box Styles: bavotasan.com Method (with special adaptations by ericrasch.com) */
+/* Source: http://bavotasan.com/2011/style-select-box-using-only-css/ */
+.header-select-div {
+/*   background: url(../img/list-select-downarrow.jpg) no-repeat right center; */
+  height: 34px;
+  overflow: hidden;
+}
+
+.header-select {
+  background: transparent;
+  padding: 5px; /* If you add too much padding here, the options won't show in IE */
+  border: 1px solid #ddd;
+  font-size: 16px;
+  font-weight: bold;
+  height: 34px;
+  text-indent: 0px;
+}
+
+@-moz-document url-prefix() {
+  select:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 #000;
+  }
+  .header-select:focus {
+    border: 1px gray dotted;
+  }
+}
+
+.bar-hover text {
+  fill: #111 !important;
+}
+
+.reference.bar-hover rect {
+  fill: #777;
+}
+
+.tick.bar-hover text {
+  fill: black;
+}
+
+
+/* text font needs to be duplicated here and in list.js for sizing to work correctly */
+text {
+  font: 12px sans-serif;
+}
+
+.y path,
+.y line {
+  visibility: hidden;
+}
+
+.tooltipdiv {
+  position: absolute;
+  text-align: right;
+  height: auto;
+  width: auto;
+  white-space: nowrap;
+  font: 12px sans-serif;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
+  padding: 6px;
+  z-index: 100;
+}
+
+.arrow-left {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right: 10px solid;
+  z-index: 100;
+}
+
+.save-image {
+	align-self: flex-start;
+	margin-left: 10px;
+}
+
+.description-wrapper {
+  flex: 1;
+  display: flex;
+}
+
+.description {
+  align-self: center;
+/*   border: 1px solid #BBB; */
+  width: 280px;
+  padding: 5px;
+  margin-left: 5px;
+  color: #444;
+  font: 13px sans-serif;
+}
+
+.description-header {
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.description ul {
+  padding-left: 20px;
+}

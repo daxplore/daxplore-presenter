@@ -1,0 +1,42 @@
+.no-select {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.dashed-button {
+	background: white;
+	border: 1px dashed #CCC;
+	border-radius: 0;
+	white-space: nowrap;
+	height: 13px;
+	display: inline-block;
+	cursor: pointer;
+	font-family: Arial, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+	padding: 5px 10px;
+	text-decoration: none;
+	color: #555;
+		
+  -webkit-touch-callout: none;
+    -webkit-user-select: none;
+     -khtml-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+	
+	margin: 3px;
+}
+		
+.dashed-button:hover {
+	border-color: #AAA;
+}
+	
+.dashed-button:active {
+	margin-top: 2px;
+	margin-bottom: 4px;
+}
