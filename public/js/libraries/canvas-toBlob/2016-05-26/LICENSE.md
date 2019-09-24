@@ -27,5 +27,5 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
 
-  [1]: http://eligrey.com
+  [1]: https:////eligrey.com
   [2]: https://github.com/dsamarin

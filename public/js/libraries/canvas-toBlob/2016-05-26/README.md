@@ -13,6 +13,6 @@ canvas-toBlob.js has [the same browser support as FileSaver.js][3].
 
 ![Tracking image](https://in.getclicky.com/212712ns.gif)
 
-  [1]: http://www.w3.org/TR/html5/the-canvas-element.html
+  [1]: https:////www.w3.org/TR/html5/the-canvas-element.html
   [2]: https://github.com/eligrey/Blob.js
   [3]: https://github.com/eligrey/FileSaver.js#supported-browsers

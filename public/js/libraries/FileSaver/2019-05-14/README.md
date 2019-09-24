@@ -124,7 +124,7 @@ FileSaver.saveAs(file);
 
 ![Tracking image](https://in.getclicky.com/212712ns.gif)
 
-  [1]: http://eligrey.com/demos/FileSaver.js/
+  [1]: https:////eligrey.com/demos/FileSaver.js/
   [2]: https://github.com/eligrey/canvas-toBlob.js
   [3]: https://bugs.chromium.org/p/chromium/issues/detail?id=375297#c107
   [4]: https://developer.mozilla.org/en-US/docs/DOM/Blob
