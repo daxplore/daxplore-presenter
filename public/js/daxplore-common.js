@@ -29,7 +29,7 @@
       return true
     }
     // Get the location of the used data folder.
-    let dataFolderLocation = new URL('data', window.location.href).href
+    const dataFolderLocation = new URL('data', window.location.href).href
     // Write a general error message, directed at the person setting up the presentation.
     daxplore.common.logError('The data folder at ' + dataFolderLocation + ' uses data format version ' +
                   manifestDataVersion + ', but this version of Daxplore Presenter uses ' +

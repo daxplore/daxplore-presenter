@@ -40,7 +40,7 @@
       // In case of problems, give feedback directed at the person setting up the presentation
       // TODO communicate the error directly in the DOM?
       if (!perspectives.includes(perspective)) {
-        let location = new URL(window.location.href)
+        const location = new URL(window.location.href)
         if (!perspective) {
           location.search = 'perspective=' + perspectives[0]
           daxplore.common.logError('The URL must contain the perspective parameter, for example:', location.href)
@@ -68,7 +68,7 @@
       const meanReferenceMap = {}
 
       for (let i = 0; i < questions.length; i++) {
-        let q = questions[i]
+        const q = questions[i]
         shorttextMap[q.column] = q.short
         descriptionMap[q.column] = unescape(q.description)
 
@@ -89,15 +89,15 @@
 
       // Get the data used in the listview
       function getQuestionData (questionID) { return axios.get('data/questions/' + questionID + '.json') }
-      let variableRequests = listview.map(function (qID) { return getQuestionData(qID) })
+      const variableRequests = listview.map(function (qID) { return getQuestionData(qID) })
       axios.all(variableRequests).then(function (responsesArray) {
         const qIDs = []
         const means = []
         responsesArray.forEach(function (response) {
           for (let i = 0; i < response.data.length; i++) {
-            let d = response.data[i]
+            const d = response.data[i]
             if (d.p === perspective) {
-              let qID = d.q
+              const qID = d.q
               qIDs.push(qID)
               means.push(d.mean[timepoint].mean)
               break

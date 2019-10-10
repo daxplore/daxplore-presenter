@@ -70,7 +70,7 @@
 
         if (total === 0) {
           hasMissingData = true
-          stackData['MISSING_DATA'] = 1
+          stackData.MISSING_DATA = 1
         } else {
           for (var j = 0; j < optionKeys.length; j++) {
             stackData[optionKeys[j]] = total !== 0 ? currentTimeData[i][j] / total : 0

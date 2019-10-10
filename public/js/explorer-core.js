@@ -11,10 +11,10 @@
 
   function updateFromHash () {
     // Get query definition string from hash
-    let queryDefinition = daxplore.querydefinition.parseString(window.location.hash.slice(1))
+    const queryDefinition = daxplore.querydefinition.parseString(window.location.hash.slice(1))
     // Parse the query definition into a (potentially empty or partially empty) query object
     daxplore.explorer.questionSetQueryDefinition(queryDefinition.question)
-    let totalSelected = queryDefinition.flags.indexOf('TOTAL') !== -1
+    const totalSelected = queryDefinition.flags.indexOf('TOTAL') !== -1
     daxplore.explorer.perspectiveSetQueryDefinition(queryDefinition.perspective, queryDefinition.perspectiveOptions, totalSelected)
     daxplore.explorer.selectionUpdateCallback()
   }
@@ -58,7 +58,7 @@
       // Download all question data
       // TODO download at the same time as other data (only get groups.json first) and/or on demand
       function getQuestionData (questionID) { return axios.get('data/questions/' + questionID + '.json') }
-      let variableRequests = []
+      const variableRequests = []
       for (let i = 0; i < groups.length; i++) {
         for (let j = 0; j < groups[i].questions.length; j++) {
           variableRequests.push(getQuestionData(groups[i].questions[j]))
@@ -68,8 +68,8 @@
       axios.all(variableRequests).then(function (responsesArray) {
         responsesArray.forEach(function (response) {
           for (let i = 0; i < response.data.length; i++) {
-            let question = response.data[i].q
-            let perspective = response.data[i].p
+            const question = response.data[i].q
+            const perspective = response.data[i].p
             if (i === 0) {
               questionData[question] = {}
             }
@@ -89,18 +89,18 @@
   }
 
   function dichotomizedSubtitle (optionTexts) {
-    let optCount = optionTexts.length
+    const optCount = optionTexts.length
     if (optCount === 0) { return '' }
 
-    let subStart = usertexts.dichotomizedSubtitleStart
-    let subEnd = usertexts.dichotomizedSubtitleEnd
+    const subStart = usertexts.dichotomizedSubtitleStart
+    const subEnd = usertexts.dichotomizedSubtitleEnd
 
     if (optionTexts.length === 1) {
       return subStart + optionTexts[0] + subEnd
     }
 
-    let subSeparator = usertexts.dichotomizedSubtitleSeparator
-    let subOr = usertexts.dichotomizedSubtitleOr
+    const subSeparator = usertexts.dichotomizedSubtitleSeparator
+    const subOr = usertexts.dichotomizedSubtitleOr
 
     let sub = subStart
     sub += optionTexts.slice(0, optCount - 1).join(subSeparator)
@@ -113,18 +113,18 @@
   function setDescription (questionID, perspectiveID) {
     let html = ''
 
-    let questionDescription = questionMap[questionID].description
+    const questionDescription = questionMap[questionID].description
     if (questionDescription !== null && questionDescription !== undefined && questionDescription.trim().length > 0) {
-      let title = questionMap[questionID].short
+      const title = questionMap[questionID].short
       html += '<b>' + title + '</b><p>' + questionDescription + '</p>'
     }
 
-    let perspectiveDescription = questionMap[perspectiveID].description
+    const perspectiveDescription = questionMap[perspectiveID].description
     if (perspectiveDescription !== null && perspectiveDescription !== undefined && perspectiveDescription.trim().length > 0) {
       if (html.length > 0) {
         html += '<hr>'
       }
-      let title = questionMap[perspectiveID].short
+      const title = questionMap[perspectiveID].short
       html += '<b>' + title + '</b><p>' + perspectiveDescription + '</p>'
     }
 
@@ -150,7 +150,7 @@
 
     // TODO move to separate function/file/namespace?
     // TODO handle all flags
-    let queryHash = daxplore.querydefinition.encodeString(question, perspective, perspectiveOptions, [tab])
+    const queryHash = daxplore.querydefinition.encodeString(question, perspective, perspectiveOptions, [tab])
     if (window.location.hash !== queryHash) {
       // Set the hash of this window
       window.location.hash = queryHash
@@ -160,8 +160,8 @@
 
     let dichSubtitle = ''
     if (tab === 'DICH') {
-      let optionTexts = questionMap[question].options
-      let usedDichTexts = []
+      const optionTexts = questionMap[question].options
+      const usedDichTexts = []
       dichselectedMap[question].forEach(function (i) {
         usedDichTexts.push(optionTexts[i])
       })

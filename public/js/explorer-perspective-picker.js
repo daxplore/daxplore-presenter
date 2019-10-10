@@ -116,7 +116,7 @@
   }
 
   exports.getSelectedPerspectiveOptions = function () {
-    let selectedOptionsInt = []
+    const selectedOptionsInt = []
     for (let i = 0; i < selectedOptions.length; i++) {
       if (selectedOptions[i]) {
         selectedOptionsInt.push(i)

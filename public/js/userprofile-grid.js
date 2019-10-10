@@ -563,7 +563,7 @@
       .then(function (dataUrl) {
         gridclone.remove()
         generateAndSaveImage(dataUrl, chartWidth, heightOffset)
-      })['catch'](function (error) {
+      })['catch'](function (error) { // eslint-disable-line dot-notation
         if (error) { // TODO standard-js forces if(error) (see handle-callback-error)
           // TODO error handling: console.error('Failed to generate image', error)
         }
