@@ -80,7 +80,7 @@
 
   exports.chartSetQueryDefinition = function (chartType, timepoints, stat, selectedOptions, dichSubtitle) {
     selectedTab = chartType
-    var questionID = stat['q']
+    var questionID = stat.q
     // TODO unused: var perspectiveID = stat['p']
 
     // Clear previous chart, legend and subs
@@ -141,8 +141,8 @@
     case 'MEAN':
       switch (timepoints) {
       case 'TIMEPOINTS_ONE':
-        daxplore.chart.mean.generateChart(usertexts, questionMap, selectedOptions, stat)
-        daxplore.chart.mean.generateLegend()
+        daxplore.chart.meanprofile.generateChart(usertexts, questionMap, selectedOptions, stat)
+        daxplore.chart.meanprofile.generateLegend()
         break
       case 'TIMEPOINTS_TWO':
         break
@@ -180,7 +180,7 @@
     case 'MEAN':
       // TODO allow more height instead of vertical scroll
       // TODO hard coded based on specific chart, should be generalized, though if dynamic perspective picker will move up and down
-      daxplore.chart.mean.updateSize(550)
+      daxplore.chart.meanprofile.updateSize(550)
       break
     case 'DICH':
       daxplore.chart.dichtimeline.updateSize(350)

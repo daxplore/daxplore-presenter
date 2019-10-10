@@ -1,7 +1,7 @@
 (function (namespace) {
   namespace.chart = namespace.chart || {}
-  namespace.chart.mean = namespace.chart.mean || {}
-  const exports = namespace.chart.mean
+  namespace.chart.meanprofile = namespace.chart.meanprofile || {}
+  const exports = namespace.chart.meanprofile
 
   // CONSTANTS
   // TODO move to setting in producer
