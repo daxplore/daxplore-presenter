@@ -89,7 +89,7 @@ FileSaver.saveAs("https://httpbin.org/image", "image.jpg");
 ```
 Using URLs within the same origin will just use `a[download]`.
 Otherwise, it will first check if it supports cors header with a synchronous head request.
-If it does, it will download the data and save using blob URLs. 
+If it does, it will download the data and save using blob URLs.
 If not, it will try to download it using `a[download]`.
 
 The standard W3C File API [`Blob`][4] interface is not available in all browsers.
@@ -110,7 +110,7 @@ Note: The standard HTML5 `canvas.toBlob()` method is not available in all browse
 
 You can save a File constructor without specifying a filename. If the
 file itself already contains a name, there is a hand full of ways to get a file
-instance (from storage, file input, new constructor, clipboard event). 
+instance (from storage, file input, new constructor, clipboard event).
 If you still want to change the name, then you can change it in the 2nd argument.
 
 ```js
@@ -124,7 +124,7 @@ FileSaver.saveAs(file);
 
 ![Tracking image](https://in.getclicky.com/212712ns.gif)
 
-  [1]: https:////eligrey.com/demos/FileSaver.js/
+  [1]: http://eligrey.com/demos/FileSaver.js/
   [2]: https://github.com/eligrey/canvas-toBlob.js
   [3]: https://bugs.chromium.org/p/chromium/issues/detail?id=375297#c107
   [4]: https://developer.mozilla.org/en-US/docs/DOM/Blob
