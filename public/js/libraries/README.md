@@ -17,8 +17,8 @@ canvas-toBlob
 d3
 ---------------------
 - **Description**: Visualization and interaction techniques with a data-driven approach to DOM manipulation. The primary library used by Daxplore Presenter to generate charts and interactive page elements.
-- **Version**: v5.9.2
-- **Downloaded**: 2019-06-01
+- **Version**: v5.12.0
+- **Downloaded**: 2019-10-10
 - **Link**: https://github.com/d3/d3
 - **License**: BSD 3-Clause "New" or "Revised" License
 
