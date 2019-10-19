@@ -158,6 +158,9 @@
       .style('stroke-width', '3')
       .style('stroke-linecap', 'butt')
       .style('stroke-dasharray', '5,3')
+
+    // LEGEND
+    var legend = d3.select('.legend').append('div')
   }
 
   // EXPORTED FUNCTIONS

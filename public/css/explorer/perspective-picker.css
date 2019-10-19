@@ -1,0 +1,142 @@
+/*** Style for the perspective picker in Daxplore Explorer ***/
+
+.perspective-button {
+  color: #999;
+	z-index: 1;
+}
+
+.perspective-header {
+	color: #888;
+	font-weight: bold;
+	padding-bottom: 7px;
+  padding-top: 10px;
+}
+
+.perspective-picker {
+	display: flex;
+	flex-direction: row;
+}
+
+.perspective-varpicker {
+	display: flex;
+	flex-direction: column;
+}
+
+.peropt-buttons {
+display: flex;
+	flex-direction: row;
+	white-space: nowrap;
+}
+
+.pervarpicker-top-padding {
+  border-left: 1px dashed #DDD;
+  border-right: 1px solid #ABABAB;
+  border-top: 1px dashed #DDD;
+  min-height: 10px;
+	position: relative;
+}
+
+.pervarpicker-bottom-padding {
+  border-bottom: 1px dashed #DDD;
+  border-left: 1px dashed #DDD;
+  border-right: 1px solid #ABABAB;
+	min-height: 10px;
+  position: relative;
+}
+
+.pervarpicker-right-border-extender {
+  border-right: 1px solid #ABABAB;
+	flex: 1;
+}
+
+.pervarpicker-varoption:before {
+	content: url('../../img/perspective-radio-empty.png');
+	padding-left: 7px;
+	padding-right: 5px;
+	padding-top: 2px;
+}
+
+.pervarpicker-varoption {
+  align-items: center;
+  border-left: 1px dashed #DDD;
+  border-right: 1px solid #ABABAB;
+  cursor: pointer;
+	display: flex;
+	padding: 5px;
+	padding-right: 10px;
+	white-space: nowrap;
+}
+
+.pervarpicker-varoption-selected:before {
+	content: url('../../img/perspective-radio-filled.png');
+}
+
+.pervarpicker-varoption-selected {
+  border-bottom: 1px solid #ABABAB;
+  border-left: 1px solid #ABABAB;
+  border-right: none;
+	border-top: 1px solid #ABABAB;
+  padding-bottom: 4px;
+	padding-right: 11px;
+	padding-top: 4px;
+}
+
+.pervarpicker-varoption:hover {
+	color: #444;
+}
+
+.perspective-options {
+  background-color: white;
+  border-bottom: solid 1px #ABABAB;
+  border-right: solid 1px #ABABAB;
+  border-top: solid 1px #ABABAB;
+  display: flex;
+	flex-direction: column;
+  position: relative;
+}
+
+.peropt-columns {
+  display: flex;
+	flex: 1;
+	flex-direction: row;
+}
+
+.peropt-extra-columns {
+  display: flex;
+	flex-direction: row;
+  overflow: hidden;
+}
+
+.peropt-bottom-padding {
+	height: 31px;
+}
+
+.peropt-more-wrapper {
+  bottom: 2px;
+	position: absolute;
+  right: 2px;
+}
+
+.peropt-checkbox {
+  align-items: center;
+  cursor: pointer;
+	display: flex;
+	padding: 2px;
+	padding-right: 10px;
+	white-space: nowrap;
+}
+
+.peropt-checkbox:before {
+	content: url('../../img/perspective-checkbox-empty.png');
+	padding-left: 7px;
+	padding-right: 5px;
+	padding-top: 3px;
+}
+
+.peropt-checkbox-selected:before {
+	content: url('../../img/perspective-checkbox-filled.png');
+}
+
+.peropt-checkbox:hover {
+	color: #444;
+}

@@ -1,0 +1,34 @@
+.legend {
+  padding-left: 5px;
+  padding-right: 5px;
+	white-space: nowrap;
+}
+
+.legend div {
+  border-radius: 2px;
+  height: 1.1em;
+	width: 1.1em;
+}
+
+.legend-row {
+  cursor: default;
+  margin-bottom: 4px;
+	white-space: nowrap;
+	width: auto !important;
+}
+
+.legend-row-missing-data {
+	margin-top: 30px;
+}
+
+.legend-marker {
+  border-radius: 2px;
+  display: inline-block;
+  height: 1.1em;
+  vertical-align: middle;
+  width: 1.1em;
+}
+
+.legend-text {
+	margin-left: 5px;
+}

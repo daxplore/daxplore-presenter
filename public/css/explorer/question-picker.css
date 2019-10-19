@@ -1,0 +1,105 @@
+/*** Style for the question picker in Daxplore Explorer ***/
+
+.question-panel {
+  padding-bottom: 10px;
+  padding-right: 5px;
+  padding-top: 10px;
+}
+
+.question-header {
+  color: #888;
+  font-weight: bold;
+  padding-bottom: 7px;
+  white-space: nowrap;
+}
+
+.question-picker {
+  border-top: 1px dashed #DDD;
+}
+
+.question-picker.above-selected {
+  border-top: 1px solid #BBB;
+}
+
+.question-section-GROUP {
+  border-bottom: 1px dashed #DDD;
+  border-left: 1px dashed #DDD;
+  border-right: 1px dashed #DDD;
+  display: flex;
+  flex-direction: column;
+}
+
+.question-section-GROUP.above-selected {
+  border-bottom: 1px solid #BBB;
+}
+
+.question-section-GROUP.selected {
+  border-color: #BBB;
+  border-style: solid;
+  border-top: none;
+}
+
+.question-section-header {
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 9px;
+}
+
+.question-section-header-text {
+  align-self: center;
+  font-weight: bold;
+  margin-right: 7px;
+  white-space: nowrap;
+}
+
+.question-section-header-text:hover {
+  color: #444;
+}
+
+.question-group-arrow-wrapper {
+  display: flex;
+}
+
+.question-group-arrow {
+  align-self: center;
+}
+
+.question-group-arrow:after {
+  content: url('../../img/question-expand-arrow.png');
+}
+
+.question-section-questions {
+  overflow: hidden;
+}
+
+.question-section-questions-inner {
+  padding-bottom: 7px;
+  padding-left: 5px;
+}
+
+.question-question {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  padding-bottom: 4px;
+  padding-right: 5px;
+  padding-top: 0;
+  white-space: nowrap;
+}
+
+.question-question:hover {
+  color: #444;
+}
+
+.question-question:before {
+  content: url('../../img/perspective-radio-empty.png');
+  padding-left: 4px;
+  padding-right: 5px;
+  padding-top: 2px;
+}
+
+.question-question.selected:before {
+  content: url('../../img/perspective-radio-filled.png');
+}

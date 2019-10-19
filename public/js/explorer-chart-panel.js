@@ -97,17 +97,17 @@
     //
     // d3.select('.legend').html('')
     //
-    // d3.select('.daxplore-ExternalHeader-sub, .daxplore-ExternalHeader-dichsub, .daxplore-ExternalHeader-freq-tooltip')
+    // d3.select('.external-header-sub, .external-header-dichsub, .external-header-freq-tooltip')
     //   .text('')
 
     // Add new content
     var questionMeta = questionMap[questionID]
-    d3.select('.daxplore-ExternalHeader-header').text(questionMeta.short)
+    d3.select('.external-header-header').text(questionMeta.short)
     if (questionMeta.short !== questionMeta.text) {
-      d3.select('.daxplore-ExternalHeader-sub').text(questionMeta.text)
+      d3.select('.external-header-sub').text(questionMeta.text)
     }
-    d3.select('.daxplore-ExternalHeader-dichsub').text(dichSubtitle)
-    d3.select('.daxplore-ExternalHeader-freq-tooltip').text('')
+    d3.select('.external-header-dichsub').text(dichSubtitle)
+    d3.select('.external-header-freq-tooltip').text('')
 
     // reset any side scroll set by previous charts
     d3.select('.chart-panel')

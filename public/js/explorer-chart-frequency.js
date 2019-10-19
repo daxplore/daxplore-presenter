@@ -116,7 +116,7 @@
               1 // 1px fudge
     // TODO - scrollbar width?
 
-    var headerBlockWidth = d3.select('.daxplore-ExternalHeader').node().offsetWidth
+    var headerBlockWidth = d3.select('.external-header').node().offsetWidth
     var bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
     var description = d3.select('.description-panel').node()
     if (description != null && description.offsetWidth > 0) {
@@ -288,11 +288,11 @@
           var percentage = d.end - d.start
           var timepointText = usertexts['timepoint' + d.timepoint]
           if (d.key !== 'MISSING_DATA') {
-            d3.select('.daxplore-ExternalHeader-freq-tooltip')
+            d3.select('.external-header-freq-tooltip')
               .text(percentageFormat(percentage) + ' av gruppen "' + d.option + '" svarade "' + d.key + (timepoints.length >= 2 ? '" år ' + timepointText : '') + '.') // TODO externalize text
               .style('color', barStrokeColor(d.key, tpIndex).darker(0.5))
           } else if (percentage > 0) {
-            d3.select('.daxplore-ExternalHeader-freq-tooltip')
+            d3.select('.external-header-freq-tooltip')
               .text('Data saknas, färre än 10 deltagare i gruppen "' + d.option + '" svarade år ' + timepointText + '.') // TODO externalize text
               .style('color', '#555')
           }

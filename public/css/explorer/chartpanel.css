@@ -1,0 +1,47 @@
+.chart {
+  border: 1px solid #BBB;
+  border-top: none;
+}
+
+.chart-scroll {
+  overflow-x: auto;
+}
+
+.chart-header-panel {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-tabs {
+  display: flex;
+}
+
+.chart-tab {
+  border: 1px solid #BBB;
+  color: #666;
+  cursor: pointer;
+  padding: 7px 14px 7px 14px;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.chart-tab-selected {
+  border-bottom: none;
+  color: black;
+}
+
+.chart-tab-spacing {
+  border-bottom: 1px solid #BBB;
+  width: 20px;
+}
+
+.chart-tab-remainder {
+  border-bottom: 1px solid #BBB;
+  width: 100%;
+}
+
+.chart-container {
+  border: 1px solid #BBB;
+  border-top: none;
+}

@@ -21,22 +21,30 @@
 	padding: 5px 10px;
 	text-decoration: none;
 	color: #555;
-		
+
   -webkit-touch-callout: none;
     -webkit-user-select: none;
      -khtml-user-select: none;
        -moz-user-select: none;
         -ms-user-select: none;
             user-select: none;
-	
+
 	margin: 3px;
 }
-		
+
 .dashed-button:hover {
 	border-color: #AAA;
 }
-	
+
 .dashed-button:active {
-	margin-top: 2px;
 	margin-bottom: 4px;
+	margin-top: 2px;
+}
+
+/* img-preload elements are hidden, while still forcing the browser to load the cointained image */
+.img-preload {
+  left: -9999px;
+  opacity: 0;
+  position: absolute;
+  top: -9999px;
 }
