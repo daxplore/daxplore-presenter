@@ -64,6 +64,9 @@
         return 'none'
       })
 
+    // Initialize chart resources
+    daxplore.chart.meanbars.initializeChartResources(usertexts, questionMap, primaryColors, hoverColors)
+
     // TODO handle here or somewhere else?
     window.addEventListener('resize', daxplore.explorer.updateChartPanelSize)
     // hack to force initial sizing to work
@@ -83,16 +86,19 @@
     var questionID = stat.q
     // TODO unused: var perspectiveID = stat['p']
 
-    // Clear previous chart, legend and subs
+    // Hide all charts elements
+    // daxplore.chart.frequency.hide() // TODO
+    daxplore.chart.meanbars.hide()
+    // daxplore.chart.dichtimeline.hide() // TODO
     // TODO allow for animated updates of same chart type
-    d3.select('.chart')
-        .selectAll(function () { return this.childNodes })
-        .remove()
-
-    d3.select('.legend').html('')
-
-    d3.select('.daxplore-ExternalHeader-sub, .daxplore-ExternalHeader-dichsub, .daxplore-ExternalHeader-freq-tooltip')
-      .text('')
+    // d3.select('.chart')
+    //     .selectAll(function () { return this.childNodes })
+    //     .remove()
+    //
+    // d3.select('.legend').html('')
+    //
+    // d3.select('.daxplore-ExternalHeader-sub, .daxplore-ExternalHeader-dichsub, .daxplore-ExternalHeader-freq-tooltip')
+    //   .text('')
 
     // Add new content
     var questionMeta = questionMap[questionID]
@@ -141,8 +147,7 @@
     case 'MEAN':
       switch (timepoints) {
       case 'TIMEPOINTS_ONE':
-        daxplore.chart.meanprofile.generateChart(usertexts, questionMap, selectedOptions, stat)
-        daxplore.chart.meanprofile.generateLegend()
+        daxplore.chart.meanbars.populateChart(stat, selectedOptions)
         break
       case 'TIMEPOINTS_TWO':
         break
@@ -161,7 +166,8 @@
       }
       break
     }
-    daxplore.explorer.updateChartPanelSize()
+    // TODO
+    // daxplore.explorer.updateChartPanelSize()
   }
 
   function setSelectedTab (tab) {
@@ -180,7 +186,7 @@
     case 'MEAN':
       // TODO allow more height instead of vertical scroll
       // TODO hard coded based on specific chart, should be generalized, though if dynamic perspective picker will move up and down
-      daxplore.chart.meanprofile.updateSize(550)
+      daxplore.chart.meanbars.setSize(800, 350)
       break
     case 'DICH':
       daxplore.chart.dichtimeline.updateSize(350)
