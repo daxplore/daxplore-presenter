@@ -481,7 +481,7 @@
   exports.generateLegend = function () {
     // GENERATE LEGEND
     var legend = d3.select('.legend')
-      .style('margin-top', (d3.select('.daxplore-ExternalHeader').node().offsetHeight + height / 2.5) + 'px')
+      .style('margin-top', (d3.select('.external-header').node().offsetHeight + height / 2.5) + 'px')
       .style('margin-left', '4px')
 
     legend.html('')
@@ -531,7 +531,7 @@
               1 // 1px fudge
     // TODO - scrollbar width?
 
-    var headerBlockWidth = d3.select('.daxplore-ExternalHeader').node().offsetWidth
+    var headerBlockWidth = d3.select('.external-header').node().offsetWidth
     var bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
     var description = d3.select('.description-panel').node()
     if (description != null && description.offsetWidth > 0) {

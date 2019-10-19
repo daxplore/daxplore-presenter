@@ -1,0 +1,20 @@
+.description-panel {
+  margin: 22px 0 0 10px;
+  max-width: 500px;
+  padding: 8px 5px 8px 8px;
+}
+
+.description-panel p {
+  margin-bottom: 1px;
+  margin-top: 1px;
+}
+
+.description-panel ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.perspective-description-row {
+  display: flex;
+  justify-content: space-between;
+}
