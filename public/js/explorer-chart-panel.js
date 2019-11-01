@@ -7,7 +7,9 @@
   // var primaryColors, hoverColors
   // TODO hard coded here as temporary hack, also input in constructor might be temporary
   const primaryColors = ['#9DC680', '#80AFC6', '#8B8BCB', '#AB8BCB', '#C68680', '#CBA46C', '#CBCB6C']
-  const hoverColors = ['#D5F0C2', '#C2E0F0', '#C2C2F0', '#D9C2F0', '#F0C6C2', '#F0DDC2', '#F0F0C2']
+  const hoverColors = ['#93C072', '#72A6C0', '#7D7DC5', '#A17DC5', '#C07972', '#C69A5D', '#C6C65D']
+  const tooltipColors = ['#D5F0C2', '#C2E0F0', '#C2C2F0', '#D9C2F0', '#F0C6C2', '#F0DDC2', '#F0F0C2']
+
   var usertexts, dichselectedMap, optionsMap, timepointsMap
 
   // Initialize the chart panel
@@ -65,7 +67,7 @@
       })
 
     // Initialize chart resources
-    daxplore.chart.meanbars.initializeChartResources(usertexts, questionMap, primaryColors, hoverColors)
+    daxplore.chart.meanbars.initializeChartResources(usertexts, questionMap, primaryColors, hoverColors, tooltipColors)
 
     // TODO handle here or somewhere else?
     window.addEventListener('resize', daxplore.explorer.updateChartPanelSize)
@@ -101,13 +103,13 @@
     //   .text('')
 
     // Add new content
-    var questionMeta = questionMap[questionID]
-    d3.select('.external-header-header').text(questionMeta.short)
-    if (questionMeta.short !== questionMeta.text) {
-      d3.select('.external-header-sub').text(questionMeta.text)
-    }
-    d3.select('.external-header-dichsub').text(dichSubtitle)
-    d3.select('.external-header-freq-tooltip').text('')
+    // var questionMeta = questionMap[questionID]
+    // d3.select('.external-header-header').text(questionMeta.short)
+    // if (questionMeta.short !== questionMeta.text) {
+    //   d3.select('.external-header-sub').text(questionMeta.text)
+    // }
+    // d3.select('.external-header-dichsub').text(dichSubtitle)
+    // d3.select('.external-header-freq-tooltip').text('')
 
     // reset any side scroll set by previous charts
     d3.select('.chart-panel')
@@ -167,7 +169,7 @@
       break
     }
     // TODO
-    // daxplore.explorer.updateChartPanelSize()
+    daxplore.explorer.updateChartPanelSize()
   }
 
   function setSelectedTab (tab) {
@@ -179,14 +181,38 @@
   }
 
   exports.updateChartPanelSize = function () {
+    // Calculate available width, assuming to horizontal scroll for the page as a whole
+    var availableWidth = document.documentElement.clientWidth - // window width
+              d3.select('.question-panel').node().offsetWidth - // tree sidebar
+              d3.select('.sidebar-column').node().offsetWidth - // right sidebar
+              2 - // border of 1px + 1px (if changed here, needs to be changed in css)
+              1 // 1 px fudge to account for rounding
+    // Calculate minimum width needed for header
+    var headerBlockWidth = d3.select('.external-header').node().offsetWidth
+
+    // Calculate minimum width needed for the block under the chart
+    var bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
+    var description = d3.select('.description-panel').node()
+    if (description != null && description.offsetWidth > 0) {
+      bottomBlockWidth += 250 // TODO hard coded
+    }
+
+    // Minimum width needed for the header and bottom blocks
+    var topBotNeededWidth = Math.max(headerBlockWidth, bottomBlockWidth)
+
+    // Use all the width available with no scrolling for the chart  unless the header or bottom
+    // block require more width. In that case also allow the chart to be so big that the page as a
+    // whole gets a vertical scroll bar. If the chart's minimum width is larger than the available
+    // width then it's up to the chart to put itself in a horizontal scroll panel.
+    var widthForChart = Math.max(availableWidth, topBotNeededWidth)
     switch (selectedTab) {
     case 'FREQ':
       daxplore.chart.frequency.updateSize(350)
       break
     case 'MEAN':
       // TODO allow more height instead of vertical scroll
-      // TODO hard coded based on specific chart, should be generalized, though if dynamic perspective picker will move up and down
-      daxplore.chart.meanbars.setSize(800, 350)
+      // TODO hard coded based on specific chart, should be generalized
+      daxplore.chart.meanbars.setSize(widthForChart, 350)
       break
     case 'DICH':
       daxplore.chart.dichtimeline.updateSize(350)

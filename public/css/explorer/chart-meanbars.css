@@ -1,0 +1,29 @@
+.meanbars__legend {
+  display: flex;
+  flex-direction: column;
+  overflow-y: visible;
+}
+
+.meanbars__tooltip, .meanbars__reference-tooltip {
+  border: 0;
+  border-radius: 8px;
+  font: 12px sans-serif;
+  height: auto;
+  padding: 7px;
+  pointer-events: none;
+  position: absolute;
+  text-align: center;
+  white-space: nowrap;
+  width: auto;
+  z-index: 100;
+}
+
+.meanbars__reference-tooltip {
+  background-color: #DDD;
+  display: flex;
+  flex-direction: column;
+}
+
+.meanbars__reference-tooltip-header {
+  font-weight: bold;
+}

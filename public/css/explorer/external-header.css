@@ -3,30 +3,30 @@
 .external-header {
 	display: table;
 	margin: 0 auto;
+	padding-bottom: 3px;
   padding-left: 3px;
   padding-right: 3px;
-  padding-top: 5px;
 	text-align: center;
 }
 
-.external-header-header {
+.external-header__main {
 	font-size: 17px;
 	font-weight: bold;
 }
 
-.external-header-sub {
+.external-header__sub {
   color: #333;
   font-size: 15px;
 	margin-top: 2px;
 }
 
-.external-header-dichsub {
+.external-header__dichsub {
   color: #333;
   font-size: 13px;
 	margin-top: 2px;
 }
 
-.external-header-freq-tooltip {
+.external-header__freq-tooltip {
 	height: 14px;
   margin-bottom: 3px;
 	margin-top: 1px;

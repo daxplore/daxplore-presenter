@@ -48,3 +48,10 @@
   position: absolute;
   top: -9999px;
 }
+
+.hidden {
+	left: -9999px !important;
+	opacity: 0 !important;
+	position: absolute !important;
+	top: -9999px !important;
+}

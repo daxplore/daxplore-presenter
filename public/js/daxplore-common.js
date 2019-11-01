@@ -2,10 +2,11 @@
   namespace.common = namespace.common || {}
   const common = namespace.common
 
+  // DAXPLORE SYSTEM HELPERS
   // Data package version used by this version of the explorer.
   // Compare with dataPackageVersion in data/manifest.json.
   // Used to make sure the code and data package are compatible.
-  const systemDataVersion = 4
+  const systemDataVersion = 5
 
   // Log an error that has occurred in the Daxplore system.
   // Uses arguments array instead of function arguments, to support any number of
@@ -42,4 +43,8 @@
     }
     return false
   }
+
+  // FORMATTING HELPERS
+  common.percentageFormat = d3.format('.0%')
+  common.integerFormat = d3.format('d')
 })(window.daxplore = window.daxplore || {})
