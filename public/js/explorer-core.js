@@ -155,7 +155,7 @@
     if (window.location.hash !== queryHash) {
       // Set the hash of this window
       window.location.hash = queryHash
-      // Send a message to parents that hold this page in an iframe to allow the outer page to update it's window hash
+      // Send a message to parents that hold this page in an iframe to allow the outer page to update its window hash
       parent.postMessage(queryHash, '*')
     }
 
