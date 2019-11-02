@@ -98,9 +98,7 @@
     var reference = meanReferences[qID]
     var direction = directions[qID]
 
-    element.transition()
-      .duration(0)
-        .style('opacity', 1)
+    element.style('opacity', 1)
 
     var color = daxplore.profile.colorTextForValue(mean, reference, direction)
     var header = "<span class='description-header'>" + groupName + '</span><br><b>' + shorttext + ': ' + d3.format('d')(mean) + '</b><br>'

@@ -30,7 +30,7 @@
 }
 
 .user-paste-data-header-arrow:before {
-	content: url('../img/question-expand-arrow.png');
+	content: url('../../img/question-expand-arrow.png');
 }
 
 .user-paste-data-header-text {
@@ -77,7 +77,6 @@
 
 .user-paste-data-textarea {
 	color: #444;
-	flex: 1;
 	height: 400px;
 	padding: 10px;
 	margin-top: 10px;

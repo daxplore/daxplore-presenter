@@ -130,11 +130,10 @@ text {
 }
 
 .description {
-  align-self: center;
-/*   border: 1px solid #BBB; */
   width: 280px;
   padding: 5px;
   margin-left: 5px;
+	margin-top: 40px;
   color: #444;
   font: 13px sans-serif;
 }
