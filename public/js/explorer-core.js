@@ -78,6 +78,7 @@
         })
 
         // Initialize elements that depend on the metadata
+        daxplore.text.initializeResources(usertexts)
         daxplore.explorer.generateQuestionPicker(questions, groups, usertexts, settings)
         daxplore.explorer.generatePerspectivePicker(questions, perspectives, usertexts, settings)
         daxplore.explorer.generateChartPanel(questions, groups, null, null, usertexts, dichselectedMap, optionsMap, timepointsMap) // TODO fix constructor

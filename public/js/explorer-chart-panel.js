@@ -67,7 +67,7 @@
       })
 
     // Initialize chart resources
-    daxplore.chart.meanbars.initializeChartResources(usertexts, questionMap, primaryColors, hoverColors, tooltipColors)
+    daxplore.chart.meanbars.initializeResources(questionMap, primaryColors, hoverColors, tooltipColors)
 
     // TODO handle here or somewhere else?
     window.addEventListener('resize', daxplore.explorer.updateChartPanelSize)
