@@ -6,8 +6,8 @@
     d3.select('.save-image')
       .text(usertexts.imageSaveButton)
 
-    daxplore.profile.generateListChart(qIDs, meanReferenceMap, shorttextMap, usertexts, directionMap, 0)
-    daxplore.profile.setChartData(perspectiveOptions, means)
+    dax.profile.generateListChart(qIDs, meanReferenceMap, shorttextMap, usertexts, directionMap, 0)
+    dax.profile.setChartData(perspectiveOptions, means)
   }
 
   exports.initializeProfile = function () {
@@ -43,11 +43,11 @@
         const location = new URL(window.location.href)
         if (!perspective) {
           location.search = 'perspective=' + perspectives[0]
-          daxplore.common.logError('The URL must contain the perspective parameter, for example:', location.href)
+          dax.common.logError('The URL must contain the perspective parameter, for example:', location.href)
         } else {
-          daxplore.common.logError('The used perspective URL paremter is not supported: ?perspective=' + perspective)
+          dax.common.logError('The used perspective URL paremter is not supported: ?perspective=' + perspective)
         }
-        daxplore.common.logError('Suggested fix: Use one of the perspectives defined in', new URL('data/perspectives.json', window.location.href).href)
+        dax.common.logError('Suggested fix: Use one of the perspectives defined in', new URL('data/perspectives.json', window.location.href).href)
         return
       }
 
@@ -56,7 +56,7 @@
       // The function logs the error as a side effect,
       // so if the versions don't match all we have to do here is exit
       // TODO communicate the error directly in the DOM?
-      if (!daxplore.common.hasMatchingDataFileVersions(manifest.dataPackageVersion)) {
+      if (!dax.common.hasMatchingDataFileVersions(manifest.dataPackageVersion)) {
         return
       }
 
@@ -85,7 +85,7 @@
         }
       }
 
-      daxplore.profile.initializeHelpers(meanReferenceMap, shorttextMap, usertexts, descriptionMap, directionMap)
+      dax.profile.initializeHelpers(meanReferenceMap, shorttextMap, usertexts, descriptionMap, directionMap)
 
       // Get the data used in the listview
       function getQuestionData (questionID) { return axios.get('data/questions/' + questionID + '.json') }
@@ -117,6 +117,6 @@
   }
 
   exports.headerChange = function (select) {
-    daxplore.profile.updateSelectorOption(select.value)
+    dax.profile.updateSelectorOption(select.value)
   }
-})(window.daxplore = window.daxplore || {})
+})(window.dax = window.dax || {})

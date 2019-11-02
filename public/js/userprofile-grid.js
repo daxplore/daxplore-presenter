@@ -123,7 +123,7 @@
           .attr('pattern', '[0-9]+([\\.,][0-9]+)?') // TODO added extra escape backslash, check it works
           .attr('step', 0.1)
           .on('focus', function (d) {
-            daxplore.profile.setDescriptionShort(d3.select('#grid-description'), d.qID)
+            dax.profile.setDescriptionShort(d3.select('#grid-description'), d.qID)
           })
           .on('focusout', function (d, i, t) {
             var el = t[i]
@@ -199,7 +199,7 @@
   }
 
   exports.generateUserPasteSection = function () {
-    daxplore.userprofile.addGridUpdateCallback(updateUserCopyGroupNameDropdown)
+    dax.userprofile.addGridUpdateCallback(updateUserCopyGroupNameDropdown)
     d3.select('.user-paste-data-header')
       .on('click', function () {
         userPasteSectionOpen = !userPasteSectionOpen
@@ -421,7 +421,7 @@
       if (Modernizr.svgforeignobject) {
         d3.select('.save-grid-image-button')
             .text('Spara som bild') // TODO externalize text
-            .on('click', daxplore.userprofile.saveGridImage)
+            .on('click', dax.userprofile.saveGridImage)
       } else {
         d3.select('.save-grid-image-button')
             .remove()
@@ -432,7 +432,7 @@
       d3.select('.grid-legend-text.bad').text(usertexts.listReferenceWorse)
 
       if (qIDs.length > 0) {
-        daxplore.profile.setDescriptionShort(d3.select('#grid-description'), qIDs[0])
+        dax.profile.setDescriptionShort(d3.select('#grid-description'), qIDs[0])
       }
 
       usernames.push('Grupp 1') // TODO externalize text
@@ -472,7 +472,7 @@
             .append('tr')
               .attr('class', function (d) { return 'gridrow-' + d.qID })
               .on('mouseover', function (d, i) {
-                daxplore.profile.setDescriptionShort(d3.select('#grid-description'), d.qID)
+                dax.profile.setDescriptionShort(d3.select('#grid-description'), d.qID)
               })
 
       gridRows.append('td')
@@ -615,4 +615,4 @@
 
     img.src = dataUrl
   }
-})(window.daxplore = window.daxplore || {})
+})(window.dax = window.dax || {})

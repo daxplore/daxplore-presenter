@@ -103,4 +103,4 @@
     // Join query definition parts with & and encode to base64
     return btoa(queryDefinitionItems.join('&'))
   }
-})(window.daxplore = window.daxplore || {})
+})(window.dax = window.dax || {})

@@ -227,7 +227,7 @@
         .classed('barrect', true)
         .attr('height', yScale.bandwidth())
         .style('fill', function (option) {
-          return daxplore.profile.colorForValue(option.mean, questionReferenceValue, questionGoodDirection)
+          return dax.profile.colorForValue(option.mean, questionReferenceValue, questionGoodDirection)
         })
         .attr('width', function (option) { return firstUpdate ? xScale(option.mean) + 1 : 0 })
         // .on("mouseover",
@@ -256,7 +256,7 @@
 
     bars.select('.barrect')
       .transition(elTrans)
-        .style('fill', function (option) { return daxplore.profile.colorForValue(option.mean, questionReferenceValue, questionGoodDirection) })
+        .style('fill', function (option) { return dax.profile.colorForValue(option.mean, questionReferenceValue, questionGoodDirection) })
         .attr('height', yScale.bandwidth())
         .attr('width', function (option) { return xScale(option.mean) + 1 })
 
@@ -463,4 +463,4 @@
 
     updateChartElements()
   }
-})(window.daxplore = window.daxplore || {})
+})(window.dax = window.dax || {})

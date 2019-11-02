@@ -32,14 +32,14 @@
     // Get the location of the used data folder.
     const dataFolderLocation = new URL('data', window.location.href).href
     // Write a general error message, directed at the person setting up the presentation.
-    daxplore.common.logError('The data folder at ' + dataFolderLocation + ' uses data format version ' +
+    dax.common.logError('The data folder at ' + dataFolderLocation + ' uses data format version ' +
                   manifestDataVersion + ', but this version of Daxplore Presenter uses ' +
                   'data format version ' + systemDataVersion + '.')
     // Add different instructions for fixing the error, depending on if the data folder or code is out of date.
     if (systemDataVersion < manifestDataVersion) {
-      daxplore.common.logError('Suggested fix: Upgrade to the latest version of Daxplore Presenter.')
+      dax.common.logError('Suggested fix: Upgrade to the latest version of Daxplore Presenter.')
     } else {
-      daxplore.common.logError('Suggested fix: Upgrade to the latest version of Daxplore Producer and export the data again.')
+      dax.common.logError('Suggested fix: Upgrade to the latest version of Daxplore Producer and export the data again.')
     }
     return false
   }
@@ -47,4 +47,4 @@
   // FORMATTING HELPERS
   common.percentageFormat = d3.format('.0%')
   common.integerFormat = d3.format('d')
-})(window.daxplore = window.daxplore || {})
+})(window.dax = window.dax || {})

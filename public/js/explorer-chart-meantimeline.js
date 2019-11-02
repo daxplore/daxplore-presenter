@@ -276,4 +276,4 @@
 //       return d;
 //     }
 //   }
-})(window.daxplore = window.daxplore || {})
+})(window.dax = window.dax || {})

@@ -24,4 +24,4 @@
   namespace.text.initializeResources = function (usertextsInput) {
     usertexts = usertextsInput
   }
-})(window.daxplore = window.daxplore || {})
+})(window.dax = window.dax || {})

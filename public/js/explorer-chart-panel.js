@@ -67,14 +67,14 @@
       })
 
     // Initialize chart resources
-    daxplore.chart.meanbars.initializeResources(questionMap, primaryColors, hoverColors, tooltipColors)
+    dax.chart.meanbars.initializeResources(questionMap, primaryColors, hoverColors, tooltipColors)
 
     // TODO handle here or somewhere else?
-    window.addEventListener('resize', daxplore.explorer.updateChartPanelSize)
+    window.addEventListener('resize', dax.explorer.updateChartPanelSize)
     // hack to force initial sizing to work
     // TODO handle in different way
     for (i = 2; i <= 12; i++) {
-      setTimeout(daxplore.explorer.updateChartPanelSize, Math.pow(2, i))
+      setTimeout(dax.explorer.updateChartPanelSize, Math.pow(2, i))
     }
   }
 
@@ -89,9 +89,9 @@
     // TODO unused: var perspectiveID = stat['p']
 
     // Hide all charts elements
-    // daxplore.chart.frequency.hide() // TODO
-    daxplore.chart.meanbars.hide()
-    // daxplore.chart.dichtimeline.hide() // TODO
+    // dax.chart.frequency.hide() // TODO
+    dax.chart.meanbars.hide()
+    // dax.chart.dichtimeline.hide() // TODO
     // TODO allow for animated updates of same chart type
     // d3.select('.chart')
     //     .selectAll(function () { return this.childNodes })
@@ -141,15 +141,15 @@
       case 'TIMEPOINTS_TWO':
       case 'TIMEPOINTS_ALL':
         // TODO temporary hard coded timepoint
-        daxplore.chart.frequency.generateChart(usertexts, questionMap, primaryColors, hoverColors, stat, selectedOptions, 4)
-        daxplore.chart.frequency.generateLegend()
+        dax.chart.frequency.generateChart(usertexts, questionMap, primaryColors, hoverColors, stat, selectedOptions, 4)
+        dax.chart.frequency.generateLegend()
         break
       }
       break
     case 'MEAN':
       switch (timepoints) {
       case 'TIMEPOINTS_ONE':
-        daxplore.chart.meanbars.populateChart(stat, selectedOptions)
+        dax.chart.meanbars.populateChart(stat, selectedOptions)
         break
       case 'TIMEPOINTS_TWO':
         break
@@ -162,14 +162,14 @@
       case 'TIMEPOINTS_ONE':
       case 'TIMEPOINTS_TWO':
       case 'TIMEPOINTS_ALL':
-        daxplore.chart.dichtimeline.generateChart(selectedOptions, stat, usertexts, dichselectedMap, optionsMap, timepointsMap, primaryColors, hoverColors)
-        daxplore.chart.dichtimeline.generateLegend()
+        dax.chart.dichtimeline.generateChart(selectedOptions, stat, usertexts, dichselectedMap, optionsMap, timepointsMap, primaryColors, hoverColors)
+        dax.chart.dichtimeline.generateLegend()
         break
       }
       break
     }
     // TODO
-    daxplore.explorer.updateChartPanelSize()
+    dax.explorer.updateChartPanelSize()
   }
 
   function setSelectedTab (tab) {
@@ -177,7 +177,7 @@
       return
     }
     selectedTab = tab
-    daxplore.explorer.selectionUpdateCallback()
+    dax.explorer.selectionUpdateCallback()
   }
 
   exports.updateChartPanelSize = function () {
@@ -207,16 +207,16 @@
     var widthForChart = Math.max(availableWidth, topBotNeededWidth)
     switch (selectedTab) {
     case 'FREQ':
-      daxplore.chart.frequency.updateSize(350)
+      dax.chart.frequency.updateSize(350)
       break
     case 'MEAN':
       // TODO allow more height instead of vertical scroll
       // TODO hard coded based on specific chart, should be generalized
-      daxplore.chart.meanbars.setSize(widthForChart, 350)
+      dax.chart.meanbars.setSize(widthForChart, 350)
       break
     case 'DICH':
-      daxplore.chart.dichtimeline.updateSize(350)
+      dax.chart.dichtimeline.updateSize(350)
       break
     }
   }
-})(window.daxplore = window.daxplore || {})
+})(window.dax = window.dax || {})

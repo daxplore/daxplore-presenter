@@ -87,7 +87,7 @@
           // TODO replace with callback to js page handler
           // gwtQuestionCallback()
           // }
-          daxplore.explorer.selectionUpdateCallback()
+          dax.explorer.selectionUpdateCallback()
         })
 
     openGroup = groupMap[selectedQuestion]
@@ -151,4 +151,4 @@
         return d === selectedQuestion
       })
   }
-})(window.daxplore = window.daxplore || {})
+})(window.dax = window.dax || {})

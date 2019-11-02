@@ -94,7 +94,7 @@
     generateChartElements()
     calculateTPWidths()
     // updateChartElements();
-    daxplore.chart.frequency.updateSize(chartHeight)
+    dax.chart.frequency.updateSize(chartHeight)
   }
 
   exports.updateSize = function (heightTotal) {
@@ -488,4 +488,4 @@
       .style('font', '12px sans-serif')
       .style('cursor', 'default')
   }
-})(window.daxplore = window.daxplore || {})
+})(window.dax = window.dax || {})

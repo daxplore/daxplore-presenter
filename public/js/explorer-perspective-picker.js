@@ -258,7 +258,7 @@
     if (fireUpdateEvent) { //  TODO removed update limiter: && hasCheckedBox
       // TODO replace with callback to js page handler
       // gwtPerspectiveCallback();
-      daxplore.explorer.selectionUpdateCallback()
+      dax.explorer.selectionUpdateCallback()
     }
 
     // hack to handle IE display bugs
@@ -298,4 +298,4 @@
         .style('opacity', collapsed ? 0 : 1)
         .style('width', collapsed ? '0px' : null)
   }
-})(window.daxplore = window.daxplore || {})
+})(window.dax = window.dax || {})

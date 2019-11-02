@@ -11,12 +11,12 @@
 
   function updateFromHash () {
     // Get query definition string from hash
-    const queryDefinition = daxplore.querydefinition.parseString(window.location.hash.slice(1))
+    const queryDefinition = dax.querydefinition.parseString(window.location.hash.slice(1))
     // Parse the query definition into a (potentially empty or partially empty) query object
-    daxplore.explorer.questionSetQueryDefinition(queryDefinition.question)
+    dax.explorer.questionSetQueryDefinition(queryDefinition.question)
     const totalSelected = queryDefinition.flags.indexOf('TOTAL') !== -1
-    daxplore.explorer.perspectiveSetQueryDefinition(queryDefinition.perspective, queryDefinition.perspectiveOptions, totalSelected)
-    daxplore.explorer.selectionUpdateCallback()
+    dax.explorer.perspectiveSetQueryDefinition(queryDefinition.perspective, queryDefinition.perspectiveOptions, totalSelected)
+    dax.explorer.selectionUpdateCallback()
   }
 
   exports.initializeExplorer = function () {
@@ -43,7 +43,7 @@
       // The function logs the error as a side effect,
       // so if the versions don't match all we have to do here is exit
       // TODO communicate the error directly in the DOM?
-      if (!daxplore.common.hasMatchingDataFileVersions(manifest.dataPackageVersion)) {
+      if (!dax.common.hasMatchingDataFileVersions(manifest.dataPackageVersion)) {
         return
       }
 
@@ -78,10 +78,10 @@
         })
 
         // Initialize elements that depend on the metadata
-        daxplore.text.initializeResources(usertexts)
-        daxplore.explorer.generateQuestionPicker(questions, groups, usertexts, settings)
-        daxplore.explorer.generatePerspectivePicker(questions, perspectives, usertexts, settings)
-        daxplore.explorer.generateChartPanel(questions, groups, null, null, usertexts, dichselectedMap, optionsMap, timepointsMap) // TODO fix constructor
+        dax.text.initializeResources(usertexts)
+        dax.explorer.generateQuestionPicker(questions, groups, usertexts, settings)
+        dax.explorer.generatePerspectivePicker(questions, perspectives, usertexts, settings)
+        dax.explorer.generateChartPanel(questions, groups, null, null, usertexts, dichselectedMap, optionsMap, timepointsMap) // TODO fix constructor
 
         updateFromHash()
         window.addEventListener('hashchange', updateFromHash, false)
@@ -137,12 +137,12 @@
   // Called by all other elements whenever their state is updated in a way that
   // will update the page state as a whole
   exports.selectionUpdateCallback = function () {
-    const question = daxplore.explorer.getSelectedQuestion()
-    const perspective = daxplore.explorer.getSelectedPerspective()
-    const perspectiveOptions = daxplore.explorer.getSelectedPerspectiveOptions()
-    // const totalSelected = daxplore.explorer.isPerspectiveTotalSelected()
+    const question = dax.explorer.getSelectedQuestion()
+    const perspective = dax.explorer.getSelectedPerspective()
+    const perspectiveOptions = dax.explorer.getSelectedPerspectiveOptions()
+    // const totalSelected = dax.explorer.isPerspectiveTotalSelected()
     // TODO temporary hack, should be handled by tab component
-    let tab = daxplore.explorer.getSelectedTab()
+    let tab = dax.explorer.getSelectedTab()
     if (questionMap[question].displaytypes.indexOf(tab) === -1) {
       tab = questionMap[question].displaytypes[0]
     }
@@ -151,7 +151,7 @@
 
     // TODO move to separate function/file/namespace?
     // TODO handle all flags
-    const queryHash = daxplore.querydefinition.encodeString(question, perspective, perspectiveOptions, [tab])
+    const queryHash = dax.querydefinition.encodeString(question, perspective, perspectiveOptions, [tab])
     if (window.location.hash !== queryHash) {
       // Set the hash of this window
       window.location.hash = queryHash
@@ -169,6 +169,6 @@
       dichSubtitle = dichotomizedSubtitle(usedDichTexts)
     }
     setDescription(question, perspective)
-    daxplore.explorer.chartSetQueryDefinition(tab, 'TIMEPOINTS_ONE', stat, perspectiveOptions, dichSubtitle)
+    dax.explorer.chartSetQueryDefinition(tab, 'TIMEPOINTS_ONE', stat, perspectiveOptions, dichSubtitle)
   }
-})(window.daxplore = window.daxplore || {})
+})(window.dax = window.dax || {})

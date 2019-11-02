@@ -30,14 +30,14 @@
     d3.select('.save-image')
       .text(usertexts.imageSaveButton)
 
-    daxplore.userprofile.generateUserPasteSection()
+    dax.userprofile.generateUserPasteSection()
 
-    daxplore.userprofile.generateGrid(qIDs, meanReferenceMap, shorttextMap, usertexts, directionMap)
+    dax.userprofile.generateGrid(qIDs, meanReferenceMap, shorttextMap, usertexts, directionMap)
 
-    daxplore.profile.generateListChart(qIDs, meanReferenceMap, shorttextMap, usertexts, directionMap, 0)
+    dax.profile.generateListChart(qIDs, meanReferenceMap, shorttextMap, usertexts, directionMap, 0)
 
-    daxplore.userprofile.addGridUpdateCallback(function (names, means) {
-      daxplore.profile.setChartData(names, means)
+    dax.userprofile.addGridUpdateCallback(function (names, means) {
+      dax.profile.setChartData(names, means)
     })
   }
 
@@ -63,7 +63,7 @@
       // The function logs the error as a side effect,
       // so if the versions don't match all we have to do here is exit
       // TODO communicate the error directly in the DOM?
-      if (!daxplore.common.hasMatchingDataFileVersions(manifest.dataPackageVersion)) {
+      if (!dax.common.hasMatchingDataFileVersions(manifest.dataPackageVersion)) {
         return
       }
 
@@ -86,7 +86,7 @@
         }
       }
 
-      daxplore.profile.initializeHelpers(meanReferenceMap, shorttextMap, usertexts, descriptionMap, directionMap)
+      dax.profile.initializeHelpers(meanReferenceMap, shorttextMap, usertexts, descriptionMap, directionMap)
 
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function (e) {
@@ -99,6 +99,6 @@
   }
 
   exports.headerChange = function (select) {
-    daxplore.profile.updateSelectorOption(select.value)
+    dax.profile.updateSelectorOption(select.value)
   }
-})(window.daxplore = window.daxplore || {})
+})(window.dax = window.dax || {})

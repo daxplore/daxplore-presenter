@@ -14,7 +14,7 @@ module.exports = {
   "globals": {
     "axios": true,
     "d3": true,
-    "daxplore": true,
+    "dax": true,
     "domtoimage": true,
     "Modernizr": true,
     "saveAs": true,

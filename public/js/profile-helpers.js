@@ -100,7 +100,7 @@
 
     element.style('opacity', 1)
 
-    var color = daxplore.profile.colorTextForValue(mean, reference, direction)
+    var color = dax.profile.colorTextForValue(mean, reference, direction)
     var header = "<span class='description-header'>" + groupName + '</span><br><b>' + shorttext + ': ' + d3.format('d')(mean) + '</b><br>'
     var subheader = '<b>' + usertexts.listReferenceValue + ': ' + d3.format('d')(reference) + '</b><br>'
 
@@ -119,4 +119,4 @@
 
     element.html(header + subheader + referenceComparison + description)
   }
-})(window.daxplore = window.daxplore || {})
+})(window.dax = window.dax || {})
