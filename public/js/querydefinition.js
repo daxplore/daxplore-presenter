@@ -12,7 +12,7 @@
   // Turn query definition flag (bit flag integer as string) into an array of flag strings
   function decodeQueryDefinitionFlags (flagString) {
     if (!isNormalInteger(flagString)) { return [] }
-    const flagInt = Number.parseInt(flagString, 10)
+    const flagInt = parseInt(flagString, 10)
     const flagArray = []
     if (flagInt & 1) { flagArray.push('TOTAL') }
     if (flagInt & 2) { flagArray.push('SECONDARY') }

@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="css/explorer/chartpanel.css">
     <link rel="stylesheet" href="css/explorer/description-panel.css">
     <link rel="stylesheet" href="css/explorer/explorer.css">
-    <link rel="stylesheet" href="css/explorer/external-header.css">
+    <link rel="stylesheet" href="css/explorer/header-section.css">
     <link rel="stylesheet" href="css/explorer/external-legend.css">
     <link rel="stylesheet" href="css/explorer/perspective-picker.css">
     <link rel="stylesheet" href="css/explorer/question-picker.css">
@@ -85,18 +85,12 @@
         <!-- Populated by explorer-chart-panel.js and different chart-*.js classes -->
         <div class="chart-panel">
 
-          <!-- The header section of the chart with placeholders for -->
-          <!-- divs that are populated by different chart-*.js -->
-          <div class="external-header">
-            <div class="external-header-header"></div>
-            <div class="external-header-sub"></div>
-            <div class="external-header-dichsub"></div>
-            <div class="external-header-freq-tooltip"></div>
-          </div>
+          <!-- The header section of the chart, which is populated by different chart-*.js -->
+          <div class="header-section"></div>
 
           <!-- Tabs used to select the chart to display when there are multiple -->
           <!-- supported charts for a given question/perspective combination -->
-          <!-- Managed/populated by explorer-chart-panel.js --->
+          <!-- Managed/populated by explorer-chart-panel.js -->
           <div class="chart-tabs">
             <div class="chart-tab-spacing freq"></div>
             <div class="chart-tab freq chart-tab-selected"></div>

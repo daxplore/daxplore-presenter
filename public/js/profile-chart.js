@@ -9,7 +9,7 @@
   var shorttexts // TODO initialize
   var selectedOption = 0
   var selectedQIDs = []
-  var chartwrapperBB, xAxisTopHeight, xAxisBottomHeight, margin, width, height
+  var chartwrapperBB, xAxisTopHeight, margin, width, height
   var xScale, yScale, yAxisElement, yAxisReferenceElement // TODO unused: chart
   var yAxisWidth
 
@@ -97,10 +97,11 @@
     chartwrapperBB.left = wrapperClientBB.left + pageXOffset
     chartwrapperBB.top = wrapperClientBB.top + pageYOffset
     chartwrapperBB.width = wrapperClientBB.width
-    chartwrapperBB.height = wrapperClientBB.height
+    // chartwrapperBB.height = wrapperClientBB.height
+    chartwrapperBB.height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0) -
+      d3.select('.header').node().getBoundingClientRect().height - 20
     xAxisTopHeight = 30
-    xAxisBottomHeight = 24
-    margin = { top: 0, right: 13, bottom: xAxisTopHeight + xAxisBottomHeight, left: 0 }
+    margin = { top: 0, right: 13, bottom: xAxisTopHeight, left: 0 }
     width = chartwrapperBB.width - margin.left - margin.right
     height = chartwrapperBB.height - margin.top - margin.bottom
   }
@@ -170,7 +171,7 @@
     // https://github.com/d3/d3-scale/blob/fd07dd8ceeaeaec612f675050ac134243b406f64/src/band.js#L26
     var yHeightWithMaxBand = Math.max(1, selectedQIDs.length - paddingInner + paddingOuter * 2) * maxBandwidth / (1 - paddingInner)
 
-    var yStop = Math.min(height - xAxisBottomHeight, yHeightWithMaxBand + xAxisTopHeight)
+    var yStop = Math.min(height, yHeightWithMaxBand + xAxisTopHeight)
 
     // CALCULATE Y SCALE
     yScale = d3.scaleBand()
@@ -473,8 +474,7 @@
 
     var chartWidth = chartBB.width
     var chartHeight = d3.select('.x.axis.top').node().getBoundingClientRect().height +
-                    d3.select('.x.axis.bottom').node().getBoundingClientRect().height +
-                    10 // constant to fudge the result
+                    d3.select('.x.axis.bottom').node().getBoundingClientRect().height
 
     var doctype = '<?xml version="1.0" standalone="no"?>' +
       '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'

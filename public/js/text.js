@@ -11,7 +11,7 @@
     var text = usertexts[textID]
     Array.prototype.slice.call(arguments, 1).forEach(function (arg, i) {
       var match = '{' + i + '}'
-      if (!text.includes(match)) {
+      if (text.indexOf(match) === -1) {
         console.warn(textID, '=', usertexts[textID], "doesn't contain ", match)
         return
       }

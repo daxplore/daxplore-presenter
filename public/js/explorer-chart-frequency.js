@@ -3,46 +3,194 @@
   namespace.chart.frequency = namespace.chart.frequency || {}
   const exports = namespace.chart.frequency
 
+  /** ** CHART TYPE AND INSTANCE VARIABLES ** **/
+
   // CONSTANTS
-  var chartHeight = 350
+  var yAxisWidth = 35
+  var xAxisHeight = 24
+  var margin = { top: 20, right: 13, bottom: xAxisHeight, left: yAxisWidth + 10 }
+  var missingDataColor = d3.hsl('#BBB') // TODO externalize to producer?
+  var leftTimetickTransform, selectedTimetickTransform, rightTimetickTransform
+  var timepointTransition = d3.transition()
+    .duration(300)
+    .ease(d3.easeLinear)
+  var fadeTransition = d3.transition()
+    .duration(100)
+    .ease(d3.easeLinear)
 
-  var primaryColors // TODO unused: , hoverColors
-  var missingDataColor = d3.hsl('#BBB')
-  var yAxisWidth, xAxisHeight, margin, width, height // TODO unused: , chartwrapperBB
-  var chart, chartG
+  // SIZE VARIABLES
+  var availableWidth = 600 // initial placeholder value
+  var width = availableWidth
+  var availableHeight = 300 // initial placeholder value
+  var height = availableHeight
 
-  // INITIALIZE STATIC RESOURCES
-  var usertexts
+  // CHART RESOURCES
+  // Use the same objects when updating the chart
+  // Objects, data and values that are independant of the chart data
+  // DATA
   var questionMap
-  // TODO
-  // for (var i=0; i < questions.length; i ++) {
-  //   var q = questions[i];
-  //   questionMap[q.column] = q;
-  // }
+  // If no question has more than 1 timepoint display all frequency charts in single timepoint mode.
+  // If at least one question has more than 1 timepoint show all charts with timepoints.
+  var singleTimepointMode
+  // HEADER
+  var headerDiv, headerMain, headerSub, headerTooltip
+  // SCALES AND AXISES
+  var xScale, xAxis, xAxisElement
+  var yScale, yAxisScale, yAxis //, yAxisElement
+  var zScaleColor
+  // CHART
+  var chartContainer, chartBB, chart, chartG
+  // STATE TRACKING
+  // LEGEND
+  var legendDiv, legendQuestionHeader, legendQuestionOptionTable, legendMissingData
 
-  var percentageFormat = d3.format('.0%')
-
-  // INSTANCE SPECIFIC VARIABLES
-  var question, perspective, timepoints, data
+  // CURRENT FREQUENCY CHART
+  var question, perspective, data
+  var timepoints = []
   var selectedPerspectiveOptionIndices, selectedPerspectiveOptions, optionKeys
   var selectedTimepoint, highlightedQuestionOption, highlightedPerspectiveOption
   var hasMissingData
   var tpWidths, tpWidthsAdditive
-  var x, y, z
 
-  // EXPORTED FUNCTIONS
-  exports.generateChart = function (usertextsInput, questionMapInput, primaryColorsInput, hoverColorsInput, stat, selectedPerspectiveOptionIndicesInput, selectedTimepointInput) {
-    usertexts = usertextsInput
+  /** ** EXPORTED FUNCTIONS ** **/
+
+  // Constructor, used to initialize the chart type.
+  // Run once when the page is loaded. Call populateChart in order to update the chart content.
+  exports.initializeResources = function (questionMapInput, primaryColors) {
     questionMap = questionMapInput
-    // TODO initialize once, not every time
-    primaryColors = primaryColorsInput
-    // TODO unused: hoverColors = hoverColorsInput
 
-    selectedPerspectiveOptionIndices = selectedPerspectiveOptionIndicesInput
+    // CALCULATE RELEVANT DATA
+    var maxTimepointCount = -1
+    for (var key in questionMap) {
+      maxTimepointCount = Math.max(questionMap[key].timepoints.length, maxTimepointCount)
+    }
+    singleTimepointMode = maxTimepointCount === 1
 
+    if (!singleTimepointMode) {
+      margin.bottom += 40
+    }
+
+    // INITIALIZE HEADER
+    headerDiv = d3.select('.header-section').append('div')
+      .attr('class', 'header-section__freqs')
+    headerMain = headerDiv.append('div')
+      .attr('class', 'header-section__main')
+    headerSub = headerDiv.append('div')
+      .attr('class', 'header-section__sub')
+    headerTooltip = headerDiv.append('div')
+      .attr('class', 'header-section__freq-tooltip')
+
+    // INITIALIZE CHART
+    // base div element
+    chartContainer = d3.select('.chart').append('div')
+      .attr('class', 'explorer-freq')
+
+    // base svg element
+    chart = chartContainer.append('svg')
+      .attr('class', 'explorer-freq')
+
+    // white background
+    chart.append('rect')
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .attr('fill', 'white')
+
+    // margin adjusted chart element
+    chartG = chart.append('g')
+      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+
+    // x axis
+    xScale = d3.scaleBand()
+      .rangeRound([0, width])
+      .paddingInner(0.1)
+      .paddingOuter(0.07)
+
+    xAxis = d3
+      .axisBottom(xScale)
+      .tickSize(singleTimepointMode ? 5 : 41)
+
+    xAxisElement = chartG.append('g')
+      .attr('class', 'axis frequency-x-axis')
+      .attr('transform', 'translate(0,' + height + ')')
+      .call(xAxis)
+
+    // y axis
+    yScale = d3.scaleLinear()
+      .rangeRound([height - 2, 0])
+      .domain([0, 1])
+
+    yAxisScale = d3.scaleLinear()
+      .rangeRound([height, 0])
+      .domain([0, 1])
+
+    yAxis = d3.axisLeft(yAxisScale)
+      .tickFormat(d3.format('.0%'))
+      .tickSize(0)
+      .tickSizeInner(width)
+
+    chartG.append('g')
+      .attr('class', 'axis frequency-y-axis')
+      .attr('transform', 'translate(' + width + ',0)')
+      .call(yAxis)
+
+    // z axis, color coding
+    zScaleColor = d3.scaleOrdinal().range(primaryColors)
+
+    // INITIALIZE LEGEND
+    // top level freqs legend container
+    legendDiv = d3.select('.legend').append('div')
+      .attr('class', 'freqs__legend')
+
+    // empty flex element, used to dynamically align the legend content vertically
+    legendDiv.append('div')
+      .style('flex', '1')
+
+    // legend for the question and selected options
+    legendQuestionHeader = legendDiv.append('h4')
+      .attr('class', 'legend__header')
+    legendQuestionOptionTable = legendDiv.append('div')
+    legendMissingData = legendDiv.append('div')
+      .attr('class', 'legend__row')
+      .style('margin-top', '15px')
+    legendMissingData.append('div')
+      .attr('class', 'legend__color-square')
+      .style('background-color', missingDataColor)
+    legendMissingData.append('div')
+      .attr('class', 'legend__row-text')
+      .text(dax.text('explorer.freq.legend.missing_data'))
+
+    // empty flex element, used to dynamically align the legend content vertically
+    legendDiv.append('div')
+      .style('flex', '3')
+
+    // INITIALIZE SVG TRANSFORMATIONS
+    // Generate matrix transformations for svg elements, to make them work in IE11
+    // See: https://stackoverflow.com/a/28726517
+    var styleHelperDiv = chartContainer.append('div')
+
+    styleHelperDiv.style('transform', 'translate(-14px, 19px) rotate(-45deg)')
+    leftTimetickTransform = getComputedStyle(styleHelperDiv.node()).getPropertyValue('transform')
+
+    styleHelperDiv.style('transform', 'translate(-8px, 0px) rotate(45deg)')
+    rightTimetickTransform = getComputedStyle(styleHelperDiv.node()).getPropertyValue('transform')
+
+    styleHelperDiv.style('transform', 'translate(-13px, 4px) rotate(0deg)')
+    selectedTimetickTransform = getComputedStyle(styleHelperDiv.node()).getPropertyValue('transform')
+
+    styleHelperDiv.remove()
+  }
+
+  // Set new data to be displayed by the chart.
+  // As a side effect, make this chart visible.
+  exports.populateChart = function (stat, selectedPerspectiveOptionIndicesInput) {
+    displayChartElements(true)
     perspective = stat.p
     question = stat.q
+    selectedPerspectiveOptionIndices = selectedPerspectiveOptionIndicesInput
+    var removedTimepoints = timepoints.filter(function (tp) { return questionMap[question].timepoints.indexOf(tp) === -1 })
     timepoints = questionMap[question].timepoints
+    selectedTimepoint = timepoints[Math.floor((2 / 3) * timepoints.length)]
+
     hasMissingData = false
 
     optionKeys = questionMap[question].options.slice()
@@ -53,6 +201,7 @@
       selectedPerspectiveOptions.push(questionMap[perspective].options[i])
     })
 
+    // Generate data map for all timepoints
     data = {}
     for (var tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
       var tp = timepoints[tpIndex]
@@ -67,7 +216,6 @@
           __total: total,
           __timepoint: timepoints[tpIndex],
         }
-
         if (total === 0) {
           hasMissingData = true
           stackData.MISSING_DATA = 1
@@ -81,53 +229,206 @@
       data[tp] = tpData
     }
 
-    z = d3.scaleOrdinal()
-      .range(primaryColors)
-      // .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
-
-    z.domain(optionKeys)
-
-    selectedTimepoint = selectedTimepointInput
-
-    // TODO this is completely recalculated in updateFreqChartSize, should not be needed
-    computeDimensions(600, chartHeight) // 600 is an arbitrary number which is overwritten later
-    generateChartElements()
+    // initialize TP width values
     calculateTPWidths()
-    // updateChartElements();
-    dax.chart.frequency.updateSize(chartHeight)
+
+    // UPDATE HEADER
+    var shortText = questionMap[question].short.trim()
+    var longText = questionMap[question].text.trim()
+    headerMain.text(shortText)
+    headerSub
+      .text(longText)
+      .style('display', longText === '' || shortText === longText ? 'none' : null)
+
+    // UPDATE X
+    xScale.domain(selectedPerspectiveOptions)
+    xAxisElement.call(xAxis)
+
+    // UPDATE Z
+    zScaleColor.domain(optionKeys)
+
+    // ADD/REMOVE/UPDATE BARS FOR EACH TIMEPOINT
+    // Remove elements from removed timepoints
+    removedTimepoints.forEach(function (tp) {
+      chartG.selectAll('.freq-optionrow-tp' + tp).remove()
+      chartG.selectAll('.freq-bar-timetick-wrapper-' + tp).remove()
+    })
+
+    // Add and update elements for current timepoints
+    for (tpIndex = timepoints.length - 1; tpIndex >= 0; tpIndex--) {
+      tp = timepoints[tpIndex]
+      tpData = data[tp]
+
+      var questionOptionRows = chartG
+       .selectAll('.freq-optionrow-tp' + tp)
+       .data(
+         d3.stack().keys(optionKeys)(tpData), // data
+         function (option) { return option.key + ';' + option.index } // key function, mapping a specific DOM element to a specific option index
+       )
+
+      questionOptionRows.enter().append('g')
+        .classed('freq-optionrow-tp' + tp, true)
+        .attr('transform', function (d, i) {
+          return 'translate(0,' + 1.5 + ')'
+        })
+
+      // remove old bars
+      questionOptionRows.exit().remove()
+
+      var sections = chartG.selectAll('.freq-optionrow-tp' + tp).selectAll('.freq-optionrow-section-tp' + tp)
+        .data(
+          function (d) {
+            return d.map(function (v) {
+              return {
+                start: v[0],
+                end: (isNaN(v[1]) ? v[0] : v[1]),
+                key: d.key,
+                option: v.data.__option,
+                timepoint: tp,
+              }
+            })
+          }, // data
+          function (option) { return option.option + ';tp-' + option.timepoint } // key function, mapping a specific DOM element to a specific option index
+        )
+
+      sections.enter().append('rect')
+        .classed('freq-optionrow-section-tp' + tp, true)
+        .attr('x', function (d) { return xScale(d.option) })
+        .attr('y', function (d) { return yScale(d.end) })
+        .attr('height', function (d) { return yScale(d.start) - yScale(d.end) })
+        .attr('width', tpWidthsAdditive[tpIndex] * xScale.bandwidth())
+        .attr('fill', function (d) { return barFillColor(d.key, tpIndex) })
+        .attr('stroke', function (d) { return barStrokeColor(d.key, tpIndex) })
+        .attr('stroke-width', 1)
+        .on('mouseover', function (d) {
+          // Set selected options
+          highlightedQuestionOption = d.key
+          highlightedPerspectiveOption = d.option
+          // Update legend highlight
+          legendOptionMouseOver(highlightedQuestionOption)
+          // Set selected timepoint and trigger visual updates
+          setSelectedTimepoint(d.timepoint)
+          // Create html for contextual header tooltip
+          if (!singleTimepointMode) {
+            var timepointText = dax.text('timepoint' + d.timepoint) // TODO change key from timepointX to new textID format
+          }
+          var perspectiveOptionText = d.option
+          if (d.key === 'MISSING_DATA') {
+            if (singleTimepointMode) {
+              var html = dax.text('explorer.freq.tooltip.timepoints_missing_data', 10, perspectiveOptionText) // TODO externalize cutoff
+            } else {
+              html = dax.text('explorer.freq.tooltip.timepoints_missing_data', 10, perspectiveOptionText, timepointText) // TODO externalize cutoff
+            }
+          } else {
+            var percentageText = dax.common.percentageFormat(d.end - d.start)
+            var questionOptionText = d.key
+            var color = barStrokeColor(d.key, tpIndex).darker(0.7)
+            if (singleTimepointMode) {
+              html = dax.text('explorer.freq.tooltip.single', percentageText, perspectiveOptionText, questionOptionText, color)
+            } else {
+              html = dax.text('explorer.freq.tooltip.timepoints', percentageText, perspectiveOptionText, questionOptionText, color, timepointText)
+            }
+          }
+          // Set new header tooltip
+          headerTooltip.html(html)
+        })
+        .on('mouseout', function (d) {
+          // Deselect any legend options
+          legendOptionMouseOut()
+        })
+
+      // remove old sections
+      sections.exit().remove()
+
+      if (!singleTimepointMode) {
+        // add/remove/update bar timepoint tick texts
+        var timeticks = chartG.selectAll('.freq-bar-timetick-wrapper-' + tp)
+          .data(selectedPerspectiveOptions)
+
+        timeticks.exit().remove()
+
+        timeticks
+          .enter().append('g')
+            .classed('freq-bar-timetick-wrapper-' + tp, true)
+            .append('text')
+              .classed('freq-bar-timetick-' + tp, true)
+              .text(dax.text('timepoint' + tp)) // TODO change key from timepointX to new textID format
+      }
+    }
+
+    // UPDATE LEGEND
+    // Update legend title
+    legendQuestionHeader
+      .text(questionMap[question].short)
+
+    // Set new data for the legend
+    var optionRows = legendQuestionOptionTable.selectAll('.legend__row')
+      .data([].concat(questionMap[question].options).reverse())
+
+    // Remove old rows
+    optionRows.exit().remove()
+
+    // Add new rows
+    var optionEnter = optionRows.enter()
+      .append('div')
+        .attr('class', 'legend__row')
+        .on('mouseover', function (option) { legendOptionMouseOver(option) })
+        .on('mouseout', legendOptionMouseOut)
+    optionEnter.append('div')
+      .attr('class', 'legend__color-square')
+    optionEnter.append('div')
+      .attr('class', 'legend__row-text')
+
+    // Reselect rows and use single-select to propagate data join to contained items
+    // update color and text for each row
+    var rows = legendQuestionOptionTable.selectAll('.legend__row')
+    rows.select('.legend__color-square')
+      .style('background-color', zScaleColor)
+    rows.select('.legend__row-text')
+      .text(function (option) { return option })
+      .style('font-style', function (option) { return option.nodata ? 'italic' : null })
+      .attr('title', function (option) { return option })
+
+    // Missing data option, show or hide
+    legendMissingData.style('display', hasMissingData ? null : 'none')
+
+    // UPDATE TIMEPOINT SPECIFIC POSITIONS
+    // Set timepoint to current timepoint to update timepoint related positions
+    setSelectedTimepoint(selectedTimepoint, true)
+
+    // UPDATE STYLES
+    updateStyles()
   }
 
-  exports.updateSize = function (heightTotal) {
-    // 2. width for chart to use is max of:
-    // a. room remaining of window width after QP, SA, margins, (scroll bar?)
-    // b. max of
-    // b.1 room required by header block
-    // b.2 room required by bottom block
-    // 3. calculate min width needed to draw chart
-    // 4. if allocated space in 2. < need in 3.
-    // then: set scroll area width to 2., chart to 3., wrap and scroll
-    // else: set chart to 2, no scroll
+  // Set the size available for the chart.
+  // Updates the chart so it fits in the new size.
+  // As a side effect, enable horizontal scrolling if needed for the chart to fit the given room.
+  exports.setSize = function (availableWidthInput, availableHeightInput) {
+    availableWidth = availableWidthInput
+    availableHeight = availableHeightInput
+    resizeAndPositionElements()
+  }
 
-    var availableWidth = document.documentElement.clientWidth - // window width
-              d3.select('.question-panel').node().offsetWidth - // tree sidebar
-              5 - // tree margin (if changed here, needs to be changed in css)
-              d3.select('.sidebar-column').node().offsetWidth - // right sidebar
-              2 - // border of 1px + 1px (if changed here, needs to be changed in css)
-              1 // 1px fudge
-    // TODO - scrollbar width?
+  // Hide all frequency chart elements
+  // Called whenever the entire chart should be hidden, so that another chart type can be dislpayed
+  exports.hide = function () {
+    displayChartElements(false)
+  }
 
-    var headerBlockWidth = d3.select('.external-header').node().offsetWidth
-    var bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
-    var description = d3.select('.description-panel').node()
-    if (description != null && description.offsetWidth > 0) {
-      bottomBlockWidth += 250 // TODO hard coded
-    }
-    var topBotNeededWidth = Math.max(headerBlockWidth, bottomBlockWidth)
+  /** ** INTERNAL FUNCTIONS ** **/
 
-    var widthForChart = Math.max(availableWidth, topBotNeededWidth)
+  // Hide or show all top level elements: header, chart and legend
+  function displayChartElements (show) {
+    headerDiv.style('display', show ? null : 'none')
+    chartContainer.style('display', show ? null : 'none')
+    legendDiv.style('display', show ? null : 'none')
+  }
 
-    // heuristically calculate width needed to display chart without internal overlap
-    var yAxis = 31 // could be calculated?
+  // Update the size and position of all chart elements.
+  // Called when the content or the size is updated.
+  function resizeAndPositionElements () {
+    // Estimate width needed to display chart without internal overlap
+    var yAxisWidth = 31 // could be calculated?
     var outsideMargin = 24 // could be calculated?
     var innerMarginBars = 25 // could be calculated?
     var innerMarginTexts = 15
@@ -136,269 +437,159 @@
     var selectedPerspectiveOptionCount = selectedPerspectiveOptions.length
 
     var longestPerspectiveOptionTextLength = 0
-    d3.select('.frequency-x-axis').selectAll('text')
+    xAxisElement.selectAll('text')
       .each(function () {
         if (this.getBBox().width > longestPerspectiveOptionTextLength) {
           longestPerspectiveOptionTextLength = this.getBBox().width
         }
       })
 
-    var minWidthBasedOnBars = yAxis + outsideMargin * 2 + innerMarginBars * (selectedPerspectiveOptionCount - 1) +
+    var minWidthBasedOnBars = yAxisWidth + outsideMargin * 2 + innerMarginBars * (selectedPerspectiveOptionCount - 1) +
                             (selectedTimepointCount * minWidthPerTimepoint) * selectedPerspectiveOptionCount
-
-    var minWidthBasedOnTickTexts = yAxis + outsideMargin * 2 + innerMarginTexts * (selectedPerspectiveOptionCount - 1) +
+    var minWidthBasedOnTickTexts = yAxisWidth + outsideMargin * 2 + innerMarginTexts * (selectedPerspectiveOptionCount - 1) +
                             longestPerspectiveOptionTextLength * selectedPerspectiveOptionCount
-
     var chartNeededWidth = Math.max(minWidthBasedOnBars, minWidthBasedOnTickTexts)
 
-    var lockWidth = widthForChart < chartNeededWidth
-    var chartWidth
-    if (lockWidth) {
-      chartWidth = chartNeededWidth
-    } else {
-      chartWidth = widthForChart
-    }
+    // Check if vertical scroll is needed
+    var scrollNeeded = availableWidth < chartNeededWidth
+
+    // Enable or disable scroll on the div containing the frequency cchart
     d3.select('.chart')
-      .classed('chart-scroll', lockWidth)
-      .style('width', function () { return lockWidth ? widthForChart + 'px' : null })
+      .classed('chart-scroll', scrollNeeded)
+      .style('width', function () { return scrollNeeded ? availableWidth + 'px' : null })
 
-    computeDimensions(chartWidth, heightTotal)
-
+    // Update width of the chart, which may be bigger than the available space if scrolling is enabled
+    width = scrollNeeded ? chartNeededWidth : availableWidth
+    width = width - margin.left - margin.right
+    height = availableHeight - margin.top - margin.bottom
     chart
       .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.top + margin.bottom)
 
-    updateChartElements()
-  }
-
-  exports.generateLegend = function () {
-    // GENERATE LEGEND
-    var legend = d3.select('.legend')
-      .style('margin-top', (height / 2) + 'px')
-      .style('margin-left', '4px')
-
-    legend.html('')
-
-    var rows = [].concat(questionMap[question].options).reverse()
-
-    // Add legend options
-    legend.selectAll('.legend-row')
-      .data(rows)
-      .enter()
-        .append('div')
-        .attr('class', function (d) { return 'legend-row legend-row-' + d.index })
-        .html(function (option) {
-          return "<span class='legend-marker' style='background-color: " +
-                  z(option) + ";'>&nbsp</span>" +
-                  "<span class='legend-text'>" + option + '</span>'
-        })
-    // TODO mouseover legend effect
-    // .on("mouseover",
-    //   function(d) {
-    //     tooltipOver(d.index);
-    //     fadeOthers(d.index);
-    // })
-    // .on("mouseout",
-    //   function(d) {
-    //     tooltipOut();
-    //     unfadeAll();
-    // });
-
-    if (hasMissingData) {
-      legend.append('div')
-          .attr('class', 'legend-row legend-row-missing-data')
-          .html("<span class='legend-marker' style='background-color: " +
-                 missingDataColor + ";'>&nbsp</span>" +
-                 "<span class='legend-text'>" + 'Data saknas' + '</span>') // TODO externalize text
+    // Update bounding box definition for the chart
+    var wrapperClientBB = d3.select('.chart').node().getBoundingClientRect()
+    chartBB = {
+      height: wrapperClientBB.height,
+      left: wrapperClientBB.left + pageXOffset,
+      top: wrapperClientBB.top + pageYOffset,
+      width: wrapperClientBB.width,
     }
 
-    updateStyles()
-  }
-
-  // INTERNAL FUNCTIONS
-
-  function updateChartElements () {
     // UPDATE X-AXIS
-    x = d3.scaleBand()
-      .rangeRound([0, width])
-      .paddingInner(0.1)
-      .paddingOuter(0.07)
-      .domain(selectedPerspectiveOptions)
-
-    var xAxis = d3
-      .axisBottom(x)
-      .tickSize(41)
-
-    d3.select('.frequency-x-axis')
+    // Update the space available for the x axis
+    xScale.rangeRound([0, width])
+    // Move and update the x axis with the new range
+    xAxisElement
       .attr('transform', 'translate(0,' + height + ')')
       .call(xAxis)
 
     // UPDATE Y AXIS
-    y = d3.scaleLinear()
-      .rangeRound([height - 2, 0])
-      .domain([0, 1])
-
-    var yAxisY = d3.scaleLinear()
-      .rangeRound([height, 0])
-      .domain([0, 1])
-
-    var yAxis = d3.axisLeft(yAxisY)
-      .tickFormat(d3.format('.0%'))
-      .tickSize(0)
-      .tickSizeInner(width)
-
+    yScale.rangeRound([height - 2, 0])
+    yAxisScale.rangeRound([height, 0])
+    yAxis.tickSizeInner(width)
     d3.select('.frequency-y-axis')
       .attr('transform', 'translate(' + width + ',0)')
       .call(yAxis)
 
+    // UPDATE BARS FOR EACH TIMEPOINT
+    // Update TP width values
+    calculateTPWidths()
+    // Update size and position for each bar element
     for (var tpIndex = timepoints.length - 1; tpIndex >= 0; tpIndex--) {
       var tp = timepoints[tpIndex]
-      var tpData = data[tp]
-
-      var freqBars = chartG
-       .selectAll('.freq-bar-' + tp)
-       .data(d3.stack().keys(optionKeys)(tpData))
-       .enter().append('g')
-         .classed('freq-bar-' + tp, true)
-         .attr('transform', function (d, i) {
-           return 'translate(0,' + 1.5 + ')'
-         })
-
-      freqBars.selectAll('.freq-bar-section-' + tp)
-        .data(function (d) {
-          return d.map(function (v) {
-            return { start: v[0], end: (isNaN(v[1]) ? v[0] : v[1]), key: d.key, option: v.data.__option, timepoint: tp }
-          })
-        })
-        .enter().append('rect')
-          .classed('freq-bar-section-' + tp, true)
-
-      d3.selectAll('.freq-bar-section-' + tp)
-        .attr('x', function (d) { return x(d.option) })
-        .attr('y', function (d) { return y(d.end) })
-        .attr('height', function (d) { return y(d.start) - y(d.end) })
-        .attr('width', tpWidthsAdditive[tpIndex] * x.bandwidth())
-        .attr('fill', function (d) { return barFillColor(d.key, tpIndex) })
-        .attr('stroke', function (d) { return barStrokeColor(d.key, tpIndex) })
-        .attr('stroke-width', 1)
-        .on('mouseover', function (d) {
-          highlightedQuestionOption = d.key
-          highlightedPerspectiveOption = d.option
-          setSelectedTimepoint(d.timepoint)
-          var percentage = d.end - d.start
-          var timepointText = usertexts['timepoint' + d.timepoint]
-          if (d.key !== 'MISSING_DATA') {
-            d3.select('.external-header-freq-tooltip')
-              .text(percentageFormat(percentage) + ' av gruppen "' + d.option + '" svarade "' + d.key + (timepoints.length >= 2 ? '" år ' + timepointText : '') + '.') // TODO externalize text
-              .style('color', barStrokeColor(d.key, tpIndex).darker(0.5))
-          } else if (percentage > 0) {
-            d3.select('.external-header-freq-tooltip')
-              .text('Data saknas, färre än 10 deltagare i gruppen "' + d.option + '" svarade år ' + timepointText + '.') // TODO externalize text
-              .style('color', '#555')
-          }
-        })
-        .on('mouseout', function (d) {
-          highlightedQuestionOption = d.key
-          highlightedPerspectiveOption = d.option
-        })
-
-      // barSections.append("text")
-      //   .classed("freq-bar-section-text-" + tpIndex, true)
-      //   .attr("font-size", function(d) {
-      //     var height = 15;
-      //     if (y(d.start)-y(d.end) < height - 2) {
-      //       height = y(d.start)-y(d.end) - 2;
-      //     }
-      //     if (height < 0) {
-      //       height = 0;
-      //     }
-      //     return height + "px";
-      //   })
-      //   .text(function(d) {
-      //     return d.key != "MISSING_DATA" ? "99%" : ""
-      //   })
-      //   .attr("x", function(d) { return x(d.option) + tpWidthsAdditive[tpIndex] * x.bandwidth(); })
-      //   .attr("y", function(d) {
-      //     var fontSize = d3.select(this).attr("font-size").replace("px","");
-      //     return y(d.end) + (y(d.start) - y(d.end))/2 + fontSize/2 ;
-      //    });
-
-      // console.log(timepoints);
-      chartG.selectAll('.freq-bar-timetick-wrapper-' + tp)
-        .data(selectedPerspectiveOptions)
-          .enter().append('g')
-            .classed('freq-bar-timetick-wrapper-' + tp, true)
-            .append('text')
-              .classed('freq-bar-timetick-' + tp, true)
-              .text(usertexts['timepoint' + tp])
+      var sections = d3.selectAll('.freq-optionrow-section-tp' + tp)
+      sections
+        .attr('x', function (d) { return xScale(d.option) })
+        .attr('y', function (d) { return yScale(d.end) })
+        .attr('height', function (d) { return yScale(d.start) - yScale(d.end) })
+        .attr('width', tpWidthsAdditive[tpIndex] * xScale.bandwidth())
     }
+
+    // LEGEND
+    // Set the vertical position and height of the legend area
+    // The position of the legend div is then adjusted via flex parameters relative the defined area
+    legendDiv
+      .style('margin-top', (chartBB.top + 0) + 'px')
+      .style('height', chartBB.height + 'px')
+
+    // UPDATE TIMEPOINT SPECIFIC POSITIONS
+    // Set timepoint to current timepoint to update timepoint related positions
     setSelectedTimepoint(selectedTimepoint, true)
-    updateStyles()
   }
 
-  function setSelectedTimepoint (selectedTimepointInput, instantAnimation = false) {
-    // TODO unused:
-    // var timepointChanged = selectedTimepoint !== selectedTimepointInput
+  function setSelectedTimepoint (selectedTimepointInput, instantAnimation) {
+    instantAnimation = typeof instantAnimation === 'undefined' ? false : instantAnimation
     selectedTimepoint = selectedTimepointInput
     calculateTPWidths(selectedTimepoint)
-    var transitionTime = instantAnimation ? 0 : 300
 
+    // Iterate over all timepoints, with special treatment for the selected timepoint
     for (var tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
       var tp = timepoints[tpIndex]
+      // Animate the bar rows for the current timepoint
+      var rows = d3.selectAll('.freq-optionrow-section-tp' + tp)
+      // Stop all current bar row animations
+      rows.interrupt().selectAll('*').interrupt()
+      // Update row colors
+      rows
+        .attr('fill', function (d) {
+          var darken = 0
+          if (highlightedQuestionOption === d.key &&
+              selectedTimepoint === tp &&
+              highlightedPerspectiveOption === d.option) {
+            darken = 0.3
+          }
+          return barFillColor(d.key, tpIndex).darker(darken)
+        })
+        .attr('stroke', function (d) { return barStrokeColor(d.key, tpIndex) })
+      // Select rows with or without transition
+      rows = instantAnimation ? rows : rows.transition(timepointTransition)
+      rows.attr('width', tpWidthsAdditive[tpIndex] * xScale.bandwidth())
 
-      d3.selectAll('.freq-bar-section-' + tp)
-        .transition()
-          .duration(transitionTime) // TODO figure out fast mouseover animation for color while keeping width transition
-          .attr('width', tpWidthsAdditive[tpIndex] * x.bandwidth())
-          .attr('fill', function (d) {
-            var darken = 0
-            if (highlightedQuestionOption === d.key &&
-                selectedTimepoint === tp &&
-                highlightedPerspectiveOption === d.option) {
-              darken = 0.1
-            }
-            return barFillColor(d.key, tpIndex).darker(darken)
-          })
-          .attr('stroke', function (d) { return barStrokeColor(d.key, tpIndex) })
+      // Timepoint tick wrappers
+      var wrappers = d3.selectAll('.freq-bar-timetick-wrapper-' + tp)
+      // Stop all wrapper animations
+      wrappers.interrupt().selectAll('*').interrupt()
+      // Select timepoint wrappers with or without transition
+      wrappers = instantAnimation ? wrappers : wrappers.transition(timepointTransition)
+      // Update timepoint wrapper positions
+      wrappers
+        .attr('transform', function (d) {
+          var xPos = xScale(d) + (tpWidthsAdditive[tpIndex] - tpWidths[tpIndex] / 2) * xScale.bandwidth()
+          var yPos = height + 15
+          return 'translate(' + xPos + ',' + yPos + ')'
+        })
 
-      // d3.selectAll(".freq-bar-section-text-" + tp)
-      //   .transition()
-      //     .duration(transitionTime)
-      //       .attr("x", function(d) { return x(d.option) + (tpWidthsAdditive[tpIndex] - tpWidths[tpIndex]) * x.bandwidth() + 5 })
-      //       .attr("opacity", tp === selectedTimepoint ? 1 : 0);
-
-      d3.selectAll('.freq-bar-timetick-wrapper-' + tp)
-        .transition()
-          .duration(transitionTime)
-            .attr('transform', function (d) {
-              var xPos = x(d) + (tpWidthsAdditive[tpIndex] - tpWidths[tpIndex] / 2) * x.bandwidth()
-              var yPos = height + 15
-              return 'translate(' + xPos + ',' + yPos + ')'
-            })
-
-      d3.selectAll('.freq-bar-timetick-' + tp)
-        .transition()
-          .duration(transitionTime)
-            .style('transform', function (d) {
-              if (tp < selectedTimepoint) {
-                return 'translate(-14px, 19px) rotate(-45deg)'
-              } else if (tp > selectedTimepoint) {
-                return 'translate(-8px, 0px) rotate(45deg)'
-              }
-              return 'translate(-13px, 4px) rotate(0deg)'
-            })
-            .style('fill', tp === selectedTimepoint ? 'black' : '#555')
+      // Timepoint ticks
+      var ticks = d3.selectAll('.freq-bar-timetick-' + tp)
+      // Stop all tick animations
+      ticks.interrupt().selectAll('*').interrupt()
+      // Select timepoint ticks with or without transition
+      ticks = instantAnimation ? ticks : ticks.transition(timepointTransition)
+      // Update timepoint tick positions, rotations and color
+      ticks
+        .attr('transform', function () {
+          if (tp < selectedTimepoint) {
+            return leftTimetickTransform
+          } else if (tp > selectedTimepoint) {
+            return rightTimetickTransform
+          }
+          return selectedTimetickTransform
+        })
+        .style('fill', tp === selectedTimepoint ? 'black' : '#555')
     }
   }
 
   function barFillColor (key, tpIndex) {
+    if (singleTimepointMode) {
+      return d3.hsl(zScaleColor(key))
+    }
     var asymptoticLightnessTarget = 0.8
     var lightnessDropoffRate = 1.3
     var selectedTPIndex = timepoints.indexOf(selectedTimepoint)
     if (key === 'MISSING_DATA') {
       var color = missingDataColor
     } else {
-      color = d3.hsl(z(key)).darker(0.3)
+      color = d3.hsl(zScaleColor(key)).darker(0.3)
     }
     var lightness = color.l
     var targetDiff = asymptoticLightnessTarget - lightness
@@ -438,54 +629,36 @@
     }
   }
 
-  function computeDimensions (widthTotal, heightTotal) {
-    yAxisWidth = 35
-    xAxisHeight = 24
-    margin = { top: 20, right: 13, bottom: xAxisHeight + 40, left: yAxisWidth + 10 }
-    width = widthTotal - margin.left - margin.right
-    height = heightTotal - margin.top - margin.bottom
-  }
-
-  function generateChartElements () {
-    chart = d3.select('.chart').append('svg')
-    chart
-      .classed('frequency-chart', true)
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom)
-
-    // WHITE BACKGROUND
-    chart.append('rect')
-      .attr('width', '100%')
-      .attr('height', '100%')
-      .attr('fill', 'white')
-
-    // MARGIN ADJUSTED CHART ELEMENT
-    chartG = chart.append('g')
-      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-
-    // Y AXIS
-    chartG.append('g')
-      .attr('class', 'axis frequency-y-axis')
-
-    // X AXIS
-    chartG.append('g')
-      .attr('class', 'axis frequency-x-axis')
-
-    updateStyles()
-  }
-
   function updateStyles () {
-    d3.selectAll('.axis .domain')
+    chartG.selectAll('.axis .domain')
       .style('visibility', 'hidden')
 
-    d3.selectAll('.axis path, .axis line')
+    chartG.selectAll('.axis path, .axis line')
       .style('fill', 'none')
       .style('stroke', '#bbb')
       .style('shape-rendering', 'geometricPrecision')
 
-    d3.selectAll('text')
+    chartG.selectAll('text')
       .style('fill', '#555')
       .style('font', '12px sans-serif')
       .style('cursor', 'default')
+  }
+
+  function legendOptionMouseOver (hoveredOption) {
+    var rows = d3.selectAll('.freqs__legend .legend__row')
+    // Stop all current legend row animations
+    rows.interrupt().selectAll('*').interrupt()
+    // Fade non-selected options
+    rows
+      .style('opacity', function (option) { return option === hoveredOption ? 1 : 0.4 })
+  }
+
+  function legendOptionMouseOut () {
+    var rows = d3.selectAll('.freqs__legend .legend__row')
+    // Stop all current legend row animations
+    rows.interrupt().selectAll('*').interrupt()
+    // Set all legend rows to visible again
+    rows.transition(fadeTransition)
+      .style('opacity', 1)
   }
 })(window.dax = window.dax || {})

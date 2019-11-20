@@ -431,7 +431,7 @@
               1 // 1px fudge
     // TODO - scrollbar width?
 
-    var headerBlockWidth = d3.select('.external-header').node().offsetWidth
+    var headerBlockWidth = d3.select('.header-section').node().offsetWidth
     var bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
     var description = d3.select('.description-panel').node()
     if (description != null && description.offsetWidth > 0) {

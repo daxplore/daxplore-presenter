@@ -3,17 +3,17 @@
 }
 
 .chart-main {
-  position: fixed !important;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
   display: flex;
   flex-direction: column;
+	/* overflow-x: auto; */
 }
 
 .chart-wrapper {
-	width: 750px;
+	width: 800px;
 }
 
 .content-row {
@@ -22,16 +22,16 @@
 
 .chart-row {
 	flex: 1;
-	height: 100%;
 	display: flex;
 }
 
 .column-left {
-  height: 100%;
+	display: flex;
+	flex-direction: column;
 }
 
 .chart-wrapper {
-  height: 100%;
+	flex: 1;
 }
 
 .column-right {

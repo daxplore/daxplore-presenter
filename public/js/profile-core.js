@@ -39,11 +39,12 @@
       // Validate the perspective URL parameter
       // In case of problems, give feedback directed at the person setting up the presentation
       // TODO communicate the error directly in the DOM?
-      if (!perspectives.includes(perspective)) {
-        const location = new URL(window.location.href)
-        if (!perspective) {
-          location.search = 'perspective=' + perspectives[0]
-          dax.common.logError('The URL must contain the perspective parameter, for example:', location.href)
+      if (perspectives.indexOf(perspective) === -1) {
+        // const location = new URL(window.location.href)
+        if (perspective === null || typeof perspective === 'undefined' || perspective.length === 0) {
+          // TODO find IE compatible way to do this
+          // location.search = 'perspective=' + perspectives[0]
+          dax.common.logError('The URL must contain the perspective parameter, for example: ?perspective=' + perspectives[0]) //, location.href)
         } else {
           dax.common.logError('The used perspective URL paremter is not supported: ?perspective=' + perspective)
         }

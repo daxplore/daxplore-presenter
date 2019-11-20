@@ -15,9 +15,9 @@
     .ease(d3.easeLinear)
 
   // SIZE VARIABLES
-  var availableWidth = 300 // initial placeholder value
+  var availableWidth = 600 // initial placeholder value
   var width = availableWidth
-  var availableHeight = 600 // initial placeholder value
+  var availableHeight = 300 // initial placeholder value
   var height = availableHeight
 
   // CHART RESOURCES
@@ -54,12 +54,12 @@
     questionMap = questionMapInput
 
     // INITIALIZE HEADER
-    headerDiv = d3.select('.external-header').append('div')
-      .attr('class', 'external-header')
+    headerDiv = d3.select('.header-section').append('div')
+      .attr('class', 'header-section__meanbars')
     headerMain = headerDiv.append('div')
-      .attr('class', 'external-header__main')
+      .attr('class', 'header-section__main')
     headerSub = headerDiv.append('div')
-      .attr('class', 'meanbars__header__sub')
+      .attr('class', 'header-section__sub')
 
     // INITIALIZE CHART
     // base div element
@@ -205,13 +205,13 @@
       selectedOptionsDataMap[option] = optionData
     })
 
-    // HEADER
+    // UPDATE HEADER
     var shortText = questionMap[question].short.trim()
     var longText = questionMap[question].text.trim()
     headerMain.text(shortText)
     headerSub
       .text(longText)
-      .style('display', shortText === longText ? 'none' : null)
+      .style('display', longText === '' || shortText === longText ? 'none' : null)
 
     // UPDATE X
     xScale.domain(selectedPerspectiveOptions)
@@ -226,7 +226,8 @@
     var bars = chartG.selectAll('.meanbars__bar')
       .data(
         selectedOptionsData, // data
-        function (option) { return option.index }) // key function, mapping a specific DOM element to a specific option index
+        function (option) { return option.index } // key function, mapping a specific DOM element to a specific option index
+      )
 
     // remove old bars
     bars.exit().remove()
@@ -334,10 +335,10 @@
   }
 
   // Update the size and position of all chart elements.
-  // Call when the content or the size is updated.
+  // Called when the content or the size is updated.
   function resizeAndPositionElements () {
     // CHART SIZE
-    // Calculate the minimum width needed for the chart with the current content
+    // Estimate the minimum width needed for the chart with the current content
     var chartNeededWidth = margin.left + margin.right + // margins
       30 + // y axis width // TODO calculate
       10 * 2 + // space outside of bars // TODO calculate
@@ -347,12 +348,12 @@
     // Check if vertical scroll is needed
     var scrollNeeded = availableWidth < chartNeededWidth
 
-    // Enable or disable scroll on the div containing the meanbars-chart
+    // Enable or disable scroll on the div containing the meanbars chart
     d3.select('.chart')
       .classed('chart-scroll', scrollNeeded)
       .style('width', function () { return scrollNeeded ? availableWidth + 'px' : null })
 
-    // Update width of the chart, which may be bigger then the available space if scrolling is enabled
+    // Update width of the chart, which may be bigger than the available space if scrolling is enabled
     width = scrollNeeded ? chartNeededWidth : availableWidth
     width = width - margin.left - margin.right
     height = availableHeight - margin.top - margin.bottom

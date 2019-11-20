@@ -1,33 +1,30 @@
 /*** External header ***/
 
-.external-header {
+.header-section {
 	display: table;
 	margin: 0 auto;
-	padding-bottom: 3px;
+	padding-bottom: 6px;
   padding-left: 3px;
   padding-right: 3px;
 	text-align: center;
 }
 
-.external-header__main {
+.header-section__main {
 	font-size: 17px;
 	font-weight: bold;
 }
 
-.external-header__sub {
+.header-section__sub {
   color: #333;
-  font-size: 15px;
-	margin-top: 2px;
 }
 
-.external-header__dichsub {
+.header-section__dichsub {
   color: #333;
   font-size: 13px;
 	margin-top: 2px;
 }
 
-.external-header__freq-tooltip {
-	height: 14px;
-  margin-bottom: 3px;
+.header-section__freq-tooltip {
+	height: 12px;
 	margin-top: 1px;
 }

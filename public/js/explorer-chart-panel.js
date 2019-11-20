@@ -68,14 +68,15 @@
 
     // Initialize chart resources
     dax.chart.meanbars.initializeResources(questionMap, primaryColors, hoverColors, tooltipColors)
+    dax.chart.frequency.initializeResources(questionMap, primaryColors, hoverColors)
 
     // TODO handle here or somewhere else?
     window.addEventListener('resize', dax.explorer.updateChartPanelSize)
     // hack to force initial sizing to work
     // TODO handle in different way
-    for (i = 2; i <= 12; i++) {
-      setTimeout(dax.explorer.updateChartPanelSize, Math.pow(2, i))
-    }
+    // for (i = 2; i <= 12; i++) {
+    //   setTimeout(dax.explorer.updateChartPanelSize, Math.pow(2, i))
+    // }
   }
 
   // Getter for selected tab
@@ -89,7 +90,7 @@
     // TODO unused: var perspectiveID = stat['p']
 
     // Hide all charts elements
-    // dax.chart.frequency.hide() // TODO
+    dax.chart.frequency.hide()
     dax.chart.meanbars.hide()
     // dax.chart.dichtimeline.hide() // TODO
     // TODO allow for animated updates of same chart type
@@ -99,17 +100,17 @@
     //
     // d3.select('.legend').html('')
     //
-    // d3.select('.external-header-sub, .external-header-dichsub, .external-header-freq-tooltip')
+    // d3.select('.header-section-sub, .header-section-dichsub, .header-section-freq-tooltip')
     //   .text('')
 
     // Add new content
     // var questionMeta = questionMap[questionID]
-    // d3.select('.external-header-header').text(questionMeta.short)
+    // d3.select('.header-section-header').text(questionMeta.short)
     // if (questionMeta.short !== questionMeta.text) {
-    //   d3.select('.external-header-sub').text(questionMeta.text)
+    //   d3.select('.header-section-sub').text(questionMeta.text)
     // }
-    // d3.select('.external-header-dichsub').text(dichSubtitle)
-    // d3.select('.external-header-freq-tooltip').text('')
+    // d3.select('.header-section-dichsub').text(dichSubtitle)
+    // d3.select('.header-section-freq-tooltip').text('')
 
     // reset any side scroll set by previous charts
     d3.select('.chart-panel')
@@ -141,8 +142,7 @@
       case 'TIMEPOINTS_TWO':
       case 'TIMEPOINTS_ALL':
         // TODO temporary hard coded timepoint
-        dax.chart.frequency.generateChart(usertexts, questionMap, primaryColors, hoverColors, stat, selectedOptions, 4)
-        dax.chart.frequency.generateLegend()
+        dax.chart.frequency.populateChart(stat, selectedOptions, 4)
         break
       }
       break
@@ -188,7 +188,7 @@
               2 - // border of 1px + 1px (if changed here, needs to be changed in css)
               1 // 1 px fudge to account for rounding
     // Calculate minimum width needed for header
-    var headerBlockWidth = d3.select('.external-header').node().offsetWidth
+    var headerBlockWidth = d3.select('.header-section').node().offsetWidth
 
     // Calculate minimum width needed for the block under the chart
     var bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
@@ -207,7 +207,7 @@
     var widthForChart = Math.max(availableWidth, topBotNeededWidth)
     switch (selectedTab) {
     case 'FREQ':
-      dax.chart.frequency.updateSize(350)
+      dax.chart.frequency.setSize(widthForChart, 350)
       break
     case 'MEAN':
       // TODO allow more height instead of vertical scroll
