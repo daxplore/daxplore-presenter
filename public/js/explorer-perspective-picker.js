@@ -103,12 +103,6 @@
 
     initializeSelection()
     initialized = true
-
-    // hack to force initial gwt sizing to work
-    // TODO replace when the resizing system is moved to pure js
-    // for (var i=2; i<=12; i++) {
-    //   setTimeout(initializeSelection, Math.pow(2, i));
-    // }
   }
 
   exports.getSelectedPerspective = function () {
