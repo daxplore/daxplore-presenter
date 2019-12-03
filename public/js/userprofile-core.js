@@ -2,39 +2,39 @@
   namespace.userprofile = namespace.userprofile || {}
   const exports = namespace.userprofile
 
-  function populateUserProfileDOM (qIDs, usertexts, meanReferenceMap, shorttextMap, descriptionMap, directionMap) {
+  function populateUserProfileDOM (qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap) {
     d3.select('.user-paste-data-header-text')
-      .text(usertexts.userProfileHeaderText)
+      .text(dax.text('userProfileHeaderText')) // TODO use new text ID style
 
     d3.select('.user-paste-data-description')
-      .text(usertexts.userProfilePasteDataDescription)
+      .text(dax.text('userProfilePasteDataDescription')) // TODO use new text ID style
 
     d3.select('.user-paste-data-submit-explanation')
-      .text(usertexts.userProfilePasteDataSubmitExplanation)
+      .text(dax.text('userProfilePasteDataSubmitExplanation')) // TODO use new text ID style
 
     d3.select('.user-paste-data-submit-button')
-      .text(usertexts.userPasteDataSubmitButton)
+      .text(dax.text('userPasteDataSubmitButton')) // TODO use new text ID style
 
     d3.select('.user-paste-data-error-log-header-text')
-      .text(usertexts.UserProfilePasteDataErrorLogHeader)
+      .text(dax.text('userProfilePasteDataErrorLogHeader')) // TODO use new text ID style
 
     d3.select('.user-paste-data-error-text-number-bounds-errors')
-      .text(usertexts.userPasteDataErrorTextNumberBoundsErrors)
+      .text(dax.text('userPasteDataErrorTextNumberBoundsErrors')) // TODO use new text ID style
 
     d3.select('.user-paste-data-error-text-no-number-errors')
-      .text(usertexts.userPasteDataErrorTextNoNumberErrors)
+      .text(dax.text('userPasteDataErrorTextNoNumberErrors')) // TODO use new text ID style
 
     d3.select('.user-paste-data-error-text-no-row-errors')
-      .text(usertexts.userPasteDataErrorTextNoRowErrors)
+      .text(dax.text('userPasteDataErrorTextNoRowErrors')) // TODO use new text ID style
 
     d3.select('.save-image')
-      .text(usertexts.imageSaveButton)
+      .text(dax.text('imageSaveButton')) // TODO use new text ID style
 
     dax.userprofile.generateUserPasteSection()
 
-    dax.userprofile.generateGrid(qIDs, meanReferenceMap, shorttextMap, usertexts, directionMap)
+    dax.userprofile.generateGrid(qIDs, meanReferenceMap, shorttextMap, directionMap)
 
-    dax.profile.generateListChart(qIDs, meanReferenceMap, shorttextMap, usertexts, directionMap, 0)
+    dax.profile.generateListChart(qIDs, meanReferenceMap, shorttextMap, directionMap, 0)
 
     dax.userprofile.addGridUpdateCallback(function (names, means) {
       dax.profile.setChartData(names, means)
@@ -86,14 +86,15 @@
         }
       }
 
-      dax.profile.initializeHelpers(meanReferenceMap, shorttextMap, usertexts, descriptionMap, directionMap)
+      dax.text.initializeResources(usertexts)
+      dax.profile.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap)
 
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function (e) {
-          populateUserProfileDOM(listview, usertexts, meanReferenceMap, shorttextMap, descriptionMap, directionMap)
+          populateUserProfileDOM(listview, meanReferenceMap, shorttextMap, descriptionMap, directionMap)
         })
       } else {
-        populateUserProfileDOM(listview, usertexts, meanReferenceMap, shorttextMap, descriptionMap, directionMap)
+        populateUserProfileDOM(listview, meanReferenceMap, shorttextMap, descriptionMap, directionMap)
       }
     }))
   }

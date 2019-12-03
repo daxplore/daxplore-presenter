@@ -4,7 +4,7 @@
 
   var firstUpdate = true
 
-  var qIDs, means, meanReferences, perspectiveOptions, usertexts, directions
+  var qIDs, means, meanReferences, perspectiveOptions, directions
   // TODO unused: descriptions
   var shorttexts // TODO initialize
   var selectedOption = 0
@@ -56,9 +56,9 @@
       .duration(200)
       .style('opacity', 1)
 
-    tooltipdiv.html(
+    tooltipdiv.html( // TODO externalize entire string
       shorttexts[getQid(i)] + ': <b>' + d3.format('d')(getMean(i, selectedOption)) + '</b><br>' +
-        usertexts.listReferenceValue + ': <b>' + d3.format('d')(meanReferences[getQid(i)]) + '</b>')
+        dax.text('listReferenceValue') + ': <b>' + d3.format('d')(meanReferences[getQid(i)]) + '</b>') // TODO use new text ID style
       .style('background', dax.profile.colorHoverForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)]))
       .style('left', (chartwrapperBB.left + xScale(Math.max(getMean(i, selectedOption), meanReferences[getQid(i)])) + yAxisWidth + 14) + 'px')
       .style('top', chartwrapperBB.top + yScale(getQid(i)) + yScale.bandwidth() / 2 - tooltipdiv.node().getBoundingClientRect().height / 2 + 'px')
@@ -133,7 +133,7 @@
       .attr('class', 'x axis top')
     .append('text')
       .classed('x-top-description', true)
-      .text(usertexts.listXAxisDescription)
+      .text(dax.text('listXAxisDescription')) // TODO use new text ID style
 
     // X AXIS BOTTOM
     chart.append('g')
@@ -142,7 +142,7 @@
       .attr('class', 'x-bottom-description')
       .attr('text-anchor', 'middle')
       .style('text-anchor', 'middle')
-      .text(usertexts.listXAxisDescription)
+      .text(dax.text('listXAxisDescription')) // TODO use new text ID style
 
     // TODO use Modernizr instead of IE-check
     // Hide save image button in IE11 because of a known svg bug
@@ -434,13 +434,11 @@
       qIDsArray,
       referencesMap,
       shorttextsMap,
-      usertextsMap,
       directionsMap,
       selectedSelectedOption) {
       qIDs = qIDsArray
       meanReferences = referencesMap
       shorttexts = shorttextsMap
-      usertexts = usertextsMap
       directions = directionsMap
 
       selectedOption = selectedSelectedOption
@@ -537,7 +535,7 @@
 
       ctx.fillText(headerText, headerHorizontalShift + imgMargin.left, headerPaddingTop + headerFontSize + imgMargin.top)
 
-      var sourceText = usertexts.imageWaterStamp
+      var sourceText = dax.text('imageWaterStamp') // TODO new text ID style
       var sourceFontHeight = 11
       ctx.font = sourceFontHeight + 'px sans-serif'
       ctx.fillStyle = '#555'

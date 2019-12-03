@@ -12,7 +12,7 @@
   var collapsed = true
   var fixedWidth = null
 
-  var questions, perspectives, usertexts, settings
+  var questions, perspectives, settings
 
   document.addEventListener('DOMContentLoaded', function (e) {
     d3.select('body').append('img')
@@ -36,14 +36,13 @@
     }
   }
 
-  exports.generatePerspectivePicker = function (questionsInput, perspectivesInput, usertextsInput, settingsInput) {
+  exports.generatePerspectivePicker = function (questionsInput, perspectivesInput, settingsInput) {
     questions = questionsInput
     perspectives = perspectivesInput
-    usertexts = usertextsInput
     settings = settingsInput
 
     d3.select('.perspective-header')
-      .text(usertexts.perspectivesHeader)
+      .text(dax.text('perspectivesHeader')) // TODO use new text ID style
 
     var variableList = d3.select('.pervarpicker-variables')
 
@@ -75,7 +74,7 @@
         }
         updateCheckboxes(true)
       })
-      .text(usertexts.perspectivesAllButton)
+      .text(dax.text('perspectivesAllButton')) // TODO use new text ID style
 
     d3.selectAll('.peropt-none-button')
       .on('click', function () {
@@ -84,10 +83,10 @@
         }
         updateCheckboxes(true)
       })
-      .text(usertexts.perspectivesNoneButton)
+      .text(dax.text('perspectivesNoneButton')) // TODO use new text ID style
 
     d3.selectAll('.peropt-more-button')
-      .text(collapsed ? usertexts.perspectivesMoreButton + '>' : '<' + usertexts.perspectivesLessButton)
+      .text(collapsed ? dax.text('perspectivesMoreButton') + '>' : '<' + dax.text('perspectivesLessButton')) // TODO use new text ID style
       .style('visibility', function () {
         return hasRemainder ? null : 'hidden'
       })

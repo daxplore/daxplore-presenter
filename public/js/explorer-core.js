@@ -2,7 +2,7 @@
   namespace.explorer = namespace.explorer || {}
   const exports = namespace.explorer
 
-  var groups, perspectives, questions, settings, usertexts
+  var groups, perspectives, questions, settings
   const questionData = {}
   const questionMap = {}
   const dichselectedMap = {}
@@ -37,8 +37,8 @@
       perspectives = perspectivesResponse.data
       questions = questionsResponse.data
       settings = settingsResponse.data
-      usertexts = usertextsResponse.data
-      const manifest = manifestResponse.data
+      var usertexts = usertextsResponse.data
+      var manifest = manifestResponse.data
 
       // The function logs the error as a side effect,
       // so if the versions don't match all we have to do here is exit
@@ -79,9 +79,9 @@
 
         // Initialize elements that depend on the metadata
         dax.text.initializeResources(usertexts)
-        dax.explorer.generateQuestionPicker(questions, groups, usertexts, settings)
-        dax.explorer.generatePerspectivePicker(questions, perspectives, usertexts, settings)
-        dax.explorer.generateChartPanel(questions, groups, null, null, usertexts, dichselectedMap, optionsMap, timepointsMap) // TODO fix constructor
+        dax.explorer.generateQuestionPicker(questions, groups, settings)
+        dax.explorer.generatePerspectivePicker(questions, perspectives, settings)
+        dax.explorer.generateChartPanel(questions, groups, null, null, dichselectedMap, optionsMap, timepointsMap) // TODO fix constructor
 
         updateFromHash()
         window.addEventListener('hashchange', updateFromHash, false)
@@ -93,15 +93,15 @@
     const optCount = optionTexts.length
     if (optCount === 0) { return '' }
 
-    const subStart = usertexts.dichotomizedSubtitleStart
-    const subEnd = usertexts.dichotomizedSubtitleEnd
+    const subStart = dax.text('dichotomizedSubtitleStart') // TODO use new text ID style
+    const subEnd = dax.text('dichotomizedSubtitleEnd') // TODO use new text ID style
 
     if (optionTexts.length === 1) {
       return subStart + optionTexts[0] + subEnd
     }
 
-    const subSeparator = usertexts.dichotomizedSubtitleSeparator
-    const subOr = usertexts.dichotomizedSubtitleOr
+    const subSeparator = dax.text('dichotomizedSubtitleSeparator') // TODO use new text ID style
+    const subOr = dax.text('dichotomizedSubtitleOr') // TODO use new text ID style
 
     let sub = subStart
     sub += optionTexts.slice(0, optCount - 1).join(subSeparator)

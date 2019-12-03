@@ -9,16 +9,15 @@
     .duration(100)
     .ease(d3.easeLinear)
 
-  var questions, groups, usertexts
+  var questions, groups
   const questionIDs = new Set()
   var shorttextMap = []
   var groupMap = []
   var selectedQuestion
 
-  exports.generateQuestionPicker = function (questionsInput, groupsInput, usertextsInput) {
+  exports.generateQuestionPicker = function (questionsInput, groupsInput) {
     questions = questionsInput
     groups = groupsInput
-    usertexts = usertextsInput
 
     selectedQuestion = groups[0].questions[0]
     for (var i = 0; i < questions.length; i++) {
@@ -34,7 +33,7 @@
       }
     }
 
-    d3.select('.question-header').text(usertexts.questionsHeader)
+    d3.select('.question-header').text(dax.text('questionsHeader')) // TODO use new text ID style
 
     var sections = d3.select('.question-picker')
       .selectAll('.question-section')

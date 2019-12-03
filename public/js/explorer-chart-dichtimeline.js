@@ -14,7 +14,6 @@
 
   // INITIALIZE STATIC RESOURCES
   // TODO actually initialize
-  var usertexts
   var dichselectedMap
   var optionsMap
   var timepointsMap
@@ -156,7 +155,7 @@
     height = heightTotal - margin.top - margin.bottom
   }
 
-  function generateChartElements (usertexts) {
+  function generateChartElements () {
     // CHART
     chart = d3.select('.chart').append('svg')
     chart
@@ -239,7 +238,7 @@
     // UPDATE X AXIS
     var xAxis = d3.axisBottom(xScale)
       .tickFormat(function (d) {
-        return usertexts['timepoint' + d]
+        return dax.text('timepoint' + d) // TODO use new text format
       })
 
     var xAxisElement = d3.select('.dichtime-x-axis')
@@ -420,13 +419,12 @@
     })
   }
 
-  exports.generateChart = function (selectedOptions, stat, usertextsInput, dichselectedMapInput, optionsMapInput, timepointsMapInput, lineColorsInput, hoverColorsInput) {
+  exports.generateChart = function (selectedOptions, stat, dichselectedMapInput, optionsMapInput, timepointsMapInput, lineColorsInput, hoverColorsInput) {
     dichselectedMap = dichselectedMapInput
     optionsMap = optionsMapInput
     timepointsMap = timepointsMapInput
 
     // TODO initialize once, not every time
-    usertexts = usertextsInput
     lineColors = lineColorsInput
     // TODO unused: hoverColors = hoverColorsInput
     computeDimensions(chartWidthScrollBreakpoint, 300)

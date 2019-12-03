@@ -2,11 +2,11 @@
   namespace.profile = namespace.profile || {}
   const exports = namespace.profile
 
-  function populateProfileDOM (usertexts, qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, perspectiveOptions, means) {
+  function populateProfileDOM (qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, perspectiveOptions, means) {
     d3.select('.save-image')
-      .text(usertexts.imageSaveButton)
+      .text(dax.text('imageSaveButton')) // TODO new text ID f
 
-    dax.profile.generateListChart(qIDs, meanReferenceMap, shorttextMap, usertexts, directionMap, 0)
+    dax.profile.generateListChart(qIDs, meanReferenceMap, shorttextMap, directionMap, 0)
     dax.profile.setChartData(perspectiveOptions, means)
   }
 
@@ -86,7 +86,8 @@
         }
       }
 
-      dax.profile.initializeHelpers(meanReferenceMap, shorttextMap, usertexts, descriptionMap, directionMap)
+      dax.text.initializeResources(usertexts)
+      dax.profile.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap)
 
       // Get the data used in the listview
       function getQuestionData (questionID) { return axios.get('data/questions/' + questionID + '.json') }
@@ -108,10 +109,10 @@
 
         if (document.readyState === 'loading') {
           document.addEventListener('DOMContentLoaded', function (e) {
-            populateProfileDOM(usertexts, qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, perspectiveOptions, means)
+            populateProfileDOM(qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, perspectiveOptions, means)
           })
         } else {
-          populateProfileDOM(usertexts, qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, perspectiveOptions, means)
+          populateProfileDOM(qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, perspectiveOptions, means)
         }
       })
     }))

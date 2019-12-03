@@ -5,7 +5,7 @@
   namespace.userprofile = namespace.userprofile || {}
   const exports = namespace.userprofile
 
-  var qIDs, meanReferences, shorttextsMap, usertexts, directions
+  var qIDs, meanReferences, shorttextsMap, directions
 
   // TODO externalize or keep hard coded in separate repo?
   var userImportRegexes = [
@@ -406,13 +406,11 @@
       qIDsArray,
       referencesMap,
       shorttextsMapInput,
-      usertextsMap,
       directionsMap
     ) {
       qIDs = qIDsArray
       meanReferences = referencesMap
       shorttextsMap = shorttextsMapInput
-      usertexts = usertextsMap
       directions = directionsMap
 
       d3.select('.add-column-button')
@@ -427,9 +425,9 @@
             .remove()
       }
 
-      d3.select('.grid-legend-text.good').text(usertexts.listReferenceBetter)
-      d3.select('.grid-legend-text.avg').text(usertexts.listReferenceComparable)
-      d3.select('.grid-legend-text.bad').text(usertexts.listReferenceWorse)
+      d3.select('.grid-legend-text.good').text(dax.text('listReferenceBetter')) // TODO use new text ID style
+      d3.select('.grid-legend-text.avg').text(dax.text('listReferenceComparable')) // TODO use new text ID style
+      d3.select('.grid-legend-text.bad').text(dax.text('listReferenceWorse')) // TODO use new text ID style
 
       if (qIDs.length > 0) {
         dax.profile.setDescriptionShort(d3.select('#grid-description'), qIDs[0])
@@ -586,7 +584,7 @@
       var canvasChart = canvasChartSelection.node()
       var ctx = canvasChart.getContext('2d')
 
-      var sourceText = usertexts.imageWaterStamp
+      var sourceText = dax.text('imageWaterStamp') // TODO use new text ID style
       var sourceFontHeight = 11
       ctx.font = sourceFontHeight + 'px sans-serif'
       var sourceTextWidth = ctx.measureText(sourceText).width
@@ -607,7 +605,7 @@
       ctx.fillText(sourceText, hMargin, canvasHeight - 5)
 
       canvasChart.toBlob(function (blob) {
-        saveAs(blob, usertexts.imageTitleProfileChart + '.png')
+        saveAs(blob, dax.text('imageTitleProfileChart') + '.png') // TODO use new text ID style
       })
 
       canvasChartSelection.remove()

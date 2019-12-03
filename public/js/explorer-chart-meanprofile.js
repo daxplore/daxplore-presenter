@@ -25,7 +25,6 @@
 
   // INITIALIZE STATIC RESOURCES
   // TODO initialize once or keep injecting?
-  var usertexts
   var questionMap
   // TODO unused: var percentageFormat = d3.format('.0%')
 
@@ -66,7 +65,7 @@
       .attr('class', 'x axis top')
     .append('text')
       .classed('x-top-description', true)
-      .text(usertexts.listXAxisDescription)
+      .text(dax.text('listXAxisDescription')) // TODO use new text format
 
     // X AXIS BOTTOM
     chartG.append('g')
@@ -75,7 +74,7 @@
       .attr('class', 'x-bottom-description')
       .attr('text-anchor', 'middle')
       .style('text-anchor', 'middle')
-      .text(usertexts.listXAxisDescription)
+      .text(dax.text('listXAxisDescription')) // TODO use new text format
 
     // Y Axis Reference Element
     yAxisReferenceElement = chartG.append('g')
@@ -86,8 +85,7 @@
 
   // EXPORTED FUNCTIONS
 
-  exports.generateChart = function (usertextsInput, questionMapInput, selectedOptionsInput, stat) {
-    usertexts = usertextsInput // TODO inject once?
+  exports.generateChart = function (questionMapInput, selectedOptionsInput, stat) {
     questionMap = questionMapInput // TODO inject once?
     computeDimensions(chartWidthScrollBreakpoint, 300)
     generateChartElements()

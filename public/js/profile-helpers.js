@@ -2,7 +2,7 @@
   namespace.profile = namespace.profile || {}
   const exports = namespace.profile
 
-  var meanReferences, shorttexts, usertexts, descriptions, directions
+  var meanReferences, shorttexts, descriptions, directions
 
   var colors = {}
 
@@ -22,12 +22,10 @@
   function (
     referencesMap,
     shorttextsMap,
-    usertextsMap,
     descriptionsMap,
     directionsMap) {
     meanReferences = referencesMap
     shorttexts = shorttextsMap
-    usertexts = usertextsMap
     descriptions = descriptionsMap
     directions = directionsMap
   }
@@ -101,20 +99,22 @@
     element.style('opacity', 1)
 
     var color = dax.profile.colorTextForValue(mean, reference, direction)
+    // TODO externalize all text?
     var header = "<span class='description-header'>" + groupName + '</span><br><b>' + shorttext + ': ' + d3.format('d')(mean) + '</b><br>'
-    var subheader = '<b>' + usertexts.listReferenceValue + ': ' + d3.format('d')(reference) + '</b><br>'
+    // TODO externalize all text?
+    var subheader = '<b>' + dax.text('listReferenceValue') + ': ' + d3.format('d')(reference) + '</b><br>' // TODO use new text ID format
 
     var trueDiff = mean - reference
     var diff = direction === 'LOW' ? reference - mean : trueDiff
 
     if (diff < -5) {
-      var referenceComparison = usertexts.listReferenceWorse
+      var referenceComparison = dax.text('listReferenceWorse') // TODO use new text ID style
     } else if (diff > 5) {
-      referenceComparison = usertexts.listReferenceBetter
+      referenceComparison = dax.text('listReferenceBetter') // TODO use new text ID style
     } else {
-      referenceComparison = usertexts.listReferenceComparable
+      referenceComparison = dax.text('listReferenceComparable') // TODO use new text ID style
     }
-
+    // TODO externalize all text?
     referenceComparison = '<span style="color: ' + color + '; font-weight: bold">' + referenceComparison + ': ' + d3.format('+d')(trueDiff) + '</span></b><br><br>'
 
     element.html(header + subheader + referenceComparison + description)

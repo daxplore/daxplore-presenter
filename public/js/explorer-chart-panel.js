@@ -10,14 +10,13 @@
   const hoverColors = ['#93C072', '#72A6C0', '#7D7DC5', '#A17DC5', '#C07972', '#C69A5D', '#C6C65D']
   const tooltipColors = ['#D5F0C2', '#C2E0F0', '#C2C2F0', '#D9C2F0', '#F0C6C2', '#F0DDC2', '#F0F0C2']
 
-  var usertexts, dichselectedMap, optionsMap, timepointsMap
+  var dichselectedMap, optionsMap, timepointsMap
 
   // Initialize the chart panel
   // TODO fix constructor
-  exports.generateChartPanel = function (questions, groups, primaryColorsInput, hoverColorsInput, usertextsInput, dichselectedMapInput, optionsMapInput, timepointsMapInput) {
+  exports.generateChartPanel = function (questions, groups, primaryColorsInput, hoverColorsInput, dichselectedMapInput, optionsMapInput, timepointsMapInput) {
     // primaryColors = primaryColorsInput
     // hoverColors = hoverColorsInput
-    usertexts = usertextsInput
     dichselectedMap = dichselectedMapInput
     optionsMap = optionsMapInput
     timepointsMap = timepointsMapInput
@@ -45,11 +44,11 @@
 
     // Set chart tab names
     d3.select('.chart-tab.freq')
-      .text(usertexts.chartTabFrequencies)
+      .text(dax.text('chartTabFrequencies')) // TODO use new text format
     d3.select('.chart-tab.mean')
-      .text(usertexts.chartTabMeans)
+      .text(dax.text('chartTabMeans'))
     d3.select('.chart-tab.dich')
-      .text(usertexts.chartTabDichotomized)
+      .text(dax.text('chartTabDichotomized'))
 
     // Apply special classes to style the tabs
     // TODO duplicate code, used again in chartSetQueryDefinition function, should probably be unified
@@ -162,7 +161,7 @@
       case 'TIMEPOINTS_ONE':
       case 'TIMEPOINTS_TWO':
       case 'TIMEPOINTS_ALL':
-        dax.chart.dichtimeline.generateChart(selectedOptions, stat, usertexts, dichselectedMap, optionsMap, timepointsMap, primaryColors, hoverColors)
+        dax.chart.dichtimeline.generateChart(selectedOptions, stat, dichselectedMap, optionsMap, timepointsMap, primaryColors, hoverColors)
         dax.chart.dichtimeline.generateLegend()
         break
       }
