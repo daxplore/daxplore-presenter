@@ -85,8 +85,8 @@
 
   exports.chartSetQueryDefinition = function (chartType, timepoints, stat, selectedOptions, dichSubtitle) {
     selectedTab = chartType
-    var questionID = stat.q
-    // TODO unused: var perspectiveID = stat['p']
+    const questionID = stat.q
+    const perspectiveID = stat.p
 
     // Hide all charts elements
     dax.chart.frequency.hide()
@@ -141,14 +141,14 @@
       case 'TIMEPOINTS_TWO':
       case 'TIMEPOINTS_ALL':
         // TODO temporary hard coded timepoint
-        dax.chart.frequency.populateChart(stat, selectedOptions, 4)
+        dax.chart.frequency.populateChart(questionID, perspectiveID, selectedOptions)
         break
       }
       break
     case 'MEAN':
       switch (timepoints) {
       case 'TIMEPOINTS_ONE':
-        dax.chart.meanbars.populateChart(stat, selectedOptions)
+        dax.chart.meanbars.populateChart(questionID, perspectiveID, selectedOptions)
         break
       case 'TIMEPOINTS_TWO':
         break

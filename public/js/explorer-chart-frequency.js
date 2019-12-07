@@ -182,10 +182,10 @@
 
   // Set new data to be displayed by the chart.
   // As a side effect, make this chart visible.
-  exports.populateChart = function (stat, selectedPerspectiveOptionIndicesInput) {
+  exports.populateChart = function (questionID, perspectiveID, selectedPerspectiveOptionIndicesInput) {
     displayChartElements(true)
-    perspective = stat.p
-    question = stat.q
+    perspective = perspectiveID
+    question = questionID
     selectedPerspectiveOptionIndices = selectedPerspectiveOptionIndicesInput
     var removedTimepoints = timepoints.filter(function (tp) { return questionMap[question].timepoints.indexOf(tp) === -1 })
     timepoints = questionMap[question].timepoints
@@ -206,11 +206,11 @@
     for (var tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
       var tp = timepoints[tpIndex]
       var perspectiveOptions = questionMap[perspective].options
-      var currentTimeData = stat.freq[tp]
       var tpData = []
 
       selectedPerspectiveOptionIndices.forEach(function (i) {
-        var total = currentTimeData[i].length > 0 ? currentTimeData[i].reduce(function (a, b) { return a + b }) : 0
+        const stat = dax.data.getFrequency(questionID, perspectiveID, i, tp)
+        var total = stat.length > 0 ? stat.reduce(function (a, b) { return a + b }) : 0
         var stackData = {
           __option: perspectiveOptions[i],
           __total: total,
@@ -221,7 +221,7 @@
           stackData.MISSING_DATA = 1
         } else {
           for (var j = 0; j < optionKeys.length; j++) {
-            stackData[optionKeys[j]] = total !== 0 ? currentTimeData[i][j] / total : 0
+            stackData[optionKeys[j]] = total !== 0 ? stat[j] / total : 0
           }
         }
         tpData.push(stackData)

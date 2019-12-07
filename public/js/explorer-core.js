@@ -79,6 +79,7 @@
 
         // Initialize elements that depend on the metadata
         dax.text.initializeResources(usertexts)
+        dax.data.initializeResources(questionMap, questionData)
         dax.explorer.generateQuestionPicker(questions, groups, settings)
         dax.explorer.generatePerspectivePicker(questions, perspectives, settings)
         dax.explorer.generateChartPanel(questions, groups, null, null, dichselectedMap, optionsMap, timepointsMap) // TODO fix constructor

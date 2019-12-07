@@ -42,7 +42,7 @@
 
   // CURRENT MEAN BAR CHART
   // Data specific for the current chart
-  var perspective, question, selectedPerspectiveOptions
+  var perspective, question, selectedOptionCount
   var questionReferenceValue
   var selectedOptionsData, selectedOptionsDataMap
 
@@ -178,16 +178,16 @@
 
   // Set new data to be displayed by the chart.
   // As a side effect, make this chart visible.
-  exports.populateChart = function (stat, selectedPerspectiveOptionsInput) {
+  exports.populateChart = function (questionID, perspectiveID, selectedPerspectiveOptions) {
     displayChartElements(true)
     // Animate the update unless the perspective has changed.
     // As long as the perspective is the same, each bar represents a specific perspective option
     // which gives continuity for the user. But of the perspective change, the contextual meaning
     // of the bars and color changes.
-    animateNextUpdate = perspective === stat.p
-    perspective = stat.p
-    question = stat.q
-    selectedPerspectiveOptions = selectedPerspectiveOptionsInput
+    animateNextUpdate = perspective === perspectiveID
+    perspective = perspectiveID
+    question = questionID
+    selectedOptionCount = selectedPerspectiveOptions.length
     questionReferenceValue = questionMap[question].mean_reference
 
     // DATA
@@ -195,11 +195,14 @@
     selectedOptionsData = []
     selectedOptionsDataMap = {}
     selectedPerspectiveOptions.forEach(function (option, i) {
+      const stat = dax.data.getMean(question, perspective, option)
+      const mean = stat.mean
+      const count = stat.count
       var optionData = {
         index: option,
-        mean: stat.mean['0'].mean[option],
-        nodata: stat.mean['0'].mean[option] === -1 && stat.mean['0'].count[option] === 0,
-        count: stat.mean['0'].count[option],
+        mean: mean,
+        nodata: mean === -1 && count === 0,
+        count: count,
       }
       selectedOptionsData.push(optionData)
       selectedOptionsDataMap[option] = optionData
@@ -342,8 +345,8 @@
     var chartNeededWidth = margin.left + margin.right + // margins
       30 + // y axis width // TODO calculate
       10 * 2 + // space outside of bars // TODO calculate
-      5 * (selectedPerspectiveOptions.length - 1) + // space between bars // TODO calculate
-      15 * selectedPerspectiveOptions.length // min width for bars // TODO set better value
+      5 * (selectedOptionCount - 1) + // space between bars // TODO calculate
+      15 * selectedOptionCount // min width for bars // TODO set better value
 
     // Check if vertical scroll is needed
     var scrollNeeded = availableWidth < chartNeededWidth
