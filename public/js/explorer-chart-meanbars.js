@@ -285,7 +285,7 @@
       .style('background-color', colorPrimary)
     rows.select('.legend__row-text')
       .text(function (option) {
-        var text = questionMap[perspective].options[option.index]
+        var text = dax.data.getQuestionOptionText(perspective, option.index)
         if (option.nodata) {
           text += ' ' + dax.text('meanbars_legend_missingData')
         }
@@ -483,7 +483,7 @@
 
     // TOOLTIP
     // Set tooltip box text
-    var optionName = questionMap[perspective].options[optIndex]
+    var optionName = dax.data.getQuestionOptionText(perspective, optIndex)
     var data = selectedOptionsDataMap[optIndex]
     var tooltipText = '<b>' + optionName + '</b><br>'
     if (data.nodata) {

@@ -83,10 +83,10 @@
     return selectedTab
   }
 
-  exports.chartSetQueryDefinition = function (chartType, timepoints, stat, selectedOptions, dichSubtitle) {
+  exports.chartSetQueryDefinition = function (chartType, timepoints, question, perspective, selectedOptions, dichSubtitle) {
     selectedTab = chartType
-    const questionID = stat.q
-    const perspectiveID = stat.p
+    const questionID = question
+    const perspectiveID = perspective
 
     // Hide all charts elements
     dax.chart.frequency.hide()
@@ -161,7 +161,7 @@
       case 'TIMEPOINTS_ONE':
       case 'TIMEPOINTS_TWO':
       case 'TIMEPOINTS_ALL':
-        dax.chart.dichtimeline.generateChart(selectedOptions, stat, dichselectedMap, optionsMap, timepointsMap, primaryColors, hoverColors)
+        dax.chart.dichtimeline.generateChart(questionID, perspectiveID, selectedOptions, dichselectedMap, optionsMap, timepointsMap, primaryColors, hoverColors)
         dax.chart.dichtimeline.generateLegend()
         break
       }
@@ -190,7 +190,8 @@
     var headerBlockWidth = d3.select('.header-section').node().offsetWidth
 
     // Calculate minimum width needed for the block under the chart
-    var bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
+    // var bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
+    var bottomBlockWidth = 0
     var description = d3.select('.description-panel').node()
     if (description != null && description.offsetWidth > 0) {
       bottomBlockWidth += 250 // TODO hard coded

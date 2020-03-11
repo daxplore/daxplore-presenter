@@ -79,9 +79,9 @@
 
         // Initialize elements that depend on the metadata
         dax.text.initializeResources(usertexts)
-        dax.data.initializeResources(questionMap, questionData)
+        dax.data.initializeResources(groups, perspectives, questionMap, questionData)
         dax.explorer.generateQuestionPicker(questions, groups, settings)
-        dax.explorer.generatePerspectivePicker(questions, perspectives, settings)
+        dax.explorer.generatePerspectivePicker(perspectives, settings)
         dax.explorer.generateChartPanel(questions, groups, null, null, dichselectedMap, optionsMap, timepointsMap) // TODO fix constructor
 
         updateFromHash()
@@ -148,7 +148,7 @@
       tab = questionMap[question].displaytypes[0]
     }
     // console.log(question, perspective, perspectiveOptions, totalSelected, tab)
-    const stat = questionData[question][perspective]
+    // const stat = questionData[question][perspective]
 
     // TODO move to separate function/file/namespace?
     // TODO handle all flags
@@ -170,6 +170,6 @@
       dichSubtitle = dichotomizedSubtitle(usedDichTexts)
     }
     setDescription(question, perspective)
-    dax.explorer.chartSetQueryDefinition(tab, 'TIMEPOINTS_ONE', stat, perspectiveOptions, dichSubtitle)
+    dax.explorer.chartSetQueryDefinition(tab, 'TIMEPOINTS_ONE', question, perspective, perspectiveOptions, dichSubtitle)
   }
 })(window.dax = window.dax || {})

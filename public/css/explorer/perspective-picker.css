@@ -1,5 +1,14 @@
 /*** Style for the perspective picker in Daxplore Explorer ***/
 
+.perspective-panel {
+  flex: 1;
+  left: 0;
+  min-width: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
 .perspective-button {
   color: #999;
 	z-index: 1;
@@ -14,7 +23,9 @@
 
 .perspective-picker {
 	display: flex;
+  flex: 1;
 	flex-direction: row;
+  min-width: 0;
 }
 
 .perspective-varpicker {
@@ -51,7 +62,7 @@ display: flex;
 
 .pervarpicker-varoption:before {
 	content: url('../../img/perspective-radio-empty.png');
-	padding-left: 7px;
+	padding-left: 3px;
 	padding-right: 5px;
 	padding-top: 2px;
 }
@@ -91,7 +102,9 @@ display: flex;
   border-right: solid 1px #ABABAB;
   border-top: solid 1px #ABABAB;
   display: flex;
+  flex: 1;
 	flex-direction: column;
+  min-width: 0;
   position: relative;
 }
 
@@ -108,7 +121,6 @@ display: flex;
 }
 
 .peropt-bottom-padding {
-	height: 31px;
 }
 
 .peropt-more-wrapper {
@@ -121,14 +133,16 @@ display: flex;
   align-items: center;
   cursor: pointer;
 	display: flex;
+  overflow: hidden;
 	padding: 2px;
+  padding-left: 4px;
 	padding-right: 10px;
+  text-overflow: ellipsis;
 	white-space: nowrap;
 }
 
-.peropt-checkbox:before {
+.peropt-checkbox::before {
 	content: url('../../img/perspective-checkbox-empty.png');
-	padding-left: 7px;
 	padding-right: 5px;
 	padding-top: 3px;
 }
@@ -139,4 +153,80 @@ display: flex;
 
 .peropt-checkbox:hover {
 	color: #444;
+}
+
+/* .peropt-col-two-combined .peropt-checkbox:first-child {
+  border-top: 0;
+  padding-top: 1px
+} */
+
+.peropt-checkbox-combined {
+  border-right: 1px solid #ABABAB;
+}
+
+.peropt-checkbox-expanded {
+  border-bottom: 1px solid #ABABAB;
+  border-left: 1px solid #ABABAB;
+  border-right: none;
+  border-top: 1px solid #ABABAB;
+  padding-bottom: 1px;
+  padding-left: 3px;
+  padding-right: 11px;
+  padding-top: 1px;
+}
+
+.peropt-checkbox-text {
+  margin-right: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  -webkit-touch-callout: none;
+    -webkit-user-select: none;
+     -khtml-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+}
+
+.peropt-checkbox-expand {
+  font-size: 12px;
+  margin-left: auto;
+  margin-right: 0;
+  padding-bottom: 2px;
+}
+
+.peropt-col-one, .peropt-col-two, .peropt-col-three {
+  flex: 1;
+  min-width: 0;
+  padding-left: 4px;
+  transition: flex 0.2s;
+}
+
+.peropt-col-two-combined, .peropt-col-three-combined {
+  border-bottom: 1px solid #ABABAB;
+  border-top: 1px solid #ABABAB;
+  display: flex;
+  flex-direction: column;
+}
+
+.peropt-col-three-combined {
+  border-right: 1px solid #ABABAB;
+  margin-right: 4px;
+}
+
+.peropt-col-two-combined::before {
+  border-right: 1px solid #ABABAB;
+  content: '';
+  height: 4px;
+}
+
+.peropt-col-two-combined::after {
+  border-right: 1px solid #ABABAB;
+  content: '';
+  flex: 1;
+}
+
+.peropt-col-one:hover, .peropt-col-two-combined:hover, .peropt-col-three-combined:hover {
+  flex: 2;
+  transition: flex 0.2s;
 }
