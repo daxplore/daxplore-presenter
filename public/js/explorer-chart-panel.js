@@ -67,7 +67,7 @@
 
     // Initialize chart resources
     dax.chart.meanbars.initializeResources(questionMap, primaryColors, hoverColors, tooltipColors)
-    dax.chart.frequency.initializeResources(questionMap, primaryColors, hoverColors)
+    dax.chart.frequency.initializeResources(primaryColors, hoverColors)
 
     // TODO handle here or somewhere else?
     window.addEventListener('resize', dax.explorer.updateChartPanelSize)

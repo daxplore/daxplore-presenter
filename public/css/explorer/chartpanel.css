@@ -3,6 +3,10 @@
   border-top: none;
 }
 
+.chart-panel {
+  position: relative;
+}
+
 .chart-scroll {
   overflow-x: auto;
 }

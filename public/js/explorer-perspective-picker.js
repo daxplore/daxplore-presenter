@@ -3,7 +3,7 @@
   const exports = namespace.explorer
 
   let initialized = false
-  let selectedPerspective = -1
+  let selectedPerspectiveID = null
   // let perspectiveOptions = []
   let selectedOptions = new Set()
   // TODO unused: let hasTotal = false
@@ -12,7 +12,7 @@
   let collapsed = true
   let fixedWidth = null
 
-  let perspectives, settings
+  let settings
 
   let combinedColumnOneHighlight = -1
   let combinedColumnTwoHighlight = -1
@@ -24,45 +24,39 @@
   })
 
   exports.perspectiveSetQueryDefinition = function (perspectiveID, perspectiveOptionsIntArray, total) {
-    const perspectiveIndex = perspectives.indexOf(perspectiveID)
-    if (perspectiveIndex === -1) { return } // TODO log error?
-    selectedPerspective = perspectiveIndex // TODO validate data?
+    if (!dax.data.isExplorerPerspective(perspectiveID)) { return } // TODO log error?
+    // selectedPerspective = perspectiveIndex // TODO validate data?
+    setSelectedPerspective(perspectiveID)
     // Remap options from array of ints to array of bools
-    selectedOptions = new Set(perspectiveOptionsIntArray)
+    selectedOptions = new Set()
+    perspectiveOptionsIntArray.forEach(function (opt) { selectedOptions.add(opt) })
     totalSelected = total
     if (initialized) {
       updateCheckboxes(false)
     }
   }
 
-  exports.generatePerspectivePicker = function (perspectivesInput, settingsInput) {
-    perspectives = perspectivesInput
+  exports.generatePerspectivePicker = function (settingsInput) {
     settings = settingsInput
 
     d3.select('.perspective-header')
       .text(dax.text('perspectivesHeader')) // TODO use new text ID style
 
-    const variableList = d3.select('.pervarpicker-variables')
+    const perspectiveIDs = dax.data.getExplorerPerspectiveIDs()
 
-    const perspectiveShorttexts = []
-    perspectives.forEach(function (perspectiveID) {
-      perspectiveShorttexts.push(dax.data.getQuestionShortText(perspectiveID))
-    })
-
-    variableList
+    d3.select('.pervarpicker-variables')
       .selectAll('.pervarpicker-varoption')
-      .data(perspectiveShorttexts)
+      .data(perspectiveIDs)
       .enter()
         .append('div')
         .classed('pervarpicker-varoption', true)
         .classed('no-select', true)
-        .on('click', function (d, i) { setSelectedPerspective(i) })
-        .text(function (d) { return d })
+        .on('click', function (perspectiveID) { setSelectedPerspective(perspectiveID) })
+        .text(function (perspectiveID) { return dax.data.getQuestionShortText(perspectiveID) })
 
     d3.selectAll('.peropt-all-button')
       .on('click', function () {
-        const perspectiveID = perspectives[selectedPerspective]
-        for (let i = 0; i < dax.data.getQuestionOptionCount(perspectiveID); i++) {
+        for (let i = 0; i < dax.data.getQuestionOptionCount(selectedPerspectiveID); i++) {
           selectedOptions.add(i)
         }
         updateCheckboxes(true)
@@ -96,15 +90,14 @@
   }
 
   exports.getSelectedPerspective = function () {
-    return perspectives[selectedPerspective]
+    return selectedPerspectiveID
   }
 
   exports.getSelectedPerspectiveOptions = function () {
-    const selectedOptionsInt = []
-    selectedOptions.forEach(opt => {
-      selectedOptionsInt.push(opt)
+    const optionsNested = dax.data.getPerspectiveOptionIndicesNestedOrder(selectedPerspectiveID)
+    return optionsNested.filter(function (optionIndex) {
+      return selectedOptions.has(optionIndex)
     })
-    return selectedOptionsInt.sort()
   }
 
   exports.isPerspectiveTotalSelected = function () {
@@ -112,41 +105,57 @@
   }
 
   function initializeSelection () {
-    if (selectedPerspective === -1) {
-      setSelectedPerspective(0)
+    if (!selectedPerspectiveID) {
+      setSelectedPerspective(dax.data.getExplorerPerspectiveIDs()[0])
     } else {
-      setSelectedPerspective(selectedPerspective)
+      setSelectedPerspective(selectedPerspectiveID)
     }
   }
 
-  function setSelectedPerspective (index) {
-    if (typeof index !== 'number' || index < 0 || index >= perspectives.length) { return } // TODO log error?
-    const changed = selectedPerspective !== index
-    selectedPerspective = index
+  function setSelectedPerspective (perspectiveID) {
+    if (!dax.data.isExplorerPerspective(perspectiveID)) { return } // TODO log error?
+    const changed = selectedPerspectiveID !== perspectiveID
+    selectedPerspectiveID = perspectiveID
 
     if (changed) {
-      const perspectiveID = perspectives[selectedPerspective]
-      const topLevelOptionCount = dax.data.getTopLevelQuestionOptionCount(perspectiveID)
+      const topLevelOptionCount = dax.data.getTopLevelQuestionOptionCount(selectedPerspectiveID)
       const selectedCount = Math.min(topLevelOptionCount, settings.defaultSelectedPerspectiveOptions)
       selectedOptions.clear()
       for (let i = 0; i < selectedCount; i++) {
         selectedOptions.add(i)
       }
-      combinedColumnOneHighlight = 0
-      combinedColumnTwoHighlight = dax.data.getPerspectiveOptionFirstChild(perspectiveID, combinedColumnOneHighlight)
+      setSelectedColumnOneHighlight(0)
     }
-
     updateCheckboxes(changed && initialized)
+  }
+
+  function setSelectedColumnOneHighlight (index) {
+    combinedColumnOneHighlight = index
+    combinedColumnTwoHighlight = dax.data.getPerspectiveOptionFirstChild(selectedPerspectiveID, combinedColumnOneHighlight)
+    updateColumnHighlights()
+  }
+
+  function setSelectedColumnTwoHighlight (index) {
+    combinedColumnTwoHighlight = index
+    updateColumnHighlights()
+  }
+
+  function updateColumnHighlights () {
+    const visibleSecondColElementCount = dax.data.getPerspectiveOptionChildCount(selectedPerspectiveID, combinedColumnOneHighlight)
+    d3.select('.peropt-col-two')
+      .classed('peropt-col-collapsed', visibleSecondColElementCount === 0)
+    const visibleThirdColElementCount = dax.data.getPerspectiveOptionChildCount(selectedPerspectiveID, combinedColumnTwoHighlight)
+    d3.select('.peropt-col-three')
+      .classed('peropt-col-collapsed', visibleThirdColElementCount === 0)
   }
 
   function updateCheckboxes (fireUpdateEvent) {
     d3.selectAll('.pervarpicker-varoption')
-      .classed('pervarpicker-varoption-selected', function (d, i) { return i === selectedPerspective })
+      .classed('pervarpicker-varoption-selected', function (d) { return d === selectedPerspectiveID })
 
-    const showSelectTotal = settings.showSelectTotal
-    const perspectiveID = perspectives[selectedPerspective]
-    const optionCount = dax.data.getQuestionOptionCount(perspectiveID)
-    const totalCount = (showSelectTotal ? 1 : 0)
+    const optionCount = dax.data.getQuestionOptionCount(selectedPerspectiveID)
+    // const showSelectTotal = settings.showSelectTotal
+    // const totalCount = (showSelectTotal ? 1 : 0)
     hasRemainder = true // TODO don't use remainder system, instead show alternative options
     // d3.select('.peropt-extra-columns')
     //   .style('width', '0px')
@@ -154,26 +163,26 @@
     const firstColumnData = []
     const secondColumnData = []
     const thirdColumnData = []
-    if (dax.data.isCombinedPerspective(perspectiveID)) {
+    if (dax.data.isCombinedPerspective(selectedPerspectiveID)) {
       // COMBINED PERSPECTIVE
       hasRemainder = false
       for (let i = 0; i < optionCount; i++) {
         const option = {
           index: i,
-          isExpandible: dax.data.hasPerspectiveOptionChildren(perspectiveID, i),
+          isExpandible: dax.data.hasPerspectiveOptionChildren(selectedPerspectiveID, i),
           selected: selectedOptions.has(i),
-          text: dax.data.getQuestionOptionText(perspectiveID, i),
+          text: dax.data.getQuestionOptionText(selectedPerspectiveID, i),
         }
-        switch (dax.data.getPerspectiveOptionTreeDepth(perspectiveID, i)) {
+        switch (dax.data.getPerspectiveOptionTreeDepth(selectedPerspectiveID, i)) {
         case 0:
           firstColumnData.push(option)
           break
         case 1:
-          option.parent = dax.data.getPerspectiveOptionParent(perspectiveID, i)
+          option.parent = dax.data.getPerspectiveOptionParent(selectedPerspectiveID, i)
           secondColumnData.push(option)
           break
         case 2:
-          option.parent = dax.data.getPerspectiveOptionParent(perspectiveID, i)
+          option.parent = dax.data.getPerspectiveOptionParent(selectedPerspectiveID, i)
           thirdColumnData.push(option)
           break
         }
@@ -200,41 +209,53 @@
 
       const firstColElements = d3.select('.peropt-col-one').selectAll('.peropt-checkbox')
         .classed('peropt-checkbox-combined', true)
-        .classed('peropt-checkbox-expandible', d => d.isExpandible)
+        .classed('peropt-checkbox-expandible', function (d) { return d.isExpandible })
         .classed('peropt-checkbox-selected', function (d) { return d.selected })
-        .classed('peropt-checkbox-expanded', (d, i) => i === combinedColumnOneHighlight)
+        .classed('peropt-checkbox-expanded', function (d, i) { return i === combinedColumnOneHighlight })
         .text('')
-        .on('mouseover', (d, i, elements) => {
+        .attr('title', function (d) { return d.text })
+        .on('mouseover', function (d, i, elements) {
           if (combinedColumnOneHighlight !== d.index) {
             // Highlights
-            combinedColumnOneHighlight = d.index
-            combinedColumnTwoHighlight = dax.data.getPerspectiveOptionFirstChild(perspectiveID, d.index)
+            setSelectedColumnOneHighlight(d.index)
             // Update shown and expanded checkboxes
             d3.selectAll(elements)
-              .classed('peropt-checkbox-expanded', (dd, j) => dd.isExpandible && dd.index === combinedColumnOneHighlight)
+              .classed('peropt-checkbox-expanded', function (dd, j) {
+                return dd.isExpandible && dd.index === combinedColumnOneHighlight
+              })
             d3.selectAll('.peropt-col-two > .peropt-checkbox')
-              .classed('peropt-checkbox-expanded', (dd, j) => dd.isExpandible && dd.index === combinedColumnTwoHighlight)
-              .style('display', (dd, i) => dd.parent === combinedColumnOneHighlight ? null : 'none')
+              .classed('peropt-checkbox-expanded', function (dd, j) {
+                return dd.isExpandible && dd.index === combinedColumnTwoHighlight
+              })
+              .classed('peropt-checkbox-hidden', function (dd, i) {
+                return dd.parent === combinedColumnOneHighlight ? null : 'none'
+              })
             d3.selectAll('.peropt-col-three > .peropt-checkbox')
-              .style('display', (dd, i) => dd.parent === combinedColumnTwoHighlight ? null : 'none')
+              .classed('peropt-checkbox-hidden', function (dd, i) {
+                return dd.parent === combinedColumnTwoHighlight ? null : 'none'
+              })
           }
         })
 
       firstColElements.append('span')
         .classed('peropt-checkbox-text', true)
         .text(function (d) { return d.text })
+
       firstColElements.append('span')
         .classed('peropt-checkbox-expand', true)
         .classed('no-select', true)
-        .style('display', d => d.isExpandible ? null : 'none')
+        .style('display', function (d) { return d.isExpandible ? null : 'none' })
         .text('▶')
+
+      // move bottom padding to the bottom of the column
+      d3.select('.peropt-col-one > .peropt-col__bottom-padding').raise()
 
       // Second column combined
       // d3.select('.peropt-columns').append(function () {
       //   return d3.select('.peropt-col-two').remove().node()
       // })
-      d3.select('.peropt-extra-columns')
-        .style('display', 'none')
+      // d3.select('.peropt-extra-columns')
+      //   .style('display', 'none')
       d3.select('.peropt-col-two')
         .classed('peropt-col-two-combined', true)
       const secondColOptions = d3.select('.peropt-col-two')
@@ -257,21 +278,25 @@
 
       const secondColElements = d3.select('.peropt-col-two').selectAll('.peropt-checkbox')
         .classed('peropt-checkbox-combined', true)
-        .classed('peropt-checkbox-expandible', d => d.isExpandible)
+        .classed('peropt-checkbox-expandible', function (d) { return d.isExpandible })
         .classed('peropt-checkbox-selected', function (d) { return d.selected })
-        .classed('peropt-checkbox-expanded', d => d.isExpandible && d.index === combinedColumnTwoHighlight)
-        .style('display', d => d.parent === combinedColumnOneHighlight ? null : 'none')
+        .classed('peropt-checkbox-expanded', function (d) { return d.isExpandible && d.index === combinedColumnTwoHighlight })
+        .classed('peropt-checkbox-hidden', function (d) { return d.parent === combinedColumnOneHighlight ? null : 'none' })
         .text('')
-        .on('mouseover', (d, i, elements) => {
+        .attr('title', function (d) { return d.text })
+        .on('mouseover', function (d, i, elements) {
           if (combinedColumnOneHighlight !== d.index) {
             // Highlights
-            combinedColumnTwoHighlight = d.index
+            setSelectedColumnTwoHighlight(d.index)
             // Update shown and expanded checkboxes
             d3.selectAll(elements)
-              .classed('peropt-checkbox-expanded', d => d.isExpandible && d.index === combinedColumnTwoHighlight)
-              .style('display', (dd, i) => dd.parent === combinedColumnOneHighlight ? null : 'none')
+              .classed('peropt-checkbox-expanded', function (d) { return d.isExpandible && d.index === combinedColumnTwoHighlight })
+              .classed('peropt-checkbox-hidden', function (dd, i) { return dd.parent === combinedColumnOneHighlight ? null : 'none' })
+            const visibleThirdColElementCount = dax.data.getPerspectiveOptionChildCount(selectedPerspectiveID, combinedColumnTwoHighlight)
+            d3.select('.peropt-col-three')
+              .classed('peropt-col-collapsed', visibleThirdColElementCount === 0)
             d3.selectAll('.peropt-col-three > .peropt-checkbox')
-              .style('display', (dd, i) => dd.parent === combinedColumnTwoHighlight ? null : 'none')
+              .classed('peropt-checkbox-hidden', function (dd, i) { return dd.parent === combinedColumnTwoHighlight ? null : 'none' })
           }
         })
 
@@ -281,8 +306,11 @@
       secondColElements.append('span')
         .classed('peropt-checkbox-expand', true)
         .classed('no-select', true)
-        .style('display', d => d.isExpandible ? null : 'none')
+        .style('display', function (d) { return d.isExpandible ? null : 'none' })
         .text('▶')
+
+      // move bottom padding to the bottom of the column
+      d3.select('.peropt-col-two > .peropt-col__bottom-padding').raise()
 
       // Third column combined
       // d3.select('.peropt-columns').append(function () {
@@ -310,8 +338,9 @@
 
       const thirdColElements = d3.select('.peropt-col-three').selectAll('.peropt-checkbox')
         .classed('peropt-checkbox-selected', function (d) { return d.selected })
-        .style('display', d => d.parent === combinedColumnTwoHighlight ? null : 'none')
+        .classed('peropt-checkbox-hidden', function (d) { return d.parent === combinedColumnTwoHighlight ? null : 'none' })
         .text('')
+        .attr('title', function (d) { return d.text })
       thirdColElements.append('span')
         .classed('peropt-checkbox-text', true)
         .text(function (d) { return d.text })
@@ -331,7 +360,7 @@
       }
 
       for (let i = 0; i < optionCount; i++) {
-        const option = { text: dax.data.getQuestionOptionText(perspectiveID, i), selected: selectedOptions.has(i), index: i }
+        const option = { text: dax.data.getQuestionOptionText(selectedPerspectiveID, i), selected: selectedOptions.has(i), index: i }
         if (i < perColumn) {
           firstColumnData.push(option)
         } else if (i < perColumn * 2) {
@@ -349,7 +378,7 @@
         .classed('peropt-checkbox-combined', false)
         .classed('peropt-checkbox-expandible', false)
         .classed('peropt-checkbox-expanded', false)
-        .on('mouseover', () => {})
+        .on('mouseover', function () {})
         .data(firstColumnData)
 
       firstColOptions.exit().remove()
@@ -369,6 +398,7 @@
       d3.select('.peropt-col-one').selectAll('.peropt-checkbox')
         .classed('peropt-checkbox-selected', function (d) { return d.selected })
         .text(function (d) { return d.text })
+        .attr('title', function (d) { return d.text })
 
       // Second column basic
       d3.select('.peropt-extra-columns').append(function () {
@@ -397,6 +427,7 @@
       d3.select('.peropt-col-two').selectAll('.peropt-checkbox')
         .classed('peropt-checkbox-selected', function (d) { return d.selected })
         .text(function (d) { return d.text })
+        .attr('title', function (d) { return d.text })
 
       // Third column basic
       d3.select('.peropt-extra-columns').append(function () {
@@ -426,6 +457,7 @@
       d3.select('.peropt-col-three').selectAll('.peropt-checkbox')
         .classed('peropt-checkbox-selected', function (d) { return d.selected })
         .text(function (d) { return d.text })
+        .attr('title', function (d) { return d.text })
 
       // let hasCheckedBox = false
       // for (i = 0; i < selectedOptions.length; i++) {
@@ -461,7 +493,7 @@
 
     d3.select('.peropt-more-button')
       .style('display', function () {
-        return dax.data.isCombinedPerspective(perspectives[selectedPerspective]) && hasRemainder ? null : 'none'
+        return dax.data.isCombinedPerspective(selectedPerspectiveID) && hasRemainder ? null : 'none'
       })
       .text(collapsed ? 'Visa fler >' : '< Visa färre ') // TODO externalize texts
 
@@ -469,7 +501,7 @@
       .style('height', function () {
         if (hasRemainder) {
           return null
-        } else if (dax.data.isCombinedPerspective(perspectives[selectedPerspective])) {
+        } else if (dax.data.isCombinedPerspective(selectedPerspectiveID)) {
           return '4px'
         } else {
           return '0px'
@@ -482,7 +514,7 @@
 
     d3.select('.peropt-extra-columns')
       .interrupt().transition()
-        .style('opacity', collapsed && !dax.data.isCombinedPerspective(perspectives[selectedPerspective]) ? 0 : 1)
-        .style('width', collapsed && !dax.data.isCombinedPerspective(perspectives[selectedPerspective]) ? '0px' : null)
+        .style('opacity', collapsed && !dax.data.isCombinedPerspective(selectedPerspectiveID) ? 0 : 1)
+        .style('width', collapsed && !dax.data.isCombinedPerspective(selectedPerspectiveID) ? '0px' : null)
   }
 })(window.dax = window.dax || {})

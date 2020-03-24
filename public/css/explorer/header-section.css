@@ -24,6 +24,38 @@
 	margin-top: 2px;
 }
 
+.header-section__description-button {
+	background: no-repeat center/100% url(../../img/question-circle.svg);
+	cursor: help;
+  height: 16px;
+	opacity: 0.75;
+  position: absolute;
+  right: 5px;
+	top: 20px;
+	transform: translateY(-50%);
+  width: 16px;
+}
+
+.header-section__description-button:hover {
+	opacity: 1;
+}
+
+.header-section__description-panel {
+	background: white;
+  border: 1px solid #ABABAB;
+  cursor: default;
+  display: none;
+  height: fit-content;
+	padding: 20px 25px 10px;
+	text-align: start;
+  transform: translate(-100%, 30px) translate(16px, 0);
+  width: 400px;
+}
+
+.header-section__description-button:hover > .header-section__description-panel {
+	display: block;
+}
+
 .header-section__freq-tooltip {
 	height: 12px;
 	margin-top: 1px;

@@ -81,7 +81,7 @@
         dax.text.initializeResources(usertexts)
         dax.data.initializeResources(groups, perspectives, questionMap, questionData)
         dax.explorer.generateQuestionPicker(questions, groups, settings)
-        dax.explorer.generatePerspectivePicker(perspectives, settings)
+        dax.explorer.generatePerspectivePicker(settings)
         dax.explorer.generateChartPanel(questions, groups, null, null, dichselectedMap, optionsMap, timepointsMap) // TODO fix constructor
 
         updateFromHash()
@@ -133,6 +133,8 @@
     d3.select('.description-panel')
       .html(html)
       .style('display', html.length > 0 ? null : 'none')
+
+    dax.chart.meanbars.setDescriptionHTML(html)
   }
 
   // Called by all other elements whenever their state is updated in a way that

@@ -18,18 +18,23 @@
 
   // Returns an array with the number of respondents for each question option
   exports.getFrequency = function (questionID, perspectiveID, perspectiveOptionIndex, timepoint) {
+    const perspectiveOption = getQuestionOptionDefinition(perspectiveID, perspectiveOptionIndex)
     timepoint = typeof timepoint !== 'undefined' ? timepoint : questionMeta[questionID].timepoints[0] // default to first defined timepoint
-    const stat = questionData[questionID][perspectiveID].freq[timepoint]
+    const stat = questionData[questionID][perspectiveOption.dataQuestion].freq[timepoint]
     if (perspectiveOptionIndex === 'ALL_RESPONDENTS') {
       return stat.all
     }
-    return stat[perspectiveOptionIndex]
+    return stat[perspectiveOption.dataOption]
   }
 
   // META
 
   exports.getQuestionShortText = function (questionID) {
-    return questionMeta[questionID].short
+    return questionMeta[questionID].short.trim()
+  }
+
+  exports.getQuestionFullText = function (questionID) {
+    return questionMeta[questionID].text.trim()
   }
 
   exports.isCombinedPerspective = function (questionID) {
@@ -40,6 +45,13 @@
     return questionMeta[questionID].type === 'COMBINED_PERSPECTIVE' &&
     typeof questionMeta[questionID].optionsFlat[optionIndex].opts !== 'undefined' &&
     questionMeta[questionID].optionsFlat[optionIndex].opts.length > 0
+  }
+
+  exports.getPerspectiveOptionChildCount = function (questionID, optionIndex) {
+    if (!dax.data.hasPerspectiveOptionChildren(questionID, optionIndex)) {
+      return 0
+    }
+    return questionMeta[questionID].optionsFlat[optionIndex].opts.length
   }
 
   function getQuestionOptionDefinition (questionID, optionIndex) {
@@ -59,6 +71,16 @@
     return questionMeta[questionID].options.length
   }
 
+  exports.getOptionTexts = function (questionID) {
+    return dax.data.getPerspectiveOptionIndicesColumnOrder(questionID).map(function (i) {
+      return dax.data.getQuestionOptionText(questionID, i)
+    })
+  }
+
+  exports.getTimepoints = function (questionID) {
+    return questionMeta[questionID].timepoints
+  }
+
   exports.getTopLevelQuestionOptionCount = function (questionID) {
     if (!dax.data.isCombinedPerspective(questionID)) {
       return exports.getQuestionOptionCount(questionID)
@@ -71,6 +93,44 @@
       return questionMeta[questionID].optionsFlat[optionIndex].text
     }
     return questionMeta[questionID].options[optionIndex].text
+  }
+
+  exports.getExplorerPerspectiveIDs = function () {
+    const perspectiveIDs = []
+    for (let i = 0; i < perspectives.length; i++) {
+      if (perspectives[i].explorerPerspective) {
+        perspectiveIDs.push(perspectives[i].q)
+      }
+    }
+    return perspectiveIDs
+  }
+
+  exports.isExplorerPerspective = function (perspectiveID) {
+    for (let i = 0; i < perspectives.length; i++) {
+      if (perspectives[i].q === perspectiveID) {
+        return perspectives[i].explorerPerspective
+      }
+    }
+    return false
+  }
+
+  exports.getPerspectiveOptionIndicesColumnOrder = function (questionID) {
+    const optionCount = dax.data.getQuestionOptionCount(questionID)
+    return Array.apply(null, Array(optionCount)).map(function (_, i) { return i })
+  }
+
+  exports.getPerspectiveOptionIndicesNestedOrder = function (questionID) {
+    if (!dax.data.isCombinedPerspective(questionID)) {
+      return dax.data.getPerspectiveOptionIndicesColumnOrder(questionID)
+    }
+    const optionTraverser = function (optionList, currentOption) {
+      optionList.push(currentOption.index)
+      if (currentOption.opts) {
+        currentOption.opts.forEach(function (childOption) { return optionTraverser(optionList, childOption) })
+      }
+      return optionList
+    }
+    return questionMeta[questionID].options.reduce(optionTraverser, [])
   }
 
   exports.getPerspectiveOptionParent = function (questionID, optionIndex) {
@@ -93,22 +153,23 @@
     questionMeta = questionMetaInput
     questionData = questionDataInput
     //
-    Object.keys(questionMeta).forEach(questionID => {
+    Object.keys(questionMeta).forEach(function (questionID) {
       const qm = questionMeta[questionID]
       if (qm.type !== 'COMBINED_PERSPECTIVE') {
         const options = []
-        qm.options.forEach((opt, i) => {
+        qm.options.forEach(function (opt, i) {
           options.push({ text: opt, dataQuestion: qm.column, dataOption: i })
         })
         qm.options = options
       }
     })
     // Add a flattened version of combined perspective option list
-    perspectives.forEach(perspective => {
-      const qm = questionMeta[perspective]
+    perspectives.forEach(function (perspective) {
+      const perspectiveID = perspective.q
+      const qm = questionMeta[perspectiveID]
       if (qm.type === 'COMBINED_PERSPECTIVE') {
         let toFlatten = qm.options
-        toFlatten.forEach(opt => {
+        toFlatten.forEach(function (opt) {
           opt.depth = 0
           opt.index = opt.o
         })
@@ -124,13 +185,13 @@
           toFlatten = toFlatten.slice(1)
           optionsFlat.push(current)
           if (current.opts) {
-            current.opts.forEach(opt => {
+            current.opts.forEach(function (opt) {
               opt.depth = current.depth + 1
               opt.parent = current.index
               opt.index = index
               index++
             })
-            toFlatten = [...toFlatten, ...current.opts]
+            toFlatten = toFlatten.concat(current.opts)
           }
         }
         qm.optionsFlat = optionsFlat
@@ -144,5 +205,18 @@
       return 0
     }
     return question.optionsFlat[perspectiveOptionIndex].depth
+  }
+
+  exports.hasTimepoint = function (questionID, timepoint) {
+    return questionMeta[questionID].timepoints.indexOf(timepoint) !== -1
+  }
+
+  exports.isAllSingleTimepoint = function () {
+    for (var questionID in questionMeta) {
+      if (questionMeta[questionID].timepoints.length > 1) {
+        return false
+      }
+    }
+    return true
   }
 })(window.dax = window.dax || {})

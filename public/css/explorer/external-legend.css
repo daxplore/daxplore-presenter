@@ -21,6 +21,14 @@
 	margin-top: 30px;
 }
 
+.legend__row--indent-1 {
+  margin-left: 0.4em;
+}
+
+.legend__row--indent-2 {
+  margin-left: 0.8em;
+}
+
 .legend__color-square {
   border-radius: 2px;
   height: 1.1em;

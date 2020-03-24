@@ -27,8 +27,6 @@
   // CHART RESOURCES
   // Use the same objects when updating the chart
   // Objects, data and values that are independant of the chart data
-  // DATA
-  var questionMap
   // If no question has more than 1 timepoint display all frequency charts in single timepoint mode.
   // If at least one question has more than 1 timepoint show all charts with timepoints.
   var singleTimepointMode
@@ -56,15 +54,9 @@
 
   // Constructor, used to initialize the chart type.
   // Run once when the page is loaded. Call populateChart in order to update the chart content.
-  exports.initializeResources = function (questionMapInput, primaryColors) {
-    questionMap = questionMapInput
-
+  exports.initializeResources = function (primaryColors) {
     // CALCULATE RELEVANT DATA
-    var maxTimepointCount = -1
-    for (var key in questionMap) {
-      maxTimepointCount = Math.max(questionMap[key].timepoints.length, maxTimepointCount)
-    }
-    singleTimepointMode = maxTimepointCount === 1
+    singleTimepointMode = dax.data.isAllSingleTimepoint()
 
     if (!singleTimepointMode) {
       margin.bottom += 40
@@ -187,25 +179,25 @@
     perspective = perspectiveID
     question = questionID
     selectedPerspectiveOptionIndices = selectedPerspectiveOptionIndicesInput
-    var removedTimepoints = timepoints.filter(function (tp) { return questionMap[question].timepoints.indexOf(tp) === -1 })
-    timepoints = questionMap[question].timepoints
+    var removedTimepoints = timepoints.filter(function (tp) { return !dax.data.hasTimepoint(question, tp) })
+    timepoints = dax.data.getTimepoints(question)
     selectedTimepoint = timepoints[Math.floor((2 / 3) * timepoints.length)]
 
     hasMissingData = false
 
-    optionKeys = questionMap[question].options.slice()
+    optionKeys = dax.data.getOptionTexts(question)
     optionKeys.push('MISSING_DATA')
 
     selectedPerspectiveOptions = []
     selectedPerspectiveOptionIndices.forEach(function (i) {
-      selectedPerspectiveOptions.push(questionMap[perspective].options[i])
+      selectedPerspectiveOptions.push(dax.data.getQuestionOptionText(perspective, i))
     })
 
     // Generate data map for all timepoints
     data = {}
     for (var tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
       var tp = timepoints[tpIndex]
-      var perspectiveOptions = questionMap[perspective].options
+      var perspectiveOptions = dax.data.getOptionTexts(perspective)
       var tpData = []
 
       selectedPerspectiveOptionIndices.forEach(function (i) {
@@ -233,8 +225,8 @@
     calculateTPWidths()
 
     // UPDATE HEADER
-    var shortText = questionMap[question].short.trim()
-    var longText = questionMap[question].text.trim()
+    var shortText = dax.data.getQuestionShortText(question)
+    var longText = dax.data.getQuestionFullText(question)
     headerMain.text(shortText)
     headerSub
       .text(longText)
@@ -359,11 +351,11 @@
     // UPDATE LEGEND
     // Update legend title
     legendQuestionHeader
-      .text(questionMap[question].short)
+      .text(dax.data.getQuestionShortText(question))
 
     // Set new data for the legend
     var optionRows = legendQuestionOptionTable.selectAll('.legend__row')
-      .data([].concat(questionMap[question].options).reverse())
+      .data([].concat(dax.data.getOptionTexts(question)).reverse())
 
     // Remove old rows
     optionRows.exit().remove()

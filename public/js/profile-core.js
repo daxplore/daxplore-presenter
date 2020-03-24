@@ -22,7 +22,7 @@
 
     // Get URL parameters
     const urlParams = new URLSearchParams(window.location.search)
-    const perspective = urlParams.get('perspective')
+    const perspectiveID = urlParams.get('perspective')
     const timepoint = urlParams.get('timepoint') != null ? urlParams.get('timepoint') : '0'
 
     // Make a batch Axios request to download all metadata and data asynchronously
@@ -38,15 +38,22 @@
 
       // Validate the perspective URL parameter
       // In case of problems, give feedback directed at the person setting up the presentation
+      let isValidPerspective = false
+      for (let i = 0; i < perspectives.length; i++) {
+        if (perspectives[i].q === perspectiveID) {
+          isValidPerspective = true
+          break
+        }
+      }
       // TODO communicate the error directly in the DOM?
-      if (perspectives.indexOf(perspective) === -1) {
+      if (!isValidPerspective) {
         // const location = new URL(window.location.href)
-        if (perspective === null || typeof perspective === 'undefined' || perspective.length === 0) {
+        if (perspectiveID === null || typeof perspectiveID === 'undefined' || perspectiveID.length === 0) {
           // TODO find IE compatible way to do this
           // location.search = 'perspective=' + perspectives[0]
-          dax.common.logError('The URL must contain the perspective parameter, for example: ?perspective=' + perspectives[0]) //, location.href)
+          dax.common.logError('The URL must contain the perspective parameter, for example: ?perspective=' + perspectives[0].q) //, location.href)
         } else {
-          dax.common.logError('The used perspective URL paremter is not supported: ?perspective=' + perspective)
+          dax.common.logError('The used perspective URL paremter is not supported: ?perspective=' + perspectiveID)
         }
         dax.common.logError('Suggested fix: Use one of the perspectives defined in', new URL('data/perspectives.json', window.location.href).href)
         return
@@ -77,7 +84,7 @@
           directionMap[q.column] = q.gooddirection
         }
 
-        if (q.column === perspective) {
+        if (q.column === perspectiveID) {
           perspectiveOptions = q.options
         }
 
@@ -98,7 +105,7 @@
         responsesArray.forEach(function (response) {
           for (let i = 0; i < response.data.length; i++) {
             const d = response.data[i]
-            if (d.p === perspective) {
+            if (d.p === perspectiveID) {
               const qID = d.q
               qIDs.push(qID)
               means.push(d.mean[timepoint].mean)

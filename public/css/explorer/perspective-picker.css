@@ -60,7 +60,7 @@ display: flex;
 	flex: 1;
 }
 
-.pervarpicker-varoption:before {
+.pervarpicker-varoption::before {
 	content: url('../../img/perspective-radio-empty.png');
 	padding-left: 3px;
 	padding-right: 5px;
@@ -78,7 +78,7 @@ display: flex;
 	white-space: nowrap;
 }
 
-.pervarpicker-varoption-selected:before {
+.pervarpicker-varoption-selected::before {
 	content: url('../../img/perspective-radio-filled.png');
 }
 
@@ -104,6 +104,7 @@ display: flex;
   display: flex;
   flex: 1;
 	flex-direction: column;
+  max-width: fit-content;
   min-width: 0;
   position: relative;
 }
@@ -114,20 +115,24 @@ display: flex;
 	flex-direction: row;
 }
 
-.peropt-extra-columns {
+.peropt-columns > div {
+  flex: 1;
+}
+
+/* .peropt-extra-columns {
   display: flex;
 	flex-direction: row;
   overflow: hidden;
-}
-
+} */
+/*
 .peropt-bottom-padding {
-}
-
+} */
+/*
 .peropt-more-wrapper {
   bottom: 2px;
 	position: absolute;
   right: 2px;
-}
+} */
 
 .peropt-checkbox {
   align-items: center;
@@ -141,13 +146,22 @@ display: flex;
 	white-space: nowrap;
 }
 
+.peropt-checkbox-hidden {
+  height: 0;
+  margin-bottom: 0;
+  margin-top: 0;
+  opacity: 0;
+  padding-bottom: 0;
+  padding-top: 0;
+}
+
 .peropt-checkbox::before {
 	content: url('../../img/perspective-checkbox-empty.png');
 	padding-right: 5px;
 	padding-top: 3px;
 }
 
-.peropt-checkbox-selected:before {
+.peropt-checkbox-selected::before {
 	content: url('../../img/perspective-checkbox-filled.png');
 }
 
@@ -176,6 +190,7 @@ display: flex;
 }
 
 .peropt-checkbox-text {
+  line-height: 1.2;
   margin-right: 8px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -197,6 +212,7 @@ display: flex;
 
 .peropt-col-one, .peropt-col-two, .peropt-col-three {
   flex: 1;
+  max-width: fit-content;
   min-width: 0;
   padding-left: 4px;
   transition: flex 0.2s;
@@ -212,15 +228,16 @@ display: flex;
 .peropt-col-three-combined {
   border-right: 1px solid #ABABAB;
   margin-right: 4px;
+  padding-top: 4px;
 }
 
-.peropt-col-two-combined::before {
+.peropt-col__top-padding {
   border-right: 1px solid #ABABAB;
   content: '';
   height: 4px;
 }
 
-.peropt-col-two-combined::after {
+.peropt-col__bottom-padding {
   border-right: 1px solid #ABABAB;
   content: '';
   flex: 1;
@@ -228,5 +245,11 @@ display: flex;
 
 .peropt-col-one:hover, .peropt-col-two-combined:hover, .peropt-col-three-combined:hover {
   flex: 2;
+  transition: flex 0.2s;
+}
+
+.peropt-col-collapsed {
+  flex: 0 !important;
+  opacity: 0;
   transition: flex 0.2s;
 }

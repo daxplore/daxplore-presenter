@@ -26,7 +26,7 @@
   // DATA
   var questionMap
   // HEADER
-  var headerDiv, headerMain, headerSub
+  var headerDiv, headerMain, headerSub, headerDescriptionButton, headerDecriptionPanel
   // SCALES AND AXISES
   var xScale, xAxis, xAxisElement
   var yScale, yAxis, yAxisElement
@@ -60,6 +60,10 @@
       .attr('class', 'header-section__main')
     headerSub = headerDiv.append('div')
       .attr('class', 'header-section__sub')
+    headerDescriptionButton = d3.select('.chart-panel').append('div')
+      .attr('class', 'header-section__description-button')
+    headerDecriptionPanel = headerDescriptionButton.append('div')
+      .attr('class', 'header-section__description-panel')
 
     // INITIALIZE CHART
     // base div element
@@ -220,10 +224,10 @@
     xScale.domain(selectedPerspectiveOptions)
 
     // UPDATE Z
-    var allIndexesArray = questionMap[perspective].options.map(function (o, i) { return i })
-    zScaleColor.domain(allIndexesArray)
-    zScaleColorHover.domain(allIndexesArray)
-    zScaleColorTooltip.domain(allIndexesArray)
+    var allIndicesArray = dax.data.getPerspectiveOptionIndicesColumnOrder(perspectiveID) // questionMap[perspective].options.map(function (o, i) { return i })
+    zScaleColor.domain(allIndicesArray)
+    zScaleColorHover.domain(allIndicesArray)
+    zScaleColorTooltip.domain(allIndicesArray)
 
     // UPDATE BARS
     var bars = chartG.selectAll('.meanbars__bar')
@@ -270,7 +274,7 @@
     // Add new rows
     var optionEnter = optionRows.enter()
       .append('div')
-        .attr('class', 'legend__row')
+        .classed('legend__row', true)
         .on('mouseover', function (option) { optionMouseOver(option, false) })
         .on('mouseout', optionMouseOut)
     optionEnter.append('div')
@@ -281,6 +285,31 @@
     // reselect rows and use single-select to propagate data join to contained items
     // update color and text for each row
     var rows = legendPerspectiveOptionTable.selectAll('.legend__row')
+      .attr('class', function (d) {
+        const depth = dax.data.getPerspectiveOptionTreeDepth(perspective, d.index)
+        let indentDepth = 0
+        if (depth >= 1) {
+          const parent = dax.data.getPerspectiveOptionParent(perspective, d.index)
+          if (selectedPerspectiveOptions.indexOf(parent) !== -1) {
+            indentDepth += 1
+          }
+          if (depth >= 2) {
+            const parentParent = dax.data.getPerspectiveOptionParent(perspective, parent)
+            if (selectedPerspectiveOptions.indexOf(parentParent) !== -1) {
+              indentDepth += 1
+            }
+          }
+        }
+        return 'legend__row legend__row--indent-' + indentDepth
+      })
+      .attr('title', function (option) {
+        var text = dax.data.getQuestionOptionText(perspective, option.index)
+        if (option.nodata) {
+          text += ' ' + dax.text('meanbars_legend_missingData')
+        }
+        return text
+      })
+
     rows.select('.legend__color-square')
       .style('background-color', colorPrimary)
     rows.select('.legend__row-text')
@@ -292,13 +321,6 @@
         return text
       })
       .style('font-style', function (option) { return option.nodata ? 'italic' : null })
-      .attr('title', function (option) {
-        var text = questionMap[perspective].options[option.index]
-        if (option.nodata) {
-          text += ' ' + dax.text('meanbars_legend_missingData')
-        }
-        return text
-      })
 
     // update the reference line text
     legendReferenceLine
@@ -311,6 +333,14 @@
       .text(dax.text('meanbars_tooltip_referenceValue'))
     referenceTooltipDiv.append('span')
       .text(dax.common.integerFormat(questionReferenceValue))
+  }
+
+  exports.setDescriptionHTML = function (html) {
+    headerDescriptionButton
+      .classed('hidden', html.length === 0)
+    headerDecriptionPanel
+      .classed('hidden', html.length === 0)
+      .html(html)
   }
 
   // Set the size available for the chart.
@@ -449,8 +479,8 @@
     // it doesn't consider the margins or the y-axis. Could be more accurate by calculating chart
     // content center, by cancelling scrollLeft and margin/y-axis. Looks good enough as is, for now.
     referenceTooltipDiv
-      .style('left', (chartContainerBB.left + chartContainerBB.width / 2 +
-        d3.select('.chart').node().scrollLeft - referenceTooltipBB.width / 2) + 'px')
+      .style('left', (chartContainerBB.width / 2 + d3.select('.chart').node().scrollLeft -
+      referenceTooltipBB.width / 2) + 'px')
       .style('top', (chartBB.top + margin.top + yPos - referenceTooltipBB.height - 10) + 'px')
 
     // LEGEND
@@ -498,7 +528,7 @@
       .html(tooltipText) // TODO construct elements via d3 instead of string->html
       .classed('hidden', !showTooltip)
       .style('background-color', data.nodata ? '#ddd' : zScaleColorTooltip(optIndex)) // TODO externalize no data color
-      .style('left', (chartBB.left + margin.left + xScale(optIndex) +
+      .style('left', (margin.left + xScale(optIndex) +
         xScale.bandwidth() / 2 - tooltipDiv.node().getBoundingClientRect().width / 2 -
         d3.select('.chart').node().scrollLeft) + 'px')
       .style('top', (chartBB.top + margin.top + height + 10) + 'px')
