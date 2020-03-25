@@ -97,9 +97,7 @@
     chartwrapperBB.left = wrapperClientBB.left + pageXOffset
     chartwrapperBB.top = wrapperClientBB.top + pageYOffset
     chartwrapperBB.width = wrapperClientBB.width
-    // chartwrapperBB.height = wrapperClientBB.height
-    chartwrapperBB.height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0) -
-      d3.select('.header').node().getBoundingClientRect().height - 20
+    chartwrapperBB.height = wrapperClientBB.height - 10
     xAxisTopHeight = 30
     margin = { top: 0, right: 13, bottom: xAxisTopHeight, left: 0 }
     width = chartwrapperBB.width - margin.left - margin.right

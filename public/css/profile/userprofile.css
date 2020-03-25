@@ -164,14 +164,19 @@
 }
 
 .rowtext, .grid-legend-text {
-	font-size: 11px;
 	color: rgb(85, 85, 85);
+	cursor: default;
+	font: 12px sans-serif;
 	white-space: nowrap;
 }
 
 .rowtext {
-	text-align: right;
 	padding-right: 8px;
+	text-align: right;
+}
+
+.rowtext:hover {
+	color: #111;
 }
 
 .grid-cell {
