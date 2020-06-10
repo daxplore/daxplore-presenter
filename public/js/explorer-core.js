@@ -79,6 +79,7 @@
 
         // Initialize elements that depend on the metadata
         dax.text.initializeResources(usertexts)
+        dax.settings.initializeResources(settings)
         dax.data.initializeResources(groups, perspectives, questionMap, questionData)
         dax.explorer.generateQuestionPicker(questions, groups, settings)
         dax.explorer.generatePerspectivePicker(settings)

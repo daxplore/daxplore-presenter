@@ -21,6 +21,10 @@
     optionsMap = optionsMapInput
     timepointsMap = timepointsMapInput
 
+    if (dax.settings('structure.perspectivePosition')) {
+      d3.select('.perspective-description-row').lower()
+    }
+
     // Unpack the data
     for (var i = 0; i < questions.length; i++) {
       var q = questions[i]
@@ -67,6 +71,7 @@
 
     // Initialize chart resources
     dax.chart.meanbars.initializeResources(questionMap, primaryColors, hoverColors, tooltipColors)
+    dax.chart.meanprofile.initializeResources()
     dax.chart.frequency.initializeResources(primaryColors, hoverColors)
 
     // TODO handle here or somewhere else?
@@ -91,6 +96,7 @@
     // Hide all charts elements
     dax.chart.frequency.hide()
     dax.chart.meanbars.hide()
+    dax.chart.meanprofile.hide()
     // dax.chart.dichtimeline.hide() // TODO
     // TODO allow for animated updates of same chart type
     // d3.select('.chart')
@@ -156,6 +162,9 @@
         break
       }
       break
+    case 'MEAN_VERTICAL':
+      dax.chart.meanprofile.populateChart(questionID, perspectiveID, selectedOptions)
+      break
     case 'DICH':
       switch (timepoints) {
       case 'TIMEPOINTS_ONE':
@@ -213,6 +222,9 @@
       // TODO allow more height instead of vertical scroll
       // TODO hard coded based on specific chart, should be generalized
       dax.chart.meanbars.setSize(widthForChart, 350)
+      break
+    case 'MEAN_VERTICAL':
+      dax.chart.meanprofile.setSize(widthForChart)
       break
     case 'DICH':
       dax.chart.dichtimeline.updateSize(350)

@@ -147,6 +147,18 @@
     return -1
   }
 
+  exports.useMeanReference = function (questionID) {
+    return questionMeta[questionID].mean_reference
+  }
+
+  exports.getMeanReference = function (questionID) {
+    return questionMeta[questionID].mean_reference
+  }
+
+  exports.getMeanReferenceDirection = function (questionID) {
+    return questionMeta[questionID].gooddirection
+  }
+
   exports.initializeResources = function (groupsInput, perspectivesInput, questionMetaInput, questionDataInput) {
     groups = groupsInput
     perspectives = perspectivesInput

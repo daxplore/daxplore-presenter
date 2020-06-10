@@ -6,45 +6,45 @@
   /** ** CHART TYPE AND INSTANCE VARIABLES ** **/
 
   // CONSTANTS
-  var margin = { top: 20, right: 10, bottom: 15, left: 35 }
-  var barTransition = d3.transition()
+  const margin = { top: 20, right: 10, bottom: 15, left: 35 }
+  const barTransition = d3.transition()
     .duration(300)
     .ease(d3.easeLinear)
-  var fadeTransition = d3.transition()
+  const fadeTransition = d3.transition()
     .duration(100)
     .ease(d3.easeLinear)
 
   // SIZE VARIABLES
-  var availableWidth = 600 // initial placeholder value
-  var width = availableWidth
-  var availableHeight = 300 // initial placeholder value
-  var height = availableHeight
+  let availableWidth = 600 // initial placeholder value
+  let width = availableWidth
+  let availableHeight = 300 // initial placeholder value
+  let height = availableHeight
 
   // CHART RESOURCES
   // Use the same objects when updating the chart
   // Objects, data and values that are independant of the chart data
   // DATA
-  var questionMap
+  let questionMap
   // HEADER
-  var headerDiv, headerMain, headerSub, headerDescriptionButton, headerDecriptionPanel
+  let headerDiv, headerMain, headerSub, headerDescriptionButton, headerDecriptionPanel
   // SCALES AND AXISES
-  var xScale, xAxis, xAxisElement
-  var yScale, yAxis, yAxisElement
-  var zScaleColor, zScaleColorHover, zScaleColorTooltip
+  let xScale, xAxis, xAxisElement
+  let yScale, yAxis, yAxisElement
+  let zScaleColor, zScaleColorHover, zScaleColorTooltip
   // CHART
-  var chartContainer, chartBB, chart, chartG
-  var referenceLine, referenceLineMouseArea
-  var tooltipDiv, referenceTooltipDiv
+  let chartContainer, chartBB, chart, chartG
+  let referenceLine, referenceLineMouseArea
+  let tooltipDiv, referenceTooltipDiv
   // STATE TRACKING
-  var animateNextUpdate = false
+  let animateNextUpdate = false
   // LEGEND
-  var legendDiv, legendPerspectiveHeader, legendPerspectiveOptionTable, legendReferenceLine
+  let legendDiv, legendPerspectiveHeader, legendPerspectiveOptionTable, legendReferenceLine
 
   // CURRENT MEAN BAR CHART
   // Data specific for the current chart
-  var perspective, question, selectedOptionCount
-  var questionReferenceValue
-  var selectedOptionsData, selectedOptionsDataMap
+  let perspective, question, selectedOptionCount
+  let questionReferenceValue
+  let selectedOptionsData, selectedOptionsDataMap
 
   /** ** EXPORTED FUNCTIONS ** **/
 
@@ -159,7 +159,7 @@
       .style('flex', '1')
 
     // legend for the perspective and selected options
-    var legendPerspective = legendDiv.append('div')
+    const legendPerspective = legendDiv.append('div')
     legendPerspectiveHeader = legendPerspective.append('h4')
       .attr('class', 'legend__header')
     legendPerspectiveOptionTable = legendPerspective.append('div')
@@ -202,7 +202,7 @@
       const stat = dax.data.getMean(question, perspective, option)
       const mean = stat.mean
       const count = stat.count
-      var optionData = {
+      const optionData = {
         index: option,
         mean: mean,
         nodata: mean === -1 && count === 0,
@@ -213,8 +213,8 @@
     })
 
     // UPDATE HEADER
-    var shortText = questionMap[question].short.trim()
-    var longText = questionMap[question].text.trim()
+    const shortText = questionMap[question].short.trim()
+    const longText = questionMap[question].text.trim()
     headerMain.text(shortText)
     headerSub
       .text(longText)
@@ -224,13 +224,13 @@
     xScale.domain(selectedPerspectiveOptions)
 
     // UPDATE Z
-    var allIndicesArray = dax.data.getPerspectiveOptionIndicesColumnOrder(perspectiveID) // questionMap[perspective].options.map(function (o, i) { return i })
+    const allIndicesArray = dax.data.getPerspectiveOptionIndicesColumnOrder(perspectiveID) // questionMap[perspective].options.map(function (o, i) { return i })
     zScaleColor.domain(allIndicesArray)
     zScaleColorHover.domain(allIndicesArray)
     zScaleColorTooltip.domain(allIndicesArray)
 
     // UPDATE BARS
-    var bars = chartG.selectAll('.meanbars__bar')
+    const bars = chartG.selectAll('.meanbars__bar')
       .data(
         selectedOptionsData, // data
         function (option) { return option.index } // key function, mapping a specific DOM element to a specific option index
@@ -263,7 +263,7 @@
       .text(questionMap[perspective].short)
 
     // Set new data for the legend
-    var optionRows = legendPerspectiveOptionTable.selectAll('.legend__row')
+    const optionRows = legendPerspectiveOptionTable.selectAll('.legend__row')
       .data(
         selectedOptionsData, // data
         function (option) { return option.index }) // key function, mapping a specific DOM element to a specific option index
@@ -272,7 +272,7 @@
     optionRows.exit().remove()
 
     // Add new rows
-    var optionEnter = optionRows.enter()
+    const optionEnter = optionRows.enter()
       .append('div')
         .classed('legend__row', true)
         .on('mouseover', function (option) { optionMouseOver(option, false) })
@@ -284,7 +284,7 @@
 
     // reselect rows and use single-select to propagate data join to contained items
     // update color and text for each row
-    var rows = legendPerspectiveOptionTable.selectAll('.legend__row')
+    const rows = legendPerspectiveOptionTable.selectAll('.legend__row')
       .attr('class', function (d) {
         const depth = dax.data.getPerspectiveOptionTreeDepth(perspective, d.index)
         let indentDepth = 0
@@ -303,7 +303,7 @@
         return 'legend__row legend__row--indent-' + indentDepth
       })
       .attr('title', function (option) {
-        var text = dax.data.getQuestionOptionText(perspective, option.index)
+        let text = dax.data.getQuestionOptionText(perspective, option.index)
         if (option.nodata) {
           text += ' ' + dax.text('meanbars_legend_missingData')
         }
@@ -314,7 +314,7 @@
       .style('background-color', colorPrimary)
     rows.select('.legend__row-text')
       .text(function (option) {
-        var text = dax.data.getQuestionOptionText(perspective, option.index)
+        let text = dax.data.getQuestionOptionText(perspective, option.index)
         if (option.nodata) {
           text += ' ' + dax.text('meanbars_legend_missingData')
         }
@@ -372,14 +372,14 @@
   function resizeAndPositionElements () {
     // CHART SIZE
     // Estimate the minimum width needed for the chart with the current content
-    var chartNeededWidth = margin.left + margin.right + // margins
+    const chartNeededWidth = margin.left + margin.right + // margins
       30 + // y axis width // TODO calculate
       10 * 2 + // space outside of bars // TODO calculate
       5 * (selectedOptionCount - 1) + // space between bars // TODO calculate
       15 * selectedOptionCount // min width for bars // TODO set better value
 
     // Check if vertical scroll is needed
-    var scrollNeeded = availableWidth < chartNeededWidth
+    const scrollNeeded = availableWidth < chartNeededWidth
 
     // Enable or disable scroll on the div containing the meanbars chart
     d3.select('.chart')
@@ -395,7 +395,7 @@
       .attr('height', height + margin.top + margin.bottom)
 
     // Update bounding box definition for the chart
-    var wrapperClientBB = d3.select('.chart').node().getBoundingClientRect()
+    const wrapperClientBB = d3.select('.chart').node().getBoundingClientRect()
     chartBB = {
       height: wrapperClientBB.height,
       left: wrapperClientBB.left + pageXOffset,
@@ -429,7 +429,7 @@
 
     // BARS
     // Use single child select to propagate data from parent selection
-    var bars = d3.selectAll('.meanbars__bar').select('.meanbars__bar-rect')
+    let bars = d3.selectAll('.meanbars__bar').select('.meanbars__bar-rect')
     // Stop all current bar animations
     bars.interrupt().selectAll('*').interrupt()
     // Select the bars with or without transition animations
@@ -443,13 +443,13 @@
 
     // REFERENCE LINE
     // Number of pixels to indent the reference line from the left and right sides
-    var lineOuterPadding = 5
+    const lineOuterPadding = 5
     // Vertical position of the reference line
-    var yPos = yScale(questionReferenceValue)
+    const yPos = yScale(questionReferenceValue)
     // Stop all current reference line animations
     referenceLine.interrupt().selectAll('*').interrupt()
     // Select the reference line  with or without transition animations
-    var rle = animateNextUpdate ? referenceLine.transition(barTransition) : referenceLine
+    const rle = animateNextUpdate ? referenceLine.transition(barTransition) : referenceLine
     // Update the line y position, possibly with animation
     rle
       .attr('y1', yPos)
@@ -463,7 +463,7 @@
 
     // Create a band for the reference line that registers mouseovers of the reference line
     // Width of the mouseover area
-    var mouseHoverWidth = 10
+    const mouseHoverWidth = 10
     // Update position of the reference line and move it to the very front
     referenceLineMouseArea
       .attr('x', 0)
@@ -473,8 +473,8 @@
       .raise()
 
     // Get bounding boxes for the reference tooltip and the top level chart container
-    var referenceTooltipBB = referenceTooltipDiv.node().getBoundingClientRect()
-    var chartContainerBB = chartContainer.node().getBoundingClientRect()
+    const referenceTooltipBB = referenceTooltipDiv.node().getBoundingClientRect()
+    const chartContainerBB = chartContainer.node().getBoundingClientRect()
     // Horizontally center on the available chart area, which may look slightly off-center since
     // it doesn't consider the margins or the y-axis. Could be more accurate by calculating chart
     // content center, by cancelling scrollLeft and margin/y-axis. Looks good enough as is, for now.
@@ -497,14 +497,14 @@
 
   // Called when the mouse over event is triggered for a bar in the chart or row in the legend
   function optionMouseOver (hoveredOption, showTooltip) {
-    var optIndex = hoveredOption.index
+    const optIndex = hoveredOption.index
     // BARS
     // Update bar mouseover highlight
     d3.selectAll('.meanbars__bar-rect')
       .style('fill', function (option) { return option.index === optIndex ? colorHover(option) : colorPrimary(option) })
 
     // LEGEND
-    var rows = d3.selectAll('.meanbars__legend .legend__row')
+    const rows = d3.selectAll('.meanbars__legend .legend__row')
     // Stop all current legend row animations
     rows.interrupt().selectAll('*').interrupt()
     // Fade non-selected options
@@ -513,9 +513,9 @@
 
     // TOOLTIP
     // Set tooltip box text
-    var optionName = dax.data.getQuestionOptionText(perspective, optIndex)
-    var data = selectedOptionsDataMap[optIndex]
-    var tooltipText = '<b>' + optionName + '</b><br>'
+    const optionName = dax.data.getQuestionOptionText(perspective, optIndex)
+    const data = selectedOptionsDataMap[optIndex]
+    let tooltipText = '<b>' + optionName + '</b><br>'
     if (data.nodata) {
       tooltipText += dax.text('meanbars_tooltip_fewRespondents', 10) + '<br>' // TODO hardcoded 10, should be read from settings generated by Daxplore Producer
       tooltipText += '<b>' + dax.text('meanbars_tooltip_missingData') + '</b>'
@@ -540,7 +540,7 @@
     // Return to default bar colors
     d3.selectAll('.meanbars__bar-rect').style('fill', colorPrimary)
     // LEGEND ROWS
-    var rows = d3.selectAll('.meanbars__legend .legend__row')
+    const rows = d3.selectAll('.meanbars__legend .legend__row')
     // Stop all current legend row animations
     rows.interrupt().selectAll('*').interrupt()
     // Set all legend rows to visible again
