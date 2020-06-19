@@ -69,5 +69,5 @@ a:hover, .gwt-Anchor:hover {
 	bottom: 0.5em;
 	color: black;
 	font-size: 0.8em;
-  position: relative;
+  /* position: relative; */
 }

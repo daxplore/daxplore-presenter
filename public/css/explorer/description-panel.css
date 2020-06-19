@@ -19,6 +19,6 @@
   display: flex;
   justify-content: space-between;
   min-width: 0;
-  position: relative;
+  /* position: relative; */
   width: 100%;
 }
