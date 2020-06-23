@@ -2,7 +2,7 @@
   namespace.userprofile = namespace.userprofile || {}
   const exports = namespace.userprofile
 
-  function populateUserProfileDOM (qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap) {
+  function populateUserProfileDOM (qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, titleRegexpMap) {
     d3.select('.user-paste-data-header-text')
       .text(dax.text('userProfileHeaderText')) // TODO use new text ID style
 
@@ -32,7 +32,7 @@
 
     dax.userprofile.generateUserPasteSection()
 
-    dax.userprofile.generateGrid(qIDs, meanReferenceMap, shorttextMap, directionMap)
+    dax.userprofile.generateGrid(qIDs, meanReferenceMap, shorttextMap, directionMap, titleRegexpMap)
 
     dax.profile.generateListChart(qIDs, meanReferenceMap, shorttextMap, directionMap, 0)
 
@@ -71,6 +71,7 @@
       var descriptionMap = {}
       var directionMap = {}
       var meanReferenceMap = {}
+      const titleRegexpMap = {}
 
       for (let i = 0; i < questions.length; i++) {
         var q = questions[i]
@@ -84,6 +85,10 @@
         if (q.use_mean_reference) {
           meanReferenceMap[q.column] = q.mean_reference
         }
+
+        if (q.titlematchregex) {
+          titleRegexpMap[q.column] = q.titlematchregex
+        }
       }
 
       dax.text.initializeResources(usertexts)
@@ -91,10 +96,10 @@
 
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function (e) {
-          populateUserProfileDOM(listview, meanReferenceMap, shorttextMap, descriptionMap, directionMap)
+          populateUserProfileDOM(listview, meanReferenceMap, shorttextMap, descriptionMap, directionMap, titleRegexpMap)
         })
       } else {
-        populateUserProfileDOM(listview, meanReferenceMap, shorttextMap, descriptionMap, directionMap)
+        populateUserProfileDOM(listview, meanReferenceMap, shorttextMap, descriptionMap, directionMap, titleRegexpMap)
       }
     }))
   }

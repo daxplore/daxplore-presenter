@@ -5,37 +5,7 @@
   namespace.userprofile = namespace.userprofile || {}
   const exports = namespace.userprofile
 
-  var qIDs, meanReferences, shorttextsMap, directions
-
-  // TODO externalize or keep hard coded in separate repo?
-  var userImportRegexes = [
-    /kvantitativ/g,
-    /tempo|takt/g,
-    /känslomässig|emotionell/g,
-    /inflytande|kontroll/g,
-    /utveckling/g,
-    /variation/g,
-    /mening/g,
-    /involvering/g,
-    /förutsägbarhet/g,
-    /klarhet|rolltydlighet/g,
-    /rollkonflikt/g,
-    /ledningskvalitet/g,
-    /(?=.*stöd)(?=.*(överordna|chef))/g,
-    /(?=.*stöd)(?=.*kolleg)/g,
-    /erkännande|belönning/g,
-    /gemenskap/g,
-    /tillfredsställ/g,
-    /^konflikt.*(privatliv|hem)/g,
-    /((?=.*tillit)(?=.*ledning)(?=.*medarbetar))|((?=.*vertikal)(?=.*tillit))/g,
-    /((?=.*tillit)(?=.*(medarbetar|anställd))(^((?!ledning).)*$))|((?=.*horisontell)(?=.*tillit))/g,
-    /rättvisa|respekt/g,
-    /((?=.*social)(?=.*ansvar))|inkluderande/g,
-    /självskattad|hälsa/g,
-    /stress/g,
-    /utbränd|utmattning/g,
-    /sömn/g,
-  ]
+  var qIDs, meanReferences, shorttextsMap, directions, titleRegexpMap
 
   var systemdata
   var usernames = []
@@ -102,7 +72,7 @@
                   }
                   callCallbacks()
                   d3.select(el)
-                     .classed('has-content', !(!(el.value) || el.value.length === 0))
+                   .classed('has-content', !(!(el.value) || el.value.length === 0))
                 })
 
     // create a cell in each row for each column
@@ -227,6 +197,7 @@
           usermeans[i][selectedGroupIndex] = NaN
         }
 
+        let importedTitle
         var rows = d3.select('.user-paste-data-textarea').node().value.split('\n')
         var importedTexts = new Array(usermeans.length)
         var importedMeanStrings = new Array(usermeans.length)
@@ -238,31 +209,47 @@
         var multiMatchErrors = []
         var noMatchErrors = []
 
+        rows = rows.map(function (row) {
+          return typeof row === 'string' ? row.trim() : row
+        })
         // parse text and numbers
         for (i = 0; i < rows.length; i++) {
           var row = rows[i]
-          if (typeof row !== 'undefined' && row.length > 0) {
-            row = row.trim()
-          }
           var lastWhitespace = row.search(/\s[^\s]*$/)
           if (lastWhitespace > 0) {
             importedTexts[i] = row.substring(0, lastWhitespace + 1).trim()
             importedMeanStrings[i] = row.substring(lastWhitespace + 1, row.length).trim()
             importedMeans[i] = Number(importedMeanStrings[i].replace(',', '.'))
           }
+          // Check if the first imported is a line without a number
+          // If so treat it as a title, rather than a scale
+          if (importedTitle === undefined && row.length > 0 && (typeof importedMeans[i] !== 'number' || isNaN(importedMeans[0]))) {
+            importedTitle = row
+            delete rows[i]
+            delete importedTexts[i]
+            delete importedMeanStrings[i]
+            delete importedMeans[i]
+
+            usernames[selectedGroupIndex] = importedTitle
+            const titleInputElement = d3.selectAll('.header-cell-input')
+              .filter(function (d, i) { return i === selectedGroupIndex })
+              .classed('has-content', true)
+            titleInputElement.node().value = importedTitle
+          }
         }
 
         // check for matches
-        for (var regIndex = 0; regIndex < userImportRegexes.length; regIndex++) {
-          var matchRow = -1
-          var matchedRowTexts = []
-          for (var importRow = 0; importRow < importedTexts.length; importRow++) {
+        qIDs.forEach(function (qID, qIDindex) {
+          let matchRow = -1
+          let matchedRowTexts = []
+          const questionTitleMatch = new RegExp(titleRegexpMap[qID], 'g')
+          for (let importRow = 0; importRow < importedTexts.length; importRow++) {
             if (typeof importedTexts[importRow] === 'undefined') {
               continue
             }
             var textLC = importedTexts[importRow].toLowerCase()
             if (textLC.length > 0) {
-              if (textLC.search(userImportRegexes[regIndex]) >= 0) {
+              if (textLC.search(questionTitleMatch) >= 0) {
                 matchedRowTexts.push(importedTexts[importRow] + ' ' + importedMeanStrings[importRow])
                 matchedRows[importRow] = true
                 matchRow = importRow
@@ -276,12 +263,12 @@
             } else if (importedMeans[matchRow] < 0 || importedMeans[matchRow] > 100) {
               numberBoundsErrors.push(rows[matchRow].trim())
             } else {
-              usermeans[regIndex][selectedGroupIndex] = importedMeans[matchRow]
+              usermeans[qIDindex][selectedGroupIndex] = importedMeans[matchRow]
             }
           } else if (matchedRowTexts.length > 1) {
-            multiMatchErrors.push({ scale: shorttextsMap[qIDs[regIndex]], matchedRowTexts: matchedRowTexts })
+            multiMatchErrors.push({ scale: shorttextsMap[qID], matchedRowTexts: matchedRowTexts })
           }
-        }
+        })
 
         // generate errors for unmatched rows
         for (i = 0; i < matchedRows.length; i++) {
@@ -406,12 +393,14 @@
       qIDsArray,
       referencesMap,
       shorttextsMapInput,
-      directionsMap
+      directionsMap,
+      titleRegexpMapInput
     ) {
       qIDs = qIDsArray
       meanReferences = referencesMap
       shorttextsMap = shorttextsMapInput
       directions = directionsMap
+      titleRegexpMap = titleRegexpMapInput
 
       d3.select('.add-column-button')
           .text('+ Lägg till grupp')
