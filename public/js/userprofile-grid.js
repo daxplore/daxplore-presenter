@@ -90,7 +90,7 @@
           .attr('value', function (d) { return isNaN(d.mean) ? null : String(d.mean).replace('.', ',') })
           .attr('class', function (d) { return isNaN(d.mean) ? 'null' : colorClassForValue(d.mean, meanReferences[d.qID], directions[d.qID]) })
           .attr('tabindex', function (d, i) { return 2 + d.row_index + d.col_index * (1 + qIDs.length) })
-          .attr('pattern', '[0-9]+([\\.,][0-9]+)?') // TODO added extra escape backslash, check it works
+          .attr('pattern', '[0-9]+([\\.,][0-9]+)?')
           .attr('step', 0.1)
           .on('focus', function (d) {
             dax.profile.setDescriptionShort(d3.select('#grid-description'), d.qID)
@@ -198,7 +198,12 @@
         }
 
         let importedTitle
-        var rows = d3.select('.user-paste-data-textarea').node().value.split('\n')
+        let importedText = d3.select('.user-paste-data-textarea').node().value.trim()
+        // Some linebreaks put question names and numbers on different lines
+        // Remove the line break in front of a number if the number has ended up on its own line
+        importedText = importedText.replace(/\n(\s*\d+[\\.,]?\d*\s*)(\n|$)/g, ' $1$2')
+
+        let rows = importedText.split('\n')
         var importedTexts = new Array(usermeans.length)
         var importedMeanStrings = new Array(usermeans.length)
         var importedMeans = new Array(usermeans.length)
@@ -210,20 +215,28 @@
         var noMatchErrors = []
 
         rows = rows.map(function (row) {
-          return typeof row === 'string' ? row.trim() : row
+          return row.trim()
         })
+        let foundFirstNonEmptyRow = false
+
         // parse text and numbers
         for (i = 0; i < rows.length; i++) {
           var row = rows[i]
+          if (row.length === 0) {
+            continue
+          }
           var lastWhitespace = row.search(/\s[^\s]*$/)
+          importedTexts[i] = row
           if (lastWhitespace > 0) {
             importedTexts[i] = row.substring(0, lastWhitespace + 1).trim()
             importedMeanStrings[i] = row.substring(lastWhitespace + 1, row.length).trim()
             importedMeans[i] = Number(importedMeanStrings[i].replace(',', '.'))
           }
+
           // Check if the first imported is a line without a number
           // If so treat it as a title, rather than a scale
-          if (importedTitle === undefined && row.length > 0 && (typeof importedMeans[i] !== 'number' || isNaN(importedMeans[0]))) {
+          if (importedTitle === undefined && !foundFirstNonEmptyRow &&
+          (typeof importedMeans[i] !== 'number' || isNaN(importedMeans[0]))) {
             importedTitle = row
             delete rows[i]
             delete importedTexts[i]
@@ -236,6 +249,7 @@
               .classed('has-content', true)
             titleInputElement.node().value = importedTitle
           }
+          foundFirstNonEmptyRow = true
         }
 
         // check for matches
@@ -368,7 +382,11 @@
         d3.select('.user-paste-data-error-log-wrapper')
           .style('display', numberBoundsErrors.length + notANumberErrors.length + multiMatchErrors.length + noMatchErrors.length > 0 ? 'flex' : 'none')
 
+        const headerNode = d3.select('.user-paste-data-submit-column-select').node()
+        const importDropdownIndex = headerNode.selectedIndex
         generateColumns(usernames, usermeans)
+        headerNode.selectedIndex = importDropdownIndex
+
         callCallbacks()
       })
   }
@@ -525,14 +543,14 @@
 
     var rotationAngle = 2 * Math.PI * 1 / 8
     var headerHeight = gridclone.select('.grid-header').node().offsetHeight
-    var trueHeaderHeight = maxTitleWidth * Math.sin(rotationAngle) + titleHeight * Math.cos(rotationAngle)
-    var heightOffset = trueHeaderHeight - headerHeight
+    var trueHeaderWidth = maxTitleWidth * Math.sin(rotationAngle) + titleHeight * Math.cos(rotationAngle)
+    var heightOffset = trueHeaderWidth - headerHeight
 
     // true_header height represents a square of the longest header
     // estimate width based on the largest title being the rightmost header.
     // This could be computed more accurately by for each header calculating:
     // vertical overflow = true header width - width of columns to the right
-    var chartWidth = gridclone.node().offsetWidth + trueHeaderHeight - 20
+    var chartWidth = gridclone.node().offsetWidth + trueHeaderWidth - 20
 
     var topMargin = 3 + (heightOffset > 0 ? heightOffset : 0)
     gridclone
@@ -599,7 +617,6 @@
 
       canvasChartSelection.remove()
     }
-
     img.src = dataUrl
   }
 })(window.dax = window.dax || {})
