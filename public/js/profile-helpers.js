@@ -2,9 +2,9 @@
   namespace.profile = namespace.profile || {}
   const exports = namespace.profile
 
-  var meanReferences, shorttexts, descriptions, directions
+  let meanReferences, shorttexts, descriptions, directions
 
-  var colors = {}
+  const colors = {}
 
   colors.good = '#509a5c'
   colors.average = '#c5c2bd'
@@ -32,10 +32,9 @@
 
   exports.colorForValue =
   function (value, reference, direction) {
+    let diff = value - reference // HIGH
     if (direction === 'LOW') {
-      var diff = reference - value
-    } else {
-      diff = value - reference
+      diff = reference - value
     }
 
     if (diff < -5) {
@@ -49,10 +48,9 @@
 
   exports.colorHoverForValue =
   function (value, reference, direction) {
+    let diff = value - reference // HIGH
     if (direction === 'LOW') {
-      var diff = reference - value
-    } else {
-      diff = value - reference
+      diff = reference - value
     }
 
     if (diff < -5) {
@@ -66,10 +64,9 @@
 
   exports.colorTextForValue =
   function (value, reference, direction) {
+    let diff = value - reference // HIGH
     if (direction === 'LOW') {
-      var diff = reference - value
-    } else {
-      diff = value - reference
+      diff = reference - value
     }
 
     if (diff < -5) {
@@ -83,32 +80,33 @@
 
   exports.setDescriptionShort =
   function (element, qID) {
-    var shorttext = shorttexts[qID]
-    var header = "<span class='description-header'>" + shorttext + '</span><br>'
-    var description = descriptions[qID]
+    const shorttext = shorttexts[qID]
+    const header = "<span class='description-header'>" + shorttext + '</span><br>'
+    const description = descriptions[qID]
     element.html(header + description)
   }
 
   exports.setDescriptionFull =
   function (element, groupName, qID, mean) {
-    var shorttext = shorttexts[qID]
-    var description = descriptions[qID]
-    var reference = meanReferences[qID]
-    var direction = directions[qID]
+    const shorttext = shorttexts[qID]
+    const description = descriptions[qID]
+    const reference = meanReferences[qID]
+    const direction = directions[qID]
 
     element.style('opacity', 1)
 
-    var color = dax.profile.colorTextForValue(mean, reference, direction)
+    const color = dax.profile.colorTextForValue(mean, reference, direction)
     // TODO externalize all text?
-    var header = "<span class='description-header'>" + groupName + '</span><br><b>' + shorttext + ': ' + d3.format('d')(mean) + '</b><br>'
+    const header = "<span class='description-header'>" + groupName + '</span><br><b>' + shorttext + ': ' + d3.format('d')(mean) + '</b><br>'
     // TODO externalize all text?
-    var subheader = '<b>' + dax.text('listReferenceValue') + ': ' + d3.format('d')(reference) + '</b><br>' // TODO use new text ID format
+    const subheader = '<b>' + dax.text('listReferenceValue') + ': ' + d3.format('d')(reference) + '</b><br>' // TODO use new text ID format
 
-    var trueDiff = mean - reference
-    var diff = direction === 'LOW' ? reference - mean : trueDiff
+    const trueDiff = mean - reference
+    const diff = direction === 'LOW' ? reference - mean : trueDiff
 
+    let referenceComparison
     if (diff < -5) {
-      var referenceComparison = dax.text('listReferenceWorse') // TODO use new text ID style
+      referenceComparison = dax.text('listReferenceWorse') // TODO use new text ID style
     } else if (diff > 5) {
       referenceComparison = dax.text('listReferenceBetter') // TODO use new text ID style
     } else {

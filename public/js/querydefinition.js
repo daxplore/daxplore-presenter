@@ -61,13 +61,10 @@
 
     // Get and parse selected perspective options
     const optionsString = urlParams.get('o')
+    let optionsArray = []
     if (typeof optionsString === 'string') {
-      const optionsStringArray = optionsString.split(',')
-      var optionsArray = optionsStringArray.map(function (o) { return Number(o) })
-    } else {
-      optionsArray = []
+      optionsArray = optionsString.split(',').map(function (o) { return Number(o) })
     }
-
     // Get and parse query flags
     const flagString = urlParams.get('f')
     const flagArray = decodeQueryDefinitionFlags(flagString)

@@ -1,6 +1,6 @@
 (function (namespace) {
   // The uploaded usertext data from Daxplore Producer
-  var usertexts
+  let usertexts
 
   // Make the 'text' namespace a function, for more compact calls
   namespace.text = function (textID) {
@@ -8,9 +8,9 @@
       console.warn('Missing usertext: ' + textID) // TODO custom logging system?
       return '[' + textID + ']'
     }
-    var text = usertexts[textID]
+    let text = usertexts[textID]
     Array.prototype.slice.call(arguments, 1).forEach(function (arg, i) {
-      var match = '{' + i + '}'
+      const match = '{' + i + '}'
       if (text.indexOf(match) === -1) {
         console.warn(textID, '=', usertexts[textID], "doesn't contain ", match)
         return

@@ -2,7 +2,7 @@
   namespace.explorer = namespace.explorer || {}
   const exports = namespace.explorer
 
-  var groups, perspectives, questions, settings
+  let groups, perspectives, questions, settings
   const questionData = {}
   const questionMap = {}
   const dichselectedMap = {}
@@ -37,8 +37,8 @@
       perspectives = perspectivesResponse.data
       questions = questionsResponse.data
       settings = settingsResponse.data
-      var usertexts = usertextsResponse.data
-      var manifest = manifestResponse.data
+      const usertexts = usertextsResponse.data
+      const manifest = manifestResponse.data
 
       // The function logs the error as a side effect,
       // so if the versions don't match all we have to do here is exit
@@ -47,8 +47,8 @@
         return
       }
 
-      for (var i = 0; i < questions.length; i++) {
-        var q = questions[i]
+      for (let i = 0; i < questions.length; i++) {
+        const q = questions[i]
         questionMap[q.column] = q
         dichselectedMap[q.column] = q.dichselected
         optionsMap[q.column] = q.options

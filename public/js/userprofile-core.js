@@ -67,14 +67,14 @@
         return
       }
 
-      var shorttextMap = {}
-      var descriptionMap = {}
-      var directionMap = {}
-      var meanReferenceMap = {}
+      const shorttextMap = {}
+      const descriptionMap = {}
+      const directionMap = {}
+      const meanReferenceMap = {}
       const titleRegexpMap = {}
 
       for (let i = 0; i < questions.length; i++) {
-        var q = questions[i]
+        const q = questions[i]
         shorttextMap[q.column] = q.short
         descriptionMap[q.column] = unescape(q.description)
 

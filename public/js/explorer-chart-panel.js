@@ -2,15 +2,15 @@
   namespace.explorer = namespace.explorer || {}
   const exports = namespace.explorer
 
-  var questionMap = {}
-  var initialQuestion, selectedTab
-  // var primaryColors, hoverColors
+  const questionMap = {}
+  let initialQuestion, selectedTab
+  // let primaryColors, hoverColors
   // TODO hard coded here as temporary hack, also input in constructor might be temporary
   const primaryColors = ['#9DC680', '#80AFC6', '#8B8BCB', '#AB8BCB', '#C68680', '#CBA46C', '#CBCB6C']
   const hoverColors = ['#93C072', '#72A6C0', '#7D7DC5', '#A17DC5', '#C07972', '#C69A5D', '#C6C65D']
   const tooltipColors = ['#D5F0C2', '#C2E0F0', '#C2C2F0', '#D9C2F0', '#F0C6C2', '#F0DDC2', '#F0F0C2']
 
-  var dichselectedMap, optionsMap, timepointsMap
+  let dichselectedMap, optionsMap, timepointsMap
 
   // Initialize the chart panel
   // TODO fix constructor
@@ -26,20 +26,20 @@
     }
 
     // Unpack the data
-    for (var i = 0; i < questions.length; i++) {
-      var q = questions[i]
+    for (let i = 0; i < questions.length; i++) {
+      const q = questions[i]
       questionMap[q.column] = q
     }
     initialQuestion = groups[0].questions[0]
     selectedTab = questionMap[initialQuestion].displaytypes[0]
-    var displaytypes = questionMap[initialQuestion].displaytypes
+    const displaytypes = questionMap[initialQuestion].displaytypes
 
     // Add click events to the tabs
     d3.selectAll('.chart-tab')
       .on('click',
         function () {
-          var classes = this.classList
-          for (var i = 0; i < classes.length; i++) {
+          const classes = this.classList
+          for (let i = 0; i < classes.length; i++) {
             if (classes[i] === 'freq' || classes[i] === 'mean' || classes[i] === 'dich') {
               setSelectedTab(classes[i].toUpperCase())
             }
@@ -61,7 +61,7 @@
         if (displaytypes.length <= 1) {
           return 'none'
         }
-        for (var j = 0; j < displaytypes.length; j++) {
+        for (let j = 0; j < displaytypes.length; j++) {
           if (tabs[i].classList.contains(displaytypes[j].toLowerCase())) {
             return 'block'
           }
@@ -109,7 +109,7 @@
     //   .text('')
 
     // Add new content
-    // var questionMeta = questionMap[questionID]
+    // let questionMeta = questionMap[questionID]
     // d3.select('.header-section-header').text(questionMeta.short)
     // if (questionMeta.short !== questionMeta.text) {
     //   d3.select('.header-section-sub').text(questionMeta.text)
@@ -122,7 +122,7 @@
       .classed('chart-scroll', false)
       .style('width', null)
 
-    var displaytypes = questionMap[questionID].displaytypes
+    const displaytypes = questionMap[questionID].displaytypes
     d3.selectAll('.chart-tab')
       .classed('chart-tab-selected', function (d, i, tabs) { return tabs[i].classList.contains(selectedTab.toLowerCase()) })
 
@@ -131,7 +131,7 @@
         if (displaytypes.length <= 1) {
           return 'none'
         }
-        for (var j = 0; j < displaytypes.length; j++) {
+        for (let j = 0; j < displaytypes.length; j++) {
           if (tabs[i].classList.contains(displaytypes[j].toLowerCase())) {
             return 'block'
           }
@@ -190,30 +190,30 @@
 
   exports.updateChartPanelSize = function () {
     // Calculate available width, assuming to horizontal scroll for the page as a whole
-    var availableWidth = document.documentElement.clientWidth - // window width
+    const availableWidth = document.documentElement.clientWidth - // window width
               d3.select('.question-panel').node().offsetWidth - // tree sidebar
               d3.select('.sidebar-column').node().offsetWidth - // right sidebar
               2 - // border of 1px + 1px (if changed here, needs to be changed in css)
               1 // 1 px fudge to account for rounding
     // Calculate minimum width needed for header
-    var headerBlockWidth = d3.select('.header-section').node().offsetWidth
+    const headerBlockWidth = d3.select('.header-section').node().offsetWidth
 
     // Calculate minimum width needed for the block under the chart
-    // var bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
-    var bottomBlockWidth = 0
-    var description = d3.select('.description-panel').node()
+    // let bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
+    let bottomBlockWidth = 0
+    const description = d3.select('.description-panel').node()
     if (description != null && description.offsetWidth > 0) {
       bottomBlockWidth += 250 // TODO hard coded
     }
 
     // Minimum width needed for the header and bottom blocks
-    var topBotNeededWidth = Math.max(headerBlockWidth, bottomBlockWidth)
+    const topBotNeededWidth = Math.max(headerBlockWidth, bottomBlockWidth)
 
     // Use all the width available with no scrolling for the chart  unless the header or bottom
     // block require more width. In that case also allow the chart to be so big that the page as a
     // whole gets a vertical scroll bar. If the chart's minimum width is larger than the available
     // width then it's up to the chart to put itself in a horizontal scroll panel.
-    var widthForChart = Math.max(availableWidth, topBotNeededWidth)
+    const widthForChart = Math.max(availableWidth, topBotNeededWidth)
     switch (selectedTab) {
     case 'FREQ':
       dax.chart.frequency.setSize(widthForChart, 350)

@@ -6,48 +6,48 @@
   // CONSTANTS
   // TODO move to setting in producer
   // if chart width is smaller than this, embed it it a scrollpanel
-  var chartWidthScrollBreakpoint = 600
+  const chartWidthScrollBreakpoint = 600
 
   // CHART VARIABLES
-  var yAxisWidth, xAxisHeight, margin, width, height
-  var chart, chartG
+  let yAxisWidth, xAxisHeight, margin, width, height
+  let chart, chartG
 
   // INITIALIZE STATIC RESOURCES
   // TODO actually initialize
-  var dichselectedMap
-  var optionsMap
-  var timepointsMap
-  var percentageFormat = d3.format('.0%')
+  let dichselectedMap
+  let optionsMap
+  let timepointsMap
+  const percentageFormat = d3.format('.0%')
 
-  var pointSymbol = d3.symbol().type(d3.symbolCircle)
-  var pointSize = 40
-  var pointFocusSize = 550
+  const pointSymbol = d3.symbol().type(d3.symbolCircle)
+  const pointSize = 40
+  const pointFocusSize = 550
 
-  var fadeTransition = d3.transition()
+  const fadeTransition = d3.transition()
       .duration(300)
       .ease(d3.easeLinear)
 
   // INSTANCE SPECIFIC VARIABLES
 
-  var lineColors // TODO unused: , hoverColors
-  var question, perspective
-  var currentOptions
-  var zScaleColor
+  let lineColors // TODO unused: , hoverColors
+  let question, perspective
+  let currentOptions
+  let zScaleColor
 
   // FUNCTIONS
 
   function fadeOthers (focusedIndex) {
     unfadeAll()
-    for (var i = 0; i < currentOptions.length; i++) {
-      var optionIndex = currentOptions[i].index
+    for (let i = 0; i < currentOptions.length; i++) {
+      const optionIndex = currentOptions[i].index
 
-      var row = d3.select('.legend-row-' + optionIndex)
+      const row = d3.select('.legend-row-' + optionIndex)
       row.interrupt().selectAll('*').interrupt()
 
-      var lineMain = d3.selectAll('.line.dataset-' + optionIndex)
+      const lineMain = d3.selectAll('.line.dataset-' + optionIndex)
       lineMain.interrupt().selectAll('*').interrupt()
 
-      var pointMain = d3.selectAll('.dich-point.dataset-' + optionIndex)
+      const pointMain = d3.selectAll('.dich-point.dataset-' + optionIndex)
       pointMain.interrupt().selectAll('*').interrupt()
 
       if (optionIndex !== focusedIndex) {
@@ -68,21 +68,21 @@
   }
 
   function unfadeAll () {
-    for (var i = 0; i < currentOptions.length; i++) {
-      var optionIndex = currentOptions[i].index
-      var row = d3.select('.legend-row-' + optionIndex)
+    for (let i = 0; i < currentOptions.length; i++) {
+      const optionIndex = currentOptions[i].index
+      const row = d3.select('.legend-row-' + optionIndex)
       row.interrupt().selectAll('*').interrupt()
       row
         .transition(fadeTransition)
         .style('opacity', 1)
     }
-    var lineMain = d3.selectAll('.line')
+    const lineMain = d3.selectAll('.line')
     lineMain.interrupt().selectAll('*').interrupt()
     lineMain
         .transition(fadeTransition)
         .attr('opacity', 1)
 
-    var pointMain = d3.selectAll('.dich-point')
+    const pointMain = d3.selectAll('.dich-point')
     pointMain.interrupt().selectAll('*').interrupt()
     pointMain
         .transition(fadeTransition)
@@ -91,14 +91,14 @@
 
   function tooltipOver (focusedIndex) {
     tooltipOut()
-    var tooltips = d3.selectAll('.point-tooltip-' + focusedIndex)
+    const tooltips = d3.selectAll('.point-tooltip-' + focusedIndex)
     tooltips.interrupt().selectAll('*').interrupt()
     tooltips.style('display', 'block')
     //     tooltips.transition(fadeTransition)
     //       .style("opacity", 1);
 
-    //     var symbol = d3.symbol().type(d3.symbolCircle);
-    //     var points = d3.selectAll(".dich-point.dataset-" + focusedIndex);
+    // let symbol = d3.symbol().type(d3.symbolCircle);
+    // let points = d3.selectAll(".dich-point.dataset-" + focusedIndex);
     // //     points.interrupt().selectAll('*').interrupt();
     // //     points.attr("d", symbol.size(64));
     // //     console.log(points);
@@ -111,38 +111,38 @@
     // //     points.transition(fadeTransition)
     // //       .attr("d", symbol.size(400));
 
-    var lineCover = d3.selectAll('.line-cover.dataset-' + focusedIndex)
+    const lineCover = d3.selectAll('.line-cover.dataset-' + focusedIndex)
     lineCover
       .attr('opacity', '1')
 
-    var pointMain = d3.selectAll('.dich-point-cover.dataset-' + focusedIndex)
+    const pointMain = d3.selectAll('.dich-point-cover.dataset-' + focusedIndex)
     pointMain
       .attr('opacity', '1')
   }
 
   function tooltipOut () {
-    var tooltips = d3.selectAll('.point-tooltip')
+    const tooltips = d3.selectAll('.point-tooltip')
     tooltips.interrupt().selectAll('*').interrupt()
     tooltips.style('display', 'none')
     //     tooltips.transition(fadeTransition)
     //       .style("opacity", 0);
 
-    //     var symbol = d3.symbol().type(d3.symbolCircle);
-    //     var points = d3.selectAll(".dich-point");
+    // let symbol = d3.symbol().type(d3.symbolCircle);
+    // let points = d3.selectAll(".dich-point");
     // //     points.interrupt().selectAll('*').interrupt();
     //     points.attr("d", symbol.size(pointSize));
     //
-    // //     var symbol = d3.symbol().size(40).type(d3.symbolCircle);
-    // //     var points = d3.selectAll(".dich-point");
+    // //let symbol = d3.symbol().size(40).type(d3.symbolCircle);
+    // //let points = d3.selectAll(".dich-point");
     // //     points.interrupt().selectAll('*').interrupt();
     // //     points.transition(fadeTransition)
     // //       .attr("d", symbol.size(pointSize));
 
-    var lineCover = d3.selectAll('.line-cover')
+    const lineCover = d3.selectAll('.line-cover')
     lineCover
       .attr('opacity', '0')
 
-    var pointMain = d3.selectAll('.dich-point-cover')
+    const pointMain = d3.selectAll('.dich-point-cover')
     pointMain
       .attr('opacity', '0')
   }
@@ -199,17 +199,17 @@
 
   function updateChartElements () {
     // X SCALE
-    var xScale = d3.scaleBand()
+    const xScale = d3.scaleBand()
       .range([0, width])
       .paddingInner(0.3)
       .paddingOuter(0)
       .domain(timepointsMap[perspective])
 
-    var xBandwidth = xScale.bandwidth()
+    const xBandwidth = xScale.bandwidth()
 
     // Y SCALE
     // TODO use a dynamic scale or min/max points set in producer
-    var yScale = d3.scaleLinear()
+    const yScale = d3.scaleLinear()
       .range([height, 0])
       .domain([0, 1])
 
@@ -219,16 +219,16 @@
       .domain(optionsMap[perspective])
 
     // TODO unused z scale hover color?
-    // var zScaleHoverColor = d3.scaleOrdinal(hoverColors)
+    // let zScaleHoverColor = d3.scaleOrdinal(hoverColors)
     //   .domain(optionsMap[perspective])
 
     // TODO unused z scale symbol?
-    // var zScaleSymbol = d3
+    // let zScaleSymbol = d3
     //   .scaleOrdinal([d3.symbolCircle, d3.symbolDiamond, d3.symbolSquare, d3.symbolTriangle, d3.symbolStar, d3.symbolCross, d3.symbolWye])
     //   .domain(optionsMap[perspective])
 
     // LINE TEMPLATE
-    var line = d3.line()
+    const line = d3.line()
       .curve(d3.curveLinear)
       .x(function (d) { return xScale(d.timepoint) + xScale.bandwidth() / 2 })
       .y(function (d) {
@@ -236,12 +236,12 @@
       })
 
     // UPDATE X AXIS
-    var xAxis = d3.axisBottom(xScale)
+    const xAxis = d3.axisBottom(xScale)
       .tickFormat(function (d) {
         return dax.text('timepoint' + d) // TODO use new text format
       })
 
-    var xAxisElement = d3.select('.dichtime-x-axis')
+    const xAxisElement = d3.select('.dichtime-x-axis')
 
     //     xAxisElement.interrupt().selectAll('*').interrupt();
 
@@ -250,12 +250,12 @@
       .call(xAxis)
 
     // UPDATE Y AXIS
-    var yAxis = d3.axisLeft(yScale)
+    const yAxis = d3.axisLeft(yScale)
       .tickFormat(d3.format('.0%'))
       .tickSize(0)
       .tickSizeInner(width)
 
-    var yAxisElement = d3.select('.dichtime-y-axis')
+    const yAxisElement = d3.select('.dichtime-y-axis')
 
     yAxisElement.interrupt().selectAll('*').interrupt()
 
@@ -264,7 +264,7 @@
       .call(yAxis)
 
     // UPDATE LINES
-    //     var option = chartG.selectAll(".option")
+    // let option = chartG.selectAll(".option")
     //       .data(options)
     //       .enter().append("g")
     //         .attr("class", "option");
@@ -277,8 +277,8 @@
     //       .style("stroke", function(d) { return zScaleColor(d.id); });
 
     //     currentOptions.forEach(function(option) {
-    //       var color = zScaleColor(option.id);
-    //       var hover_color = zScaleHoverColor(option.id);
+    // let color = zScaleColor(option.id);
+    // let hover_color = zScaleHoverColor(option.id);
     //
 
     // Connect the points with lines
@@ -302,7 +302,7 @@
 
     // Connect the points with lines
     currentOptions.forEach(function (option) {
-      var color = zScaleColor(option.id)
+      const color = zScaleColor(option.id)
       d3.select('.line.dataset-' + option.index).remove()
       chartG.append('path')
         .datum(option.values)
@@ -325,7 +325,7 @@
 
     // Individual points
     currentOptions.forEach(function (option) {
-      var color = zScaleColor(option.id)
+      const color = zScaleColor(option.id)
       chartG.selectAll('.dich-point.dataset-' + option.index)
         .data(option.values)
       .enter().append('path')
@@ -352,7 +352,7 @@
 
     // Mouse over elements added later in order to cover underlying elements when highlighted
     currentOptions.forEach(function (option) {
-      var color = zScaleColor(option.id)
+      const color = zScaleColor(option.id)
 
       // Connect the points with lines
       d3.selectAll('.line-cover.dataset-' + option.index).remove()
@@ -368,7 +368,7 @@
     })
 
     currentOptions.forEach(function (option) {
-      var color = zScaleColor(option.id)
+      const color = zScaleColor(option.id)
       // Individual points
       d3.selectAll('.dich-point-cover.dataset-' + option.index).remove()
       chartG.selectAll('.dich-point-cover.dataset-' + option.index)
@@ -389,8 +389,8 @@
 
     currentOptions.forEach(function (option) {
       // Add tooltip divs
-      //       var dichWrapper = d3.select(".dich-line-chart").node().getBoundingClientRect();
-      //         var xAxisStart = d3.select(".dichtime-x-axis").node().getBoundingClientRect().x;
+      // let dichWrapper = d3.select(".dich-line-chart").node().getBoundingClientRect();
+      // let xAxisStart = d3.select(".dichtime-x-axis").node().getBoundingClientRect().x;
       d3.selectAll('.point-tooltip-' + option.index).remove()
       chartG.selectAll('.point-tooltip-' + option.index)
         .data(option.values)
@@ -435,19 +435,19 @@
 
     // TODO check actually delivered time points in statJson data?
     // TODO generate timepoint texts in daxplore export file to experiment with that as an array here
-    var options = []
+    const options = []
     selectedOptions.forEach(function (option, i) {
-      var values = []
+      const values = []
       timepointsMap[perspective].forEach(function (timepoint) {
         if (typeof stat.freq[timepoint] !== 'undefined') {
-          var freq = stat.freq[timepoint][option]
-          var selected = dichselectedMap[question]
-          var selectedCount = 0
-          var totalCount = 0
-          for (var i = 0; i < freq.length; i++) {
+          const freq = stat.freq[timepoint][option]
+          const selected = dichselectedMap[question]
+          let selectedCount = 0
+          let totalCount = 0
+          for (let i = 0; i < freq.length; i++) {
             if (freq[i] > 0) {
               totalCount += freq[i]
-              for (var j = 0; j < selected.length; j++) {
+              for (let j = 0; j < selected.length; j++) {
                 if (i === selected[j]) {
                   selectedCount += freq[i]
                 }
@@ -478,7 +478,7 @@
 
   exports.generateLegend = function () {
     // GENERATE LEGEND
-    var legend = d3.select('.legend')
+    const legend = d3.select('.legend')
       .style('margin-top', (d3.select('.header-section').node().offsetHeight + height / 2.5) + 'px')
       .style('margin-left', '4px')
 
@@ -521,7 +521,7 @@
     // then: set scroll area width to 2., chart to 3., wrap and scroll
     // else: set chart to 2, no scroll
 
-    var availableWidth = document.documentElement.clientWidth - // window width
+    const availableWidth = document.documentElement.clientWidth - // window width
               d3.select('.question-panel').node().offsetWidth - // tree sidebar
               5 - // tree margin (if changed here, needs to be changed in css)
               d3.select('.sidebar-column').node().offsetWidth - // right sidebar
@@ -529,24 +529,22 @@
               1 // 1px fudge
     // TODO - scrollbar width?
 
-    var headerBlockWidth = d3.select('.header-section').node().offsetWidth
-    var bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
-    var description = d3.select('.description-panel').node()
+    const headerBlockWidth = d3.select('.header-section').node().offsetWidth
+    let bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
+    const description = d3.select('.description-panel').node()
     if (description != null && description.offsetWidth > 0) {
       bottomBlockWidth += 250 // TODO hard coded
     }
-    var topBotNeededWidth = Math.max(headerBlockWidth, bottomBlockWidth)
+    const topBotNeededWidth = Math.max(headerBlockWidth, bottomBlockWidth)
 
-    var widthForChart = Math.max(availableWidth, topBotNeededWidth)
+    const widthForChart = Math.max(availableWidth, topBotNeededWidth)
 
-    var chartNeededWidth = 600 // TODO hard coded, shouldn't be
+    const chartNeededWidth = 600 // TODO hard coded, shouldn't be
 
-    var lockWidth = widthForChart < chartNeededWidth
-    var chartWidth
+    const lockWidth = widthForChart < chartNeededWidth
+    let chartWidth = widthForChart
     if (lockWidth) {
       chartWidth = chartNeededWidth
-    } else {
-      chartWidth = widthForChart
     }
     d3.select('.chart')
       .classed('chart-scroll', lockWidth)

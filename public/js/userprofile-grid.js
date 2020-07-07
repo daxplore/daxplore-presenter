@@ -5,25 +5,23 @@
   namespace.userprofile = namespace.userprofile || {}
   const exports = namespace.userprofile
 
-  var qIDs, meanReferences, shorttextsMap, directions, titleRegexpMap
+  let qIDs, meanReferences, shorttextsMap, directions, titleRegexpMap
 
-  var systemdata
-  var usernames = []
-  var usermeans = []
+  let systemdata
+  const usernames = []
+  let usermeans = []
 
-  var callbackFunctions = []
+  const callbackFunctions = []
 
-  var gridRows, tbody
+  let gridRows, tbody
 
-  var userPasteSectionOpen = false
+  let userPasteSectionOpen = false
 
   function colorClassForValue (value, reference, direction) {
     if (typeof value !== 'number' || isNaN(value)) { return '' }
-
+    let diff = value - reference // HIGH
     if (direction === 'LOW') {
-      var diff = reference - value
-    } else {
-      diff = value - reference
+      diff = reference - value
     }
 
     if (diff < -5) {
@@ -37,16 +35,16 @@
 
   function callCallbacks () {
     // make sure all names are unique for the drop-down
-    var names = []
-    for (var i = 0; i < usernames.length; i++) {
-      var name = usernames[i]
+    const names = []
+    for (let i = 0; i < usernames.length; i++) {
+      let name = usernames[i]
       while (names.indexOf(name) !== -1) {
         name += ' '
       }
       names.push(name)
     }
 
-    for (i = 0; i < callbackFunctions.length; i++) {
+    for (let i = 0; i < callbackFunctions.length; i++) {
       callbackFunctions[i](names, usermeans)
     }
   }
@@ -64,7 +62,7 @@
                 .attr('tabindex', function (d, i) { return 1 + i * (qIDs.length + 1) })
                 .attr('placeholder', function (d, i) { return 'Grupp ' + (i + 1) }) // TODO externalize
                 .on('input', function (d, i, t) {
-                  var el = t[i]
+                  const el = t[i]
                   if (typeof el.value === 'undefined' || el.value === '') {
                     usernames[i] = el.placeholder
                   } else {
@@ -96,15 +94,15 @@
             dax.profile.setDescriptionShort(d3.select('#grid-description'), d.qID)
           })
           .on('focusout', function (d, i, t) {
-            var el = t[i]
-            var val = parseFloat(el.value.replace(',', '.'))
+            const el = t[i]
+            let val = parseFloat(el.value.replace(',', '.'))
             if (typeof val !== 'number' || isNaN(val)) {
               el.value = ''
               return
             }
 
-            var min = 0
-            var max = 100
+            const min = 0
+            const max = 100
 
             val = Math.min(Math.max(val, min), max)
 
@@ -118,11 +116,11 @@
                 .attr('class', colorClassForValue(val, meanReferences[d.qID], directions[d.qID]))
           })
           .on('input', function (d, i, t) {
-            var el = t[i]
-            var val = parseFloat(el.value.replace(',', '.'))
+            const el = t[i]
+            let val = parseFloat(el.value.replace(',', '.'))
 
-            var min = 0
-            var max = 100
+            const min = 0
+            const max = 100
 
             val = Math.min(Math.max(val, min), max)
 
@@ -142,9 +140,9 @@
   }
 
   function updateUserCopyGroupNameDropdown (groupNames) {
-    var dropdown = d3.selectAll('.user-paste-data-submit-column-select')
+    const dropdown = d3.selectAll('.user-paste-data-submit-column-select')
 
-    var options = dropdown.selectAll('option')
+    const options = dropdown.selectAll('option')
         .data(groupNames, function (d) { return d })
 
     options.exit().remove()
@@ -175,7 +173,7 @@
         userPasteSectionOpen = !userPasteSectionOpen
 
         // TURN ARROW
-        var arrow = d3.select('.user-paste-data-header-arrow')
+        const arrow = d3.select('.user-paste-data-header-arrow')
         arrow.interrupt().selectAll('*').interrupt()
         arrow
           .transition().duration(300)
@@ -191,9 +189,9 @@
 
     d3.select('.user-paste-data-submit-button')
       .on('click', function () {
-        var selectedGroupIndex = d3.select('.user-paste-data-submit-column-select').node().selectedIndex
+        const selectedGroupIndex = d3.select('.user-paste-data-submit-column-select').node().selectedIndex
 
-        for (var i = 0; i < usermeans.length; i++) {
+        for (let i = 0; i < usermeans.length; i++) {
           usermeans[i][selectedGroupIndex] = NaN
         }
 
@@ -204,15 +202,15 @@
         importedText = importedText.replace(/\n(\s*\d+[\\.,]?\d*\s*)(\n|$)/g, ' $1$2')
 
         let rows = importedText.split('\n')
-        var importedTexts = new Array(usermeans.length)
-        var importedMeanStrings = new Array(usermeans.length)
-        var importedMeans = new Array(usermeans.length)
-        var matchedRows = new Array(rows.length)
+        const importedTexts = new Array(usermeans.length)
+        const importedMeanStrings = new Array(usermeans.length)
+        const importedMeans = new Array(usermeans.length)
+        const matchedRows = new Array(rows.length)
 
-        var numberBoundsErrors = []
-        var notANumberErrors = []
-        var multiMatchErrors = []
-        var noMatchErrors = []
+        const numberBoundsErrors = []
+        const notANumberErrors = []
+        const multiMatchErrors = []
+        const noMatchErrors = []
 
         rows = rows.map(function (row) {
           return row.trim()
@@ -220,12 +218,12 @@
         let foundFirstNonEmptyRow = false
 
         // parse text and numbers
-        for (i = 0; i < rows.length; i++) {
-          var row = rows[i]
+        for (let i = 0; i < rows.length; i++) {
+          const row = rows[i]
           if (row.length === 0) {
             continue
           }
-          var lastWhitespace = row.search(/\s[^\s]*$/)
+          const lastWhitespace = row.search(/\s[^\s]*$/)
           importedTexts[i] = row
           if (lastWhitespace > 0) {
             importedTexts[i] = row.substring(0, lastWhitespace + 1).trim()
@@ -261,7 +259,7 @@
             if (typeof importedTexts[importRow] === 'undefined') {
               continue
             }
-            var textLC = importedTexts[importRow].toLowerCase()
+            const textLC = importedTexts[importRow].toLowerCase()
             if (textLC.length > 0) {
               if (textLC.search(questionTitleMatch) >= 0) {
                 matchedRowTexts.push(importedTexts[importRow] + ' ' + importedMeanStrings[importRow])
@@ -285,7 +283,7 @@
         })
 
         // generate errors for unmatched rows
-        for (i = 0; i < matchedRows.length; i++) {
+        for (let i = 0; i < matchedRows.length; i++) {
           if (typeof matchedRows[i] === 'undefined' && typeof rows[i] !== 'undefined' && rows[i].length > 0) {
             noMatchErrors.push(rows[i])
           }
@@ -295,7 +293,7 @@
         d3.select('.user-paste-data-error-text-number-bounds-errors')
           .style('display', numberBoundsErrors.length > 0 ? 'block' : 'none')
 
-        var numberBoundsErrorRows = d3.select('.user-paste-data-error-text-number-bounds-errors')
+        const numberBoundsErrorRows = d3.select('.user-paste-data-error-text-number-bounds-errors')
           .selectAll('.user-paste-data-error-row')
           .data(numberBoundsErrors)
 
@@ -313,7 +311,7 @@
         d3.select('.user-paste-data-error-text-no-number-errors')
           .style('display', notANumberErrors.length > 0 ? 'block' : 'none')
 
-        var notANumberErrorRows = d3.select('.user-paste-data-error-text-no-number-errors')
+        const notANumberErrorRows = d3.select('.user-paste-data-error-text-no-number-errors')
           .selectAll('.user-paste-data-error-row')
           .data(notANumberErrors)
 
@@ -331,14 +329,14 @@
         d3.select('.user-paste-data-error-text-multiple-rows-errors')
           .style('display', multiMatchErrors.length > 0 ? 'block' : 'none')
 
-        var multipleMatchErrorGroups = d3.select('.user-paste-data-error-text-multiple-rows-errors')
+        const multipleMatchErrorGroups = d3.select('.user-paste-data-error-text-multiple-rows-errors')
           .selectAll('.user-paste-data-error-multiple-match-group')
           .data(multiMatchErrors)
 
         multipleMatchErrorGroups.exit().remove()
 
-        var multipleMatchContentFunction = function (d) {
-          var group = d3.select(this)
+        const multipleMatchContentFunction = function (d) {
+          const group = d3.select(this)
           group.text('')
 
           // TODO externalize text
@@ -364,7 +362,7 @@
         d3.select('.user-paste-data-error-text-no-row-errors')
           .style('display', noMatchErrors.length > 0 ? 'block' : 'none')
 
-        var noMatchErrorRows = d3.select('.user-paste-data-error-text-no-row-errors')
+        const noMatchErrorRows = d3.select('.user-paste-data-error-text-no-row-errors')
           .selectAll('.user-paste-data-error-row')
           .data(noMatchErrors)
 
@@ -455,13 +453,13 @@
       })
 
       // GRID FORM
-      var form = d3.select('.grid').append('form').attr('lang', 'sv')
-      var table = form.append('table')
-      var thead = table.append('thead')
+      const form = d3.select('.grid').append('form').attr('lang', 'sv')
+      const table = form.append('table')
+      const thead = table.append('thead')
       tbody = table.append('tbody')
 
       // GRID HEADER
-      var header = thead.append('tr')
+      const header = thead.append('tr')
           .classed('grid-header', true)
 
       header
@@ -488,11 +486,11 @@
     }
 
   exports.saveGridImage = function () {
-    var gridclone = d3.select(d3.select('.grid').node().cloneNode(true))
+    let gridclone = d3.select(d3.select('.grid').node().cloneNode(true))
 
-    var removed = 0
+    let removed = 0
     systemdata.forEach(function (d) {
-      for (var col = 0; col < usernames.length; col++) {
+      for (let col = 0; col < usernames.length; col++) {
         if (!isNaN(usermeans[d.index][col])) {
           return
         }
@@ -528,31 +526,31 @@
               .style('width', 'auto')
               .text(function (name) { return name })
 
-    var textTest = d3.select('body')
+    const textTest = d3.select('body')
       .append('span')
       .classed('text-width-test', true)
 
-    var maxTitleWidth = 0
-    for (var i = 0; i < usernames.length; i++) {
+    let maxTitleWidth = 0
+    for (let i = 0; i < usernames.length; i++) {
       textTest
         .text(usernames[i])
       maxTitleWidth = Math.max(maxTitleWidth, textTest.node().offsetWidth)
     }
-    var titleHeight = textTest.node().offsetHeight
+    const titleHeight = textTest.node().offsetHeight
     textTest.remove()
 
-    var rotationAngle = 2 * Math.PI * 1 / 8
-    var headerHeight = gridclone.select('.grid-header').node().offsetHeight
-    var trueHeaderWidth = maxTitleWidth * Math.sin(rotationAngle) + titleHeight * Math.cos(rotationAngle)
-    var heightOffset = trueHeaderWidth - headerHeight
+    const rotationAngle = 2 * Math.PI * 1 / 8
+    const headerHeight = gridclone.select('.grid-header').node().offsetHeight
+    const trueHeaderWidth = maxTitleWidth * Math.sin(rotationAngle) + titleHeight * Math.cos(rotationAngle)
+    let heightOffset = trueHeaderWidth - headerHeight
 
     // true_header height represents a square of the longest header
     // estimate width based on the largest title being the rightmost header.
     // This could be computed more accurately by for each header calculating:
     // vertical overflow = true header width - width of columns to the right
-    var chartWidth = gridclone.node().offsetWidth + trueHeaderWidth - 20
+    const chartWidth = gridclone.node().offsetWidth + trueHeaderWidth - 20
 
-    var topMargin = 3 + (heightOffset > 0 ? heightOffset : 0)
+    const topMargin = 3 + (heightOffset > 0 ? heightOffset : 0)
     gridclone
       .style('padding-top', topMargin + 'px')
       .style('padding-bottom', 1 + 'px')
@@ -575,26 +573,26 @@
       })
   }
 
-  var generateAndSaveImage = function (dataUrl, minWidth, heightOffset) {
-    var img = new Image()
+  const generateAndSaveImage = function (dataUrl, minWidth, heightOffset) {
+    const img = new Image()
     img.onload = function () {
-      var hMargin = 10
-      var chartWidth = Math.max(minWidth, img.width + 2 * hMargin)
-      var topMargin = 10
-      var bottomMargin = 20
-      var canvasHeight = img.height + heightOffset + topMargin + bottomMargin
+      const hMargin = 10
+      const chartWidth = Math.max(minWidth, img.width + 2 * hMargin)
+      const topMargin = 10
+      const bottomMargin = 20
+      const canvasHeight = img.height + heightOffset + topMargin + bottomMargin
 
-      var canvasChartSelection = d3.select('body').append('canvas')
+      const canvasChartSelection = d3.select('body').append('canvas')
         .attr('width', chartWidth)
         .attr('height', canvasHeight)
         .style('visibility', 'visible')
-      var canvasChart = canvasChartSelection.node()
-      var ctx = canvasChart.getContext('2d')
+      const canvasChart = canvasChartSelection.node()
+      const ctx = canvasChart.getContext('2d')
 
-      var sourceText = dax.text('imageWaterStamp') // TODO use new text ID style
-      var sourceFontHeight = 11
+      const sourceText = dax.text('imageWaterStamp') // TODO use new text ID style
+      const sourceFontHeight = 11
       ctx.font = sourceFontHeight + 'px sans-serif'
-      var sourceTextWidth = ctx.measureText(sourceText).width
+      const sourceTextWidth = ctx.measureText(sourceText).width
 
       if (sourceTextWidth + 2 * hMargin > chartWidth) {
         generateAndSaveImage(dataUrl, sourceTextWidth + 2 * hMargin, heightOffset)

@@ -20,10 +20,10 @@
 
   // CURRENT CHART
   // HEADER
-  let headerDiv, headerMain, headerSub, headerDescriptionButton, headerDecriptionPanel
+  let headerDiv, headerMain, headerSub, headerDescriptionButton //, headerDecriptionPanel
   // CHART
   let chart, chartContainer, chartG
-  let referenceLine, referenceLineMouseArea
+  // let referenceLine, referenceLineMouseArea
 
   // SCALES AND AXISES
   let xScale
@@ -60,7 +60,8 @@
       .attr('class', 'header-section__sub')
     headerDescriptionButton = d3.select('.chart-panel').append('div')
       .attr('class', 'header-section__description-button')
-    headerDecriptionPanel = headerDescriptionButton.append('div')
+    // headerDecriptionPanel =
+    headerDescriptionButton.append('div')
       .attr('class', 'header-section__description-panel')
 
     // INITIALIZE CHART
@@ -133,7 +134,8 @@
       .text(dax.text('listXAxisDescription')) // TODO use new text ID style
 
     // REFERENCE LINE
-    referenceLine = chartG.append('line')
+    // referenceLine =
+    chartG.append('line')
       .attr('class', 'reference-line')
       .style('stroke', '#666')
       .style('stroke-width', '3.2px')
@@ -141,7 +143,8 @@
       .style('stroke-dasharray', '4,8')
       .style('shape-rendering', 'crispedges')
 
-    referenceLineMouseArea = chartG.append('rect')
+    // referenceLineMouseArea =
+    chartG.append('rect')
       .style('opacity', 0)
       // .on('mouseover', function () { referenceTooltipDiv.classed('hidden', false) })
       // .on('mouseout', function () { referenceTooltipDiv.classed('hidden', true) })
@@ -339,7 +342,7 @@
     /** * TODO REMOVE OLD VERSION * **/
 
     // if (animateNextUpdate) {
-    // var elTransition = elementTransition
+    // let elTransition = elementTransition
     // } else {
     //   elTransition = d3.transition().duration(0)
     // }

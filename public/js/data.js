@@ -2,7 +2,8 @@
   namespace.data = namespace.data || {}
   const exports = namespace.data
 
-  let groups, perspectives, questionData, questionMeta
+  let perspectives, questionData, questionMeta
+  // let groups
 
   // DATA
   // Returns an object with values for mean (the mean value) and count (the number of respondents)
@@ -160,7 +161,7 @@
   }
 
   exports.initializeResources = function (groupsInput, perspectivesInput, questionMetaInput, questionDataInput) {
-    groups = groupsInput
+    // groups = groupsInput
     perspectives = perspectivesInput
     questionMeta = questionMetaInput
     questionData = questionDataInput
@@ -224,7 +225,7 @@
   }
 
   exports.isAllSingleTimepoint = function () {
-    for (var questionID in questionMeta) {
+    for (const questionID in questionMeta) {
       if (questionMeta[questionID].timepoints.length > 1) {
         return false
       }

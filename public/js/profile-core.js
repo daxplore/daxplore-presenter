@@ -69,7 +69,7 @@
       }
 
       // TODO do data parsing as a Promise, to prevent blocking of the rest of the data download?
-      var perspectiveOptions = []
+      let perspectiveOptions = []
       const shorttextMap = {}
       const descriptionMap = {}
       const directionMap = {}

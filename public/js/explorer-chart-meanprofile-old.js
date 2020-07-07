@@ -22,27 +22,27 @@
   // CONSTANTS
   // TODO move to setting in producer
   // if chart width is smaller than this, embed it it a scrollpanel
-  var chartWidthScrollBreakpoint = 300
+  const chartWidthScrollBreakpoint = 300
 
-  var elementTransition = d3.transition()
+  const elementTransition = d3.transition()
       .duration(300)
       .ease(d3.easeLinear)
 
   // CHART VARIABLES
-  var xAxisTopHeight, xAxisBottomHeight, margin, width, height
-  var chart, chartG
+  let xAxisTopHeight, xAxisBottomHeight, margin, width, height
+  let chart, chartG
 
   // INSTANCE SPECIFIC VARIABLES
-  var firstUpdate = true
-  var selectedOptions, perspective, question
-  var questionReferenceValue, questionGoodDirection
-  var selectedOptionsData
-  var yAxisElement, yAxisReferenceElement
+  const firstUpdate = true
+  let selectedOptions, perspective, question
+  let questionReferenceValue, questionGoodDirection
+  let selectedOptionsData
+  let yAxisElement, yAxisReferenceElement
 
   // INITIALIZE STATIC RESOURCES
   // TODO initialize once or keep injecting?
-  var questionMap
-  // TODO unused: var percentageFormat = d3.format('.0%')
+  let questionMap
+  // TODO unused: let percentageFormat = d3.format('.0%')
 
   // INTERNAL FUNCTIONS
 
@@ -124,43 +124,42 @@
   }
 
   function updateChartElements () {
+    let elTrans = elementTransition
     if (firstUpdate) {
-      var elTrans = d3.transition().duration(0)
-    } else {
-      elTrans = elementTransition
+      elTrans = d3.transition().duration(0)
     }
 
-    var paddingInner = 0.3
-    var paddingOuter = 0.4
-    // TODO unused: var maxBandwidth = 50
+    const paddingInner = 0.3
+    const paddingOuter = 0.4
+    // TODO unused: let maxBandwidth = 50
 
     // TODO use to calculate minHeight for chart
     // rearranged equation from d3's source file band.js, ignoring the floor call
     // https://github.com/d3/d3-scale/blob/fd07dd8ceeaeaec612f675050ac134243b406f64/src/band.js#L26
-    // var yHeightWithMaxBand = Math.max(1, selectedOptions.length - paddingInner + paddingOuter * 2) * maxBandwidth / (1 - paddingInner);
+    // let yHeightWithMaxBand = Math.max(1, selectedOptions.length - paddingInner + paddingOuter * 2) * maxBandwidth / (1 - paddingInner);
     //
-    // var yStop = Math.min(height - xAxisBottomHeight, yHeightWithMaxBand + xAxisTopHeight);
+    // let yStop = Math.min(height - xAxisBottomHeight, yHeightWithMaxBand + xAxisTopHeight);
 
-    var yStop = height - xAxisBottomHeight
+    const yStop = height - xAxisBottomHeight
 
     // CALCULATE Y SCALE
-    var yScale = d3.scaleBand()
+    const yScale = d3.scaleBand()
       .range([xAxisTopHeight, yStop])
       .paddingInner(paddingInner)
       .paddingOuter(paddingOuter)
       .domain(selectedOptions)
 
     // UPDATE Y AXIS
-    var yAxisScale = yScale.copy()
+    const yAxisScale = yScale.copy()
     yAxisScale.domain(selectedOptionsData.map(function (option) { return questionMap[perspective].options[option.index] }))
-    var yAxis = d3.axisLeft()
+    const yAxis = d3.axisLeft()
       .tickSize(3)
       .scale(yAxisScale)
 
-    var oldYAxisWidth = Math.max(50, yAxisReferenceElement.node().getBBox().width)
+    let oldYAxisWidth = Math.max(50, yAxisReferenceElement.node().getBBox().width)
     yAxisReferenceElement.call(yAxis)
     updateStyles() // update yAxisReferenceElement styling to get correct width
-    var yAxisWidth = Math.max(50, yAxisReferenceElement.node().getBBox().width)
+    const yAxisWidth = Math.max(50, yAxisReferenceElement.node().getBBox().width)
 
     if (firstUpdate) {
       oldYAxisWidth = yAxisWidth
@@ -186,17 +185,17 @@
     //     });
 
     // CALCULATE X SCALE
-    var xScale = d3.scaleLinear()
+    const xScale = d3.scaleLinear()
       .domain([0, 100]) // TODO define range in producer
       .range([0, width - yAxisWidth])
 
     // UPDATE X AXIS TOP
-    var xAxisTop = d3.axisTop()
+    const xAxisTop = d3.axisTop()
       .scale(xScale)
       .ticks(20, 'd')
       .tickSizeInner(0)
 
-    var xAxisTopElement = d3.selectAll('g.x.axis.top')
+    const xAxisTopElement = d3.selectAll('g.x.axis.top')
 
     xAxisTopElement.interrupt().selectAll('*').interrupt()
 
@@ -209,12 +208,12 @@
         .attr('transform', 'translate(' + (width - yAxisWidth) / 2 + ', -20)')
 
     // UPDATE X AXIS BOTTOM
-    var xAxisBottom = d3.axisBottom()
+    const xAxisBottom = d3.axisBottom()
       .scale(xScale)
       .ticks(20, 'd')
       .tickSizeInner(-(yStop - xAxisTopHeight))
 
-    var xAxisBottomElement = d3.selectAll('g.x.axis.bottom')
+    const xAxisBottomElement = d3.selectAll('g.x.axis.bottom')
 
     xAxisBottomElement.interrupt().selectAll('*').interrupt()
 
@@ -227,7 +226,7 @@
       .attr('transform', 'translate(' + (width - yAxisWidth) / 2 + ', 28)')
 
     // BARS
-    var bars = chartG.selectAll('.bar')
+    let bars = chartG.selectAll('.bar')
       .data(selectedOptionsData)
 
     // remove old bars
@@ -246,13 +245,13 @@
         .attr('width', function (option) { return firstUpdate ? xScale(option.mean) + 1 : 0 })
         // .on("mouseover",
         //   function(option) {
-        //     var i = selected_q_ids.indexOf(d);
+        //     let i = selected_q_ids.indexOf(d);
         //     tooltipOver(i);
         //     setToHoverColor(i);
         //   })
         // .on("mouseout",
         //   function(d) {
-        //     var i = selected_q_ids.indexOf(d);
+        //     let i = selected_q_ids.indexOf(d);
         //     tooltipOut();
         //     setToNormalColor(i);
         //   });
@@ -275,9 +274,9 @@
         .attr('width', function (option) { return xScale(option.mean) + 1 })
 
     // REFERENCE LINES
-    var referenceWidth = 3
+    const referenceWidth = 3
     chartG.selectAll('.reference-line').remove()
-    // var referenceLine = chartG.append('g')
+    // let referenceLine = chartG.append('g')
     //   .classed("reference-line", true)
     //   .append("rect")
     //     .attr("transform", "translate(" + (margin.left + yAxisWidth + xScale(questionReferenceValue)) + "," + (margin.top + xAxisTopHeight) + ")")
@@ -286,7 +285,7 @@
     //     .attr("width", referenceWidth);
 
     // Reference line
-    // TODO unused: var referenceLine =
+    // TODO unused: let referenceLine =
     chartG.append('g')
       .classed('reference-line', true)
       .append('line')
@@ -299,11 +298,11 @@
         .attr('y2', height - xAxisBottomHeight)
 
     // REFERENCE LINES
-    // var referenceWidth = 2;
-    // var referenceExtraHeight = 4;
-    // var referenceHeight = y_scale.bandwidth() + referenceExtraHeight;
+    // let referenceWidth = 2;
+    // let referenceExtraHeight = 4;
+    // let referenceHeight = y_scale.bandwidth() + referenceExtraHeight;
     //
-    // var references = chartG.selectAll(".reference")
+    // let references = chartG.selectAll(".reference")
     //   .data(selectedOptionsData);
     //
     // // remove old reference lines
@@ -314,13 +313,13 @@
     //   .classed('reference', true)
     //   .on("mouseover",
     //     function(d) {
-    //       var i = selected_q_ids.indexOf(d);
+    //       let i = selected_q_ids.indexOf(d);
     //       tooltipOver(i);
     //       setToHoverColor(i);
     //     })
     //   .on("mouseout",
     //     function(d) {
-    //       var i = selected_q_ids.indexOf(d);
+    //       let i = selected_q_ids.indexOf(d);
     //       tooltipOut();
     //       setToNormalColor(i);
     //     })
@@ -367,10 +366,10 @@
     // tooltipOut();
 
     // HEADER SELECT
-    // var header_select_div = d3.select(".header-select-div");
-    // var header_select = d3.select(".header-select");
+    // let header_select_div = d3.select(".header-select-div");
+    // let header_select = d3.select(".header-select");
     //
-    // var options = header_select.selectAll('option')
+    // let options = header_select.selectAll('option')
     //     .data(perspective_options, function(d) { return d; });
     //
     // options.exit().remove();
@@ -380,8 +379,8 @@
     //     .text(function(d) { return d; })
     //     .attr("value", function(d, i) { return i });
     //
-    // var bar_area_width = (width - yAxisWidth);
-    // var select_width = header_select.node().getBoundingClientRect().width;
+    // let bar_area_width = (width - yAxisWidth);
+    // let select_width = header_select.node().getBoundingClientRect().width;
     //
     // header_select_div.interrupt();
     //
@@ -418,7 +417,7 @@
 
   exports.generateLegend = function () {
     // GENERATE LEGEND
-    var legend = d3.select('.external-legend')
+    const legend = d3.select('.external-legend')
       .style('margin-top', '0px')
       .style('margin-left', '0px')
 
@@ -437,7 +436,7 @@
     // then: set scroll area width to 2., chart to 3., wrap and scroll
     // else: set chart to 2, no scroll
 
-    var availableWidth = document.documentElement.clientWidth - // window width
+    const availableWidth = document.documentElement.clientWidth - // window width
               d3.select('.question-panel').node().offsetWidth - // tree sidebar
               5 - // tree margin (if changed here, needs to be changed in css)
               d3.select('.sidebar-column').node().offsetWidth - // right sidebar
@@ -445,25 +444,23 @@
               1 // 1px fudge
     // TODO - scrollbar width?
 
-    var headerBlockWidth = d3.select('.header-section').node().offsetWidth
-    var bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
-    var description = d3.select('.description-panel').node()
+    const headerBlockWidth = d3.select('.header-section').node().offsetWidth
+    let bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
+    const description = d3.select('.description-panel').node()
     if (description != null && description.offsetWidth > 0) {
       bottomBlockWidth += 250 // TODO hard coded
     }
-    var topBotNeededWidth = Math.max(headerBlockWidth, bottomBlockWidth)
+    const topBotNeededWidth = Math.max(headerBlockWidth, bottomBlockWidth)
 
-    var widthForChart = Math.max(availableWidth, topBotNeededWidth)
+    const widthForChart = Math.max(availableWidth, topBotNeededWidth)
 
     // TODO heuristically calculate width needed to display chart without internal overlap
-    var chartNeededWidth = 770 // TODO hard coded, shouldn't be
+    const chartNeededWidth = 770 // TODO hard coded, shouldn't be
 
-    var lockWidth = widthForChart < chartNeededWidth
-    var chartWidth
+    const lockWidth = widthForChart < chartNeededWidth
+    let chartWidth = widthForChart
     if (lockWidth) {
       chartWidth = chartNeededWidth
-    } else {
-      chartWidth = widthForChart
     }
     d3.select('.chart')
       .classed('chart-scroll', lockWidth)

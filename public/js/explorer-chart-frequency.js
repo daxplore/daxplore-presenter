@@ -6,49 +6,49 @@
   /** ** CHART TYPE AND INSTANCE VARIABLES ** **/
 
   // CONSTANTS
-  var yAxisWidth = 35
-  var xAxisHeight = 24
-  var margin = { top: 20, right: 13, bottom: xAxisHeight, left: yAxisWidth + 10 }
-  var missingDataColor = d3.hsl('#BBB') // TODO externalize to producer?
-  var leftTimetickTransform, selectedTimetickTransform, rightTimetickTransform
-  var timepointTransition = d3.transition()
+  const yAxisWidth = 35
+  const xAxisHeight = 24
+  const margin = { top: 20, right: 13, bottom: xAxisHeight, left: yAxisWidth + 10 }
+  const missingDataColor = d3.hsl('#BBB') // TODO externalize to producer?
+  let leftTimetickTransform, selectedTimetickTransform, rightTimetickTransform
+  const timepointTransition = d3.transition()
     .duration(300)
     .ease(d3.easeLinear)
-  var fadeTransition = d3.transition()
+  const fadeTransition = d3.transition()
     .duration(100)
     .ease(d3.easeLinear)
 
   // SIZE VARIABLES
-  var availableWidth = 600 // initial placeholder value
-  var width = availableWidth
-  var availableHeight = 300 // initial placeholder value
-  var height = availableHeight
+  let availableWidth = 600 // initial placeholder value
+  let width = availableWidth
+  let availableHeight = 300 // initial placeholder value
+  let height = availableHeight
 
   // CHART RESOURCES
   // Use the same objects when updating the chart
   // Objects, data and values that are independant of the chart data
   // If no question has more than 1 timepoint display all frequency charts in single timepoint mode.
   // If at least one question has more than 1 timepoint show all charts with timepoints.
-  var singleTimepointMode
+  let singleTimepointMode
   // HEADER
-  var headerDiv, headerMain, headerSub, headerTooltip
+  let headerDiv, headerMain, headerSub, headerTooltip
   // SCALES AND AXISES
-  var xScale, xAxis, xAxisElement
-  var yScale, yAxisScale, yAxis //, yAxisElement
-  var zScaleColor
+  let xScale, xAxis, xAxisElement
+  let yScale, yAxisScale, yAxis //, yAxisElement
+  let zScaleColor
   // CHART
-  var chartContainer, chartBB, chart, chartG
+  let chartContainer, chartBB, chart, chartG
   // STATE TRACKING
   // LEGEND
-  var legendDiv, legendQuestionHeader, legendQuestionOptionTable, legendMissingData
+  let legendDiv, legendQuestionHeader, legendQuestionOptionTable, legendMissingData
 
   // CURRENT FREQUENCY CHART
-  var question, perspective, data
-  var timepoints = []
-  var selectedPerspectiveOptionIndices, selectedPerspectiveOptions, optionKeys
-  var selectedTimepoint, highlightedQuestionOption, highlightedPerspectiveOption
-  var hasMissingData
-  var tpWidths, tpWidthsAdditive
+  let question, perspective, data
+  let timepoints = []
+  let selectedPerspectiveOptionIndices, selectedPerspectiveOptions, optionKeys
+  let selectedTimepoint, highlightedQuestionOption, highlightedPerspectiveOption
+  let hasMissingData
+  let tpWidths, tpWidthsAdditive
 
   /** ** EXPORTED FUNCTIONS ** **/
 
@@ -158,7 +158,7 @@
     // INITIALIZE SVG TRANSFORMATIONS
     // Generate matrix transformations for svg elements, to make them work in IE11
     // See: https://stackoverflow.com/a/28726517
-    var styleHelperDiv = chartContainer.append('div')
+    const styleHelperDiv = chartContainer.append('div')
 
     styleHelperDiv.style('transform', 'translate(-14px, 19px) rotate(-45deg)')
     leftTimetickTransform = getComputedStyle(styleHelperDiv.node()).getPropertyValue('transform')
@@ -179,7 +179,7 @@
     perspective = perspectiveID
     question = questionID
     selectedPerspectiveOptionIndices = selectedPerspectiveOptionIndicesInput
-    var removedTimepoints = timepoints.filter(function (tp) { return !dax.data.hasTimepoint(question, tp) })
+    const removedTimepoints = timepoints.filter(function (tp) { return !dax.data.hasTimepoint(question, tp) })
     timepoints = dax.data.getTimepoints(question)
     selectedTimepoint = timepoints[Math.floor((2 / 3) * timepoints.length)]
 
@@ -195,15 +195,15 @@
 
     // Generate data map for all timepoints
     data = {}
-    for (var tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
-      var tp = timepoints[tpIndex]
-      var perspectiveOptions = dax.data.getOptionTexts(perspective)
-      var tpData = []
+    for (let tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
+      const tp = timepoints[tpIndex]
+      const perspectiveOptions = dax.data.getOptionTexts(perspective)
+      const tpData = []
 
       selectedPerspectiveOptionIndices.forEach(function (i) {
         const stat = dax.data.getFrequency(questionID, perspectiveID, i, tp)
-        var total = stat.length > 0 ? stat.reduce(function (a, b) { return a + b }) : 0
-        var stackData = {
+        const total = stat.length > 0 ? stat.reduce(function (a, b) { return a + b }) : 0
+        const stackData = {
           __option: perspectiveOptions[i],
           __total: total,
           __timepoint: timepoints[tpIndex],
@@ -212,7 +212,7 @@
           hasMissingData = true
           stackData.MISSING_DATA = 1
         } else {
-          for (var j = 0; j < optionKeys.length; j++) {
+          for (let j = 0; j < optionKeys.length; j++) {
             stackData[optionKeys[j]] = total !== 0 ? stat[j] / total : 0
           }
         }
@@ -225,8 +225,8 @@
     calculateTPWidths()
 
     // UPDATE HEADER
-    var shortText = dax.data.getQuestionShortText(question)
-    var longText = dax.data.getQuestionFullText(question)
+    const shortText = dax.data.getQuestionShortText(question)
+    const longText = dax.data.getQuestionFullText(question)
     headerMain.text(shortText)
     headerSub
       .text(longText)
@@ -247,11 +247,11 @@
     })
 
     // Add and update elements for current timepoints
-    for (tpIndex = timepoints.length - 1; tpIndex >= 0; tpIndex--) {
-      tp = timepoints[tpIndex]
-      tpData = data[tp]
+    for (let tpIndex = timepoints.length - 1; tpIndex >= 0; tpIndex--) {
+      const tp = timepoints[tpIndex]
+      const tpData = data[tp]
 
-      var questionOptionRows = chartG
+      const questionOptionRows = chartG
        .selectAll('.freq-optionrow-tp' + tp)
        .data(
          d3.stack().keys(optionKeys)(tpData), // data
@@ -267,7 +267,7 @@
       // remove old bars
       questionOptionRows.exit().remove()
 
-      var sections = chartG.selectAll('.freq-optionrow-tp' + tp).selectAll('.freq-optionrow-section-tp' + tp)
+      const sections = chartG.selectAll('.freq-optionrow-tp' + tp).selectAll('.freq-optionrow-section-tp' + tp)
         .data(
           function (d) {
             return d.map(function (v) {
@@ -301,20 +301,22 @@
           // Set selected timepoint and trigger visual updates
           setSelectedTimepoint(d.timepoint)
           // Create html for contextual header tooltip
+          let timepointText
           if (!singleTimepointMode) {
-            var timepointText = dax.text('timepoint' + d.timepoint) // TODO change key from timepointX to new textID format
+            timepointText = dax.text('timepoint' + d.timepoint) // TODO change key from timepointX to new textID format
           }
-          var perspectiveOptionText = d.option
+          const perspectiveOptionText = d.option
+          let html
           if (d.key === 'MISSING_DATA') {
             if (singleTimepointMode) {
-              var html = dax.text('explorer.freq.tooltip.timepoints_missing_data', 10, perspectiveOptionText) // TODO externalize cutoff
+              html = dax.text('explorer.freq.tooltip.timepoints_missing_data', 10, perspectiveOptionText) // TODO externalize cutoff
             } else {
               html = dax.text('explorer.freq.tooltip.timepoints_missing_data', 10, perspectiveOptionText, timepointText) // TODO externalize cutoff
             }
           } else {
-            var percentageText = dax.common.percentageFormat(d.end - d.start)
-            var questionOptionText = d.key
-            var color = barStrokeColor(d.key, tpIndex).darker(0.7)
+            const percentageText = dax.common.percentageFormat(d.end - d.start)
+            const questionOptionText = d.key
+            const color = barStrokeColor(d.key, tpIndex).darker(0.7)
             if (singleTimepointMode) {
               html = dax.text('explorer.freq.tooltip.single', percentageText, perspectiveOptionText, questionOptionText, color)
             } else {
@@ -334,7 +336,7 @@
 
       if (!singleTimepointMode) {
         // add/remove/update bar timepoint tick texts
-        var timeticks = chartG.selectAll('.freq-bar-timetick-wrapper-' + tp)
+        const timeticks = chartG.selectAll('.freq-bar-timetick-wrapper-' + tp)
           .data(selectedPerspectiveOptions)
 
         timeticks.exit().remove()
@@ -354,14 +356,14 @@
       .text(dax.data.getQuestionShortText(question))
 
     // Set new data for the legend
-    var optionRows = legendQuestionOptionTable.selectAll('.legend__row')
+    const optionRows = legendQuestionOptionTable.selectAll('.legend__row')
       .data([].concat(dax.data.getOptionTexts(question)).reverse())
 
     // Remove old rows
     optionRows.exit().remove()
 
     // Add new rows
-    var optionEnter = optionRows.enter()
+    const optionEnter = optionRows.enter()
       .append('div')
         .attr('class', 'legend__row')
         .on('mouseover', function (option) { legendOptionMouseOver(option) })
@@ -373,7 +375,7 @@
 
     // Reselect rows and use single-select to propagate data join to contained items
     // update color and text for each row
-    var rows = legendQuestionOptionTable.selectAll('.legend__row')
+    const rows = legendQuestionOptionTable.selectAll('.legend__row')
     rows.select('.legend__color-square')
       .style('background-color', zScaleColor)
     rows.select('.legend__row-text')
@@ -420,15 +422,15 @@
   // Called when the content or the size is updated.
   function resizeAndPositionElements () {
     // Estimate width needed to display chart without internal overlap
-    var yAxisWidth = 31 // could be calculated?
-    var outsideMargin = 24 // could be calculated?
-    var innerMarginBars = 25 // could be calculated?
-    var innerMarginTexts = 15
-    var selectedTimepointCount = timepoints.length
-    var minWidthPerTimepoint = 32
-    var selectedPerspectiveOptionCount = selectedPerspectiveOptions.length
+    const yAxisWidth = 31 // could be calculated?
+    const outsideMargin = 24 // could be calculated?
+    const innerMarginBars = 25 // could be calculated?
+    const innerMarginTexts = 15
+    const selectedTimepointCount = timepoints.length
+    const minWidthPerTimepoint = 32
+    const selectedPerspectiveOptionCount = selectedPerspectiveOptions.length
 
-    var longestPerspectiveOptionTextLength = 0
+    let longestPerspectiveOptionTextLength = 0
     xAxisElement.selectAll('text')
       .each(function () {
         if (this.getBBox().width > longestPerspectiveOptionTextLength) {
@@ -436,14 +438,14 @@
         }
       })
 
-    var minWidthBasedOnBars = yAxisWidth + outsideMargin * 2 + innerMarginBars * (selectedPerspectiveOptionCount - 1) +
+    const minWidthBasedOnBars = yAxisWidth + outsideMargin * 2 + innerMarginBars * (selectedPerspectiveOptionCount - 1) +
                             (selectedTimepointCount * minWidthPerTimepoint) * selectedPerspectiveOptionCount
-    var minWidthBasedOnTickTexts = yAxisWidth + outsideMargin * 2 + innerMarginTexts * (selectedPerspectiveOptionCount - 1) +
+    const minWidthBasedOnTickTexts = yAxisWidth + outsideMargin * 2 + innerMarginTexts * (selectedPerspectiveOptionCount - 1) +
                             longestPerspectiveOptionTextLength * selectedPerspectiveOptionCount
-    var chartNeededWidth = Math.max(minWidthBasedOnBars, minWidthBasedOnTickTexts)
+    const chartNeededWidth = Math.max(minWidthBasedOnBars, minWidthBasedOnTickTexts)
 
     // Check if vertical scroll is needed
-    var scrollNeeded = availableWidth < chartNeededWidth
+    const scrollNeeded = availableWidth < chartNeededWidth
 
     // Enable or disable scroll on the div containing the frequency cchart
     d3.select('.chart')
@@ -459,7 +461,7 @@
       .attr('height', height + margin.top + margin.bottom)
 
     // Update bounding box definition for the chart
-    var wrapperClientBB = d3.select('.chart').node().getBoundingClientRect()
+    const wrapperClientBB = d3.select('.chart').node().getBoundingClientRect()
     chartBB = {
       height: wrapperClientBB.height,
       left: wrapperClientBB.left + pageXOffset,
@@ -487,9 +489,9 @@
     // Update TP width values
     calculateTPWidths()
     // Update size and position for each bar element
-    for (var tpIndex = timepoints.length - 1; tpIndex >= 0; tpIndex--) {
-      var tp = timepoints[tpIndex]
-      var sections = d3.selectAll('.freq-optionrow-section-tp' + tp)
+    for (let tpIndex = timepoints.length - 1; tpIndex >= 0; tpIndex--) {
+      const tp = timepoints[tpIndex]
+      const sections = d3.selectAll('.freq-optionrow-section-tp' + tp)
       sections
         .attr('x', function (d) { return xScale(d.option) })
         .attr('y', function (d) { return yScale(d.end) })
@@ -515,16 +517,16 @@
     calculateTPWidths(selectedTimepoint)
 
     // Iterate over all timepoints, with special treatment for the selected timepoint
-    for (var tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
-      var tp = timepoints[tpIndex]
+    for (let tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
+      const tp = timepoints[tpIndex]
       // Animate the bar rows for the current timepoint
-      var rows = d3.selectAll('.freq-optionrow-section-tp' + tp)
+      let rows = d3.selectAll('.freq-optionrow-section-tp' + tp)
       // Stop all current bar row animations
       rows.interrupt().selectAll('*').interrupt()
       // Update row colors
       rows
         .attr('fill', function (d) {
-          var darken = 0
+          let darken = 0
           if (highlightedQuestionOption === d.key &&
               selectedTimepoint === tp &&
               highlightedPerspectiveOption === d.option) {
@@ -538,7 +540,7 @@
       rows.attr('width', tpWidthsAdditive[tpIndex] * xScale.bandwidth())
 
       // Timepoint tick wrappers
-      var wrappers = d3.selectAll('.freq-bar-timetick-wrapper-' + tp)
+      let wrappers = d3.selectAll('.freq-bar-timetick-wrapper-' + tp)
       // Stop all wrapper animations
       wrappers.interrupt().selectAll('*').interrupt()
       // Select timepoint wrappers with or without transition
@@ -546,13 +548,13 @@
       // Update timepoint wrapper positions
       wrappers
         .attr('transform', function (d) {
-          var xPos = xScale(d) + (tpWidthsAdditive[tpIndex] - tpWidths[tpIndex] / 2) * xScale.bandwidth()
-          var yPos = height + 15
+          const xPos = xScale(d) + (tpWidthsAdditive[tpIndex] - tpWidths[tpIndex] / 2) * xScale.bandwidth()
+          const yPos = height + 15
           return 'translate(' + xPos + ',' + yPos + ')'
         })
 
       // Timepoint ticks
-      var ticks = d3.selectAll('.freq-bar-timetick-' + tp)
+      let ticks = d3.selectAll('.freq-bar-timetick-' + tp)
       // Stop all tick animations
       ticks.interrupt().selectAll('*').interrupt()
       // Select timepoint ticks with or without transition
@@ -575,21 +577,20 @@
     if (singleTimepointMode) {
       return d3.hsl(zScaleColor(key))
     }
-    var asymptoticLightnessTarget = 0.8
-    var lightnessDropoffRate = 1.3
-    var selectedTPIndex = timepoints.indexOf(selectedTimepoint)
-    if (key === 'MISSING_DATA') {
-      var color = missingDataColor
-    } else {
+    const asymptoticLightnessTarget = 0.8
+    const lightnessDropoffRate = 1.3
+    const selectedTPIndex = timepoints.indexOf(selectedTimepoint)
+    let color = missingDataColor
+    if (key !== 'MISSING_DATA') {
       color = d3.hsl(zScaleColor(key)).darker(0.3)
     }
-    var lightness = color.l
-    var targetDiff = asymptoticLightnessTarget - lightness
+    const lightness = color.l
+    let targetDiff = asymptoticLightnessTarget - lightness
     color.l = lightness + targetDiff - (targetDiff) / Math.pow(lightnessDropoffRate, Math.abs(selectedTPIndex - tpIndex))
 
-    var asymptoticSaturationTarget = 0.25
-    var saturationDropoffRate = 1.5
-    var saturation = color.s
+    const asymptoticSaturationTarget = 0.25
+    const saturationDropoffRate = 1.5
+    const saturation = color.s
     targetDiff = saturation - asymptoticSaturationTarget
     color.s = saturation - targetDiff + (targetDiff) / Math.pow(saturationDropoffRate, Math.abs(selectedTPIndex - tpIndex))
 
@@ -602,19 +603,19 @@
 
   function calculateTPWidths () {
     tpWidths = []
-    var selectedTPIndex = timepoints.indexOf(selectedTimepoint)
+    const selectedTPIndex = timepoints.indexOf(selectedTimepoint)
     // if (selectedTPIndex === -1) {
     //   console.log('Invalid selected tp.', 'question:', question, '/ perspective:', perspective, '/ selectedTimepoint:', selectedTimepoint)
     // }
-    var unselectedSize = 0.4
-    for (var tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
+    const unselectedSize = 0.4
+    for (let tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
       tpWidths.push(selectedTPIndex - tpIndex === 0 ? 1 : unselectedSize)
     }
     // Adjust the widths so they sum up to 1
-    var totalWidth = tpWidths.reduce(function (a, b) { return a + b })
+    const totalWidth = tpWidths.reduce(function (a, b) { return a + b })
     tpWidthsAdditive = []
-    var widthSum = 0
-    for (tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
+    let widthSum = 0
+    for (let tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
       tpWidths[tpIndex] /= totalWidth
       widthSum += tpWidths[tpIndex]
       tpWidthsAdditive[tpIndex] = widthSum
@@ -637,7 +638,7 @@
   }
 
   function legendOptionMouseOver (hoveredOption) {
-    var rows = d3.selectAll('.freqs__legend .legend__row')
+    const rows = d3.selectAll('.freqs__legend .legend__row')
     // Stop all current legend row animations
     rows.interrupt().selectAll('*').interrupt()
     // Fade non-selected options
@@ -646,7 +647,7 @@
   }
 
   function legendOptionMouseOut () {
-    var rows = d3.selectAll('.freqs__legend .legend__row')
+    const rows = d3.selectAll('.freqs__legend .legend__row')
     // Stop all current legend row animations
     rows.interrupt().selectAll('*').interrupt()
     // Set all legend rows to visible again
