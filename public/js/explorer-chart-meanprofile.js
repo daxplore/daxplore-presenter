@@ -9,6 +9,8 @@
   const paddingInner = 0.3
   const paddingOuter = 0.4
 
+  const referenceLineHoverWidth = 10 // width of the reference line mouseover area
+
   const xAxisTopHeight = 30
   const margin = { top: 0, right: 13, bottom: xAxisTopHeight, left: 10 }
   const elementTransition = d3.transition().duration(300).ease(d3.easeLinear)
@@ -23,7 +25,7 @@
   let headerDiv, headerMain, headerSub, headerDescriptionButton //, headerDecriptionPanel
   // CHART
   let chart, chartContainer, chartG
-  // let referenceLine, referenceLineMouseArea
+  let referenceLine, referenceLineMouseArea
 
   // SCALES AND AXISES
   let xScale
@@ -134,8 +136,7 @@
       .text(dax.text('listXAxisDescription')) // TODO use new text ID style
 
     // REFERENCE LINE
-    // referenceLine =
-    chartG.append('line')
+    referenceLine = chartG.append('line')
       .attr('class', 'reference-line')
       .style('stroke', '#666')
       .style('stroke-width', '3.2px')
@@ -143,9 +144,9 @@
       .style('stroke-dasharray', '4,8')
       .style('shape-rendering', 'crispedges')
 
-    // referenceLineMouseArea =
-    chartG.append('rect')
+    referenceLineMouseArea = chartG.append('rect')
       .style('opacity', 0)
+      .attr('width', referenceLineHoverWidth)
       // .on('mouseover', function () { referenceTooltipDiv.classed('hidden', false) })
       // .on('mouseout', function () { referenceTooltipDiv.classed('hidden', true) })
   }
@@ -209,6 +210,7 @@
   // Set the size available for the chart.
   // Updates the chart so it fits in the new size.
   exports.setSize = function (availableWidthInput) {
+    animateNextUpdate = availableWidth === availableWidthInput
     availableWidth = availableWidthInput
     resizeAndPositionElements()
   }
@@ -283,7 +285,8 @@
     const barSectionHeight = Math.max(1, selectedPerspectiveOptions.length - paddingInner + paddingOuter * 2) * bandWidth / (1 - paddingInner)
     const yStop = barSectionHeight + xAxisTopHeight
 
-    chart
+    chart.interrupt().selectAll('*').interrupt()
+    conditionalApplyTransition(chart, elementTransition, animateNextUpdate)
       .attr('width', availableWidth - margin.left - margin.right)
       .attr('height', yStop + margin.top + margin.bottom)
 
@@ -292,8 +295,6 @@
       .range([xAxisTopHeight, yStop])
 
     yAxisElement.interrupt().selectAll('*').interrupt()
-
-    // const yae = animateNextUpdate ? yAxisElement : yAxisElement.transition(elementTransition)
 
     conditionalApplyTransition(yAxisElement, elementTransition, animateNextUpdate)
       .attr('transform', 'translate(' + yAxisWidth + ', 0)')
@@ -322,7 +323,7 @@
       .attr('transform', 'translate(' + yAxisWidth + ',' + xAxisTopHeight + ')')
       .call(xAxisTop)
 
-    conditionalApplyTransition(xAxisTopDescription, elementTransition, animateNextUpdate)
+    xAxisTopDescription
       .attr('transform', 'translate(' + (width - yAxisWidth) / 2 + ', -20)')
 
     // UPDATE X BOTTOM
@@ -335,43 +336,8 @@
       .attr('transform', 'translate(' + yAxisWidth + ',' + yStop + ')')
       .call(xAxisBottom)
 
-    conditionalApplyTransition(xAxisBottomDescription, elementTransition, animateNextUpdate)
-      .transition(elementTransition)
+    xAxisBottomDescription
       .attr('transform', 'translate(' + (width - yAxisWidth) / 2 + ', 28)')
-
-    /** * TODO REMOVE OLD VERSION * **/
-
-    // if (animateNextUpdate) {
-    // let elTransition = elementTransition
-    // } else {
-    //   elTransition = d3.transition().duration(0)
-    // }
-
-    // UPDATE Y AXIS
-    // const yAxisScale = yScale.copy()
-    // yAxisScale.domain(yAxisScale.domain().map(function (opt) {
-    //   return dax.data.getQuestionOptionText(perspectiveID, opt)
-    // }))
-    // yAxis
-    //   .scale(yAxisScale)
-
-    // let oldYAxisWidth = Math.max(50, yAxisReferenceElement.node().getBoundingClientRect().width)
-    // yAxisReferenceElement.call(yAxis)
-    // yAxisWidth = Math.max(50, yAxisReferenceElement.node().getBoundingClientRect().width)
-
-    // UPDATE X AXIS BOTTOM
-    //
-    // const xAxisBottomElement = d3.selectAll('g.x.axis.bottom')
-    //
-    // xAxisBottomElement.interrupt().selectAll('*').interrupt()
-    //
-    // xAxisBottomElement.transition(elTransition)
-    //   .attr('transform', 'translate(' + yAxisWidth + ',' + (yStop) + ')')
-    //   .call(xAxisBottom)
-    //
-    // d3.selectAll('.x-bottom-description')
-    //   .transition(elTransition)
-    //   .attr('transform', 'translate(' + (width - yAxisWidth) / 2 + ', 28)')
 
     // BARS
     let bars = chartG.selectAll('.bar')
@@ -383,7 +349,7 @@
     // remove old bars
     bars.exit().remove()
 
-    // // add new bars
+    // add new bars
     bars.enter().append('g')
       .classed('bar', true)
       .attr('transform', function (option) { return 'translate(' + (oldYAxisWidth + 1) + ',' + yScale(option.index) + ')' })
@@ -417,6 +383,47 @@
       .style('fill', function (option) { return dax.profile.colorForValue(option.mean, questionReferenceValue, questionReferenceDirection) })
       .attr('height', yScale.bandwidth())
       .attr('width', function (option) { return xScale(option.mean) + 1 })
+
+    // REFERENCE LINE
+    const referenceXPosition = yAxisWidth + xScale(questionReferenceValue)
+    conditionalApplyTransition(referenceLine, elementTransition, animateNextUpdate)
+      .attr('transform', 'translate(' + referenceXPosition + ',' + 0 + ')')
+      .attr('y1', xAxisTopHeight + 5)
+      .attr('y2', yStop - 5)
+    referenceLine.raise()
+
+    referenceLineMouseArea
+      .attr('x', referenceXPosition - referenceLineHoverWidth / 2)
+      .attr('y', xAxisTopHeight)
+      .attr('height', yStop - xAxisTopHeight)
+      .raise()
+
+    /** * TODO REMOVE OLD VERSION * **/
+    // UPDATE Y AXIS
+    // const yAxisScale = yScale.copy()
+    // yAxisScale.domain(yAxisScale.domain().map(function (opt) {
+    //   return dax.data.getQuestionOptionText(perspectiveID, opt)
+    // }))
+    // yAxis
+    //   .scale(yAxisScale)
+
+    // let oldYAxisWidth = Math.max(50, yAxisReferenceElement.node().getBoundingClientRect().width)
+    // yAxisReferenceElement.call(yAxis)
+    // yAxisWidth = Math.max(50, yAxisReferenceElement.node().getBoundingClientRect().width)
+
+    // UPDATE X AXIS BOTTOM
+    //
+    // const xAxisBottomElement = d3.selectAll('g.x.axis.bottom')
+    //
+    // xAxisBottomElement.interrupt().selectAll('*').interrupt()
+    //
+    // xAxisBottomElement.transition(elTransition)
+    //   .attr('transform', 'translate(' + yAxisWidth + ',' + (yStop) + ')')
+    //   .call(xAxisBottom)
+    //
+    // d3.selectAll('.x-bottom-description')
+    //   .transition(elTransition)
+    //   .attr('transform', 'translate(' + (width - yAxisWidth) / 2 + ', 28)')
 
     // REFERENCE LINE
     // const referenceWidth = 2
@@ -590,8 +597,8 @@
   }
 
   // Helper
-  function conditionalApplyTransition (element, transition, useTransition) {
-    return useTransition ? element.transition(transition) : element
+  function conditionalApplyTransition (selection, transition, useTransition) {
+    return useTransition ? selection.transition(transition) : selection
   }
 
   // CHART ELEMENTS
