@@ -5,6 +5,10 @@
   padding-right: 5px;
 }
 
+.question-panel.perspective-is-top {
+  padding-right: 10px;
+}
+
 .question-header {
   color: #888;
   font-weight: bold;

@@ -21,6 +21,14 @@
   padding-top: 10px;
 }
 
+.perspective-row-top {
+  margin-bottom: 10px;
+}
+
+.perspective-row-top .perspective-header {
+  padding-top: 0;
+}
+
 .perspective-picker {
 	display: flex;
   flex: 1;
@@ -104,9 +112,8 @@
   display: flex;
   flex: 1;
 	flex-direction: column;
-  max-width: fit-content;
+  max-width: max-content;
   min-width: 0;
-  /* position: relative; */
 }
 
 .peropt-columns {

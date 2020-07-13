@@ -21,8 +21,13 @@
     optionsMap = optionsMapInput
     timepointsMap = timepointsMapInput
 
-    if (dax.settings('structure.perspectivePosition')) {
-      d3.select('.perspective-description-row').lower()
+    if (dax.settings('structure.perspectivePosition') === 'TOP') {
+      d3.select('.perspective-description-row')
+        .classed('perspective-row-top', true)
+        .lower()
+
+      d3.select('.question-panel')
+        .classed('perspective-is-top', true)
     }
 
     // Unpack the data

@@ -225,8 +225,8 @@
   }
 
   exports.isAllSingleTimepoint = function () {
-    for (const questionID in questionMeta) {
-      if (questionMeta[questionID].timepoints.length > 1) {
+    for (let i = 0; i < questionMeta.length; i++) {
+      if (questionMeta[questionMeta[i]].timepoints.length > 1) {
         return false
       }
     }

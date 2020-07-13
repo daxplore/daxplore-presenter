@@ -133,7 +133,7 @@
 
     d3.select('.description-panel')
       .html(html)
-      .style('display', html.length > 0 ? null : 'none')
+      .style('display', html.length > 0 ? 'inherit' : 'none')
 
     dax.chart.meanbars.setDescriptionHTML(html)
   }

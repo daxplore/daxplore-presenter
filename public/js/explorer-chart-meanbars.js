@@ -60,10 +60,14 @@
       .attr('class', 'header-section__main')
     headerSub = headerDiv.append('div')
       .attr('class', 'header-section__sub')
-    headerDescriptionButton = d3.select('.chart-panel').append('div')
-      .attr('class', 'header-section__description-button')
-    headerDecriptionPanel = headerDescriptionButton.append('div')
-      .attr('class', 'header-section__description-panel')
+
+    // TODO move to centralized description handling, or remove completely
+    if (dax.settings('perspectiveDescriptionPosition') === 'TOP') {
+      headerDescriptionButton = d3.select('.chart-panel').append('div')
+        .attr('class', 'header-section__description-button')
+      headerDecriptionPanel = headerDescriptionButton.append('div')
+        .attr('class', 'header-section__description-panel')
+    }
 
     // INITIALIZE CHART
     // base div element
@@ -335,12 +339,15 @@
       .text(dax.common.integerFormat(questionReferenceValue))
   }
 
+  // TODO move to core or description handler, or remove completely
   exports.setDescriptionHTML = function (html) {
-    headerDescriptionButton
-      .classed('hidden', html.length === 0)
-    headerDecriptionPanel
-      .classed('hidden', html.length === 0)
-      .html(html)
+    if (headerDescriptionButton && headerDecriptionPanel) {
+      headerDescriptionButton
+        .classed('hidden', html.length === 0)
+      headerDecriptionPanel
+        .classed('hidden', html.length === 0)
+        .html(html)
+    }
   }
 
   // Set the size available for the chart.
