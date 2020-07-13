@@ -12,7 +12,7 @@
   const referenceLineHoverWidth = 10 // width of the reference line mouseover area
 
   const xAxisTopHeight = 30
-  const margin = { top: 0, right: 13, bottom: xAxisTopHeight, left: 10 }
+  const margin = { top: 0, right: 23, bottom: xAxisTopHeight, left: 10 }
   const elementTransition = d3.transition().duration(300).ease(d3.easeLinear)
 
   // SIZE VARIABLES
@@ -68,7 +68,6 @@
 
     // base svg element
     chart = chartContainer.append('svg')
-      .attr('class', 'explorer-meanprofile')
 
     // white background
     chart.append('rect')
@@ -272,7 +271,7 @@
     // const minBarLength = 100 // TODO
     // const chartNeededWidth = margin.left + margin.right + yAxisWidth + minBarLength
 
-    width = availableWidth - margin.left - margin.right - 40
+    width = availableWidth - margin.left - margin.right
 
     const bandWidth = 20
     // rearranged equation from d3's source file band.js, ignoring the floor call
@@ -282,7 +281,7 @@
 
     chart.interrupt().selectAll('*').interrupt()
     conditionalApplyTransition(chart, elementTransition, animateNextUpdate)
-      .attr('width', availableWidth - margin.left - margin.right)
+      .attr('width', availableWidth) // - margin.left - margin.right)
       .attr('height', yStop + margin.top + margin.bottom)
 
     // UPDATE Y

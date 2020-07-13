@@ -23,15 +23,6 @@
   width: 100%;
 }
 
-.description-left-wrapper {
-  position: relative;
-}
-
-.description-left {
-  position: absolute;
-}
-
-
 .description-panel.description-left {
   margin-left: 0;
   padding-left: 0;

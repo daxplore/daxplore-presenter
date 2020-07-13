@@ -83,9 +83,9 @@
     window.addEventListener('resize', dax.explorer.updateChartPanelSize)
     // hack to force initial sizing to work
     // TODO handle in different way
-    // for (i = 2; i <= 12; i++) {
-    //   setTimeout(dax.explorer.updateChartPanelSize, Math.pow(2, i))
-    // }
+    for (let i = 2; i <= 13; i++) {
+      setTimeout(dax.explorer.updateChartPanelSize, Math.pow(2, i))
+    }
   }
 
   // Getter for selected tab

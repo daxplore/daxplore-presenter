@@ -3,8 +3,8 @@
   border-top: none;
 }
 
-.chart-panel {
-  /* position: relative; */
+.chart-perspective-column {
+  overflow: auto;
 }
 
 .chart-scroll {

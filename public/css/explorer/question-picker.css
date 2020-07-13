@@ -1,6 +1,7 @@
 /*** Style for the question picker in Daxplore Explorer ***/
 
 .question-panel {
+  flex: 0;
   padding-bottom: 10px;
   padding-right: 5px;
 }
