@@ -1,0 +1,45 @@
+.meanprofile__tooltip-body {
+  border: 0;
+  border-radius: 8px;
+  font: 12px sans-serif;
+  height: auto;
+  padding: 10px;
+  pointer-events: none;
+  position: absolute;
+  text-align: center;
+  white-space: nowrap;
+  width: auto;
+  z-index: 100;
+}
+
+.meanprofile__tooltip-arrow {
+  height: 0;
+  position: absolute;
+  width: 0;
+  z-index: 100;
+}
+
+.meanprofile__tooltip-arrow--up {
+  border-bottom: 10px solid;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+}
+
+.meanprofile__tooltip-arrow--right {
+  border-bottom: 10px solid transparent;
+  border-left: 10px solid;
+  border-top: 10px solid transparent;
+}
+
+.meanprofile__y-axis--hover text {
+  fill: #111 !important;
+}
+
+.meanprofile__reference-tooltip-header {
+  font-weight: bold;
+  margin-right: 4px;
+}
+
+.meanprofile__tooltip-reference-value {
+
+}

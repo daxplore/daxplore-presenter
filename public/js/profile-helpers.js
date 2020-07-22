@@ -6,17 +6,23 @@
 
   const colors = {}
 
-  colors.good = '#509a5c'
-  colors.average = '#c5c2bd'
-  colors.bad = '#d13d40'
+  // TODO export colors to producer
 
-  colors.goodHover = 'hsl(95, 38%, 57%)'
-  colors.averageHover = 'hsl(60, 0%, 51%)'
-  colors.badHover = 'hsl( 5, 38%, 67%)'
+  colors.good = '#509a5c' // =  hsl(130, 32%, 46%)
+  colors.average = '#c5c2bd' // = hsl(37, 6%, 76%)
+  colors.bad = '#d13d40' // = hsl(359, 62%, 53%)
+
+  colors.goodHover = 'hsl(130, 32%, 39%)'
+  colors.averageHover = 'hsl(37, 6%, 66%)'
+  colors.badHover = 'hsl(359, 62%, 43%)'
+
+  colors.goodTooltipBackground = 'hsl(130, 32%, 56%)'
+  colors.averageTooltipBackground = 'hsl(37, 6%, 86%)'
+  colors.badTooltipBackground = 'hsl(359, 62%, 63%)'
 
   colors.goodText = 'hsl(95, 38%, 34%)'
   colors.averageText = 'hsl(60, 0%, 31%)'
-  colors.badText = 'hsl( 5, 38%, 42%)'
+  colors.badText = 'hsl(359, 62%, 53%)'
 
   exports.initializeHelpers =
   function (
@@ -70,11 +76,27 @@
     }
 
     if (diff < -5) {
-      return colors.badText
+      return colors.badHover
     } else if (diff > 5) {
-      return colors.goodText
+      return colors.goodHover
     } else {
-      return colors.averageText
+      return colors.averageHover
+    }
+  }
+
+  exports.colorTooltipBackground =
+  function (value, reference, direction) {
+    let diff = value - reference // HIGH
+    if (direction === 'LOW') {
+      diff = reference - value
+    }
+
+    if (diff < -5) {
+      return colors.badTooltipBackground
+    } else if (diff > 5) {
+      return colors.goodTooltipBackground
+    } else {
+      return colors.averageTooltipBackground
     }
   }
 

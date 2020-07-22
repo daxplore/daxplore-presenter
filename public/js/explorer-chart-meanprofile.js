@@ -8,6 +8,7 @@
   // CONSTANTS
   const paddingInner = 0.3
   const paddingOuter = 0.4
+  const tooltipBarArrowDistance = 6
 
   const referenceLineHoverWidth = 10 // width of the reference line mouseover area
 
@@ -18,37 +19,27 @@
   // SIZE VARIABLES
   let availableWidth = 600 // initial placeholder value
   let width = availableWidth
-  // const height = availableHeight
 
   // CURRENT CHART
   // HEADER
   let headerDiv, headerMain, headerSub
   // CHART
   let chart, chartContainer, chartG
+  let bars
   let referenceLine, referenceLineMouseArea
+  let tooltipArrow, tooltipBody
 
   // SCALES AND AXISES
   let xScale
   let xAxisTop, xAxisTopElement, xAxisTopDescription
   let xAxisBottom, xAxisBottomElement, xAxisBottomDescription
-  let yScale, yAxis, yAxisElement, yAxisReferenceElement
+  let yScale, yAxis, yAxisElement, yAxisReferenceElement, yAxisWidth
 
   // STATE TRACKING
   let animateNextUpdate = false
 
   let perspectiveID, questionID, selectedPerspectiveOptions, questionReferenceValue, questionReferenceDirection
   let selectedOptionsData, selectedOptionsDataMap
-
-  // let qIDs, means, meanReferences, perspectiveOptions, directions
-  // TODO unused: descriptions
-  // let shorttexts // TODO initialize
-  // const selectedOption = 0
-  // let selectedQIDs = []
-  // let chartwrapperBB,
-  // let xScale, yScale, yAxisElement, yAxisReferenceElement // TODO unused: chart
-  // let yAxisWidth
-
-  let lastHoveredBar = 0
 
   /** ** EXPORTED FUNCTIONS ** **/
 
@@ -141,8 +132,20 @@
     referenceLineMouseArea = chartG.append('rect')
       .style('opacity', 0)
       .attr('width', referenceLineHoverWidth)
-      // .on('mouseover', function () { referenceTooltipDiv.classed('hidden', false) })
-      // .on('mouseout', function () { referenceTooltipDiv.classed('hidden', true) })
+      .on('mouseover', tooltipOverReferenceLine)
+      .on('mousemove', tooltipReferenceLineMove)
+      .on('mouseout', function () {
+        tooltipOut()
+        referenceLine.style('stroke', '#666')
+      })
+
+    // TOOLTIPS
+    tooltipArrow = chartContainer.append('div')
+      .classed('meanprofile__tooltip-arrow', true)
+      .style('opacity', 0)
+    tooltipBody = chartContainer.append('div')
+      .classed('meanprofile__tooltip-body', true)
+      .style('opacity', 0)
   }
 
   exports.populateChart = function (questionIDInput, perspectiveIDInput, selectedPerspectiveOptionsInput) {
@@ -226,19 +229,6 @@
 
   // CHART ELEMENTS
 
-  // function computeDimensions () {
-  //   const wrapperClientBB = d3.select('.chart').node().getBoundingClientRect()
-  //   chartwrapperBB = {}
-  //   chartwrapperBB.left = wrapperClientBB.left + pageXOffset
-  //   chartwrapperBB.top = wrapperClientBB.top + pageYOffset
-  //   chartwrapperBB.width = wrapperClientBB.width
-  //   chartwrapperBB.height = wrapperClientBB.height - 10
-  //   xAxisTopHeight = 30
-  //   margin = { top: 0, right: 13, bottom: xAxisTopHeight, left: 0 }
-  //   width = chartwrapperBB.width - margin.left - margin.right
-  //   height = 600 - margin.top - margin.bottom
-  // }
-
   function updateStyles () {
     chartG.selectAll('.axis .domain')
       .style('visibility', 'hidden')
@@ -263,7 +253,7 @@
   function resizeAndPositionElements () {
     let oldYAxisWidth = Math.max(50, yAxisReferenceElement.node().getBoundingClientRect().width)
     yAxisReferenceElement.call(yAxis)
-    const yAxisWidth = Math.max(50, yAxisReferenceElement.node().getBoundingClientRect().width)
+    yAxisWidth = Math.max(50, yAxisReferenceElement.node().getBoundingClientRect().width)
     if (!animateNextUpdate) {
       oldYAxisWidth = yAxisWidth
     }
@@ -296,15 +286,12 @@
 
     yAxisElement.selectAll('.y.axis text')
       .on('mouseover',
-        function (d, i) {
-          tooltipOver(i)
-          setToHoverColor(i)
+        function (optionIndex) {
+          const option = selectedOptionsDataMap[optionIndex]
+          tooltipOverBar(option)
         })
-      .on('mouseout',
-        function (d, i) {
-          tooltipOut()
-          setToNormalColor(i)
-        })
+      .on('mousemove', tooltipBarMove)
+      .on('mouseout', tooltipOut)
 
     // UPDATE X SCALE
     xScale
@@ -334,7 +321,7 @@
       .attr('transform', 'translate(' + (width - yAxisWidth) / 2 + ', 28)')
 
     // BARS
-    let bars = chartG.selectAll('.bar')
+    bars = chartG.selectAll('.bar')
       .data(
         selectedOptionsData, // data
         function (option) { return option.index } // key function, mapping a specific DOM element to a specific option index
@@ -354,16 +341,9 @@
           return dax.profile.colorForValue(option.mean, questionReferenceValue, questionReferenceDirection)
         })
         .attr('width', function (option) { return animateNextUpdate ? xScale(option.mean) + 1 : 0 })
-        .on('mouseover',
-          function (option) {
-            tooltipOver(option.index)
-            setToHoverColor(option.index)
-          })
-        .on('mouseout',
-          function (option) {
-            tooltipOut()
-            setToNormalColor(option.index)
-          })
+        .on('mouseout', function (option) { tooltipOut() })
+        .on('mouseover', function (option) { tooltipOverBar(option) })
+        .on('mousemove', tooltipBarMove)
 
     // animate all bars into position
     bars = d3.selectAll('.bar')
@@ -392,79 +372,123 @@
       .attr('height', yStop - xAxisTopHeight)
       .raise()
 
-    /** * TODO REMOVE OLD VERSION * **/
-
-    // repopulate the description box and reset the tooltip
-    if (selectedPerspectiveOptions.length > 0) {
-      tooltipOver(Math.min(lastHoveredBar, selectedPerspectiveOptions.length - 1))
-    } else {
-      d3.selectAll('#chart-description')
-        .style('opacity', '0')
-    }
-    tooltipOut()
-
     // FINISH
     updateStyles()
   }
 
-  function setToNormalColor (option) {
-    d3.select('#barrect-' + option.index)
-      .style('fill', dax.profile.colorForValue(option.mean, questionReferenceValue, questionReferenceDirection))
-    d3.selectAll('.q-' + option.index)
-      .classed('bar-hover', false)
-    d3.selectAll('.y.axis .tick')
-      .classed('bar-hover', false)
+  // Populate, position and show tooltip on mouse hover on bar
+  function tooltipOverBar (option) {
+    tooltipBody.style('opacity', 1)
+    tooltipArrow.style('opacity', 1)
+
+    // Set tooltip box text
+    // TODO This relies on meanbars texts, rather than meanprofile texts. Merge or create as separate?
+    const optionName = dax.data.getQuestionOptionText(perspectiveID, option.index)
+    let tooltipText = '<b>' + optionName + '</b><br>'
+    if (option.nodata) {
+      tooltipText += dax.text('meanbars_tooltip_fewRespondents', 10) + '<br>' // TODO hardcoded 10, should be read from settings generated by Daxplore Producer
+      tooltipText += '<b>' + dax.text('meanbars_tooltip_missingData') + '</b>'
+    } else {
+      tooltipText += dax.text('meanbars_tooltip_mean', dax.common.integerFormat(option.mean)) + '<br>' +
+      dax.text('meanbars_tooltip_respondents', option.count)
+    }
+    // Update tooltip position, color and visibility
+    const chartTop = chart.node().getBoundingClientRect().top + window.pageYOffset + margin.top
+
+    tooltipBody
+      .html(tooltipText) // TODO construct elements via d3 instead of string->html
+
+    const tooltipArrowBB = tooltipArrow.node().getBoundingClientRect()
+    tooltipBody
+      .style('background-color', option.nodata ? '#ddd' : dax.profile.colorTooltipBackground(option.mean, questionReferenceValue, questionReferenceDirection)) // TODO externalize no data color
+      .style('top', (chartTop + yScale(option.index) + yScale.bandwidth() + tooltipBarArrowDistance + tooltipArrowBB.height) + 'px')
+
+    tooltipArrow
+      .classed('meanprofile__tooltip-arrow--right', false)
+      .classed('meanprofile__tooltip-arrow--up', true)
+      .style('border-bottom-color', option.nodata ? '#ddd' : dax.profile.colorTooltipBackground(option.mean, questionReferenceValue, questionReferenceDirection))
+      .style('border-left-color', null)
+      .style('top', (chartTop + yScale(option.index) + yScale.bandwidth() + tooltipBarArrowDistance) + 'px')
+
+    bars.selectAll('.barrect')
+      .style('fill', function (opt) {
+        if (opt.index === option.index) {
+          return dax.profile.colorHoverForValue(opt.mean, questionReferenceValue, questionReferenceDirection)
+        }
+        return dax.profile.colorForValue(opt.mean, questionReferenceValue, questionReferenceDirection)
+      })
+
+    yAxisElement.selectAll('.tick')
+      .classed('meanprofile__y-axis--hover', function (opt) {
+        return opt === option.index
+      })
+
+    tooltipBarMove()
   }
 
-  function setToHoverColor (option) {
-    d3.select('#barrect-' + option.index)
-      .style('fill', dax.profile.colorHoverForValue(option.mean, questionReferenceValue, questionReferenceDirection))
-    d3.selectAll('.q-' + option.index)
-      .classed('bar-hover', true)
-    d3.selectAll('.y.axis .tick')
-      .classed('bar-hover', function (option, index) { return option.index === index }) // TODO probably broken
+  // Update tooltip X position on bar
+  function tooltipBarMove () {
+    const tooltipBodyBB = tooltipBody.node().getBoundingClientRect()
+    const tooltipArrowBB = tooltipArrow.node().getBoundingClientRect()
+    let mouseX = d3.event.pageX
+    if (tooltipBodyBB.width / 2 + mouseX > window.innerWidth) {
+      mouseX = window.innerWidth - tooltipBodyBB.width / 2
+    }
+    tooltipBody.style('left', (mouseX - tooltipBodyBB.width / 2) + 'px')
+    tooltipArrow.style('left', (mouseX - tooltipArrowBB.width / 2) + 'px')
   }
 
-  function tooltipOver (i) {
-    // computeDimensions()
-    lastHoveredBar = i
-    const tooltipdiv = d3.select('.tooltipdiv')
+  // Populate, position and show tooltip on mouse hover on reference line
+  function tooltipOverReferenceLine () {
+    tooltipBody.style('opacity', 1)
+    tooltipArrow.style('opacity', 1)
 
-    tooltipdiv.transition()
-      .duration(200)
-      .style('opacity', 1)
+    const chartLeft = chart.node().getBoundingClientRect().left + window.pageXOffset + margin.left + yAxisWidth
 
-    // tooltipdiv.html( // TODO externalize entire string
-    //   shorttexts[getQid(i)] + ': <b>' + d3.format('d')(getMean(i, selectedOption)) + '</b><br>' +
-    //     dax.text('listReferenceValue') + ': <b>' + d3.format('d')(meanReferences[getQid(i)]) + '</b>') // TODO use new text ID style
-    //   .style('background', dax.profile.colorHoverForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)]))
-    //   .style('left', (chartwrapperBB.left + xScale(Math.max(getMean(i, selectedOption), meanReferences[getQid(i)])) + yAxisWidth + 14) + 'px')
-    //   .style('top', chartwrapperBB.top + yScale(getQid(i)) + yScale.bandwidth() / 2 - tooltipdiv.node().getBoundingClientRect().height / 2 + 'px')
+    tooltipBody.html('')
+    tooltipBody.append('span')
+      .attr('class', 'meanprofile__reference-tooltip-header')
+      .text(dax.text('meanbars_tooltip_referenceValue')) // TODO externalize as meanprofile
+    tooltipBody.append('span')
+      .text(dax.common.integerFormat(questionReferenceValue))
 
-    const arrowleft = d3.select('.arrow-left')
+    const tooltipBodyBB = tooltipBody.node().getBoundingClientRect()
+    const tooltipArrowBB = tooltipArrow.node().getBoundingClientRect()
 
-    arrowleft.transition()
-      .duration(200)
-      .style('opacity', 1)
+    tooltipBody
+      .style('background-color', dax.profile.colorTooltipBackground(0, 0))
+      .style('left', (chartLeft + xScale(questionReferenceValue) - tooltipBodyBB.width - tooltipArrowBB.width - tooltipBarArrowDistance) + 'px')
 
-    // arrowleft
-    //   .style('border-right-color', dax.profile.colorHoverForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)]))
-    //   .style('left', (chartwrapperBB.left + xScale(Math.max(getMean(i, selectedOption), meanReferences[getQid(i)])) + yAxisWidth + 4) + 'px')
-    //   .style('top', chartwrapperBB.top + yScale(getQid(i)) + yScale.bandwidth() / 2 - arrowleft.node().getBoundingClientRect().height / 2 + 'px')
-    //
-    // dax.profile.setDescriptionFull(d3.select('#chart-description'), perspectiveOptions[selectedOption], getQid(i), getMean(i, selectedOption))
+    tooltipArrow
+      .style('border-left-color', dax.profile.colorTooltipBackground(0, 0))
+      .style('border-bottom-color', null)
+      .classed('meanprofile__tooltip-arrow--right', true)
+      .classed('meanprofile__tooltip-arrow--up', false)
+      .style('left', (chartLeft + xScale(questionReferenceValue) - tooltipArrowBB.width - tooltipBarArrowDistance) + 'px')
+
+    referenceLine.style('stroke', '#454545')
   }
 
+  // Update tooltip X position on bar
+  function tooltipReferenceLineMove () {
+    const tooltipBodyBB = tooltipBody.node().getBoundingClientRect()
+    const tooltipArrowBB = tooltipArrow.node().getBoundingClientRect()
+    tooltipBody.style('top', (d3.event.pageY - tooltipBodyBB.height / 2) + 'px')
+    tooltipArrow.style('top', (d3.event.pageY - tooltipArrowBB.height / 2) + 'px')
+  }
+
+  // Hide all tooltip components
   function tooltipOut () {
-    d3.select('.tooltipdiv')
-      .transition()
-        .duration(300)
-        .style('opacity', 0)
+    tooltipBody.style('opacity', 0)
+    tooltipArrow.style('opacity', 0)
 
-    d3.select('.arrow-left')
-      .transition()
-        .duration(300)
-        .style('opacity', 0)
+    bars.selectAll('.barrect')
+      .style('fill', function (opt) {
+        return dax.profile.colorForValue(opt.mean, questionReferenceValue, questionReferenceDirection)
+      })
+
+    yAxisElement.selectAll('.tick')
+      .classed('meanprofile__y-axis--hover', false)
   }
 
   // Helper
