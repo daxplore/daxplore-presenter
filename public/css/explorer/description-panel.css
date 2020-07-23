@@ -1,4 +1,5 @@
 .description-panel {
+  border: 1px solid #BBB;
   display: none;
   margin: 22px 0 0 10px;
   max-width: 500px;

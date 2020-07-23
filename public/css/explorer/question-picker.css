@@ -11,10 +11,7 @@
 }
 
 .question-header {
-  color: #888;
-  font-weight: bold;
   padding-bottom: 7px;
-  white-space: nowrap;
 }
 
 .question-picker {

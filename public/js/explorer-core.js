@@ -114,6 +114,7 @@
 
   // TODO move to separate file?
   function setDescription (questionID, perspectiveID) {
+    // TODO construct from elements instead of raw html
     let html = ''
 
     const questionDescription = questionMap[questionID].description
