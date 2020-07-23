@@ -4,7 +4,7 @@
 }
 
 .chart-perspective-column {
-  overflow: auto;
+  overflow-x: auto
 }
 
 .chart-scroll {

@@ -1,13 +1,13 @@
 /*** Style for the question picker in Daxplore Explorer ***/
 
 .question-panel {
-  flex: 0;
   padding-bottom: 10px;
   padding-right: 5px;
 }
 
 .question-panel.perspective-is-top {
   padding-right: 10px;
+  position: relative;
 }
 
 .question-header {
