@@ -340,7 +340,7 @@
         .style('fill', function (option) {
           return dax.profile.colorForValue(option.mean, questionReferenceValue, questionReferenceDirection)
         })
-        .attr('width', function (option) { return animateNextUpdate ? xScale(option.mean) + 1 : 0 })
+        .attr('width', function (option) { return animateNextUpdate && !option.nodata ? xScale(option.mean) + 1 : 0 })
         .on('mouseout', function (option) { tooltipOut() })
         .on('mouseover', function (option) { tooltipOverBar(option) })
         .on('mousemove', tooltipBarMove)
@@ -356,7 +356,9 @@
     conditionalApplyTransition(bars.select('.barrect'), elementTransition, animateNextUpdate)
       .style('fill', function (option) { return dax.profile.colorForValue(option.mean, questionReferenceValue, questionReferenceDirection) })
       .attr('height', yScale.bandwidth())
-      .attr('width', function (option) { return xScale(option.mean) + 1 })
+      .attr('width', function (option) {
+        return option.nodata ? 0 : xScale(option.mean) + 1
+      })
 
     // REFERENCE LINE
     const referenceXPosition = yAxisWidth + xScale(questionReferenceValue)
