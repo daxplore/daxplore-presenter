@@ -397,6 +397,13 @@
     // Update tooltip position, color and visibility
     const chartTop = chart.node().getBoundingClientRect().top + window.pageYOffset + margin.top
 
+    tooltipArrow
+      .classed('meanprofile__tooltip-arrow--right', false)
+      .classed('meanprofile__tooltip-arrow--up', true)
+      .style('border-bottom-color', option.nodata ? '#ddd' : dax.profile.colorTooltipBackground(option.mean, questionReferenceValue, questionReferenceDirection))
+      .style('border-left-color', null)
+      .style('top', (chartTop + yScale(option.index) + yScale.bandwidth() + tooltipBarArrowDistance) + 'px')
+
     tooltipBody
       .html(tooltipText) // TODO construct elements via d3 instead of string->html
 
@@ -404,13 +411,6 @@
     tooltipBody
       .style('background-color', option.nodata ? '#ddd' : dax.profile.colorTooltipBackground(option.mean, questionReferenceValue, questionReferenceDirection)) // TODO externalize no data color
       .style('top', (chartTop + yScale(option.index) + yScale.bandwidth() + tooltipBarArrowDistance + tooltipArrowBB.height) + 'px')
-
-    tooltipArrow
-      .classed('meanprofile__tooltip-arrow--right', false)
-      .classed('meanprofile__tooltip-arrow--up', true)
-      .style('border-bottom-color', option.nodata ? '#ddd' : dax.profile.colorTooltipBackground(option.mean, questionReferenceValue, questionReferenceDirection))
-      .style('border-left-color', null)
-      .style('top', (chartTop + yScale(option.index) + yScale.bandwidth() + tooltipBarArrowDistance) + 'px')
 
     bars.selectAll('.barrect')
       .style('fill', function (opt) {
