@@ -4,7 +4,8 @@
 
   let initialized = false
   let selectedPerspectiveID = null
-  // let perspectiveOptions = []
+  let perspectiveIDs
+  const perspectiveColumns = {}
   let selectedOptions = new Set()
   // TODO unused: let hasTotal = false
   let totalSelected = false
@@ -42,7 +43,62 @@
     d3.select('.perspective-header')
       .text(dax.text('perspectivesHeader')) // TODO use new text ID style
 
-    const perspectiveIDs = dax.data.getExplorerPerspectiveIDs()
+    perspectiveIDs = dax.data.getExplorerPerspectiveIDs()
+
+    // Generate data structure for all perspectives
+    perspectiveIDs.forEach(perspectiveID => {
+      const optionCount = dax.data.getQuestionOptionCount(perspectiveID)
+      const firstColumnData = []
+      const secondColumnData = []
+      const thirdColumnData = []
+      if (!dax.data.isCombinedPerspective(perspectiveID)) {
+        // BASIC PERSPECTIVE
+        const perColumnSetting = settings.perspectiveCheckboxesPerColumn
+        const maxColumns = 3
+        const columns = Math.min(maxColumns, Math.ceil(optionCount / perColumnSetting))
+        const perColumn = Math.ceil(optionCount / columns)
+        for (let i = 0; i < optionCount; i++) {
+          const option = {
+            index: i,
+            text: dax.data.getQuestionOptionText(perspectiveID, i),
+          }
+          if (i < perColumn) {
+            firstColumnData.push(option)
+          } else if (i < perColumn * 2) {
+            secondColumnData.push(option)
+          } else {
+            thirdColumnData.push(option)
+          }
+        }
+      } else {
+        // COMBINED PERSPECTIVE
+        for (let i = 0; i < optionCount; i++) {
+          const option = {
+            index: i,
+            isExpandable: dax.data.hasPerspectiveOptionChildren(perspectiveID, i),
+            text: dax.data.getQuestionOptionText(perspectiveID, i),
+          }
+          switch (dax.data.getPerspectiveOptionTreeDepth(perspectiveID, i)) {
+          case 0:
+            firstColumnData.push(option)
+            break
+          case 1:
+            option.parent = dax.data.getPerspectiveOptionParent(perspectiveID, i)
+            secondColumnData.push(option)
+            break
+          case 2:
+            option.parent = dax.data.getPerspectiveOptionParent(perspectiveID, i)
+            thirdColumnData.push(option)
+            break
+          }
+        }
+      }
+      perspectiveColumns[perspectiveID] = {
+        firstColumnData,
+        secondColumnData,
+        thirdColumnData,
+      }
+    })
 
     d3.select('.pervarpicker-variables')
       .selectAll('.pervarpicker-varoption')
@@ -160,38 +216,14 @@
     // d3.select('.peropt-extra-columns')
     //   .style('width', '0px')
 
-    const firstColumnData = []
-    const secondColumnData = []
-    const thirdColumnData = []
     if (dax.data.isCombinedPerspective(selectedPerspectiveID)) {
       // COMBINED PERSPECTIVE
       hasRemainder = false
-      for (let i = 0; i < optionCount; i++) {
-        const option = {
-          index: i,
-          isExpandible: dax.data.hasPerspectiveOptionChildren(selectedPerspectiveID, i),
-          selected: selectedOptions.has(i),
-          text: dax.data.getQuestionOptionText(selectedPerspectiveID, i),
-        }
-        switch (dax.data.getPerspectiveOptionTreeDepth(selectedPerspectiveID, i)) {
-        case 0:
-          firstColumnData.push(option)
-          break
-        case 1:
-          option.parent = dax.data.getPerspectiveOptionParent(selectedPerspectiveID, i)
-          secondColumnData.push(option)
-          break
-        case 2:
-          option.parent = dax.data.getPerspectiveOptionParent(selectedPerspectiveID, i)
-          thirdColumnData.push(option)
-          break
-        }
-      }
 
       // First column combined
       const firstColOptions = d3.select('.peropt-col-one')
         .selectAll('.peropt-checkbox')
-        .data(firstColumnData)
+        .data(perspectiveColumns[selectedPerspectiveID].firstColumnData)
 
       firstColOptions.exit().remove()
 
@@ -209,8 +241,8 @@
 
       const firstColElements = d3.select('.peropt-col-one').selectAll('.peropt-checkbox')
         .classed('peropt-checkbox-combined', true)
-        .classed('peropt-checkbox-expandible', function (d) { return d.isExpandible })
-        .classed('peropt-checkbox-selected', function (d) { return d.selected })
+        .classed('peropt-checkbox-expandable', function (d) { return d.isExpandable })
+        .classed('peropt-checkbox-selected', function (d) { return selectedOptions.has(d.index) })
         .classed('peropt-checkbox-expanded', function (d, i) { return i === combinedColumnOneHighlight })
         .text('')
         .attr('title', function (d) { return d.text })
@@ -221,11 +253,11 @@
             // Update shown and expanded checkboxes
             d3.selectAll(elements)
               .classed('peropt-checkbox-expanded', function (dd, j) {
-                return dd.isExpandible && dd.index === combinedColumnOneHighlight
+                return dd.isExpandable && dd.index === combinedColumnOneHighlight
               })
             d3.selectAll('.peropt-col-two > .peropt-checkbox')
               .classed('peropt-checkbox-expanded', function (dd, j) {
-                return dd.isExpandible && dd.index === combinedColumnTwoHighlight
+                return dd.isExpandable && dd.index === combinedColumnTwoHighlight
               })
               .classed('peropt-checkbox-hidden', function (dd, i) {
                 return dd.parent === combinedColumnOneHighlight ? null : 'none'
@@ -244,7 +276,7 @@
       firstColElements.append('span')
         .classed('peropt-checkbox-expand', true)
         .classed('no-select', true)
-        .style('display', function (d) { return d.isExpandible ? null : 'none' })
+        .style('display', function (d) { return d.isExpandable ? null : 'none' })
         .text('▶')
 
       // move bottom padding to the bottom of the column
@@ -260,7 +292,7 @@
         .classed('peropt-col-two-combined', true)
       const secondColOptions = d3.select('.peropt-col-two')
         .selectAll('.peropt-checkbox')
-        .data(secondColumnData)
+        .data(perspectiveColumns[selectedPerspectiveID].secondColumnData)
 
       secondColOptions.exit().remove()
 
@@ -278,9 +310,9 @@
 
       const secondColElements = d3.select('.peropt-col-two').selectAll('.peropt-checkbox')
         .classed('peropt-checkbox-combined', true)
-        .classed('peropt-checkbox-expandible', function (d) { return d.isExpandible })
-        .classed('peropt-checkbox-selected', function (d) { return d.selected })
-        .classed('peropt-checkbox-expanded', function (d) { return d.isExpandible && d.index === combinedColumnTwoHighlight })
+        .classed('peropt-checkbox-expandable', function (d) { return d.isExpandable })
+        .classed('peropt-checkbox-selected', function (d) { return selectedOptions.has(d.index) })
+        .classed('peropt-checkbox-expanded', function (d) { return d.isExpandable && d.index === combinedColumnTwoHighlight })
         .classed('peropt-checkbox-hidden', function (d) { return d.parent === combinedColumnOneHighlight ? null : 'none' })
         .text('')
         .attr('title', function (d) { return d.text })
@@ -290,7 +322,7 @@
             setSelectedColumnTwoHighlight(d.index)
             // Update shown and expanded checkboxes
             d3.selectAll(elements)
-              .classed('peropt-checkbox-expanded', function (d) { return d.isExpandible && d.index === combinedColumnTwoHighlight })
+              .classed('peropt-checkbox-expanded', function (d) { return d.isExpandable && d.index === combinedColumnTwoHighlight })
               .classed('peropt-checkbox-hidden', function (dd, i) { return dd.parent === combinedColumnOneHighlight ? null : 'none' })
             const visibleThirdColElementCount = dax.data.getPerspectiveOptionChildCount(selectedPerspectiveID, combinedColumnTwoHighlight)
             d3.select('.peropt-col-three')
@@ -306,7 +338,7 @@
       secondColElements.append('span')
         .classed('peropt-checkbox-expand', true)
         .classed('no-select', true)
-        .style('display', function (d) { return d.isExpandible ? null : 'none' })
+        .style('display', function (d) { return d.isExpandable ? null : 'none' })
         .text('▶')
 
       // move bottom padding to the bottom of the column
@@ -320,7 +352,7 @@
         .classed('peropt-col-three-combined', true)
       const thirdColOptions = d3.select('.peropt-col-three')
         .selectAll('.peropt-checkbox')
-        .data(thirdColumnData)
+        .data(perspectiveColumns[selectedPerspectiveID].thirdColumnData)
 
       thirdColOptions.exit().remove()
 
@@ -337,7 +369,7 @@
           })
 
       const thirdColElements = d3.select('.peropt-col-three').selectAll('.peropt-checkbox')
-        .classed('peropt-checkbox-selected', function (d) { return d.selected })
+        .classed('peropt-checkbox-selected', function (d) { return selectedOptions.has(d.index) })
         .classed('peropt-checkbox-hidden', function (d) { return d.parent === combinedColumnTwoHighlight ? null : 'none' })
         .text('')
         .attr('title', function (d) { return d.text })
@@ -349,7 +381,7 @@
       const perColumnSetting = settings.perspectiveCheckboxesPerColumn
       const maxColumns = 3
       const columns = Math.min(maxColumns, Math.ceil(optionCount / perColumnSetting))
-      const perColumn = Math.ceil(optionCount / columns)
+
       hasRemainder = columns > 1
       if (collapsed) {
         d3.select('.peropt-extra-columns')
@@ -359,27 +391,16 @@
         collapsed = true
       }
 
-      for (let i = 0; i < optionCount; i++) {
-        const option = { text: dax.data.getQuestionOptionText(selectedPerspectiveID, i), selected: selectedOptions.has(i), index: i }
-        if (i < perColumn) {
-          firstColumnData.push(option)
-        } else if (i < perColumn * 2) {
-          secondColumnData.push(option)
-        } else {
-          thirdColumnData.push(option)
-        }
-      }
-
       // TODO add total
 
       // First column basic
       const firstColOptions = d3.select('.peropt-col-one')
         .selectAll('.peropt-checkbox')
         .classed('peropt-checkbox-combined', false)
-        .classed('peropt-checkbox-expandible', false)
+        .classed('peropt-checkbox-expandable', false)
         .classed('peropt-checkbox-expanded', false)
         .on('mouseover', function () {})
-        .data(firstColumnData)
+        .data(perspectiveColumns[selectedPerspectiveID].firstColumnData)
 
       firstColOptions.exit().remove()
 
@@ -396,7 +417,7 @@
           })
 
       d3.select('.peropt-col-one').selectAll('.peropt-checkbox')
-        .classed('peropt-checkbox-selected', function (d) { return d.selected })
+        .classed('peropt-checkbox-selected', function (d) { return selectedOptions.has(d.index) })
         .text(function (d) { return d.text })
         .attr('title', function (d) { return d.text })
 
@@ -408,7 +429,7 @@
         .classed('peropt-col-two-combined', false)
       const secondColOptions = d3.select('.peropt-col-two')
         .selectAll('.peropt-checkbox')
-        .data(secondColumnData)
+        .data(perspectiveColumns[selectedPerspectiveID].secondColumnData)
 
       secondColOptions.exit().remove()
 
@@ -425,7 +446,7 @@
           })
 
       d3.select('.peropt-col-two').selectAll('.peropt-checkbox')
-        .classed('peropt-checkbox-selected', function (d) { return d.selected })
+        .classed('peropt-checkbox-selected', function (d) { return selectedOptions.has(d.index) })
         .text(function (d) { return d.text })
         .attr('title', function (d) { return d.text })
 
@@ -438,7 +459,7 @@
         .classed('peropt-col-three-combined', false)
       const thirdColOptions = d3.select('.peropt-col-three')
         .selectAll('.peropt-checkbox')
-        .data(thirdColumnData)
+        .data(perspectiveColumns[selectedPerspectiveID].thirdColumnData)
 
       thirdColOptions.exit().remove()
 
@@ -455,7 +476,7 @@
           })
 
       d3.select('.peropt-col-three').selectAll('.peropt-checkbox')
-        .classed('peropt-checkbox-selected', function (d) { return d.selected })
+        .classed('peropt-checkbox-selected', function (d) { return selectedOptions.has(d.index) })
         .text(function (d) { return d.text })
         .attr('title', function (d) { return d.text })
 
@@ -479,7 +500,7 @@
     if (isIE) {
       const optionsHeight = Math.max(
         d3.select('.pervarpicker-border-wrapper').node().offsetHeight,
-        62 + 24 * firstColumnData.length)
+        62 + 24 * perspectiveColumns[selectedPerspectiveID].firstColumnData.length)
       d3.select('.perspective-options')
         .style('height', optionsHeight + 'px')
     }
