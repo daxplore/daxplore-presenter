@@ -46,7 +46,7 @@
     perspectiveIDs = dax.data.getExplorerPerspectiveIDs()
 
     // Generate data structure for all perspectives
-    perspectiveIDs.forEach(perspectiveID => {
+    perspectiveIDs.forEach(function (perspectiveID) {
       const optionCount = dax.data.getQuestionOptionCount(perspectiveID)
       const firstColumnData = []
       const secondColumnData = []
@@ -94,9 +94,9 @@
         }
       }
       perspectiveColumns[perspectiveID] = {
-        firstColumnData,
-        secondColumnData,
-        thirdColumnData,
+        firstColumnData: firstColumnData,
+        secondColumnData: secondColumnData,
+        thirdColumnData: thirdColumnData,
       }
     })
 
