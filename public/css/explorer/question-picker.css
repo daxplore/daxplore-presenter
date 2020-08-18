@@ -3,11 +3,11 @@
 .question-panel {
   padding-bottom: 10px;
   padding-right: 5px;
+  position: relative;
 }
 
 .question-panel.perspective-is-top {
   padding-right: 10px;
-  position: relative;
 }
 
 .question-header {
