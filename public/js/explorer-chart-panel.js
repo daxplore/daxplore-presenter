@@ -157,18 +157,18 @@
       }
       break
     case 'MEAN':
-      switch (timepoints) {
-      case 'TIMEPOINTS_ONE':
-        dax.chart.meanbars.populateChart(questionID, perspectiveID, selectedOptions)
+      switch (dax.settings('chart.mean.orientation')) {
+      case 'HORIZONTAL':
+        switch (timepoints) {
+        case 'TIMEPOINTS_ONE':
+          dax.chart.meanbars.populateChart(questionID, perspectiveID, selectedOptions)
+          break
+        }
         break
-      case 'TIMEPOINTS_TWO':
-        break
-      case 'TIMEPOINTS_ALL':
+      case 'VERTICAL':
+        dax.chart.meanprofile.populateChart(questionID, perspectiveID, selectedOptions)
         break
       }
-      break
-    case 'MEAN_VERTICAL':
-      dax.chart.meanprofile.populateChart(questionID, perspectiveID, selectedOptions)
       break
     case 'DICH':
       switch (timepoints) {
@@ -224,12 +224,16 @@
       dax.chart.frequency.setSize(widthForChart, 350)
       break
     case 'MEAN':
-      // TODO allow more height instead of vertical scroll
-      // TODO hard coded based on specific chart, should be generalized
-      dax.chart.meanbars.setSize(widthForChart, 350)
-      break
-    case 'MEAN_VERTICAL':
-      dax.chart.meanprofile.setSize(widthForChart)
+      switch (dax.settings('chart.mean.orientation')) {
+      case 'HORIZONTAL':
+        // TODO allow more height instead of vertical scroll
+        // TODO hard coded based on specific chart, should be generalized
+        dax.chart.meanbars.setSize(widthForChart, 350)
+        break
+      case 'VERTICAL':
+        dax.chart.meanprofile.setSize(widthForChart)
+        break
+      }
       break
     case 'DICH':
       dax.chart.dichtimeline.updateSize(350)
