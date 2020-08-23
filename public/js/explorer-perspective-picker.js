@@ -15,6 +15,8 @@
 
   let settings
 
+  let columnOne, columnTwo, columnThree
+
   let combinedColumnOneHighlight = -1
   let combinedColumnTwoHighlight = -1
 
@@ -39,6 +41,10 @@
 
   exports.generatePerspectivePicker = function (settingsInput) {
     settings = settingsInput
+
+    columnOne = d3.select('.peropt-col-one')
+    columnTwo = d3.select('.peropt-col-two')
+    columnThree = d3.select('.peropt-col-three')
 
     d3.select('.perspective-header')
       .text(dax.text('perspectivesHeader')) // TODO use new text ID style
@@ -188,21 +194,26 @@
   function setSelectedColumnOneHighlight (index) {
     combinedColumnOneHighlight = index
     combinedColumnTwoHighlight = dax.data.getPerspectiveOptionFirstChild(selectedPerspectiveID, combinedColumnOneHighlight)
-    updateColumnHighlights()
+    updateColumnCollapse()
   }
 
   function setSelectedColumnTwoHighlight (index) {
     combinedColumnTwoHighlight = index
-    updateColumnHighlights()
+    updateColumnCollapse()
   }
 
-  function updateColumnHighlights () {
+  function updateColumnCollapse () {
+    // Collapse second column, if empty
     const visibleSecondColElementCount = dax.data.getPerspectiveOptionChildCount(selectedPerspectiveID, combinedColumnOneHighlight)
-    d3.select('.peropt-col-two')
-      .classed('peropt-col-collapsed', visibleSecondColElementCount === 0)
+    columnTwo.classed('peropt-col-collapsed', visibleSecondColElementCount === 0)
+
+    // Collapse third column, if empty
     const visibleThirdColElementCount = dax.data.getPerspectiveOptionChildCount(selectedPerspectiveID, combinedColumnTwoHighlight)
-    d3.select('.peropt-col-three')
-      .classed('peropt-col-collapsed', visibleThirdColElementCount === 0)
+    columnThree.classed('peropt-col-collapsed', visibleThirdColElementCount === 0)
+
+    // Double flex size of column two if column three is collapsed
+    const hasThirdColumnElements = perspectiveColumns[selectedPerspectiveID].thirdColumnData.length > 0
+    columnTwo.style('flex', hasThirdColumnElements && visibleThirdColElementCount === 0 ? 2 : 1)
   }
 
   function updateCheckboxes (fireUpdateEvent) {
@@ -221,7 +232,7 @@
       hasRemainder = false
 
       // First column combined
-      const firstColOptions = d3.select('.peropt-col-one')
+      const firstColOptions = columnOne
         .selectAll('.peropt-checkbox')
         .data(perspectiveColumns[selectedPerspectiveID].firstColumnData)
 
@@ -239,7 +250,7 @@
             updateCheckboxes(true)
           })
 
-      const firstColElements = d3.select('.peropt-col-one').selectAll('.peropt-checkbox')
+      const firstColElements = columnOne.selectAll('.peropt-checkbox')
         .classed('peropt-checkbox-combined', true)
         .classed('peropt-checkbox-expandable', function (d) { return d.isExpandable })
         .classed('peropt-checkbox-selected', function (d) { return selectedOptions.has(d.index) })
@@ -284,13 +295,13 @@
 
       // Second column combined
       // d3.select('.peropt-columns').append(function () {
-      //   return d3.select('.peropt-col-two').remove().node()
+      //   return columnTwo.remove().node()
       // })
       // d3.select('.peropt-extra-columns')
       //   .style('display', 'none')
-      d3.select('.peropt-col-two')
+      columnTwo
         .classed('peropt-col-two-combined', true)
-      const secondColOptions = d3.select('.peropt-col-two')
+      const secondColOptions = columnTwo
         .selectAll('.peropt-checkbox')
         .data(perspectiveColumns[selectedPerspectiveID].secondColumnData)
 
@@ -308,7 +319,7 @@
             updateCheckboxes(true)
           })
 
-      const secondColElements = d3.select('.peropt-col-two').selectAll('.peropt-checkbox')
+      const secondColElements = columnTwo.selectAll('.peropt-checkbox')
         .classed('peropt-checkbox-combined', true)
         .classed('peropt-checkbox-expandable', function (d) { return d.isExpandable })
         .classed('peropt-checkbox-selected', function (d) { return selectedOptions.has(d.index) })
@@ -325,7 +336,7 @@
               .classed('peropt-checkbox-expanded', function (d) { return d.isExpandable && d.index === combinedColumnTwoHighlight })
               .classed('peropt-checkbox-hidden', function (dd, i) { return dd.parent === combinedColumnOneHighlight ? null : 'none' })
             const visibleThirdColElementCount = dax.data.getPerspectiveOptionChildCount(selectedPerspectiveID, combinedColumnTwoHighlight)
-            d3.select('.peropt-col-three')
+            columnThree
               .classed('peropt-col-collapsed', visibleThirdColElementCount === 0)
             d3.selectAll('.peropt-col-three > .peropt-checkbox')
               .classed('peropt-checkbox-hidden', function (dd, i) { return dd.parent === combinedColumnTwoHighlight ? null : 'none' })
@@ -346,11 +357,11 @@
 
       // Third column combined
       // d3.select('.peropt-columns').append(function () {
-      //   return d3.select('.peropt-col-three').remove().node()
+      //   return columnThree.remove().node()
       // })
-      d3.select('.peropt-col-three')
+      columnThree
         .classed('peropt-col-three-combined', true)
-      const thirdColOptions = d3.select('.peropt-col-three')
+      const thirdColOptions = columnThree
         .selectAll('.peropt-checkbox')
         .data(perspectiveColumns[selectedPerspectiveID].thirdColumnData)
 
@@ -368,7 +379,7 @@
             updateCheckboxes(true)
           })
 
-      const thirdColElements = d3.select('.peropt-col-three').selectAll('.peropt-checkbox')
+      const thirdColElements = columnThree.selectAll('.peropt-checkbox')
         .classed('peropt-checkbox-selected', function (d) { return selectedOptions.has(d.index) })
         .classed('peropt-checkbox-hidden', function (d) { return d.parent === combinedColumnTwoHighlight ? null : 'none' })
         .text('')
@@ -394,7 +405,7 @@
       // TODO add total
 
       // First column basic
-      const firstColOptions = d3.select('.peropt-col-one')
+      const firstColOptions = columnOne
         .selectAll('.peropt-checkbox')
         .classed('peropt-checkbox-combined', false)
         .classed('peropt-checkbox-expandable', false)
@@ -416,18 +427,18 @@
             updateCheckboxes(true)
           })
 
-      d3.select('.peropt-col-one').selectAll('.peropt-checkbox')
+      columnOne.selectAll('.peropt-checkbox')
         .classed('peropt-checkbox-selected', function (d) { return selectedOptions.has(d.index) })
         .text(function (d) { return d.text })
         .attr('title', function (d) { return d.text })
 
       // Second column basic
       d3.select('.peropt-extra-columns').append(function () {
-        return d3.select('.peropt-col-two').remove().node()
+        return columnTwo.remove().node()
       })
-      d3.select('.peropt-col-two')
+      columnTwo
         .classed('peropt-col-two-combined', false)
-      const secondColOptions = d3.select('.peropt-col-two')
+      const secondColOptions = columnTwo
         .selectAll('.peropt-checkbox')
         .data(perspectiveColumns[selectedPerspectiveID].secondColumnData)
 
@@ -445,19 +456,19 @@
             updateCheckboxes(true)
           })
 
-      d3.select('.peropt-col-two').selectAll('.peropt-checkbox')
+      columnTwo.selectAll('.peropt-checkbox')
         .classed('peropt-checkbox-selected', function (d) { return selectedOptions.has(d.index) })
         .text(function (d) { return d.text })
         .attr('title', function (d) { return d.text })
 
       // Third column basic
       d3.select('.peropt-extra-columns').append(function () {
-        return d3.select('.peropt-col-three').remove().node()
+        return columnThree.remove().node()
       })
       d3.select('.peropt-extra-columns').style('display', null)
-      d3.select('.peropt-col-three')
+      columnThree
         .classed('peropt-col-three-combined', false)
-      const thirdColOptions = d3.select('.peropt-col-three')
+      const thirdColOptions = columnThree
         .selectAll('.peropt-checkbox')
         .data(perspectiveColumns[selectedPerspectiveID].thirdColumnData)
 
@@ -475,7 +486,7 @@
             updateCheckboxes(true)
           })
 
-      d3.select('.peropt-col-three').selectAll('.peropt-checkbox')
+      columnThree.selectAll('.peropt-checkbox')
         .classed('peropt-checkbox-selected', function (d) { return selectedOptions.has(d.index) })
         .text(function (d) { return d.text })
         .attr('title', function (d) { return d.text })
