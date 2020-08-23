@@ -4,7 +4,6 @@
   flex: 1;
   left: 0;
   min-width: 0;
-  /* position: absolute; */
   top: 0;
   width: 100%;
 }
@@ -217,7 +216,6 @@
 
 .peropt-col-one, .peropt-col-two, .peropt-col-three {
   flex: 1;
-  max-width: fit-content;
   min-width: 0;
   padding-left: 4px;
   transition: flex 0.2s;
