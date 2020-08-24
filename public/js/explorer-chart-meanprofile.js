@@ -200,8 +200,6 @@
       .domain(selectedPerspectiveOptions)
     yAxis
       .scale(yScale)
-
-    resizeAndPositionElements()
   }
 
   // Set the size available for the chart.

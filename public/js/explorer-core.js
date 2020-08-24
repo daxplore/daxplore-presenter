@@ -3,16 +3,23 @@
   const exports = namespace.explorer
 
   let groups, perspectives, questions, settings
+
+  let currentHash = null
+
   const questionData = {}
   const questionMap = {}
   const dichselectedMap = {}
   const optionsMap = {}
   const timepointsMap = {}
 
-  function updateFromHash () {
+  function onHashUpdate () {
+    if (currentHash === window.hash) {
+      return
+    }
+    currentHash = window.hash
     // Get query definition string from hash
-    const queryDefinition = dax.querydefinition.parseString(window.location.hash.slice(1))
     // Parse the query definition into a (potentially empty or partially empty) query object
+    const queryDefinition = dax.querydefinition.parseString(window.location.hash.slice(1))
     dax.explorer.questionSetQueryDefinition(queryDefinition.question)
     const totalSelected = queryDefinition.flags.indexOf('TOTAL') !== -1
     dax.explorer.perspectiveSetQueryDefinition(queryDefinition.perspective, queryDefinition.perspectiveOptions, totalSelected)
@@ -85,8 +92,8 @@
         dax.explorer.generatePerspectivePicker(settings)
         dax.explorer.generateChartPanel(questions, groups, null, null, dichselectedMap, optionsMap, timepointsMap) // TODO fix constructor
 
-        updateFromHash()
-        window.addEventListener('hashchange', updateFromHash, false)
+        onHashUpdate()
+        window.addEventListener('hashchange', onHashUpdate, false)
       })
     }))
   }
