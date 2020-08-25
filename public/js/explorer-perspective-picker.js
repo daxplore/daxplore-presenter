@@ -451,6 +451,16 @@
           .classed('peropt-checkbox-text', true)
           .text(function (d) { return d.text })
       }
+
+      // Skip width animation when switching to new perspective
+      columnOne.style('transition', '0s')
+      columnTwo.style('transition', '0s')
+      columnThree.style('transition', '0s')
+      setTimeout(function () {
+        columnOne.style('transition', null)
+        columnTwo.style('transition', null)
+        columnThree.style('transition', null)
+      }, 0)
     }
 
     updateCheckboxes(changed && initialized)
