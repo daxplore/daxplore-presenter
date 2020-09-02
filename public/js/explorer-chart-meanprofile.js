@@ -33,7 +33,8 @@
   let xScale
   let xAxisTop, xAxisTopElement, xAxisTopDescription
   let xAxisBottom, xAxisBottomElement, xAxisBottomDescription
-  let yScale, yAxis, yAxisElement, yAxisReferenceElement, yAxisWidth
+  let yScale, yAxis, yAxisElement, yAxisReferenceElement
+  let yAxisWidth = 50
 
   // STATE TRACKING
   let animateNextUpdate = false
@@ -227,35 +228,7 @@
 
   // CHART ELEMENTS
 
-  function updateStyles () {
-    chartG.selectAll('.axis .domain')
-      .style('visibility', 'hidden')
-
-    chartG.selectAll('.axis path, .axis line')
-      .style('fill', 'none')
-      .style('stroke', '#bbb')
-      .style('shape-rendering', 'geometricPrecision')
-
-    chartG.selectAll('text')
-      .style('fill', '#555')
-      .style('font', '12px sans-serif')
-      .style('cursor', 'default')
-
-    chartG.selectAll('.y path, .y line')
-      .style('visibility', 'hidden')
-
-    chartG.selectAll('.reference rect, .reference path')
-      .style('fill', '#444')
-  }
-
   function resizeAndPositionElements () {
-    let oldYAxisWidth = Math.max(50, yAxisReferenceElement.node().getBoundingClientRect().width)
-    yAxisReferenceElement.call(yAxis)
-    yAxisWidth = Math.max(50, yAxisReferenceElement.node().getBoundingClientRect().width)
-    if (!animateNextUpdate) {
-      oldYAxisWidth = yAxisWidth
-    }
-
     // const minBarLength = 100 // TODO
     // const chartNeededWidth = margin.left + margin.right + yAxisWidth + minBarLength
 
@@ -273,10 +246,17 @@
       .attr('height', yStop + margin.top + margin.bottom)
 
     // UPDATE Y
-    yScale
-      .range([xAxisTopHeight, yStop])
+    yScale.range([xAxisTopHeight, yStop])
 
     yAxisElement.interrupt().selectAll('*').interrupt()
+
+    let oldYAxisWidth = yAxisWidth
+    yAxisReferenceElement.call(yAxis)
+    yAxisWidth = Math.max(50, yAxisReferenceElement.node().getBoundingClientRect().width)
+
+    if (!animateNextUpdate) {
+      oldYAxisWidth = yAxisWidth
+    }
 
     conditionalApplyTransition(yAxisElement, elementTransition, animateNextUpdate)
       .attr('transform', 'translate(' + yAxisWidth + ', 0)')
@@ -371,9 +351,6 @@
       .attr('y', xAxisTopHeight)
       .attr('height', yStop - xAxisTopHeight)
       .raise()
-
-    // FINISH
-    updateStyles()
   }
 
   // Populate, position and show tooltip on mouse hover on bar

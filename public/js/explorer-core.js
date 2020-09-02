@@ -171,6 +171,7 @@
       parent.postMessage(queryHash, '*')
     }
 
+    // TODO dich subtitle should be handled by a dich subsystem
     let dichSubtitle = ''
     if (tab === 'DICH') {
       const optionTexts = questionMap[question].options

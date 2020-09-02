@@ -194,22 +194,26 @@
   }
 
   exports.updateChartPanelSize = function () {
-    // Calculate available width, assuming to horizontal scroll for the page as a whole
-    const availableWidth = document.documentElement.clientWidth - // window width
-              d3.select('.question-panel').node().offsetWidth - // tree sidebar
-              d3.select('.sidebar-column').node().offsetWidth - // right sidebar
-              2 - // border of 1px + 1px (if changed here, needs to be changed in css)
-              1 // 1 px fudge to account for rounding
-    // Calculate minimum width needed for header
+    // TODO ask all elements for their needed width
+    const windowWidth = document.documentElement.clientWidth
+    const leftSidebarWidth = d3.select('.question-panel').node().offsetWidth
+    const rightSidebarWidth = d3.select('.sidebar-column').node().offsetWidth
     const headerBlockWidth = d3.select('.header-section').node().offsetWidth
 
-    // Calculate minimum width needed for the block under the chart
-    // let bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
     let bottomBlockWidth = 0
-    const description = d3.select('.description-panel').node()
-    if (description != null && description.offsetWidth > 0) {
-      bottomBlockWidth += 250 // TODO hard coded
+    if (dax.settings('perspectiveDescriptionPosition') === 'BOTTOM') {
+      const descriptionPanel = d3.select('.description-panel').node()
+      if (descriptionPanel !== null && descriptionPanel.offsetWidth > 0) {
+        bottomBlockWidth = 250 // TODO hard coded
+      }
     }
+
+    // Calculate available width, assuming to horizontal scroll for the page as a whole
+    const availableWidth = windowWidth -
+              leftSidebarWidth -
+              rightSidebarWidth - // right sidebar
+              2 - // border of 1px + 1px (if changed here, needs to be changed in css)
+              1 // 1 px fudge to account for rounding
 
     // Minimum width needed for the header and bottom blocks
     const topBotNeededWidth = Math.max(headerBlockWidth, bottomBlockWidth)

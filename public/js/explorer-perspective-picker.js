@@ -14,7 +14,7 @@
 
   let settings
 
-  let columnOne, columnTwo, columnThree
+  let moreButton, columnOne, columnTwo, columnThree
 
   let combinedColumnOneHighlight = -1
   let combinedColumnTwoHighlight = -1
@@ -43,6 +43,7 @@
   exports.generatePerspectivePicker = function (settingsInput) {
     settings = settingsInput
 
+    moreButton = d3.selectAll('.peropt-more-button')
     columnOne = d3.select('.peropt-col-one')
     columnTwo = d3.select('.peropt-col-two')
     columnThree = d3.select('.peropt-col-three')
@@ -133,7 +134,7 @@
       })
       .text(dax.text('perspectivesNoneButton')) // TODO use new text ID style
 
-    d3.selectAll('.peropt-more-button')
+    moreButton
       .text(collapsed ? dax.text('perspectivesMoreButton') + '>' : '<' + dax.text('perspectivesLessButton')) // TODO use new text ID style
       .style('visibility', function () {
         return hasRemainder ? null : 'hidden'
@@ -330,9 +331,11 @@
             .on('click', toggleOption)
 
         const firstColElements = columnOne.selectAll('.peropt-checkbox')
-          .classed('peropt-checkbox-combined', true)
-          .classed('peropt-checkbox-expandable', function (d) { return d.isExpandable })
-          .classed('peropt-checkbox-expanded', function (d, i) { return i === combinedColumnOneHighlight })
+          .attr('class', function (d, i) {
+            return 'peropt-checkbox peropt-checkbox-combined' +
+            (d.isExpandable ? ' peropt-checkbox-combined' : '') +
+            (i === combinedColumnOneHighlight ? ' peropt-checkbox-expanded' : '')
+          })
           .text('')
           .attr('title', function (d) { return d.text })
           .on('mouseover', function (d, i, elements) {
@@ -363,8 +366,7 @@
           .text(function (d) { return d.text })
 
         firstColElements.append('span')
-          .classed('peropt-checkbox-expand', true)
-          .classed('no-select', true)
+          .classed('peropt-checkbox-expand no-select', true)
           .style('display', function (d) { return d.isExpandable ? null : 'none' })
           .text('▶')
 
@@ -391,10 +393,12 @@
             .on('click', toggleOption)
 
         const secondColElements = columnTwo.selectAll('.peropt-checkbox')
-          .classed('peropt-checkbox-combined', true)
-          .classed('peropt-checkbox-expandable', function (d) { return d.isExpandable })
-          .classed('peropt-checkbox-expanded', function (d) { return d.isExpandable && d.index === combinedColumnTwoHighlight })
-          .classed('peropt-checkbox-hidden', function (d) { return d.parent === combinedColumnOneHighlight ? null : 'none' })
+          .attr('class', function (d, i) {
+            return 'peropt-checkbox peropt-checkbox-combined' +
+            (d.isExpandable ? ' peropt-checkbox-expandable' : '') +
+            (d.isExpandable && d.index === combinedColumnTwoHighlight ? ' peropt-checkbox-expanded' : '') +
+            (d.parent !== combinedColumnOneHighlight ? ' peropt-checkbox-hidden' : '')
+          })
           .text('')
           .attr('title', function (d) { return d.text })
           .on('mouseover', function (d, i, elements) {
@@ -417,8 +421,7 @@
           .classed('peropt-checkbox-text', true)
           .text(function (d) { return d.text })
         secondColElements.append('span')
-          .classed('peropt-checkbox-expand', true)
-          .classed('no-select', true)
+          .attr('class', 'peropt-checkbox-expand no-select')
           .style('display', function (d) { return d.isExpandable ? null : 'none' })
           .text('▶')
 
@@ -452,6 +455,26 @@
           .text(function (d) { return d.text })
       }
 
+      d3.select('.peropt-bottom-padding')
+        .style('height', function () {
+          if (hasRemainder) {
+            return null
+          } else if (dax.data.isCombinedPerspective(selectedPerspectiveID)) {
+            return '4px'
+          } else {
+            return '0px'
+          }
+        })
+
+      d3.select('.description-panel')
+        .interrupt().transition()
+          .style('color', collapsed ? 'black' : 'hsl(0, 0%, 70%)')
+
+      d3.select('.peropt-extra-columns')
+        .interrupt().transition()
+          .style('opacity', collapsed && !dax.data.isCombinedPerspective(selectedPerspectiveID) ? 0 : 1)
+          .style('width', collapsed && !dax.data.isCombinedPerspective(selectedPerspectiveID) ? '0px' : null)
+
       // Skip width animation when switching to new perspective
       columnOne.style('transition', '0s')
       columnTwo.style('transition', '0s')
@@ -462,6 +485,19 @@
         columnThree.style('transition', null)
       }, 0)
     }
+
+    // hack to handle IE display bugs
+    if (isIE) {
+      const optionsHeight = Math.max(
+        d3.select('.pervarpicker-border-wrapper').node().offsetHeight,
+        62 + 24 * perspectiveColumns[selectedPerspectiveID].firstColumnData.length)
+      d3.select('.perspective-options')
+        .style('height', optionsHeight + 'px')
+    }
+
+    moreButton
+      .style('display', !dax.data.isCombinedPerspective(selectedPerspectiveID) && hasRemainder ? null : 'none')
+      .text(collapsed ? dax.text('perspectivesMoreButton') + '>' : '<' + dax.text('perspectivesLessButton')) // TODO use new text ID style
 
     updateCheckboxes(changed && initialized)
   }
@@ -484,44 +520,5 @@
     if (fireUpdateEvent) {
       dax.explorer.selectionUpdateCallback()
     }
-
-    // hack to handle IE display bugs
-    if (isIE) {
-      const optionsHeight = Math.max(
-        d3.select('.pervarpicker-border-wrapper').node().offsetHeight,
-        62 + 24 * perspectiveColumns[selectedPerspectiveID].firstColumnData.length)
-      d3.select('.perspective-options')
-        .style('height', optionsHeight + 'px')
-    }
-
-    updateElements()
-  }
-
-  function updateElements () {
-    d3.select('.peropt-more-button')
-      .style('display', function () {
-        return dax.data.isCombinedPerspective(selectedPerspectiveID) && hasRemainder ? null : 'none'
-      })
-      .text(collapsed ? 'Visa fler >' : '< Visa färre ') // TODO externalize texts
-
-    d3.select('.peropt-bottom-padding')
-      .style('height', function () {
-        if (hasRemainder) {
-          return null
-        } else if (dax.data.isCombinedPerspective(selectedPerspectiveID)) {
-          return '4px'
-        } else {
-          return '0px'
-        }
-      })
-
-    d3.select('.description-panel')
-      .interrupt().transition()
-        .style('color', collapsed ? 'black' : 'hsl(0, 0%, 70%)')
-
-    d3.select('.peropt-extra-columns')
-      .interrupt().transition()
-        .style('opacity', collapsed && !dax.data.isCombinedPerspective(selectedPerspectiveID) ? 0 : 1)
-        .style('width', collapsed && !dax.data.isCombinedPerspective(selectedPerspectiveID) ? '0px' : null)
   }
 })(window.dax = window.dax || {})

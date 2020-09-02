@@ -47,3 +47,27 @@
 .meanprofile__tooltip-reference-value {
 
 }
+
+.explorer-meanprofile .axis .domain {
+  visibility: hidden;
+}
+
+.explorer-meanprofile .axis path, .explorer-meanprofile .axis line {
+  fill: none;
+  shape-rendering: geometricPrecision;
+  stroke: #bbb;
+}
+
+.explorer-meanprofile text {
+  cursor: default;
+  fill: #555;
+  font: 12px sans-serif;
+}
+
+.explorer-meanprofile .y path, .explorer-meanprofile .y line {
+  visibility: hidden;
+}
+
+.explorer-meanprofile .reference rect, .explorer-meanprofile .reference path {
+  fill: #444;
+}
