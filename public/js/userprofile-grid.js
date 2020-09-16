@@ -589,7 +589,14 @@
       const canvasChart = canvasChartSelection.node()
       const ctx = canvasChart.getContext('2d')
 
-      const sourceText = dax.text('imageWaterStamp') // TODO use new text ID style
+      let sourceText = dax.text('profile_user.image.watermark')
+      const date = new Date()
+      sourceText = sourceText.replace(
+        '{date}',
+        date.getFullYear() + '-' +
+        ('0' + date.getMonth()).slice(-2) + '-' +
+        ('0' + date.getDate()).slice(-2))
+
       const sourceFontHeight = 11
       ctx.font = sourceFontHeight + 'px sans-serif'
       const sourceTextWidth = ctx.measureText(sourceText).width

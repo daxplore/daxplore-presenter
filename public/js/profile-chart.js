@@ -4,7 +4,7 @@
 
   let firstUpdate = true
 
-  let qIDs, means, meanReferences, perspectiveOptions, directions
+  let perspectiveID, qIDs, means, meanReferences, perspectiveOptions, directions
   // TODO unused: descriptions
   let shorttexts // TODO initialize
   let selectedOption = 0
@@ -428,11 +428,13 @@
 
   exports.generateListChart =
     function (
+      perspectiveIDInput,
       qIDsArray,
       referencesMap,
       shorttextsMap,
       directionsMap,
       selectedSelectedOption) {
+      perspectiveID = perspectiveIDInput
       qIDs = qIDsArray
       meanReferences = referencesMap
       shorttexts = shorttextsMap
@@ -532,17 +534,32 @@
 
       ctx.fillText(headerText, headerHorizontalShift + imgMargin.left, headerPaddingTop + headerFontSize + imgMargin.top)
 
-      const sourceText = dax.text('imageWaterStamp') // TODO new text ID style
+      let watermarkText = dax.text('profile.image.watermark')
+      const date = new Date()
+      watermarkText = watermarkText.replace(
+        '{date}',
+        date.getFullYear() + '-' +
+        ('0' + date.getMonth()).slice(-2) + '-' +
+        ('0' + date.getDate()).slice(-2))
+
+      let fileName = dax.text('profile.image.filename')
+        .replace('{perspective}', shorttexts[perspectiveID])
+        .replace('{option}', headerText)
+
+      if (fileName.length === 0) {
+        fileName = shorttexts[perspectiveID] + ' - ' + headerText
+      }
+
       const sourceFontHeight = 11
       ctx.font = sourceFontHeight + 'px sans-serif'
       ctx.fillStyle = '#555'
       // TODO unused: let sourceTextWidth = ctx.measureText(sourceText).width
-      ctx.fillText(sourceText, 5, completeHeight - 5)
+      ctx.fillText(watermarkText, 5, completeHeight - 5)
 
       ctx.drawImage(canvasChart, imgMargin.left, imgMargin.top + headerHeight)
 
       canvasComplete.toBlob(function (blob) {
-        saveAs(blob, headerText + '.png')
+        saveAs(blob, fileName + '.png')
       })
 
       imgSelection.remove()

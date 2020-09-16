@@ -2,11 +2,11 @@
   namespace.profile = namespace.profile || {}
   const exports = namespace.profile
 
-  function populateProfileDOM (qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, perspectiveOptions, means) {
+  function populateProfileDOM (perspectiveID, qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, perspectiveOptions, means) {
     d3.select('.save-image')
       .text(dax.text('imageSaveButton')) // TODO new text ID f
 
-    dax.profile.generateListChart(qIDs, meanReferenceMap, shorttextMap, directionMap, 0)
+    dax.profile.generateListChart(perspectiveID, qIDs, meanReferenceMap, shorttextMap, directionMap, 0)
     dax.profile.setChartData(perspectiveOptions, means)
   }
 
@@ -116,10 +116,10 @@
 
         if (document.readyState === 'loading') {
           document.addEventListener('DOMContentLoaded', function (e) {
-            populateProfileDOM(qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, perspectiveOptions, means)
+            populateProfileDOM(perspectiveID, qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, perspectiveOptions, means)
           })
         } else {
-          populateProfileDOM(qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, perspectiveOptions, means)
+          populateProfileDOM(perspectiveID, qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, perspectiveOptions, means)
         }
       })
     }))
