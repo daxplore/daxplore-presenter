@@ -93,10 +93,8 @@
     return selectedTab
   }
 
-  exports.chartSetQueryDefinition = function (chartType, timepoints, question, perspective, selectedOptions, dichSubtitle) {
+  exports.chartSetQueryDefinition = function (chartType, timepoints, question, perspectives, selectedOptions, dichSubtitle) {
     selectedTab = chartType
-    const questionID = question
-    const perspectiveID = perspective
 
     // Hide all charts elements
     dax.chart.frequency.hide()
@@ -127,7 +125,7 @@
       .classed('chart-scroll', false)
       .style('width', null)
 
-    const displaytypes = questionMap[questionID].displaytypes
+    const displaytypes = questionMap[question].displaytypes
     d3.selectAll('.chart-tab')
       .classed('chart-tab-selected', function (d, i, tabs) { return tabs[i].classList.contains(selectedTab.toLowerCase()) })
 
@@ -152,7 +150,7 @@
       case 'TIMEPOINTS_TWO':
       case 'TIMEPOINTS_ALL':
         // TODO temporary hard coded timepoint
-        dax.chart.frequency.populateChart(questionID, perspectiveID, selectedOptions)
+        dax.chart.frequency.populateChart(question, perspectives, selectedOptions)
         break
       }
       break
@@ -161,12 +159,12 @@
       case 'HORIZONTAL':
         switch (timepoints) {
         case 'TIMEPOINTS_ONE':
-          dax.chart.meanbars.populateChart(questionID, perspectiveID, selectedOptions)
+          dax.chart.meanbars.populateChart(question, perspectives, selectedOptions)
           break
         }
         break
       case 'VERTICAL':
-        dax.chart.meanprofile.populateChart(questionID, perspectiveID, selectedOptions)
+        dax.chart.meanprofile.populateChart(question, perspectives, selectedOptions)
         break
       }
       break
@@ -175,13 +173,13 @@
       case 'TIMEPOINTS_ONE':
       case 'TIMEPOINTS_TWO':
       case 'TIMEPOINTS_ALL':
-        dax.chart.dichtimeline.generateChart(questionID, perspectiveID, selectedOptions, dichselectedMap, optionsMap, timepointsMap, primaryColors, hoverColors)
+        dax.chart.dichtimeline.generateChart(question, perspectives, selectedOptions, dichselectedMap, optionsMap, timepointsMap, primaryColors, hoverColors)
         dax.chart.dichtimeline.generateLegend()
         break
       }
       break
     }
-    // TODO
+
     dax.explorer.updateChartPanelSize()
   }
 

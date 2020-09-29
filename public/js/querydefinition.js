@@ -57,7 +57,15 @@
     const question = urlParams.get('q')
 
     // Get perspective selection
-    const perspective = urlParams.get('p')
+    let perspective = urlParams.get('p')
+    let perspectiveSecondary = null
+    if (perspective !== null) {
+      const perspectives = perspective.split(',')
+      perspective = perspectives[0]
+      if (perspectives.length > 1) {
+        perspectiveSecondary = perspectives[1]
+      }
+    }
 
     // Get and parse selected perspective options
     const optionsString = urlParams.get('o')
@@ -70,22 +78,20 @@
     const flagArray = decodeQueryDefinitionFlags(flagString)
 
     // Return query definition object
-    return { question: question, perspective: perspective, perspectiveOptions: optionsArray, flags: flagArray }
+    return {
+      question: question,
+      perspective: perspective,
+      perspectiveSecondary: perspectiveSecondary,
+      perspectiveOptions: optionsArray,
+      flags: flagArray,
+    }
   }
 
   // Takes query definition elements and creates an encoded query definition string
-  exports.encodeString = function (question, perspective, perspectiveOptions, flags) {
+  exports.encodeString = function (question, perspectives, perspectiveOptions, flags) {
     const queryDefinitionItems = []
-
-    // Add q=question if it exists
-    if (typeof question === 'string' && question.length > 0) {
-      queryDefinitionItems.push('q=' + question)
-    }
-
-    // Add p=perspective if it exists
-    if (typeof perspective === 'string' && perspective.length > 0) {
-      queryDefinitionItems.push('p=' + perspective)
-    }
+    queryDefinitionItems.push('q=' + question)
+    queryDefinitionItems.push('p=' + perspectives.join(','))
 
     // Add o = comma-separated list of perspective options
     if (Array.isArray(perspectiveOptions) && perspectiveOptions.length > 0) {

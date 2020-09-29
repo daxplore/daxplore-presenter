@@ -5,7 +5,8 @@
 .meanprofile__tooltip-body {
   border: 0;
   border-radius: 8px;
-  font: 12px sans-serif;
+  font-family:'Raleway', sans-serif;
+  font-size: 12px;
   height: auto;
   padding: 10px;
   pointer-events: none;
@@ -61,7 +62,17 @@
 .explorer-meanprofile text {
   cursor: default;
   fill: #555;
-  font: 12px sans-serif;
+  font-family:'Raleway', sans-serif;
+  font-size: 12px;
+}
+
+.meanprofile__y-tick text {
+  font-weight: bold;  
+}
+
+.meanprofile__y-tick-header text {
+  fill: black;
+  transform: translate(0, 5px);
 }
 
 .explorer-meanprofile .y path, .explorer-meanprofile .y line {

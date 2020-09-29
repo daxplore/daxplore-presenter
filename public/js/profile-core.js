@@ -6,7 +6,7 @@
     d3.select('.save-image')
       .text(dax.text('imageSaveButton')) // TODO new text ID f
 
-    dax.profile.generateListChart(perspectiveID, qIDs, meanReferenceMap, shorttextMap, directionMap, 0)
+    dax.profile.generateListChart(qIDs, meanReferenceMap, shorttextMap, directionMap, 0)
     dax.profile.setChartData(perspectiveOptions, means)
   }
 
@@ -105,7 +105,7 @@
         responsesArray.forEach(function (response) {
           for (let i = 0; i < response.data.length; i++) {
             const d = response.data[i]
-            if (d.p === perspectiveID) {
+            if (d.p.length === 1 && d.p[0] === perspectiveID) {
               const qID = d.q
               qIDs.push(qID)
               means.push(d.mean[timepoint].mean)

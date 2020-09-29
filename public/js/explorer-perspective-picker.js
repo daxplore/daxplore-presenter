@@ -4,8 +4,11 @@
 
   let initialized = false
   let selectedPerspectiveID = null
+  let selectedSecondaryPerspectiveID = null
+
   let perspectiveIDs
   const perspectiveColumns = {}
+  let secondaryPerspectives
   let selectedOptions = new Set()
   // TODO unused: let hasTotal = false
   let totalSelected = false
@@ -14,11 +17,12 @@
 
   let settings
 
-  let moreButton, columnOne, columnTwo, columnThree
+  let moreButton, columnOne, columnTwo, columnThree, secondaryPanel
 
   let combinedColumnOneHighlight = -1
   let combinedColumnTwoHighlight = -1
 
+  // TODO use feature testing instead
   const isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g)
 
   document.addEventListener('DOMContentLoaded', function (e) {
@@ -27,16 +31,24 @@
       .attr('src', './img/perspective-checkbox-empty.png')
   })
 
-  exports.perspectiveSetQueryDefinition = function (perspectiveID, perspectiveOptionsIntArray, total) {
-    if (!dax.data.isExplorerPerspective(perspectiveID)) { return } // TODO log error?
-    // selectedPerspective = perspectiveIndex // TODO validate data?
+  exports.perspectiveSetQueryDefinition = function (perspectiveID, perspectiveSecondaryID, perspectiveOptionsIntArray, total) {
+    if (!dax.data.isExplorerPerspective(perspectiveID)) {
+      console.warn('Not a valid perspective:', perspectiveID)
+      return
+    }
+
+    if (perspectiveSecondaryID !== null && !dax.data.isExplorerPerspective(perspectiveSecondaryID)) {
+      console.warn('Not a valid secondary perspective:', perspectiveSecondaryID)
+      return
+    }
+
     setSelectedPerspective(perspectiveID)
     // Remap options from array of ints to array of bools
     selectedOptions = new Set()
     perspectiveOptionsIntArray.forEach(function (opt) { selectedOptions.add(opt) })
     totalSelected = total
     if (initialized) {
-      updateCheckboxes(false)
+      updateElements(false)
     }
   }
 
@@ -47,11 +59,17 @@
     columnOne = d3.select('.peropt-col-one')
     columnTwo = d3.select('.peropt-col-two')
     columnThree = d3.select('.peropt-col-three')
+    secondaryPanel = d3.select('.perspective-secondary-picker')
 
     d3.select('.perspective-header')
-      .text(dax.text('perspectivesHeader')) // TODO use new text ID style
+      .text(dax.text('explorer.perspective.header'))
+
+    d3.select('.perspective-secondary-title')
+      .text(dax.text('explorer.perspective.header_secondary'))
 
     perspectiveIDs = dax.data.getExplorerPerspectiveIDs()
+
+    secondaryPerspectives = [{ type: 'none' }]
 
     // Generate data structure for all perspectives
     perspectiveIDs.forEach(function (perspectiveID) {
@@ -101,10 +119,16 @@
           }
         }
       }
+
       perspectiveColumns[perspectiveID] = {
         firstColumnData: firstColumnData,
         secondColumnData: secondColumnData,
         thirdColumnData: thirdColumnData,
+      }
+
+      // SECONDARY PERSPECTIVE
+      if (dax.data.isSecondaryPerspective(perspectiveID)) {
+        secondaryPerspectives.push({ type: 'perspective', id: perspectiveID })
       }
     })
 
@@ -123,14 +147,14 @@
         for (let i = 0; i < dax.data.getQuestionOptionCount(selectedPerspectiveID); i++) {
           selectedOptions.add(i)
         }
-        updateCheckboxes(true)
+        updateElements(true)
       })
       .text(dax.text('perspectivesAllButton')) // TODO use new text ID style
 
     d3.selectAll('.peropt-none-button')
       .on('click', function () {
         selectedOptions.clear()
-        updateCheckboxes(true)
+        updateElements(true)
       })
       .text(dax.text('perspectivesNoneButton')) // TODO use new text ID style
 
@@ -146,12 +170,33 @@
           .style('width', fixedWidth + 'px')
       })
 
+    // Secondary perspective panel
+    secondaryPanel.style('display', secondaryPerspectives.length === 0 ? 'none' : null)
+    const secondaryButtons = secondaryPanel.selectAll('.peropt-second-button').data(secondaryPerspectives)
+
+    secondaryButtons.enter()
+      .append('div')
+        .classed('peropt-second-button peropt-second-button dashed-button perspective-button', true)
+        .text(function (d) {
+          switch (d.type) {
+          case 'perspective': return dax.data.getQuestionShortText(d.id)
+          case 'none':return dax.text('explorer.perspective.secondary_none_button')
+          }
+        })
+        .on('click', function (d) {
+          setSelectedSecondaryPerspective(d.type === 'perspective' ? d.id : null)
+        })
+
     initializeSelection()
     initialized = true
   }
 
-  exports.getSelectedPerspective = function () {
-    return selectedPerspectiveID
+  exports.getSelectedPerspectives = function () {
+    const perspectives = [selectedPerspectiveID]
+    if (selectedSecondaryPerspectiveID !== null && selectedPerspectiveID !== selectedSecondaryPerspectiveID) {
+      perspectives.push(selectedSecondaryPerspectiveID)
+    }
+    return perspectives
   }
 
   exports.getSelectedPerspectiveOptions = function () {
@@ -159,6 +204,22 @@
     return optionsNested.filter(function (optionIndex) {
       return selectedOptions.has(optionIndex)
     })
+  }
+
+  // Combines primary and secondary perspective (if selected) into a single option array
+  exports.getSelectedPerspectiveOptionsCombined = function () {
+    const options = exports.getSelectedPerspectiveOptions()
+    if (selectedSecondaryPerspectiveID === null || selectedPerspectiveID === selectedSecondaryPerspectiveID) {
+      return options
+    }
+    const secondPerspectiveOptionCount = dax.data.getQuestionOptionCount(selectedSecondaryPerspectiveID)
+    const combinedOptions = []
+    options.forEach(function (opt1) {
+      for (let opt2 = 0; opt2 < secondPerspectiveOptionCount; opt2++) {
+        combinedOptions.push(opt1 * secondPerspectiveOptionCount + opt2)
+      }
+    })
+    return combinedOptions
   }
 
   exports.isPerspectiveTotalSelected = function () {
@@ -204,7 +265,7 @@
     } else {
       selectedOptions.add(option.index)
     }
-    updateCheckboxes(true)
+    updateElements(true)
   }
 
   function setSelectedPerspective (perspectiveID) {
@@ -499,10 +560,16 @@
       .style('display', !dax.data.isCombinedPerspective(selectedPerspectiveID) && hasRemainder ? null : 'none')
       .text(collapsed ? dax.text('perspectivesMoreButton') + '>' : '<' + dax.text('perspectivesLessButton')) // TODO use new text ID style
 
-    updateCheckboxes(changed && initialized)
+    updateElements(changed && initialized)
   }
 
-  function updateCheckboxes (fireUpdateEvent) {
+  function setSelectedSecondaryPerspective (perspectiveID) {
+    const oldSecondaryPerspective = selectedSecondaryPerspectiveID
+    selectedSecondaryPerspectiveID = perspectiveID
+    updateElements(selectedSecondaryPerspectiveID !== oldSecondaryPerspective)
+  }
+
+  function updateElements (fireUpdateEvent) {
     // const showSelectTotal = settings.showSelectTotal
     // const totalCount = (showSelectTotal ? 1 : 0)
     // d3.select('.peropt-extra-columns')
@@ -516,6 +583,17 @@
 
     columnThree.selectAll('.peropt-checkbox')
       .classed('peropt-checkbox-selected', function (d) { return selectedOptions.has(d.index) })
+
+    secondaryPanel.selectAll('.peropt-second-button')
+      .classed('peropt-second-button--selected', function (d) {
+        if (d.type === 'none') {
+          return selectedSecondaryPerspectiveID === null
+        }
+        return d.id === selectedSecondaryPerspectiveID
+      })
+      .classed('peropt-second-button--redundant', function (d) {
+        return d.type === 'perspective' && d.id === selectedPerspectiveID
+      })
 
     if (fireUpdateEvent) {
       dax.explorer.selectionUpdateCallback()

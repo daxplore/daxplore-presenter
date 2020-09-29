@@ -9,7 +9,7 @@
 }
 
 .perspective-button {
-  color: #999;
+  color: #888;
 	z-index: 1;
 }
 
@@ -41,7 +41,9 @@
 .peropt-buttons {
   display: flex;
 	flex-direction: row;
-	white-space: nowrap;
+  padding-left: 3px;
+  padding-top: 3px;
+  white-space: nowrap;
 }
 
 .pervarpicker-top-padding {
@@ -255,4 +257,29 @@
   flex: 0 !important;
   opacity: 0;
   transition: flex 0.2s;
+}
+
+.perspective-secondary-picker {
+  border: 1px solid #BBB;
+  display: flex;
+  flex-direction: row;
+  float: left;
+  margin-top: 5px;
+  padding: 5px;
+  padding-left: 10px;
+}
+
+.perspective-secondary-title {
+  align-self: center;
+  margin-right: 5px;
+}
+
+.peropt-second-button--selected {
+  border: 1px solid black;
+  color: black;
+}
+
+.peropt-second-button--redundant {
+  color: #AAA;
+  background-color: #EEE;
 }

@@ -130,7 +130,8 @@
 
     d3.selectAll('text')
       .style('fill', '#555')
-      .style('font', '12px sans-serif')
+      .style('font-size', '12px')
+      .style('font-family', 'font-family:"Raleway", sans-serif')
       .style('cursor', 'default')
 
     // z axis, color coding
@@ -534,7 +535,7 @@
     tooltipDiv
       .html(tooltipText) // TODO construct elements via d3 instead of string->html
       .classed('hidden', !showTooltip)
-      .style('background-color', data.nodata ? '#ddd' : zScaleColorTooltip(optIndex)) // TODO externalize no data color
+      .style('background-color', data.nodata ? '#DDD' : zScaleColorTooltip(optIndex)) // TODO externalize no data color
       .style('left', (margin.left + xScale(optIndex) +
         xScale.bandwidth() / 2 - tooltipDiv.node().getBoundingClientRect().width / 2 -
         d3.select('.chart').node().scrollLeft) + 'px')

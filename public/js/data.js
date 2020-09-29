@@ -7,14 +7,36 @@
 
   // DATA
   // Returns an object with values for mean (the mean value) and count (the number of respondents)
-  exports.getMean = function (questionID, perspectiveID, perspectiveOptionIndex, timepoint) {
-    const perspectiveOption = getQuestionOptionDefinition(perspectiveID, perspectiveOptionIndex)
+  exports.getMean = function (questionID, perspectives, combinedPerspectiveOptionIndex, timepoint) {
     timepoint = typeof timepoint !== 'undefined' ? timepoint : questionMeta[questionID].timepoints[0] // default to first defined timepoint
-    const stat = questionData[questionID][perspectiveOption.dataQuestion].mean[timepoint]
-    if (perspectiveOptionIndex === 'ALL_RESPONDENTS') {
+    let dataItem, dataIndex
+    if (perspectives.length === 1) {
+      const perspective1Option = getQuestionOptionDefinition(perspectives[0], combinedPerspectiveOptionIndex)
+      dataItem = questionData[questionID][perspective1Option.dataQuestion]
+      dataIndex = perspective1Option.dataOption
+    } else {
+      const p1OptionCount = exports.getQuestionOptionCount(perspectives[0])
+      const p2OptionCount = exports.getQuestionOptionCount(perspectives[1])
+      const p1Index = Math.floor(combinedPerspectiveOptionIndex / p2OptionCount)
+      const p2Index = combinedPerspectiveOptionIndex % p2OptionCount
+      const perspective1Option = getQuestionOptionDefinition(perspectives[0], p1Index)
+      const perspective2Option = getQuestionOptionDefinition(perspectives[1], p2Index)
+      const dataPerspectives = [perspective1Option.dataQuestion, perspective2Option.dataQuestion]
+      dataItem = questionData[questionID][dataPerspectives]
+      if (typeof dataItem !== 'undefined') {
+        dataIndex = perspective1Option.dataOption * p2OptionCount + perspective2Option.dataOption
+      } else {
+        // Perspective combination missing, assume the reverse perspective order exists in the data file
+        dataPerspectives.reverse()
+        dataItem = questionData[questionID][dataPerspectives]
+        dataIndex = perspective2Option.dataOption * p1OptionCount + perspective1Option.dataOption
+      }
+    }
+    const stat = dataItem.mean[timepoint]
+    if (combinedPerspectiveOptionIndex === 'ALL_RESPONDENTS') {
       return { mean: stat.all, count: stat.allcount }
     }
-    return { mean: stat.mean[perspectiveOption.dataOption], count: stat.count[perspectiveOption.dataOption] }
+    return { mean: stat.mean[dataIndex], count: stat.count[dataIndex] }
   }
 
   // Returns an array with the number of respondents for each question option
@@ -96,6 +118,23 @@
     return questionMeta[questionID].options[optionIndex].text
   }
 
+  exports.getPerspectivesOptionTexts = function (perspectives, optionIndex) {
+    switch (perspectives.length) {
+    case 1:
+      return [exports.getQuestionOptionText(perspectives[0], optionIndex)]
+    case 2: {
+      const p2OptionCount = exports.getQuestionOptionCount(perspectives[1])
+      const p1Index = Math.floor(optionIndex / p2OptionCount)
+      const p2Index = optionIndex % p2OptionCount
+      return [
+        exports.getQuestionOptionText(perspectives[0], p1Index),
+        exports.getQuestionOptionText(perspectives[1], p2Index),
+      ]
+    }
+    }
+    throw Error('Invalid perspecvies array', perspectives)
+  }
+
   exports.getExplorerPerspectiveIDs = function () {
     const perspectiveIDs = []
     for (let i = 0; i < perspectives.length; i++) {
@@ -110,6 +149,15 @@
     for (let i = 0; i < perspectives.length; i++) {
       if (perspectives[i].q === perspectiveID) {
         return perspectives[i].explorerPerspective
+      }
+    }
+    return false
+  }
+
+  exports.isSecondaryPerspective = function (perspectiveID) {
+    for (let i = 0; i < perspectives.length; i++) {
+      if (perspectives[i].q === perspectiveID) {
+        return perspectives[i].secondary
       }
     }
     return false

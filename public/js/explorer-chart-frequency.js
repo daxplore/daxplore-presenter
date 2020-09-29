@@ -633,7 +633,8 @@
 
     chartG.selectAll('text')
       .style('fill', '#555')
-      .style('font', '12px sans-serif')
+      .style('font-size', '12px')
+
       .style('cursor', 'default')
   }
 

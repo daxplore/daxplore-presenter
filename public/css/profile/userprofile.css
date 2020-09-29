@@ -1,6 +1,7 @@
 .user-paste-data {
 	display: inline-block;
-	font: 12px sans-serif;
+	font-family:'Raleway', sans-serif;
+	font-size: 12px;
 	color: #444;
 	border: 1px solid #DDD;
 	padding: 10px;
@@ -70,7 +71,7 @@
 .user-paste-data-submit-column-select {
 	background: transparent;
   padding: 5px;
-  border: 1px solid #ddd;
+  border: 1px solid #DDD;
   text-indent: 0px;
 	margin-right: 10px;
 }
@@ -110,7 +111,7 @@
 }
 
 .user-paste-data-error-text-area {
-	border: 1px solid #ddd;
+	border: 1px solid #DDD;
   flex: 1;
 	padding: 0px 10px 10px 10px;
   margin-top: 10px;
@@ -166,7 +167,8 @@
 .rowtext, .grid-legend-text {
 	color: rgb(85, 85, 85);
 	cursor: default;
-	font: 12px sans-serif;
+	font-family:'Raleway', sans-serif;
+	font-size: 12px;
 	white-space: nowrap;
 }
 

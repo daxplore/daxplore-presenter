@@ -4,9 +4,8 @@
 
   let firstUpdate = true
 
-  let perspectiveID, qIDs, means, meanReferences, perspectiveOptions, directions
-  // TODO unused: descriptions
-  let shorttexts // TODO initialize
+  let qIDs, means, meanReferences, perspectiveOptions, directions
+  let shorttexts
   let selectedOption = 0
   let selectedQIDs = []
   let chartwrapperBB, xAxisTopHeight, margin, width, height
@@ -369,7 +368,7 @@
     const headerSelect = d3.select('.header-select')
 
     const options = headerSelect.selectAll('option')
-        .data(perspectiveOptions, function (d) { return d })
+      .data(perspectiveOptions, function (d) { return d })
 
     options.exit().remove()
 
@@ -404,7 +403,8 @@
 
     d3.selectAll('text')
       .style('fill', '#555')
-      .style('font', '12px sans-serif')
+      .style('font-size', '12px')
+      .style('font-family', 'font-family:"Raleway", sans-serif')
       .style('cursor', 'default')
 
     d3.selectAll('.y path, .y line')
@@ -428,13 +428,11 @@
 
   exports.generateListChart =
     function (
-      perspectiveIDInput,
       qIDsArray,
       referencesMap,
       shorttextsMap,
       directionsMap,
       selectedSelectedOption) {
-      perspectiveID = perspectiveIDInput
       qIDs = qIDsArray
       meanReferences = referencesMap
       shorttexts = shorttextsMap
@@ -505,7 +503,7 @@
       const headerPaddingTop = 5
       const headerFontSize = 16
       const headerPaddingBottom = 10
-      const headerFont = 'bold ' + headerFontSize + 'px sans-serif'
+      const headerFont = 'bold ' + headerFontSize + 'px "Raleway"'
       const headerHeight = headerPaddingTop + headerFontSize + headerPaddingBottom
 
       const imgMargin = { top: 10, right: 20, bottom: 20, left: 10 }
@@ -542,16 +540,11 @@
         ('0' + date.getMonth()).slice(-2) + '-' +
         ('0' + date.getDate()).slice(-2))
 
-      let fileName = dax.text('profile.image.filename')
-        .replace('{perspective}', shorttexts[perspectiveID])
-        .replace('{option}', headerText)
-
-      if (fileName.length === 0) {
-        fileName = shorttexts[perspectiveID] + ' - ' + headerText
-      }
+      const fileName = dax.text('profile.image.filename')
+        .replace('{perspective_option}', headerText)
 
       const sourceFontHeight = 11
-      ctx.font = sourceFontHeight + 'px sans-serif'
+      ctx.font = sourceFontHeight + 'px "Raleway"'
       ctx.fillStyle = '#555'
       // TODO unused: let sourceTextWidth = ctx.measureText(sourceText).width
       ctx.fillText(watermarkText, 5, completeHeight - 5)

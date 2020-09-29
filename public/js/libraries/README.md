@@ -49,8 +49,8 @@ es6-promise
 FileSaver
 --------------------
 - **Description**: An HTML5 saveAs() FileSaver implementation.
-- **Version**: 2019-05-14
-- **Downloaded**: 2019-05-31
+- **Version**: 2019-09-24
+- **Downloaded**: 2019-09-24
 - **Link**: https://github.com/eligrey/FileSaver.js
 - **License**: MIT License
 
@@ -69,4 +69,3 @@ url-search-params
 - **Downloaded**: 2019-06-01
 - **Link**: https://github.com/ungap/url-search-params
 - **License**: ISC License
-

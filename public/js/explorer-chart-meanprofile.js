@@ -7,7 +7,7 @@
 
   // CONSTANTS
   const paddingInner = 0.3
-  const paddingOuter = 0.4
+  const paddingOuter = 0.3
   const tooltipBarArrowDistance = 6
 
   const referenceLineHoverWidth = 10 // width of the reference line mouseover area
@@ -39,7 +39,7 @@
   // STATE TRACKING
   let animateNextUpdate = false
 
-  let perspectiveID, questionID, selectedPerspectiveOptions, questionReferenceValue, questionReferenceDirection
+  let questionID, perspectives, selectedPerspectiveOptions, questionReferenceValue, questionReferenceDirection
   let selectedOptionsData, selectedOptionsDataMap
 
   /** ** EXPORTED FUNCTIONS ** **/
@@ -79,7 +79,11 @@
     yAxis = d3.axisLeft()
       .tickSize(3)
       .tickFormat(function (opt) {
-        return dax.data.getQuestionOptionText(perspectiveID, opt)
+        const optSplit = opt.split('|')
+        switch (optSplit[0]) {
+        case 'HEADER': return dax.data.getPerspectivesOptionTexts(perspectives.slice(0, 1), optSplit[1])
+        case 'DATA': return dax.data.getPerspectivesOptionTexts(perspectives, optSplit[1]).slice(-1)
+        }
       })
 
     yAxisElement = chartG.append('g')
@@ -149,18 +153,19 @@
       .style('opacity', 0)
   }
 
-  exports.populateChart = function (questionIDInput, perspectiveIDInput, selectedPerspectiveOptionsInput) {
+  exports.populateChart = function (questionIDInput, perspectivesInput, selectedPerspectiveOptionsInput) {
     displayChartElements(true)
 
     // Animate the update unless the perspective has changed.
     // As long as the perspective is the same, each bar represents a specific perspective option
     // which gives continuity for the user. But of the perspective change, the contextual meaning
     // of the bars and color changes.
-    animateNextUpdate = perspectiveIDInput === perspectiveID
+    // animateNextUpdate = JSON.stringify(perspectivesInput) === JSON.stringify(perspectives)
+    animateNextUpdate = true
 
     // Arguments
     questionID = questionIDInput
-    perspectiveID = perspectiveIDInput
+    perspectives = perspectivesInput
     selectedPerspectiveOptions = selectedPerspectiveOptionsInput
     questionReferenceValue = dax.data.getMeanReference(questionID)
     questionReferenceDirection = dax.data.getMeanReferenceDirection(questionID)
@@ -169,15 +174,28 @@
     // Restructure the input data that can be used in a d3 join
     selectedOptionsData = []
     selectedOptionsDataMap = {}
+    let secondarySection = -1
     selectedPerspectiveOptions.forEach(function (option, i) {
-      const stat = dax.data.getMean(questionID, perspectiveID, option)
+      if (perspectives.length === 2) {
+        const newSecondarySection = Math.floor(option / dax.data.getQuestionOptionCount(perspectives[1]))
+        if (secondarySection !== newSecondarySection) {
+          secondarySection = newSecondarySection
+          selectedOptionsData.push({
+            index: secondarySection,
+            nodata: true,
+            type: 'HEADER',
+          })
+        }
+      }
+      const stat = dax.data.getMean(questionID, perspectives, option)
       const mean = stat.mean
       const count = stat.count
       const optionData = {
+        count: count,
         index: option,
         mean: mean,
         nodata: mean === -1 && count === 0,
-        count: count,
+        type: 'DATA',
       }
       selectedOptionsData.push(optionData)
       selectedOptionsDataMap[option] = optionData
@@ -186,21 +204,19 @@
     // UPDATE HEADER
     const shortText = dax.data.getQuestionShortText(questionID)
     const longText = dax.data.getQuestionFullText(questionID)
-    headerMain
-      .text(shortText)
+    headerMain.text(shortText)
     headerSub
       .text(longText)
       .style('display', longText === '' || shortText === longText ? 'none' : null)
 
     // X AXIS
-    xScale
-      .domain([0, 100]) // TODO define range in producer
+    xScale.domain([0, 100]) // TODO define range in producer
 
     // Y AXIS
-    yScale
-      .domain(selectedPerspectiveOptions)
-    yAxis
-      .scale(yScale)
+    yScale.domain(selectedOptionsData.map(function (opt) {
+      return opt.type + '|' + opt.index
+    }))
+    yAxis.scale(yScale)
   }
 
   // Set the size available for the chart.
@@ -246,12 +262,26 @@
       .attr('height', yStop + margin.top + margin.bottom)
 
     // UPDATE Y
-    yScale.range([xAxisTopHeight, yStop])
+    switch (perspectives.length) {
+    case 1:
+      yScale.range([xAxisTopHeight, yStop])
+      break
+    case 2:
+      yScale.range([xAxisTopHeight - 10, yStop]) // offset for header translate in css file: .meanprofile__y-tick-header
+      break
+    }
 
     yAxisElement.interrupt().selectAll('*').interrupt()
 
     let oldYAxisWidth = yAxisWidth
     yAxisReferenceElement.call(yAxis)
+
+    yAxisReferenceElement.selectAll('.tick')
+    .classed('meanprofile__y-tick', true)
+    .classed('meanprofile__y-tick-header', function (d, i) {
+      return d.split('|')[0] === 'HEADER'
+    })
+
     yAxisWidth = Math.max(50, yAxisReferenceElement.node().getBoundingClientRect().width)
 
     if (!animateNextUpdate) {
@@ -262,18 +292,30 @@
       .attr('transform', 'translate(' + yAxisWidth + ', 0)')
       .call(yAxis)
 
+    yAxisElement.selectAll('.tick')
+      .classed('meanprofile__y-tick', true)
+      .classed('meanprofile__y-tick-header', function (d, i) {
+        return d.split('|')[0] === 'HEADER'
+      })
+
     yAxisElement.selectAll('.y.axis text')
       .on('mouseover',
-        function (optionIndex) {
-          const option = selectedOptionsDataMap[optionIndex]
-          tooltipOverBar(option)
+        function (opt) {
+          const optSplit = opt.split('|')
+          if (optSplit[0] === 'DATA') {
+            const option = selectedOptionsDataMap[optSplit[1]]
+            tooltipOverBar(option)
+          }
         })
       .on('mousemove', tooltipBarMove)
       .on('mouseout', tooltipOut)
+      .classed('meanprofile__y-tick', true)
+      .classed('meanprofile__y-tick-header', function (d, i) {
+        return d.split('|')[0] === 'HEADER'
+      })
 
     // UPDATE X SCALE
-    xScale
-      .range([0, width - yAxisWidth])
+    xScale.range([0, width - yAxisWidth])
 
     // UPDATE X TOP
     xAxisTopElement.interrupt().selectAll('*').interrupt()
@@ -282,12 +324,10 @@
       .attr('transform', 'translate(' + yAxisWidth + ',' + xAxisTopHeight + ')')
       .call(xAxisTop)
 
-    xAxisTopDescription
-      .attr('transform', 'translate(' + (width - yAxisWidth) / 2 + ', -20)')
+    xAxisTopDescription.attr('transform', 'translate(' + (width - yAxisWidth) / 2 + ', -20)')
 
     // UPDATE X BOTTOM
-    xAxisBottom
-      .tickSizeInner(-(yStop - xAxisTopHeight))
+    xAxisBottom.tickSizeInner(-(yStop - xAxisTopHeight))
 
     xAxisBottomElement.interrupt().selectAll('*').interrupt()
 
@@ -295,14 +335,18 @@
       .attr('transform', 'translate(' + yAxisWidth + ',' + yStop + ')')
       .call(xAxisBottom)
 
-    xAxisBottomDescription
-      .attr('transform', 'translate(' + (width - yAxisWidth) / 2 + ', 28)')
+    xAxisBottomDescription.attr('transform', 'translate(' + (width - yAxisWidth) / 2 + ', 28)')
 
     // BARS
     bars = chartG.selectAll('.bar')
       .data(
         selectedOptionsData, // data
-        function (option) { return option.index } // key function, mapping a specific DOM element to a specific option index
+        function (option) { // key function, mapping a specific DOM element to a specific option index
+          switch (option.type) {
+          case 'HEADER': return perspectives.slice(0, 1) + '-' + option.index
+          case 'DATA': return perspectives.join(',') + '-' + option.index
+          }
+        }
       )
 
     // remove old bars
@@ -311,7 +355,7 @@
     // add new bars
     bars.enter().append('g')
       .classed('bar', true)
-      .attr('transform', function (option) { return 'translate(' + (oldYAxisWidth + 1) + ',' + yScale(option.index) + ')' })
+      .attr('transform', function (option) { return 'translate(' + (oldYAxisWidth + 1) + ',' + yScale(option.type + '|' + option.index) + ')' })
       .append('rect')
         .classed('barrect', true)
         .attr('height', yScale.bandwidth())
@@ -329,7 +373,7 @@
     bars.interrupt().selectAll('*').interrupt()
 
     conditionalApplyTransition(bars, elementTransition, animateNextUpdate)
-      .attr('transform', function (option) { return 'translate(' + (yAxisWidth + 1) + ',' + yScale(option.index) + ')' })
+      .attr('transform', function (option) { return 'translate(' + (yAxisWidth + 1) + ',' + yScale(option.type + '|' + option.index) + ')' })
 
     conditionalApplyTransition(bars.select('.barrect'), elementTransition, animateNextUpdate)
       .style('fill', function (option) { return dax.profile.colorForValue(option.mean, questionReferenceValue, questionReferenceDirection) })
@@ -360,7 +404,7 @@
 
     // Set tooltip box text
     // TODO This relies on meanbars texts, rather than meanprofile texts. Merge or create as separate?
-    const optionName = dax.data.getQuestionOptionText(perspectiveID, option.index)
+    const optionName = dax.data.getPerspectivesOptionTexts(perspectives, option.index).join(', ')
     let tooltipText = '<b>' + optionName + '</b><br>'
     if (option.nodata) {
       tooltipText += dax.text('meanbars_tooltip_fewRespondents', 10) + '<br>' // TODO hardcoded 10, should be read from settings generated by Daxplore Producer
@@ -375,17 +419,16 @@
     tooltipArrow
       .classed('meanprofile__tooltip-arrow--right', false)
       .classed('meanprofile__tooltip-arrow--up', true)
-      .style('border-bottom-color', option.nodata ? '#ddd' : dax.profile.colorTooltipBackground(option.mean, questionReferenceValue, questionReferenceDirection))
+      .style('border-bottom-color', option.nodata ? '#DDD' : dax.profile.colorTooltipBackground(option.mean, questionReferenceValue, questionReferenceDirection))
       .style('border-left-color', null)
-      .style('top', (chartTop + yScale(option.index) + yScale.bandwidth() + tooltipBarArrowDistance) + 'px')
+      .style('top', (chartTop + yScale(option.type + '|' + option.index) + yScale.bandwidth() + tooltipBarArrowDistance) + 'px')
 
-    tooltipBody
-      .html(tooltipText) // TODO construct elements via d3 instead of string->html
+    tooltipBody.html(tooltipText) // TODO construct elements via d3 instead of string->html
 
     const tooltipArrowBB = tooltipArrow.node().getBoundingClientRect()
     tooltipBody
-      .style('background-color', option.nodata ? '#ddd' : dax.profile.colorTooltipBackground(option.mean, questionReferenceValue, questionReferenceDirection)) // TODO externalize no data color
-      .style('top', (chartTop + yScale(option.index) + yScale.bandwidth() + tooltipBarArrowDistance + tooltipArrowBB.height) + 'px')
+      .style('background-color', option.nodata ? '#DDD' : dax.profile.colorTooltipBackground(option.mean, questionReferenceValue, questionReferenceDirection)) // TODO externalize no data color
+      .style('top', (chartTop + yScale(option.type + '|' + option.index) + yScale.bandwidth() + tooltipBarArrowDistance + tooltipArrowBB.height) + 'px')
 
     bars.selectAll('.barrect')
       .style('fill', function (opt) {

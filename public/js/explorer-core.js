@@ -13,16 +13,16 @@
   const timepointsMap = {}
 
   function onHashUpdate () {
-    if (currentHash === window.hash) {
+    if (currentHash === window.location.hash.slice(1)) {
       return
     }
-    currentHash = window.hash
+    currentHash = window.location.hash.slice(1)
     // Get query definition string from hash
     // Parse the query definition into a (potentially empty or partially empty) query object
-    const queryDefinition = dax.querydefinition.parseString(window.location.hash.slice(1))
+    const queryDefinition = dax.querydefinition.parseString(currentHash)
     dax.explorer.questionSetQueryDefinition(queryDefinition.question)
     const totalSelected = queryDefinition.flags.indexOf('TOTAL') !== -1
-    dax.explorer.perspectiveSetQueryDefinition(queryDefinition.perspective, queryDefinition.perspectiveOptions, totalSelected)
+    dax.explorer.perspectiveSetQueryDefinition(queryDefinition.perspective, queryDefinition.perspectiveSecondary, queryDefinition.perspectiveOptions, totalSelected)
     dax.explorer.selectionUpdateCallback()
   }
 
@@ -120,7 +120,7 @@
   }
 
   // TODO move to separate file?
-  function setDescription (questionID, perspectiveID) {
+  function setDescription (questionID, perspectives) {
     // TODO construct from elements instead of raw html
     let html = ''
 
@@ -130,14 +130,16 @@
       html += '<b>' + title + '</b><p>' + questionDescription + '</p>'
     }
 
-    const perspectiveDescription = questionMap[perspectiveID].description
-    if (perspectiveDescription !== null && perspectiveDescription !== undefined && perspectiveDescription.trim().length > 0) {
-      if (html.length > 0) {
-        html += '<hr>'
+    perspectives.forEach(function (perspectiveID) {
+      const perspectiveDescription = questionMap[perspectiveID].description
+      if (perspectiveDescription !== null && perspectiveDescription !== undefined && perspectiveDescription.trim().length > 0) {
+        if (html.length > 0) {
+          html += '<hr>'
+        }
+        const title = questionMap[perspectiveID].short
+        html += '<b>' + title + '</b><p>' + perspectiveDescription + '</p>'
       }
-      const title = questionMap[perspectiveID].short
-      html += '<b>' + title + '</b><p>' + perspectiveDescription + '</p>'
-    }
+    })
 
     d3.select('.description-panel')
       .html(html)
@@ -150,8 +152,9 @@
   // will update the page state as a whole
   exports.selectionUpdateCallback = function () {
     const question = dax.explorer.getSelectedQuestion()
-    const perspective = dax.explorer.getSelectedPerspective()
+    const perspective = dax.explorer.getSelectedPerspectives()
     const perspectiveOptions = dax.explorer.getSelectedPerspectiveOptions()
+    const perspectiveOptionsCombined = dax.explorer.getSelectedPerspectiveOptionsCombined()
     // const totalSelected = dax.explorer.isPerspectiveTotalSelected()
     // TODO temporary hack, should be handled by tab component
     let tab = dax.explorer.getSelectedTab()
@@ -164,7 +167,8 @@
     // TODO move to separate function/file/namespace?
     // TODO handle all flags
     const queryHash = dax.querydefinition.encodeString(question, perspective, perspectiveOptions, [tab])
-    if (window.location.hash !== queryHash) {
+    if (currentHash !== queryHash) {
+      currentHash = queryHash
       // Set the hash of this window
       window.location.hash = queryHash
       // Send a message to parents that hold this page in an iframe to allow the outer page to update its window hash
@@ -182,6 +186,6 @@
       dichSubtitle = dichotomizedSubtitle(usedDichTexts)
     }
     setDescription(question, perspective)
-    dax.explorer.chartSetQueryDefinition(tab, 'TIMEPOINTS_ONE', question, perspective, perspectiveOptions, dichSubtitle)
+    dax.explorer.chartSetQueryDefinition(tab, 'TIMEPOINTS_ONE', question, perspective, perspectiveOptionsCombined, dichSubtitle)
   }
 })(window.dax = window.dax || {})

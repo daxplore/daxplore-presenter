@@ -193,7 +193,8 @@
 
     d3.selectAll('text')
       .style('fill', '#555')
-      .style('font', '12px sans-serif')
+      .style('font-size', '12px')
+      .style('font-family', 'font-family:"Raleway", sans-serif')
       .style('cursor', 'default')
   }
 

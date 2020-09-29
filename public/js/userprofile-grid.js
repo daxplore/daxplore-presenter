@@ -598,7 +598,7 @@
         ('0' + date.getDate()).slice(-2))
 
       const sourceFontHeight = 11
-      ctx.font = sourceFontHeight + 'px sans-serif'
+      ctx.font = sourceFontHeight + 'px "Raleway"'
       const sourceTextWidth = ctx.measureText(sourceText).width
 
       if (sourceTextWidth + 2 * hMargin > chartWidth) {
@@ -617,7 +617,7 @@
       ctx.fillText(sourceText, hMargin, canvasHeight - 5)
 
       canvasChart.toBlob(function (blob) {
-        saveAs(blob, dax.text('imageTitleProfileChart') + '.png') // TODO use new text ID style
+        saveAs(blob, dax.text('profile_user.grid_image.filename') + '.png')
       })
 
       canvasChartSelection.remove()
