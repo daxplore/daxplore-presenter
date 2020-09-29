@@ -6,7 +6,7 @@
   // Data package version used by this version of the explorer.
   // Compare with dataPackageVersion in data/manifest.json.
   // Used to make sure the code and data package are compatible.
-  const systemDataVersion = 5
+  const systemDataVersion = 6
 
   // Log an error that has occurred in the Daxplore system.
   // Uses arguments array instead of function arguments, to support any number of
