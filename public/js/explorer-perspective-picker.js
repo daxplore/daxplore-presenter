@@ -32,12 +32,12 @@
   })
 
   exports.perspectiveSetQueryDefinition = function (perspectiveID, perspectiveSecondaryID, perspectiveOptionsIntArray, total) {
-    if (!dax.data.isExplorerPerspective(perspectiveID)) {
-      console.warn('Not a valid perspective:', perspectiveID)
+    if (!dax.data.isExplorerPrimaryPerspective(perspectiveID)) {
+      console.warn('Not a valid primary perspective:', perspectiveID)
       return
     }
 
-    if (perspectiveSecondaryID !== null && !dax.data.isExplorerPerspective(perspectiveSecondaryID)) {
+    if (perspectiveSecondaryID !== null && !dax.data.isExplorerSecondaryPerspective(perspectiveSecondaryID)) {
       console.warn('Not a valid secondary perspective:', perspectiveSecondaryID)
       return
     }
@@ -67,9 +67,7 @@
     d3.select('.perspective-secondary-title')
       .text(dax.text('explorer.perspective.header_secondary'))
 
-    perspectiveIDs = dax.data.getExplorerPerspectiveIDs()
-
-    secondaryPerspectives = [{ type: 'none' }]
+    perspectiveIDs = dax.data.getExplorerPrimaryPerspectiveIDs()
 
     // Generate data structure for all perspectives
     perspectiveIDs.forEach(function (perspectiveID) {
@@ -125,11 +123,13 @@
         secondColumnData: secondColumnData,
         thirdColumnData: thirdColumnData,
       }
+    })
 
-      // SECONDARY PERSPECTIVE
-      if (dax.data.isSecondaryPerspective(perspectiveID)) {
-        secondaryPerspectives.push({ type: 'perspective', id: perspectiveID })
-      }
+    // SECONDARY PERSPECTIVE
+    secondaryPerspectives = [{ type: 'none' }]
+    const secondaryPerspectiveIDs = dax.data.getExplorerSecondaryPerspectiveIDs()
+    secondaryPerspectiveIDs.forEach(function (perspectiveID) {
+      secondaryPerspectives.push({ type: 'perspective', id: perspectiveID })
     })
 
     d3.select('.pervarpicker-variables')
@@ -228,7 +228,7 @@
 
   function initializeSelection () {
     if (!selectedPerspectiveID) {
-      setSelectedPerspective(dax.data.getExplorerPerspectiveIDs()[0])
+      setSelectedPerspective(dax.data.getExplorerPrimaryPerspectiveIDs()[0])
     } else {
       setSelectedPerspective(selectedPerspectiveID)
     }
@@ -269,7 +269,7 @@
   }
 
   function setSelectedPerspective (perspectiveID) {
-    if (!dax.data.isExplorerPerspective(perspectiveID)) {
+    if (!dax.data.isExplorerPrimaryPerspective(perspectiveID)) {
       throw new Error('Perspective does not exist: ' + perspectiveID)
     }
     const changed = selectedPerspectiveID !== perspectiveID

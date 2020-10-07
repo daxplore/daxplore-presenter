@@ -135,7 +135,7 @@
     throw Error('Invalid perspecvies array', perspectives)
   }
 
-  exports.getExplorerPerspectiveIDs = function () {
+  exports.getExplorerPrimaryPerspectiveIDs = function () {
     const perspectiveIDs = []
     for (let i = 0; i < perspectives.length; i++) {
       if (perspectives[i].explorerPerspective) {
@@ -145,7 +145,7 @@
     return perspectiveIDs
   }
 
-  exports.isExplorerPerspective = function (perspectiveID) {
+  exports.isExplorerPrimaryPerspective = function (perspectiveID) {
     for (let i = 0; i < perspectives.length; i++) {
       if (perspectives[i].q === perspectiveID) {
         return perspectives[i].explorerPerspective
@@ -154,7 +154,17 @@
     return false
   }
 
-  exports.isSecondaryPerspective = function (perspectiveID) {
+  exports.getExplorerSecondaryPerspectiveIDs = function () {
+    const perspectiveIDs = []
+    for (let i = 0; i < perspectives.length; i++) {
+      if (perspectives[i].secondary) {
+        perspectiveIDs.push(perspectives[i].q)
+      }
+    }
+    return perspectiveIDs
+  }
+
+  exports.isExplorerSecondaryPerspective = function (perspectiveID) {
     for (let i = 0; i < perspectives.length; i++) {
       if (perspectives[i].q === perspectiveID) {
         return perspectives[i].secondary
