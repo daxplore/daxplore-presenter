@@ -218,9 +218,10 @@
 
 .peropt-col-one, .peropt-col-two, .peropt-col-three {
   flex: 1;
+  max-width: max-content;
   min-width: 0;
   padding-left: 4px;
-  transition: flex 0.2s;
+  transition: flex 0.3s;
 }
 
 .peropt-col-two-combined, .peropt-col-three-combined {
@@ -250,13 +251,13 @@
 
 .peropt-col-one:hover, .peropt-col-two-combined:hover, .peropt-col-three-combined:hover {
   flex: 2;
-  transition: flex 0.2s;
+  transition: flex 0.3s;
 }
 
 .peropt-col-collapsed {
   flex: 0 !important;
   opacity: 0;
-  transition: flex 0.2s;
+  transition: flex 0.3s;
 }
 
 .perspective-secondary-picker {

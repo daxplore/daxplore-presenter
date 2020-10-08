@@ -306,11 +306,8 @@
         // TODO add total
 
         // First column basic
-        const firstColOptions = columnOne
-          .selectAll('.peropt-checkbox')
-          .classed('peropt-checkbox-combined', false)
-          .classed('peropt-checkbox-expandable', false)
-          .classed('peropt-checkbox-expanded', false)
+        const firstColOptions = columnOne.selectAll('.peropt-checkbox')
+          .attr('class', 'peropt-checkbox')
           .on('mouseover', function () {})
           .data(perspectiveColumns[selectedPerspectiveID].firstColumnData)
 
@@ -326,13 +323,13 @@
           .attr('title', function (d) { return d.text })
 
         // Second column basic
-        d3.select('.peropt-extra-columns').append(function () {
-          return columnTwo.remove().node()
-        })
         columnTwo
           .classed('peropt-col-two-combined', false)
-        const secondColOptions = columnTwo
-          .selectAll('.peropt-checkbox')
+          .classed('peropt-col-collapsed', perspectiveColumns[selectedPerspectiveID].secondColumnData.length === 0)
+
+        const secondColOptions = columnTwo.selectAll('.peropt-checkbox')
+          .attr('class', 'peropt-checkbox')
+          .on('mouseover', function () {})
           .data(perspectiveColumns[selectedPerspectiveID].secondColumnData)
 
         secondColOptions.exit().remove()
@@ -347,14 +344,14 @@
           .attr('title', function (d) { return d.text })
 
         // Third column basic
-        d3.select('.peropt-extra-columns').append(function () {
-          return columnThree.remove().node()
-        })
         d3.select('.peropt-extra-columns').style('display', null)
         columnThree
           .classed('peropt-col-three-combined', false)
-        const thirdColOptions = columnThree
-          .selectAll('.peropt-checkbox')
+          .classed('peropt-col-collapsed', perspectiveColumns[selectedPerspectiveID].thirdColumnData.length === 0)
+
+        const thirdColOptions = columnThree.selectAll('.peropt-checkbox')
+          .attr('class', 'peropt-checkbox')
+          .on('mouseover', function () {})
           .data(perspectiveColumns[selectedPerspectiveID].thirdColumnData)
 
         thirdColOptions.exit().remove()
@@ -367,6 +364,12 @@
         columnThree.selectAll('.peropt-checkbox')
           .text(function (d) { return d.text })
           .attr('title', function (d) { return d.text })
+
+        // move bottom padding elements to the bottom of the column
+        d3.selectAll('.peropt-col__bottom-padding').raise()
+
+        d3.select('.peropt-bottom-padding')
+          .style('height', '5px')
 
         // let hasCheckedBox = false
         // for (i = 0; i < selectedOptions.length; i++) {
@@ -431,9 +434,6 @@
           .style('display', function (d) { return d.isExpandable ? null : 'none' })
           .text('▶')
 
-        // move bottom padding to the bottom of the column
-        d3.select('.peropt-col-one > .peropt-col__bottom-padding').raise()
-
         // Second column combined
         // d3.select('.peropt-columns').append(function () {
         //   return columnTwo.remove().node()
@@ -486,9 +486,6 @@
           .style('display', function (d) { return d.isExpandable ? null : 'none' })
           .text('▶')
 
-        // move bottom padding to the bottom of the column
-        d3.select('.peropt-col-two > .peropt-col__bottom-padding').raise()
-
         // Third column combined
         // d3.select('.peropt-columns').append(function () {
         //   return columnThree.remove().node()
@@ -514,18 +511,13 @@
         thirdColElements.append('span')
           .classed('peropt-checkbox-text', true)
           .text(function (d) { return d.text })
-      }
 
-      d3.select('.peropt-bottom-padding')
-        .style('height', function () {
-          if (hasRemainder) {
-            return null
-          } else if (dax.data.isCombinedPerspective(selectedPerspectiveID)) {
-            return '4px'
-          } else {
-            return '0px'
-          }
-        })
+        // move bottom padding elements to the bottom of the column
+        d3.selectAll('.peropt-col__bottom-padding').raise()
+
+        d3.select('.peropt-bottom-padding')
+          .style('height', hasRemainder ? null : '4px')
+      }
 
       d3.select('.description-panel')
         .interrupt().transition()
