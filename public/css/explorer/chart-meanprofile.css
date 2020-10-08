@@ -19,6 +19,7 @@
 
 .meanprofile__tooltip-arrow {
   height: 0;
+  pointer-events: none;
   position: absolute;
   width: 0;
   z-index: 100;
@@ -67,7 +68,7 @@
 }
 
 .meanprofile__y-tick text {
-  font-weight: bold;  
+  font-weight: bold;
 }
 
 .meanprofile__y-tick-header text {
