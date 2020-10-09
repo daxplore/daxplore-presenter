@@ -245,21 +245,12 @@
   // CHART ELEMENTS
 
   function resizeAndPositionElements () {
-    // const minBarLength = 100 // TODO
-    // const chartNeededWidth = margin.left + margin.right + yAxisWidth + minBarLength
-
-    width = availableWidth - margin.left - margin.right
-
+    // CALCULATE HEIGHT
     const bandWidth = 20
     // rearranged equation from d3's source file band.js, ignoring the floor call
     // https://github.com/d3/d3-scale/blob/fd07dd8ceeaeaec612f675050ac134243b406f64/src/band.js#L26
     const barSectionHeight = Math.max(1, selectedPerspectiveOptions.length - paddingInner + paddingOuter * 2) * bandWidth / (1 - paddingInner)
     const yStop = barSectionHeight + xAxisTopHeight
-
-    chart.interrupt().selectAll('*').interrupt()
-    conditionalApplyTransition(chart, elementTransition, animateNextUpdate)
-      .attr('width', availableWidth) // - margin.left - margin.right)
-      .attr('height', yStop + margin.top + margin.bottom)
 
     // UPDATE Y
     switch (perspectives.length) {
@@ -267,7 +258,8 @@
       yScale.range([xAxisTopHeight, yStop])
       break
     case 2:
-      yScale.range([xAxisTopHeight - 10, yStop]) // offset for header translate in css file: .meanprofile__y-tick-header
+      // offset for header translate in css file: .meanprofile__y-tick-header
+      yScale.range([xAxisTopHeight - 10, yStop])
       break
     }
 
@@ -313,6 +305,29 @@
       .classed('meanprofile__y-tick-header', function (d, i) {
         return d.split('|')[0] === 'HEADER'
       })
+
+    // CALCULATE WIDTH
+    const minBarLength = Math.max(300, xAxisTopDescription.node().getBBox().width, xAxisBottomDescription.node().getBBox().width)
+    const chartNeededWidth = margin.left + margin.right + yAxisWidth + minBarLength
+
+    // Check if vertical scroll is neededa
+    const scrollNeeded = availableWidth < chartNeededWidth
+
+    // Enable or disable scroll on the div containing the meanbars chart
+    d3.select('.chart')
+      .classed('chart-scroll', scrollNeeded)
+      .style('width', function () { return scrollNeeded ? availableWidth + 'px' : null })
+
+    // Update width of the chart, which may be bigger than the available space if scrolling is enabled
+    width = scrollNeeded ? chartNeededWidth : availableWidth
+
+    // SET MAIN ELEMENT WIDTH AND HEIGHT
+    chart.interrupt().selectAll('*').interrupt()
+    conditionalApplyTransition(chart, elementTransition, animateNextUpdate)
+      .attr('width', width)
+      .attr('height', yStop + margin.top + margin.bottom)
+
+    width = width - margin.left - margin.right
 
     // UPDATE X SCALE
     xScale.range([0, width - yAxisWidth])
