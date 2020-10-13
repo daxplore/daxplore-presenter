@@ -272,10 +272,10 @@
     yAxisReferenceElement.call(yAxis)
 
     yAxisReferenceElement.selectAll('.tick')
-    .classed('meanprofile__y-tick', true)
-    .classed('meanprofile__y-tick-header', function (d, i) {
-      return d.split('|')[0] === 'HEADER'
-    })
+      .classed('meanprofile__y-tick', true)
+      .classed('meanprofile__y-tick-header', function (d, i) {
+        return d.split('|')[0] === 'HEADER'
+      })
 
     yAxisWidth = Math.max(50, yAxisReferenceElement.node().getBoundingClientRect().width)
 

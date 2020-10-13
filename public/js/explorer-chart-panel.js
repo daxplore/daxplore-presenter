@@ -14,7 +14,15 @@
 
   // Initialize the chart panel
   // TODO fix constructor
-  exports.generateChartPanel = function (questions, groups, primaryColorsInput, hoverColorsInput, dichselectedMapInput, optionsMapInput, timepointsMapInput) {
+  exports.generateChartPanel = function (
+    questions,
+    groups,
+    primaryColorsInput,
+    hoverColorsInput,
+    dichselectedMapInput,
+    optionsMapInput,
+    timepointsMapInput
+  ) {
     // primaryColors = primaryColorsInput
     // hoverColors = hoverColorsInput
     dichselectedMap = dichselectedMapInput
@@ -93,7 +101,14 @@
     return selectedTab
   }
 
-  exports.chartSetQueryDefinition = function (chartType, timepoints, question, perspectives, selectedOptions, dichSubtitle) {
+  exports.chartSetQueryDefinition = function (
+    chartType,
+    timepoints,
+    question,
+    perspectives,
+    selectedOptions,
+    dichSubtitle
+  ) {
     selectedTab = chartType
 
     // Hide all charts elements
@@ -173,7 +188,16 @@
       case 'TIMEPOINTS_ONE':
       case 'TIMEPOINTS_TWO':
       case 'TIMEPOINTS_ALL':
-        dax.chart.dichtimeline.generateChart(question, perspectives, selectedOptions, dichselectedMap, optionsMap, timepointsMap, primaryColors, hoverColors)
+        dax.chart.dichtimeline.generateChart(
+          question,
+          perspectives,
+          selectedOptions,
+          dichselectedMap,
+          optionsMap,
+          timepointsMap,
+          primaryColors,
+          hoverColors
+        )
         dax.chart.dichtimeline.generateLegend()
         break
       }
