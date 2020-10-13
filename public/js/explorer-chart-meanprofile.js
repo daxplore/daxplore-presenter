@@ -245,6 +245,9 @@
   // CHART ELEMENTS
 
   function resizeAndPositionElements () {
+    // CANCEL ALL PREVIOUS ANIMATIONS
+    chart.interrupt().selectAll('*').interrupt()
+
     // CALCULATE HEIGHT
     const bandWidth = 20
     // rearranged equation from d3's source file band.js, ignoring the floor call
@@ -322,7 +325,6 @@
     width = scrollNeeded ? chartNeededWidth : availableWidth
 
     // SET MAIN ELEMENT WIDTH AND HEIGHT
-    chart.interrupt().selectAll('*').interrupt()
     conditionalApplyTransition(chart, elementTransition, animateNextUpdate)
       .attr('width', width)
       .attr('height', yStop + margin.top + margin.bottom)
