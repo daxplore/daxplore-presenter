@@ -277,7 +277,7 @@
         return d.split('|')[0] === 'HEADER'
       })
 
-    yAxisWidth = Math.max(50, yAxisReferenceElement.node().getBoundingClientRect().width)
+    yAxisWidth = Math.max(50, yAxisReferenceElement.node().getBBox().width)
 
     if (!animateNextUpdate) {
       oldYAxisWidth = yAxisWidth

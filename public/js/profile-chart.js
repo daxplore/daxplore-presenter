@@ -468,8 +468,8 @@
     const chartBB = d3.select('.chart').node().getBoundingClientRect()
 
     const chartWidth = chartBB.width
-    const chartHeight = d3.select('.x.axis.top').node().getBoundingClientRect().height +
-                    d3.select('.x.axis.bottom').node().getBoundingClientRect().height
+    const chartHeight = d3.select('.x.axis.top').node().getBBox().height +
+                        d3.select('.x.axis.bottom').node().getBBox().height
 
     const doctype = '<?xml version="1.0" standalone="no"?>' +
       '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
