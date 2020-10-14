@@ -319,8 +319,10 @@
             .on('click', toggleOption)
 
         columnOne.selectAll('.peropt-checkbox')
-          .text(function (d) { return d.text })
-          .attr('title', function (d) { return d.text })
+          .text('')
+          .append('span')
+            .classed('peropt-checkbox-text', true)
+            .text(function (d) { return d.text })
 
         // Second column basic
         columnTwo
@@ -340,8 +342,10 @@
             .on('click', toggleOption)
 
         columnTwo.selectAll('.peropt-checkbox')
-          .text(function (d) { return d.text })
-          .attr('title', function (d) { return d.text })
+          .text('')
+          .append('span')
+            .classed('peropt-checkbox-text', true)
+            .text(function (d) { return d.text })
 
         // Third column basic
         d3.select('.peropt-extra-columns').style('display', null)
@@ -362,8 +366,10 @@
             .on('click', toggleOption)
 
         columnThree.selectAll('.peropt-checkbox')
-          .text(function (d) { return d.text })
-          .attr('title', function (d) { return d.text })
+          .text('')
+          .append('span')
+            .classed('peropt-checkbox-text', true)
+            .text(function (d) { return d.text })
 
         // move bottom padding elements to the bottom of the column
         d3.selectAll('.peropt-col__bottom-padding').raise()

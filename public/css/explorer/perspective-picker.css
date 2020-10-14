@@ -4,6 +4,7 @@
   flex: 1;
   left: 0;
   min-width: 0;
+  padding-right: 1px;
   top: 0;
   width: 100%;
 }
@@ -147,9 +148,11 @@
   overflow: hidden;
 	padding: 2px;
   padding-left: 4px;
-	padding-right: 10px;
-  text-overflow: ellipsis;
 	white-space: nowrap;
+}
+
+.peropt-checkbox-combined {
+  padding-right: 10px;
 }
 
 .peropt-checkbox-hidden {
@@ -197,7 +200,7 @@
 
 .peropt-checkbox-text {
   line-height: 1.2;
-  margin-right: 8px;
+  margin-right: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
 
@@ -207,6 +210,10 @@
        -moz-user-select: none;
         -ms-user-select: none;
             user-select: none;
+}
+
+.peropt-checkbox-combined .peropt-checkbox-text {
+  margin-right: 8px;
 }
 
 .peropt-checkbox-expand {
@@ -249,7 +256,7 @@
   flex: 1;
 }
 
-.peropt-col-one:hover, .peropt-col-two-combined:hover, .peropt-col-three-combined:hover {
+.peropt-col-one:hover, .peropt-col-two:hover, .peropt-col-three:hover {
   flex: 2;
   transition: flex 0.3s;
 }
@@ -258,6 +265,10 @@
   flex: 0 !important;
   opacity: 0;
   transition: flex 0.3s;
+}
+
+.perspective-secondary-picker-wrapper {
+  overflow-x: auto;
 }
 
 .perspective-secondary-picker {
