@@ -24,24 +24,22 @@
     return selectedQIDs[i]
   }
 
-  function getMean (i, selectedOption) {
-    return means[qIDs.indexOf(getQid(i))][selectedOption]
+  function getMean (qID, selectedOption) {
+    return means[qIDs.indexOf(qID)][selectedOption]
   }
 
   function setToNormalColor (i) {
-    d3.select('#barrect-' + getQid(i))
-      .style('fill', dax.profile.colorForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)]))
-    d3.selectAll('.q-' + getQid(i))
-      .classed('bar-hover', false)
+    const questionID = getQid(i)
+    d3.select('.barrect-' + questionID)
+      .style('fill', dax.profile.colorForValue(getMean(questionID, selectedOption), meanReferences[questionID], directions[questionID]))
     d3.selectAll('.y.axis .tick')
       .classed('bar-hover', false)
   }
 
   function setToHoverColor (i) {
-    d3.select('#barrect-' + getQid(i))
-      .style('fill', dax.profile.colorHoverForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)]))
-    d3.selectAll('.q-' + getQid(i))
-      .classed('bar-hover', true)
+    const questionID = getQid(i)
+    d3.select('.barrect-' + questionID)
+      .style('fill', dax.profile.colorHoverForValue(getMean(questionID, selectedOption), meanReferences[questionID], directions[questionID]))
     d3.selectAll('.y.axis .tick')
       .classed('bar-hover', function (d, index) { return i === index })
   }
@@ -49,6 +47,7 @@
   function tooltipOver (i) {
     computeDimensions()
     lastHoveredBar = i
+    const qID = getQid(i)
     const tooltipdiv = d3.select('.tooltipdiv')
 
     tooltipdiv.transition()
@@ -56,11 +55,11 @@
       .style('opacity', 1)
 
     tooltipdiv.html( // TODO externalize entire string
-      shorttexts[getQid(i)] + ': <b>' + d3.format('d')(getMean(i, selectedOption)) + '</b><br>' +
-        dax.text('listReferenceValue') + ': <b>' + d3.format('d')(meanReferences[getQid(i)]) + '</b>') // TODO use new text ID style
-      .style('background', dax.profile.colorHoverForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)]))
-      .style('left', (chartwrapperBB.left + xScale(Math.max(getMean(i, selectedOption), meanReferences[getQid(i)])) + yAxisWidth + 14) + 'px')
-      .style('top', chartwrapperBB.top + yScale(getQid(i)) + yScale.bandwidth() / 2 - tooltipdiv.node().getBoundingClientRect().height / 2 + 'px')
+      shorttexts[qID] + ': <b>' + d3.format('d')(getMean(qID, selectedOption)) + '</b><br>' +
+        dax.text('listReferenceValue') + ': <b>' + d3.format('d')(meanReferences[qID]) + '</b>') // TODO use new text ID style
+      .style('background', dax.profile.colorHoverForValue(getMean(qID, selectedOption), meanReferences[qID], directions[qID]))
+      .style('left', (chartwrapperBB.left + xScale(Math.max(getMean(qID, selectedOption), meanReferences[qID])) + yAxisWidth + 14) + 'px')
+      .style('top', chartwrapperBB.top + yScale(qID) + yScale.bandwidth() / 2 - tooltipdiv.node().getBoundingClientRect().height / 2 + 'px')
 
     const arrowleft = d3.select('.arrow-left')
 
@@ -69,11 +68,11 @@
       .style('opacity', 1)
 
     arrowleft
-      .style('border-right-color', dax.profile.colorHoverForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)]))
-      .style('left', (chartwrapperBB.left + xScale(Math.max(getMean(i, selectedOption), meanReferences[getQid(i)])) + yAxisWidth + 4) + 'px')
-      .style('top', chartwrapperBB.top + yScale(getQid(i)) + yScale.bandwidth() / 2 - arrowleft.node().getBoundingClientRect().height / 2 + 'px')
+      .style('border-right-color', dax.profile.colorHoverForValue(getMean(qID, selectedOption), meanReferences[qID], directions[qID]))
+      .style('left', (chartwrapperBB.left + xScale(Math.max(getMean(qID, selectedOption), meanReferences[qID])) + yAxisWidth + 4) + 'px')
+      .style('top', chartwrapperBB.top + yScale(qID) + yScale.bandwidth() / 2 - arrowleft.node().getBoundingClientRect().height / 2 + 'px')
 
-    dax.profile.setDescriptionFull(d3.select('#chart-description'), perspectiveOptions[selectedOption], getQid(i), getMean(i, selectedOption))
+    dax.profile.setDescriptionFull(d3.select('#chart-description'), perspectiveOptions[selectedOption], qID, getMean(qID, selectedOption))
   }
 
   function tooltipOut () {
@@ -263,10 +262,12 @@
       .classed('bar', true)
       .attr('transform', function (d, i) { return 'translate(' + (oldYAxisWidth + 1) + ',' + yScale(d) + ')' })
       .append('rect')
-        .classed('barrect', true)
+        .attr('class', function (qID) {
+          return 'barrect barrect-' + qID
+        })
         .attr('height', yScale.bandwidth())
-        .style('fill', function (d, i) { return dax.profile.colorForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)]) })
-        .attr('width', function (d, i) { return firstUpdate ? xScale(getMean(i, selectedOption)) + 1 : 0 })
+        .style('fill', function (qID) { return dax.profile.colorForValue(getMean(qID, selectedOption), meanReferences[qID], directions[qID]) })
+        .attr('width', function (qID) { return firstUpdate ? xScale(getMean(qID, selectedOption)) + 1 : 0 })
         .on('mouseover',
           function (d) {
             const i = selectedQIDs.indexOf(d)
@@ -289,11 +290,13 @@
       .transition(elTransition)
       .attr('transform', function (d, i) { return 'translate(' + (yAxisWidth + 1) + ',' + yScale(d) + ')' })
 
-    bars.select('.barrect')
+    bars.selectAll('.barrect')
       .transition(elTransition)
-        .style('fill', function (d, i) { return dax.profile.colorForValue(getMean(i, selectedOption), meanReferences[getQid(i)], directions[getQid(i)]) })
+        .style('fill', function (qID) {
+          return dax.profile.colorForValue(getMean(qID, selectedOption), meanReferences[qID], directions[qID])
+        })
         .attr('height', yScale.bandwidth())
-        .attr('width', function (d, i) { return xScale(getMean(i, selectedOption)) + 1 })
+        .attr('width', function (qID) { return xScale(getMean(qID, selectedOption)) + 1 })
 
     // REFERENCE LINES
     const referenceWidth = 2
