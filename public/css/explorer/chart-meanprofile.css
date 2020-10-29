@@ -3,12 +3,14 @@
 }
 
 .meanprofile__tooltip-body {
-  border: 0;
-  border-radius: 8px;
-  font-family:'Raleway', sans-serif;
+  background-color: white;
+  border: #ABABAB solid 2px;
+  font-family: 'Raleway', sans-serif;
   font-size: 12px;
   height: auto;
+  line-height: 1.4;
   padding: 10px;
+  padding-bottom: 7px;
   pointer-events: none;
   position: absolute;
   text-align: center;
@@ -18,23 +20,20 @@
 }
 
 .meanprofile__tooltip-arrow {
-  height: 0;
+  background-color: white;
+  border-left: #ABABAB solid 2px;
+  border-radius: 0 0 10px 0;
+  border-top: #ABABAB solid 2px;
+  height: 10px;
   pointer-events: none;
   position: absolute;
-  width: 0;
+  transform: rotate(45deg);
+  width: 10px;
   z-index: 100;
 }
 
-.meanprofile__tooltip-arrow--up {
-  border-bottom: 10px solid;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-}
-
 .meanprofile__tooltip-arrow--right {
-  border-bottom: 10px solid transparent;
-  border-left: 10px solid;
-  border-top: 10px solid transparent;
+  transform: rotate(135deg);
 }
 
 .meanprofile__y-axis--hover text {
@@ -44,10 +43,6 @@
 .meanprofile__reference-tooltip-header {
   font-weight: bold;
   margin-right: 4px;
-}
-
-.meanprofile__tooltip-reference-value {
-
 }
 
 .explorer-meanprofile .axis .domain {

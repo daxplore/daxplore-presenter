@@ -102,27 +102,32 @@ text {
 }
 
 .tooltipdiv {
-	border: 0;
-	border-radius: 8px;
-	font-family:'Raleway', sans-serif;
-	font-size: 12px;
+  background-color: white;
+  border: #ABABAB solid 2px;
+  font-family: 'Raleway', sans-serif;
+  font-size: 12px;
   height: auto;
-  padding: 6px;
-	pointer-events: none;
-	position: absolute;
-	text-align: right;
-	white-space: nowrap;
-	width: auto;
+  line-height: 1.4;
+  padding: 10px;
+  padding-bottom: 7px;
+  pointer-events: none;
+  position: absolute;
+  text-align: center;
+  white-space: nowrap;
+  width: auto;
   z-index: 100;
 }
 
 .arrow-left {
-	border-bottom: 10px solid transparent;
-	border-right: 10px solid;
-	border-top: 10px solid transparent;
-  height: 0;
-	position: absolute;
-	width: 0;
+  background-color: white;
+  border-left: #ABABAB solid 2px;
+  border-radius: 0 0 10px 0;
+  border-top: #ABABAB solid 2px;
+  height: 10px;
+  pointer-events: none;
+  position: absolute;
+	transform: rotate(-45deg);
+  width: 10px;
   z-index: 100;
 }
 

@@ -76,11 +76,11 @@
     }
 
     if (diff < -5) {
-      return colors.badHover
+      return colors.badText
     } else if (diff > 5) {
-      return colors.goodHover
+      return colors.goodText
     } else {
-      return colors.averageHover
+      return colors.averageText
     }
   }
 

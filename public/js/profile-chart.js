@@ -57,9 +57,8 @@
     tooltipdiv.html( // TODO externalize entire string
       shorttexts[qID] + ': <b>' + d3.format('d')(getMean(qID, selectedOption)) + '</b><br>' +
         dax.text('listReferenceValue') + ': <b>' + d3.format('d')(meanReferences[qID]) + '</b>') // TODO use new text ID style
-      .style('background', dax.profile.colorHoverForValue(getMean(qID, selectedOption), meanReferences[qID], directions[qID]))
-      .style('left', (chartwrapperBB.left + xScale(Math.max(getMean(qID, selectedOption), meanReferences[qID])) + yAxisWidth + 14) + 'px')
-      .style('top', chartwrapperBB.top + yScale(qID) + yScale.bandwidth() / 2 - tooltipdiv.node().getBoundingClientRect().height / 2 + 'px')
+      .style('left', (chartwrapperBB.left + xScale(Math.max(getMean(qID, selectedOption), meanReferences[qID])) + yAxisWidth + 15.5) + 'px')
+      .style('top', (chartwrapperBB.top + yScale(qID) + yScale.bandwidth() / 2 - tooltipdiv.node().getBoundingClientRect().height / 2 + 0.5) + 'px')
 
     const arrowleft = d3.select('.arrow-left')
 
@@ -68,9 +67,8 @@
       .style('opacity', 1)
 
     arrowleft
-      .style('border-right-color', dax.profile.colorHoverForValue(getMean(qID, selectedOption), meanReferences[qID], directions[qID]))
-      .style('left', (chartwrapperBB.left + xScale(Math.max(getMean(qID, selectedOption), meanReferences[qID])) + yAxisWidth + 4) + 'px')
-      .style('top', chartwrapperBB.top + yScale(qID) + yScale.bandwidth() / 2 - arrowleft.node().getBoundingClientRect().height / 2 + 'px')
+      .style('left', (chartwrapperBB.left + xScale(Math.max(getMean(qID, selectedOption), meanReferences[qID])) + yAxisWidth + 10) + 'px')
+      .style('top', (chartwrapperBB.top + yScale(qID) + yScale.bandwidth() / 2 - arrowleft.node().getBoundingClientRect().height / 2 + 3) + 'px')
 
     dax.profile.setDescriptionFull(d3.select('#chart-description'), perspectiveOptions[selectedOption], qID, getMean(qID, selectedOption))
   }
