@@ -1,6 +1,6 @@
 .user-paste-data {
 	display: inline-block;
-	font-family:'Raleway', sans-serif;
+	font-family: 'Raleway', sans-serif;
 	font-size: 12px;
 	color: #444;
 	border: 1px solid #DDD;
@@ -167,7 +167,7 @@
 .rowtext, .grid-legend-text {
 	color: rgb(85, 85, 85);
 	cursor: default;
-	font-family:'Raleway', sans-serif;
+	font-family: 'Raleway', sans-serif;
 	font-size: 12px;
 	white-space: nowrap;
 }
