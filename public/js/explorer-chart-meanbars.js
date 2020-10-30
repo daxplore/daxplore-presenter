@@ -50,7 +50,8 @@
 
   // Constructor, used to initialize the chart type.
   // Run once when the page is loaded. Call populateChart in order to update the chart content.
-  exports.initializeResources = function (questionMapInput, primaryColors, hoverColors, tooltipColors) {
+  exports.initializeResources =
+  function (questionMapInput, primaryColors, hoverColors, tooltipColors) {
     questionMap = questionMapInput
 
     // INITIALIZE HEADER
@@ -187,7 +188,8 @@
 
   // Set new data to be displayed by the chart.
   // As a side effect, make this chart visible.
-  exports.populateChart = function (questionID, perspectiveID, selectedPerspectiveOptions) {
+  exports.populateChart =
+  function (questionID, perspectiveID, selectedPerspectiveOptions) {
     displayChartElements(true)
     // Animate the update unless the perspective has changed.
     // As long as the perspective is the same, each bar represents a specific perspective option
@@ -341,7 +343,8 @@
   }
 
   // TODO move to core or description handler, or remove completely
-  exports.setDescriptionHTML = function (html) {
+  exports.setDescriptionHTML =
+  function (html) {
     if (headerDescriptionButton && headerDecriptionPanel) {
       headerDescriptionButton
         .classed('hidden', html.length === 0)
@@ -354,7 +357,8 @@
   // Set the size available for the chart.
   // Updates the chart so it fits in the new size.
   // As a side effect, enable horizontal scrolling if needed for the chart to fit the given room.
-  exports.setSize = function (availableWidthInput, availableHeightInput) {
+  exports.setSize =
+  function (availableWidthInput, availableHeightInput) {
     availableWidth = availableWidthInput
     availableHeight = availableHeightInput
     resizeAndPositionElements()
@@ -362,7 +366,8 @@
 
   // Hide all meanbars chart elements
   // Called whenever the entire chart should be hidden, so that another chart type can be dislpayed
-  exports.hide = function () {
+  exports.hide =
+  function () {
     displayChartElements(false)
   }
 

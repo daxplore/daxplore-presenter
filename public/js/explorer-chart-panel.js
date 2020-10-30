@@ -14,7 +14,8 @@
 
   // Initialize the chart panel
   // TODO fix constructor
-  exports.generateChartPanel = function (
+  exports.generateChartPanel =
+  function (
     questions,
     groups,
     primaryColorsInput,
@@ -97,11 +98,13 @@
   }
 
   // Getter for selected tab
-  exports.getSelectedTab = function () {
+  exports.getSelectedTab =
+  function () {
     return selectedTab
   }
 
-  exports.chartSetQueryDefinition = function (
+  exports.chartSetQueryDefinition =
+  function (
     chartType,
     timepoints,
     question,
@@ -215,7 +218,8 @@
     dax.explorer.selectionUpdateCallback()
   }
 
-  exports.updateChartPanelSize = function () {
+  exports.updateChartPanelSize =
+  function () {
     // TODO ask all elements for their needed width
     const windowWidth = document.documentElement.clientWidth
     const leftSidebarWidth = d3.select('.question-panel').node().offsetWidth

@@ -7,7 +7,8 @@
   const timepointsMap = {}
   let chartSvg
 
-  exports.generateChart = function (questions, selectedOptions, statJson) {
+  exports.generateChart =
+  function (questions, selectedOptions, statJson) {
     for (let i = 0; i < questions.length; i++) {
       const q = questions[i]
       timepointsMap[q.column] = q.timepoints

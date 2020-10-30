@@ -420,7 +420,8 @@
     })
   }
 
-  exports.generateChart = function (selectedOptions, stat, dichselectedMapInput, optionsMapInput, timepointsMapInput, lineColorsInput, hoverColorsInput) {
+  exports.generateChart =
+  function (selectedOptions, stat, dichselectedMapInput, optionsMapInput, timepointsMapInput, lineColorsInput, hoverColorsInput) {
     dichselectedMap = dichselectedMapInput
     optionsMap = optionsMapInput
     timepointsMap = timepointsMapInput
@@ -477,7 +478,8 @@
     updateStyles()
   }
 
-  exports.generateLegend = function () {
+  exports.generateLegend =
+  function () {
     // GENERATE LEGEND
     const legend = d3.select('.legend')
       .style('margin-top', (d3.select('.header-section').node().offsetHeight + height / 2.5) + 'px')
@@ -511,7 +513,8 @@
   }
 
   // TODO pretty hacky quick fixed solution
-  exports.updateSize = function (heightTotal) {
+  exports.updateSize =
+  function (heightTotal) {
     // 2. width for chart to use is max of:
     // a. room remaining of window width after QP, SA, margins, (scroll bar?)
     // b. max of

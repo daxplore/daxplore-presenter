@@ -41,7 +41,8 @@
   }
 
   // Takes a query definition string and returns a query definition object
-  exports.parseString = function (queryString) {
+  exports.parseString =
+  function (queryString) {
     // Decode string from base64
     let decodedString = ''
     try {
@@ -88,7 +89,8 @@
   }
 
   // Takes query definition elements and creates an encoded query definition string
-  exports.encodeString = function (question, perspectives, perspectiveOptions, flags) {
+  exports.encodeString =
+  function (question, perspectives, perspectiveOptions, flags) {
     const queryDefinitionItems = []
     queryDefinitionItems.push('q=' + question)
     queryDefinitionItems.push('p=' + perspectives.join(','))

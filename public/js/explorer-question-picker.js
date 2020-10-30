@@ -15,7 +15,8 @@
   const groupMap = []
   let selectedQuestion
 
-  exports.generateQuestionPicker = function (questionsInput, groupsInput) {
+  exports.generateQuestionPicker =
+  function (questionsInput, groupsInput) {
     questions = questionsInput
     groups = groupsInput
 
@@ -100,11 +101,13 @@
   }
 
   // TODO unused?
-  exports.getSelectedQuestion = function () {
+  exports.getSelectedQuestion =
+  function () {
     return selectedQuestion
   }
 
-  exports.questionSetQueryDefinition = function (questionID) {
+  exports.questionSetQueryDefinition =
+  function (questionID) {
     if (!questionIDs.has(questionID)) { return } // TODO log error?
     selectedQuestion = questionID
     openGroup = groupMap[selectedQuestion]

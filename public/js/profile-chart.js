@@ -447,7 +447,8 @@
       updateStyles()
     }
 
-  exports.setChartData = function (perspectiveOptionsArray, meansArray) {
+  exports.setChartData =
+  function (perspectiveOptionsArray, meansArray) {
     perspectiveOptions = perspectiveOptionsArray
     means = meansArray
     selectedQIDs = getSelectedQIDs(means, selectedOption)
@@ -457,7 +458,8 @@
     firstUpdate = false
   }
 
-  exports.updateSelectorOption = function (selectedSelectedOption) {
+  exports.updateSelectorOption =
+  function (selectedSelectedOption) {
     selectedOption = selectedSelectedOption
     selectedQIDs = getSelectedQIDs(means, selectedOption)
 
@@ -465,7 +467,8 @@
     updateStyles()
   }
 
-  exports.generateImage = function () {
+  exports.generateImage =
+  function () {
     const chartBB = d3.select('.chart').node().getBoundingClientRect()
 
     const chartWidth = chartBB.width

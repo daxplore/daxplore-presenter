@@ -7,7 +7,8 @@
 
   // DATA
   // Returns an object with values for mean (the mean value) and count (the number of respondents)
-  exports.getMean = function (questionID, perspectives, combinedPerspectiveOptionIndex, timepoint) {
+  exports.getMean =
+  function (questionID, perspectives, combinedPerspectiveOptionIndex, timepoint) {
     timepoint = typeof timepoint !== 'undefined' ? timepoint : questionMeta[questionID].timepoints[0] // default to first defined timepoint
     let dataItem, dataIndex
     if (perspectives.length === 1) {
@@ -40,7 +41,8 @@
   }
 
   // Returns an array with the number of respondents for each question option
-  exports.getFrequency = function (questionID, perspectiveID, perspectiveOptionIndex, timepoint) {
+  exports.getFrequency =
+  function (questionID, perspectiveID, perspectiveOptionIndex, timepoint) {
     const perspectiveOption = getQuestionOptionDefinition(perspectiveID, perspectiveOptionIndex)
     timepoint = typeof timepoint !== 'undefined' ? timepoint : questionMeta[questionID].timepoints[0] // default to first defined timepoint
     const stat = questionData[questionID][perspectiveOption.dataQuestion].freq[timepoint]
@@ -52,25 +54,30 @@
 
   // META
 
-  exports.getQuestionShortText = function (questionID) {
+  exports.getQuestionShortText =
+  function (questionID) {
     return questionMeta[questionID].short.trim()
   }
 
-  exports.getQuestionFullText = function (questionID) {
+  exports.getQuestionFullText =
+  function (questionID) {
     return questionMeta[questionID].text.trim()
   }
 
-  exports.isCombinedPerspective = function (questionID) {
+  exports.isCombinedPerspective =
+  function (questionID) {
     return questionMeta[questionID].type === 'COMBINED_PERSPECTIVE'
   }
 
-  exports.hasPerspectiveOptionChildren = function (questionID, optionIndex) {
+  exports.hasPerspectiveOptionChildren =
+  function (questionID, optionIndex) {
     return questionMeta[questionID].type === 'COMBINED_PERSPECTIVE' &&
     typeof questionMeta[questionID].optionsFlat[optionIndex].opts !== 'undefined' &&
     questionMeta[questionID].optionsFlat[optionIndex].opts.length > 0
   }
 
-  exports.getPerspectiveOptionChildCount = function (questionID, optionIndex) {
+  exports.getPerspectiveOptionChildCount =
+  function (questionID, optionIndex) {
     if (!dax.data.hasPerspectiveOptionChildren(questionID, optionIndex)) {
       return 0
     }
@@ -84,7 +91,8 @@
     return questionMeta[questionID].options[optionIndex]
   }
 
-  exports.getQuestionOptionCount = function (questionID) {
+  exports.getQuestionOptionCount =
+  function (questionID) {
     if (!questionMeta[questionID].options) {
       return 0
     }
@@ -94,31 +102,36 @@
     return questionMeta[questionID].options.length
   }
 
-  exports.getOptionTexts = function (questionID) {
+  exports.getOptionTexts =
+  function (questionID) {
     return dax.data.getPerspectiveOptionIndicesColumnOrder(questionID).map(function (i) {
       return dax.data.getQuestionOptionText(questionID, i)
     })
   }
 
-  exports.getTimepoints = function (questionID) {
+  exports.getTimepoints =
+  function (questionID) {
     return questionMeta[questionID].timepoints
   }
 
-  exports.getTopLevelQuestionOptionCount = function (questionID) {
+  exports.getTopLevelQuestionOptionCount =
+  function (questionID) {
     if (!dax.data.isCombinedPerspective(questionID)) {
       return exports.getQuestionOptionCount(questionID)
     }
     return questionMeta[questionID].options.length
   }
 
-  exports.getQuestionOptionText = function (questionID, optionIndex) {
+  exports.getQuestionOptionText =
+  function (questionID, optionIndex) {
     if (dax.data.isCombinedPerspective(questionID)) {
       return questionMeta[questionID].optionsFlat[optionIndex].text
     }
     return questionMeta[questionID].options[optionIndex].text
   }
 
-  exports.getPerspectivesOptionTexts = function (perspectives, optionIndex) {
+  exports.getPerspectivesOptionTexts =
+  function (perspectives, optionIndex) {
     switch (perspectives.length) {
     case 1:
       return [exports.getQuestionOptionText(perspectives[0], optionIndex)]
@@ -135,7 +148,8 @@
     throw Error('Invalid perspecvies array', perspectives)
   }
 
-  exports.getExplorerPrimaryPerspectiveIDs = function () {
+  exports.getExplorerPrimaryPerspectiveIDs =
+  function () {
     const perspectiveIDs = []
     for (let i = 0; i < perspectives.length; i++) {
       if (perspectives[i].explorerPerspective) {
@@ -145,7 +159,8 @@
     return perspectiveIDs
   }
 
-  exports.isExplorerPrimaryPerspective = function (perspectiveID) {
+  exports.isExplorerPrimaryPerspective =
+  function (perspectiveID) {
     for (let i = 0; i < perspectives.length; i++) {
       if (perspectives[i].q === perspectiveID) {
         return perspectives[i].explorerPerspective
@@ -154,7 +169,8 @@
     return false
   }
 
-  exports.getExplorerSecondaryPerspectiveIDs = function () {
+  exports.getExplorerSecondaryPerspectiveIDs =
+  function () {
     const perspectiveIDs = []
     for (let i = 0; i < perspectives.length; i++) {
       if (perspectives[i].secondary) {
@@ -164,7 +180,8 @@
     return perspectiveIDs
   }
 
-  exports.isExplorerSecondaryPerspective = function (perspectiveID) {
+  exports.isExplorerSecondaryPerspective =
+  function (perspectiveID) {
     for (let i = 0; i < perspectives.length; i++) {
       if (perspectives[i].q === perspectiveID) {
         return perspectives[i].secondary
@@ -173,12 +190,14 @@
     return false
   }
 
-  exports.getPerspectiveOptionIndicesColumnOrder = function (questionID) {
+  exports.getPerspectiveOptionIndicesColumnOrder =
+  function (questionID) {
     const optionCount = dax.data.getQuestionOptionCount(questionID)
     return Array.apply(null, Array(optionCount)).map(function (_, i) { return i })
   }
 
-  exports.getPerspectiveOptionIndicesNestedOrder = function (questionID) {
+  exports.getPerspectiveOptionIndicesNestedOrder =
+  function (questionID) {
     if (!dax.data.isCombinedPerspective(questionID)) {
       return dax.data.getPerspectiveOptionIndicesColumnOrder(questionID)
     }
@@ -192,33 +211,39 @@
     return questionMeta[questionID].options.reduce(optionTraverser, [])
   }
 
-  exports.getPerspectiveOptionParent = function (questionID, optionIndex) {
+  exports.getPerspectiveOptionParent =
+  function (questionID, optionIndex) {
     if (dax.data.isCombinedPerspective(questionID)) {
       return questionMeta[questionID].optionsFlat[optionIndex].parent
     }
     return -1
   }
 
-  exports.getPerspectiveOptionFirstChild = function (questionID, optionIndex) {
+  exports.getPerspectiveOptionFirstChild =
+  function (questionID, optionIndex) {
     if (dax.data.isCombinedPerspective(questionID) && dax.data.hasPerspectiveOptionChildren(questionID, optionIndex)) {
       return questionMeta[questionID].optionsFlat[optionIndex].opts[0].index
     }
     return -1
   }
 
-  exports.useMeanReference = function (questionID) {
+  exports.useMeanReference =
+  function (questionID) {
     return questionMeta[questionID].mean_reference
   }
 
-  exports.getMeanReference = function (questionID) {
+  exports.getMeanReference =
+  function (questionID) {
     return questionMeta[questionID].mean_reference
   }
 
-  exports.getMeanReferenceDirection = function (questionID) {
+  exports.getMeanReferenceDirection =
+  function (questionID) {
     return questionMeta[questionID].gooddirection
   }
 
-  exports.initializeResources = function (groupsInput, perspectivesInput, questionMetaInput, questionDataInput) {
+  exports.initializeResources =
+  function (groupsInput, perspectivesInput, questionMetaInput, questionDataInput) {
     // groups = groupsInput
     perspectives = perspectivesInput
     questionMeta = questionMetaInput
@@ -270,7 +295,8 @@
     })
   }
 
-  exports.getPerspectiveOptionTreeDepth = function (questionID, perspectiveOptionIndex) {
+  exports.getPerspectiveOptionTreeDepth =
+  function (questionID, perspectiveOptionIndex) {
     const question = questionMeta[questionID]
     if (question.type !== 'COMBINED_PERSPECTIVE') {
       return 0
@@ -278,11 +304,13 @@
     return question.optionsFlat[perspectiveOptionIndex].depth
   }
 
-  exports.hasTimepoint = function (questionID, timepoint) {
+  exports.hasTimepoint =
+  function (questionID, timepoint) {
     return questionMeta[questionID].timepoints.indexOf(timepoint) !== -1
   }
 
-  exports.isAllSingleTimepoint = function () {
+  exports.isAllSingleTimepoint =
+  function () {
     for (let i = 0; i < questionMeta.length; i++) {
       if (questionMeta[questionMeta[i]].timepoints.length > 1) {
         return false

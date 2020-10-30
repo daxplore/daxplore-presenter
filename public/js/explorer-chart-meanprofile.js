@@ -44,7 +44,8 @@
 
   /** ** EXPORTED FUNCTIONS ** **/
 
-  exports.initializeResources = function () {
+  exports.initializeResources =
+  function () {
     // INITIALIZE HEADER
     headerDiv = d3.select('.header-section').append('div')
       .attr('class', 'header-section__meanprofile')
@@ -153,7 +154,8 @@
       .style('opacity', 0)
   }
 
-  exports.populateChart = function (questionIDInput, perspectivesInput, selectedPerspectiveOptionsInput) {
+  exports.populateChart =
+  function (questionIDInput, perspectivesInput, selectedPerspectiveOptionsInput) {
     displayChartElements(true)
 
     // Animate the update unless the perspective has changed.
@@ -221,7 +223,8 @@
 
   // Set the size available for the chart.
   // Updates the chart so it fits in the new size.
-  exports.setSize = function (availableWidthInput) {
+  exports.setSize =
+  function (availableWidthInput) {
     animateNextUpdate = availableWidth === availableWidthInput
     availableWidth = availableWidthInput
     resizeAndPositionElements()
@@ -229,7 +232,8 @@
 
   // Hide all meanbars chart elements
   // Called whenever the entire chart should be hidden, so that another chart type can be dislpayed
-  exports.hide = function () {
+  exports.hide =
+  function () {
     displayChartElements(false)
   }
 

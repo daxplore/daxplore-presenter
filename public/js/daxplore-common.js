@@ -14,7 +14,8 @@
   // Currently logs to browser console.
   // Wrapped in its own Daxplore function in order to allow easy future
   // refactoring into a DOM based logging system.
-  common.logError = function () {
+  common.logError =
+  function () {
     if (typeof (console) !== 'undefined') {
       console.error.apply(console, arguments) // eslint-disable-line no-console
     }
@@ -24,7 +25,8 @@
   // Logs any problem as a severe error, aimed at the person deploying Daxplore Presenter.
   // Takes the manifest's data version as an argument.
   // Returns true if the data files and system use the same version.
-  common.hasMatchingDataFileVersions = function (manifestDataVersion) {
+  common.hasMatchingDataFileVersions =
+  function (manifestDataVersion) {
     // Check that the data and code uses the same data format version.
     if (systemDataVersion === manifestDataVersion) {
       return true

@@ -54,7 +54,8 @@
 
   // Constructor, used to initialize the chart type.
   // Run once when the page is loaded. Call populateChart in order to update the chart content.
-  exports.initializeResources = function (primaryColors) {
+  exports.initializeResources =
+  function (primaryColors) {
     // CALCULATE RELEVANT DATA
     singleTimepointMode = dax.data.isAllSingleTimepoint()
 
@@ -174,7 +175,8 @@
 
   // Set new data to be displayed by the chart.
   // As a side effect, make this chart visible.
-  exports.populateChart = function (questionID, perspectiveID, selectedPerspectiveOptionIndicesInput) {
+  exports.populateChart =
+  function (questionID, perspectiveID, selectedPerspectiveOptionIndicesInput) {
     displayChartElements(true)
     perspective = perspectiveID
     question = questionID
@@ -397,7 +399,8 @@
   // Set the size available for the chart.
   // Updates the chart so it fits in the new size.
   // As a side effect, enable horizontal scrolling if needed for the chart to fit the given room.
-  exports.setSize = function (availableWidthInput, availableHeightInput) {
+  exports.setSize =
+  function (availableWidthInput, availableHeightInput) {
     availableWidth = availableWidthInput
     availableHeight = availableHeightInput
     resizeAndPositionElements()
@@ -405,7 +408,8 @@
 
   // Hide all frequency chart elements
   // Called whenever the entire chart should be hidden, so that another chart type can be dislpayed
-  exports.hide = function () {
+  exports.hide =
+  function () {
     displayChartElements(false)
   }
 

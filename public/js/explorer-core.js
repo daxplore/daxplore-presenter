@@ -26,7 +26,8 @@
     dax.explorer.selectionUpdateCallback()
   }
 
-  exports.initializeExplorer = function () {
+  exports.initializeExplorer =
+  function () {
     // Use Axios to download all needed metadata files from the server
     // Define functions for all metadata files to be downloaded
     function getGroups () { return axios.get('data/groups.json') }
@@ -150,7 +151,8 @@
 
   // Called by all other elements whenever their state is updated in a way that
   // will update the page state as a whole
-  exports.selectionUpdateCallback = function () {
+  exports.selectionUpdateCallback =
+  function () {
     const question = dax.explorer.getSelectedQuestion()
     const perspective = dax.explorer.getSelectedPerspectives()
     const perspectiveOptions = dax.explorer.getSelectedPerspectiveOptions()

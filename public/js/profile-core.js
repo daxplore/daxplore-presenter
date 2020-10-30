@@ -10,7 +10,8 @@
     dax.profile.setChartData(perspectiveOptions, means)
   }
 
-  exports.initializeProfile = function () {
+  exports.initializeProfile =
+  function () {
     // Use Axios to download all needed metadata files from the server
     // Define functions for all metadata files to be downloaded
     function getQuestions () { return axios.get('data/questions.json') }
@@ -125,7 +126,8 @@
     }))
   }
 
-  exports.headerChange = function (select) {
+  exports.headerChange =
+  function (select) {
     dax.profile.updateSelectorOption(select.value)
   }
 })(window.dax = window.dax || {})

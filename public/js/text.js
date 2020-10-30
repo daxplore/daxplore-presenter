@@ -3,7 +3,8 @@
   let usertexts
 
   // Make the 'text' namespace a function, for more compact calls
-  namespace.text = function (textID) {
+  namespace.text =
+  function (textID) {
     if (typeof usertexts[textID] === 'undefined') {
       console.warn('Missing usertext: ' + textID) // TODO custom logging system?
       return '[' + textID + ']'
@@ -21,7 +22,8 @@
   }
 
   // Initlaize 'text' with the usertext data
-  namespace.text.initializeResources = function (usertextsInput) {
+  namespace.text.initializeResources =
+  function (usertextsInput) {
     usertexts = usertextsInput
   }
 })(window.dax = window.dax || {})

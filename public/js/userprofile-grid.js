@@ -166,7 +166,8 @@
         })
   }
 
-  exports.generateUserPasteSection = function () {
+  exports.generateUserPasteSection =
+  function () {
     dax.userprofile.addGridUpdateCallback(updateUserCopyGroupNameDropdown)
     d3.select('.user-paste-data-header')
       .on('click', function () {
@@ -389,12 +390,14 @@
       })
   }
 
-  exports.addGridUpdateCallback = function (callbackFunction) {
+  exports.addGridUpdateCallback =
+  function (callbackFunction) {
     callbackFunctions.push(callbackFunction)
     callCallbacks()
   }
 
-  exports.addColumn = function () {
+  exports.addColumn =
+  function () {
     usernames.push('Grupp ' + (usernames.length + 1)) // TODO externalize text
 
     usermeans.forEach(function (u) {
@@ -405,71 +408,71 @@
   }
 
   exports.generateGrid =
-    function (
-      qIDsArray,
-      referencesMap,
-      shorttextsMapInput,
-      directionsMap,
-      titleRegexpMapInput
-    ) {
-      qIDs = qIDsArray
-      meanReferences = referencesMap
-      shorttextsMap = shorttextsMapInput
-      directions = directionsMap
-      titleRegexpMap = titleRegexpMapInput
+  function (
+    qIDsArray,
+    referencesMap,
+    shorttextsMapInput,
+    directionsMap,
+    titleRegexpMapInput
+  ) {
+    qIDs = qIDsArray
+    meanReferences = referencesMap
+    shorttextsMap = shorttextsMapInput
+    directions = directionsMap
+    titleRegexpMap = titleRegexpMapInput
 
-      d3.select('.add-column-button')
+    d3.select('.add-column-button')
           .text('+ Lägg till grupp')
 
-      if (Modernizr.svgforeignobject) {
-        d3.select('.save-grid-image-button')
+    if (Modernizr.svgforeignobject) {
+      d3.select('.save-grid-image-button')
             .text('Spara som bild') // TODO externalize text
             .on('click', dax.userprofile.saveGridImage)
-      } else {
-        d3.select('.save-grid-image-button')
+    } else {
+      d3.select('.save-grid-image-button')
             .remove()
+    }
+
+    d3.select('.grid-legend-text.good').text(dax.text('listReferenceBetter')) // TODO use new text ID style
+    d3.select('.grid-legend-text.avg').text(dax.text('listReferenceComparable')) // TODO use new text ID style
+    d3.select('.grid-legend-text.bad').text(dax.text('listReferenceWorse')) // TODO use new text ID style
+
+    if (qIDs.length > 0) {
+      dax.profile.setDescriptionShort(d3.select('#grid-description'), qIDs[0])
+    }
+
+    usernames.push('Grupp 1') // TODO externalize text
+
+    usermeans = qIDs.map(function (qID, i) {
+      return [NaN]
+    })
+
+    systemdata = qIDs.map(function (qID, i) {
+      return {
+        qID: qID,
+        index: i,
+        reference: referencesMap[qID],
       }
+    })
 
-      d3.select('.grid-legend-text.good').text(dax.text('listReferenceBetter')) // TODO use new text ID style
-      d3.select('.grid-legend-text.avg').text(dax.text('listReferenceComparable')) // TODO use new text ID style
-      d3.select('.grid-legend-text.bad').text(dax.text('listReferenceWorse')) // TODO use new text ID style
+    // GRID FORM
+    const form = d3.select('.grid').append('form').attr('lang', 'sv')
+    const table = form.append('table')
+    const thead = table.append('thead')
+    tbody = table.append('tbody')
 
-      if (qIDs.length > 0) {
-        dax.profile.setDescriptionShort(d3.select('#grid-description'), qIDs[0])
-      }
-
-      usernames.push('Grupp 1') // TODO externalize text
-
-      usermeans = qIDs.map(function (qID, i) {
-        return [NaN]
-      })
-
-      systemdata = qIDs.map(function (qID, i) {
-        return {
-          qID: qID,
-          index: i,
-          reference: referencesMap[qID],
-        }
-      })
-
-      // GRID FORM
-      const form = d3.select('.grid').append('form').attr('lang', 'sv')
-      const table = form.append('table')
-      const thead = table.append('thead')
-      tbody = table.append('tbody')
-
-      // GRID HEADER
-      const header = thead.append('tr')
+    // GRID HEADER
+    const header = thead.append('tr')
           .classed('grid-header', true)
 
-      header
+    header
           .append('th')
           .classed('rowtext', true)
           .classed('groupname', true)
           .text('Gruppnamn:') // TODO externalize
 
-      // GRID ROWS
-      gridRows = tbody.selectAll('tr')
+    // GRID ROWS
+    gridRows = tbody.selectAll('tr')
           .data(systemdata)
           .enter()
             .append('tr')
@@ -478,14 +481,15 @@
                 dax.profile.setDescriptionShort(d3.select('#grid-description'), d.qID)
               })
 
-      gridRows.append('td')
+    gridRows.append('td')
           .classed('rowtext', true)
           .text(function (d) { return shorttextsMap[d.qID] })
 
-      generateColumns(usernames, usermeans)
-    }
+    generateColumns(usernames, usermeans)
+  }
 
-  exports.saveGridImage = function () {
+  exports.saveGridImage =
+  function () {
     let gridclone = d3.select(d3.select('.grid').node().cloneNode(true))
 
     let removed = 0
@@ -573,7 +577,8 @@
       })
   }
 
-  const generateAndSaveImage = function (dataUrl, minWidth, heightOffset) {
+  const generateAndSaveImage =
+  function (dataUrl, minWidth, heightOffset) {
     const img = new Image()
     img.onload = function () {
       const hMargin = 10

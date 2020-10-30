@@ -31,7 +31,8 @@
       .attr('src', './img/perspective-checkbox-empty.png')
   })
 
-  exports.perspectiveSetQueryDefinition = function (perspectiveID, perspectiveSecondaryID, perspectiveOptionsIntArray, total) {
+  exports.perspectiveSetQueryDefinition =
+  function (perspectiveID, perspectiveSecondaryID, perspectiveOptionsIntArray, total) {
     if (!dax.data.isExplorerPrimaryPerspective(perspectiveID)) {
       console.warn('Not a valid primary perspective:', perspectiveID)
       return
@@ -52,7 +53,8 @@
     }
   }
 
-  exports.generatePerspectivePicker = function (settingsInput) {
+  exports.generatePerspectivePicker =
+  function (settingsInput) {
     settings = settingsInput
 
     moreButton = d3.selectAll('.peropt-more-button')
@@ -191,7 +193,8 @@
     initialized = true
   }
 
-  exports.getSelectedPerspectives = function () {
+  exports.getSelectedPerspectives =
+  function () {
     const perspectives = [selectedPerspectiveID]
     if (selectedSecondaryPerspectiveID !== null && selectedPerspectiveID !== selectedSecondaryPerspectiveID) {
       perspectives.push(selectedSecondaryPerspectiveID)
@@ -199,7 +202,8 @@
     return perspectives
   }
 
-  exports.getSelectedPerspectiveOptions = function () {
+  exports.getSelectedPerspectiveOptions =
+  function () {
     const optionsNested = dax.data.getPerspectiveOptionIndicesNestedOrder(selectedPerspectiveID)
     return optionsNested.filter(function (optionIndex) {
       return selectedOptions.has(optionIndex)
@@ -207,7 +211,8 @@
   }
 
   // Combines primary and secondary perspective (if selected) into a single option array
-  exports.getSelectedPerspectiveOptionsCombined = function () {
+  exports.getSelectedPerspectiveOptionsCombined =
+  function () {
     const options = exports.getSelectedPerspectiveOptions()
     if (selectedSecondaryPerspectiveID === null || selectedPerspectiveID === selectedSecondaryPerspectiveID) {
       return options
@@ -222,7 +227,8 @@
     return combinedOptions
   }
 
-  exports.isPerspectiveTotalSelected = function () {
+  exports.isPerspectiveTotalSelected =
+  function () {
     return totalSelected
   }
 
