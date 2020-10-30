@@ -31,7 +31,7 @@
   function setToNormalColor (i) {
     const questionID = getQid(i)
     d3.select('.barrect-' + questionID)
-      .style('fill', dax.profile.colorForValue(getMean(questionID, selectedOption), meanReferences[questionID], directions[questionID]))
+      .style('fill', dax.colors.colorForValue(getMean(questionID, selectedOption), meanReferences[questionID], directions[questionID]))
     d3.selectAll('.y.axis .tick')
       .classed('bar-hover', false)
   }
@@ -39,7 +39,7 @@
   function setToHoverColor (i) {
     const questionID = getQid(i)
     d3.select('.barrect-' + questionID)
-      .style('fill', dax.profile.colorHoverForValue(getMean(questionID, selectedOption), meanReferences[questionID], directions[questionID]))
+      .style('fill', dax.colors.colorHoverForValue(getMean(questionID, selectedOption), meanReferences[questionID], directions[questionID]))
     d3.selectAll('.y.axis .tick')
       .classed('bar-hover', function (d, index) { return i === index })
   }
@@ -264,7 +264,7 @@
           return 'barrect barrect-' + qID
         })
         .attr('height', yScale.bandwidth())
-        .style('fill', function (qID) { return dax.profile.colorForValue(getMean(qID, selectedOption), meanReferences[qID], directions[qID]) })
+        .style('fill', function (qID) { return dax.colors.colorForValue(getMean(qID, selectedOption), meanReferences[qID], directions[qID]) })
         .attr('width', function (qID) { return firstUpdate ? xScale(getMean(qID, selectedOption)) + 1 : 0 })
         .on('mouseover',
           function (d) {
@@ -291,7 +291,7 @@
     bars.selectAll('.barrect')
       .transition(elTransition)
         .style('fill', function (qID) {
-          return dax.profile.colorForValue(getMean(qID, selectedOption), meanReferences[qID], directions[qID])
+          return dax.colors.colorForValue(getMean(qID, selectedOption), meanReferences[qID], directions[qID])
         })
         .attr('height', yScale.bandwidth())
         .attr('width', function (qID) { return xScale(getMean(qID, selectedOption)) + 1 })

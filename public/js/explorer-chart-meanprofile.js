@@ -381,7 +381,7 @@
         .classed('barrect', true)
         .attr('height', yScale.bandwidth())
         .style('fill', function (option) {
-          return dax.profile.colorForValue(option.mean, questionReferenceValue, questionReferenceDirection)
+          return dax.colors.colorForValue(option.mean, questionReferenceValue, questionReferenceDirection)
         })
         .attr('width', function (option) { return animateNextUpdate && !option.nodata ? xScale(option.mean) + 1 : 0 })
         .on('mouseout', function (option) { tooltipOut() })
@@ -397,7 +397,7 @@
       .attr('transform', function (option) { return 'translate(' + (yAxisWidth + 1) + ',' + yScale(option.type + '|' + option.index) + ')' })
 
     conditionalApplyTransition(bars.select('.barrect'), elementTransition, animateNextUpdate)
-      .style('fill', function (option) { return dax.profile.colorForValue(option.mean, questionReferenceValue, questionReferenceDirection) })
+      .style('fill', function (option) { return dax.colors.colorForValue(option.mean, questionReferenceValue, questionReferenceDirection) })
       .attr('height', yScale.bandwidth())
       .attr('width', function (option) {
         return option.nodata ? 0 : xScale(option.mean) + 1
@@ -432,7 +432,7 @@
       tooltipText += '<b>' + dax.text('meanbars_tooltip_missingData') + '</b>'
     } else {
       tooltipText += '<span style="color:'
-      tooltipText += dax.profile.colorTextForValue(option.mean, questionReferenceValue, questionReferenceDirection)
+      tooltipText += dax.colors.colorTextForValue(option.mean, questionReferenceValue, questionReferenceDirection)
       tooltipText += ';font-weight:bold">' + dax.text('meanbars_tooltip_mean', dax.common.integerFormat(option.mean)) + '</span>'
       tooltipText += '<br>'
       tooltipText += dax.text('meanbars_tooltip_respondents', option.count)
@@ -443,7 +443,7 @@
     tooltipArrow
       .classed('meanprofile__tooltip-arrow--right', false)
       .classed('meanprofile__tooltip-arrow--up', true)
-      .style('border-bottom-color', option.nodata ? '#DDD' : dax.profile.colorTooltipBackground(option.mean, questionReferenceValue, questionReferenceDirection))
+      .style('border-bottom-color', option.nodata ? '#DDD' : dax.colors.colorTooltipBackground(option.mean, questionReferenceValue, questionReferenceDirection))
       .style('border-left-color', null)
       .style('top', (chartTop + yScale(option.type + '|' + option.index) + yScale.bandwidth() + tooltipBarArrowDistance) + 'px')
 
@@ -456,9 +456,9 @@
     bars.selectAll('.barrect')
       .style('fill', function (opt) {
         if (opt.index === option.index) {
-          return dax.profile.colorHoverForValue(opt.mean, questionReferenceValue, questionReferenceDirection)
+          return dax.colors.colorHoverForValue(opt.mean, questionReferenceValue, questionReferenceDirection)
         }
-        return dax.profile.colorForValue(opt.mean, questionReferenceValue, questionReferenceDirection)
+        return dax.colors.colorForValue(opt.mean, questionReferenceValue, questionReferenceDirection)
       })
 
     yAxisElement.selectAll('.tick')
@@ -527,7 +527,7 @@
 
     bars.selectAll('.barrect')
       .style('fill', function (opt) {
-        return dax.profile.colorForValue(opt.mean, questionReferenceValue, questionReferenceDirection)
+        return dax.colors.colorForValue(opt.mean, questionReferenceValue, questionReferenceDirection)
       })
 
     yAxisElement.selectAll('.tick')
