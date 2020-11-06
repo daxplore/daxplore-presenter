@@ -9,7 +9,7 @@
   font-size: 12px;
   height: auto;
   line-height: 1.4;
-  padding: 10px;
+  padding: 10px 15px;
   pointer-events: none;
   position: absolute;
   text-align: center;
@@ -76,4 +76,22 @@
 
 .explorer-meanprofile .reference rect, .explorer-meanprofile .reference path {
   fill: #444;
+}
+
+.meanprofile__description-header {
+  font-weight: bold;
+  margin-bottom: 8px;
+  overflow-wrap: break-word;
+}
+
+.meanprofile__description-option,
+.meanprofile__description-reference,
+.meanprofile__description-comparison {
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.meanprofile__description-comparison {
+  margin-bottom: 10px;
 }

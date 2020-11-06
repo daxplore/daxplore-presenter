@@ -343,7 +343,7 @@
   }
 
   // TODO move to core or description handler, or remove completely
-  exports.setDescriptionHTML =
+  exports.setHeaderDescriptionHTML =
   function (html) {
     if (headerDescriptionButton && headerDecriptionPanel) {
       headerDescriptionButton

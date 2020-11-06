@@ -69,6 +69,11 @@
     return questionMeta[questionID].type === 'COMBINED_PERSPECTIVE'
   }
 
+  exports.getQuestionDescription =
+  function (questionID) {
+    return questionMeta[questionID].description
+  }
+
   exports.hasPerspectiveOptionChildren =
   function (questionID, optionIndex) {
     return questionMeta[questionID].type === 'COMBINED_PERSPECTIVE' &&

@@ -146,7 +146,7 @@
       .html(html)
       .style('display', html.length > 0 ? 'inherit' : 'none')
 
-    dax.chart.meanbars.setDescriptionHTML(html)
+    dax.chart.meanbars.setHeaderDescriptionHTML(html)
   }
 
   // Called by all other elements whenever their state is updated in a way that

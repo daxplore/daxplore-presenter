@@ -177,6 +177,7 @@
     selectedOptionsData = []
     selectedOptionsDataMap = {}
     let secondarySection = -1
+    let firstOptionData = null
     selectedPerspectiveOptions.forEach(function (option, i) {
       if (perspectives.length === 2) {
         const newSecondarySection = Math.floor(option / dax.data.getQuestionOptionCount(perspectives[1]))
@@ -199,6 +200,9 @@
         nodata: mean === -1 && count === 0,
         type: 'DATA',
       }
+      if (firstOptionData === null) {
+        firstOptionData = optionData
+      }
       selectedOptionsData.push(optionData)
       selectedOptionsDataMap[option] = optionData
     })
@@ -219,6 +223,11 @@
       return opt.type + '|' + opt.index
     }))
     yAxis.scale(yScale)
+
+    // DESCRIPTION
+    if (firstOptionData !== null) {
+      setDescriptionContent(firstOptionData)
+    }
   }
 
   // Set the size available for the chart.
@@ -468,6 +477,57 @@
       })
 
     tooltipBarMove()
+    setDescriptionContent(option)
+  }
+
+  function setDescriptionContent (option) {
+    if (option.type !== 'DATA') {
+      return
+    }
+    // Introduce a zero-width space after slashes to encourage linebreaks after slashes
+    const shorttext = dax.data.getQuestionShortText(questionID).replace(/\//g, '/&#8203;')
+    const optiontext = dax.data.getPerspectivesOptionTexts(perspectives, option.index).join(', ').replace(/\//g, '/&#8203;')
+    const description = dax.data.getQuestionDescription(questionID)
+    const reference = questionReferenceValue // TODO not assaign
+    const direction = questionReferenceDirection
+
+    // TODO externalize all text?
+    let header = '<div class="meanprofile__description-header">' + shorttext + '</div>'
+    header += '<div class="meanprofile__description-option">' + optiontext + ':&nbsp;' + d3.format('d')(option.mean) + '</div>'
+
+    // TODO externalize all text?
+    const subheader = '<div class="meanprofile__description-reference">' + dax.text('listReferenceValue') + ': ' + d3.format('d')(reference) + '</div>' // TODO use new text ID format
+
+    const trueDiff = option.mean - reference
+    const diff = direction === 'LOW' ? reference - option.mean : trueDiff
+
+    let referenceComparison
+    if (diff < -5) {
+      referenceComparison = dax.text('listReferenceWorse') // TODO use new text ID style
+    } else if (diff > 5) {
+      referenceComparison = dax.text('listReferenceBetter') // TODO use new text ID style
+    } else {
+      referenceComparison = dax.text('listReferenceComparable') // TODO use new text ID style
+    }
+    // TODO externalize all text?
+    const color = dax.colors.colorTextForValue(option.mean, reference, direction)
+    referenceComparison = '<div class="meanprofile__description-comparison" style="color: ' + color + ';"">' + referenceComparison + ': ' + d3.format('+d')(trueDiff) + '</div>'
+
+    let html = header + subheader + referenceComparison + description
+
+    perspectives.forEach(function (perspectiveID) {
+      const perspectiveDescription = dax.data.getQuestionDescription(perspectiveID)
+      if (perspectiveDescription !== null && perspectiveDescription !== undefined && perspectiveDescription.trim().length > 0) {
+        if (html.length > 0) {
+          html += '<hr>'
+        }
+        const title = dax.data.getQuestionShortText(perspectiveID)
+        html += '<b>' + title + '</b><p>' + perspectiveDescription + '</p>'
+      }
+    })
+
+    d3.selectAll('.description-panel')
+      .html(html)
   }
 
   // Update tooltip X position on bar
@@ -478,6 +538,7 @@
     if (tooltipBodyBB.width / 2 + mouseX > window.innerWidth) {
       mouseX = window.innerWidth - tooltipBodyBB.width / 2
     }
+    mouseX -= 7
     tooltipBody.style('left', (mouseX - tooltipBodyBB.width / 2) + 'px')
     tooltipArrow.style('left', (mouseX - tooltipArrowBB.width / 2) + 'px')
   }
@@ -501,7 +562,7 @@
     const leftPosition = chartLeft + xScale(questionReferenceValue) - tooltipBarArrowDistance
 
     tooltipBody
-      .style('left', (leftPosition - tooltipBodyBB.width - tooltipArrowBB.width / 2 - 1.5) + 'px')
+      .style('left', (leftPosition - tooltipBodyBB.width - tooltipArrowBB.width / 2 - 2) + 'px')
 
     tooltipArrow
       .style('border-bottom-color', null)
