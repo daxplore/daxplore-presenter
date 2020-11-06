@@ -484,7 +484,7 @@
     if (option.type !== 'DATA') {
       return
     }
-    // Introduce a zero-width space after slashes to encourage linebreaks after slashes
+    // Add a zero-width space after slashes to encourage linebreaks after slashes
     const shorttext = dax.data.getQuestionShortText(questionID).replace(/\//g, '/&#8203;')
     const optiontext = dax.data.getPerspectivesOptionTexts(perspectives, option.index).join(', ').replace(/\//g, '/&#8203;')
     const description = dax.data.getQuestionDescription(questionID)

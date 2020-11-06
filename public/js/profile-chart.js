@@ -250,7 +250,10 @@
 
     // BARS
     let bars = chart.selectAll('.bar')
-      .data(selectedQIDs)
+      .data(
+        selectedQIDs, // data
+        function (option) { return option } // key function
+      )
 
     // remove old bars
     bars.exit().remove()
@@ -342,10 +345,11 @@
     references.interrupt().selectAll('*').interrupt()
 
     references
+      .raise()
       .transition(elTransition)
         .attr('transform', function (d, i) { return 'translate(' + (yAxisWidth + xScale(meanReferences[d]) - referenceWidth / 2) + ',' + (yScale(d) - referenceExtraHeight / 2) + ')' })
 
-    references.select('.reference-line')
+    references.selectAll('.reference-line')
       .transition(elTransition)
         .attr('width', referenceWidth)
         .attr('height', referenceHeight)
