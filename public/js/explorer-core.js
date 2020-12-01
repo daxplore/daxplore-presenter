@@ -12,17 +12,21 @@
   const optionsMap = {}
   const timepointsMap = {}
 
+  let maxHeight = -1
+
   function onHashUpdate () {
     if (currentHash === window.location.hash.slice(1)) {
       return
     }
     currentHash = window.location.hash.slice(1)
-    // Get query definition string from hash
-    // Parse the query definition into a (potentially empty or partially empty) query object
-    const queryDefinition = dax.querydefinition.parseString(currentHash)
-    dax.explorer.questionSetQueryDefinition(queryDefinition.question)
-    const totalSelected = queryDefinition.flags.indexOf('TOTAL') !== -1
-    dax.explorer.perspectiveSetQueryDefinition(queryDefinition.perspective, queryDefinition.perspectiveSecondary, queryDefinition.perspectiveOptions, totalSelected)
+    if (currentHash !== null && typeof currentHash === 'string' && currentHash.length !== 0) {
+      // Get query definition string from hash
+      // Parse the query definition into a (potentially empty or partially empty) query object
+      const queryDefinition = dax.querydefinition.parseString(currentHash)
+      dax.explorer.questionSetQueryDefinition(queryDefinition.question)
+      const totalSelected = queryDefinition.flags.indexOf('TOTAL') !== -1
+      dax.explorer.perspectiveSetQueryDefinition(queryDefinition.perspective, queryDefinition.perspectiveSecondary, queryDefinition.perspectiveOptions, totalSelected)
+    }
     dax.explorer.selectionUpdateCallback()
   }
 
@@ -95,6 +99,23 @@
 
         onHashUpdate()
         window.addEventListener('hashchange', onHashUpdate, false)
+
+        // Send height changes to parent window, so it can update iframe size
+        if (window.ResizeObserver) {
+          const outerElement = document.querySelector('.daxplore-explorer')
+          const resizeObserver = new ResizeObserver(function (entries) {
+            for (let i = 0; i < entries.length; i++) {
+              if (entries[i].target === outerElement) {
+                if (entries[i].contentRect.height > maxHeight) {
+                  maxHeight = entries[i].contentRect.height
+                  parent.postMessage({ height: maxHeight }, '*')
+                }
+                break
+              }
+            }
+          })
+          resizeObserver.observe(outerElement)
+        }
       })
     }))
   }
@@ -158,23 +179,11 @@
     const perspectiveOptions = dax.explorer.getSelectedPerspectiveOptions()
     const perspectiveOptionsCombined = dax.explorer.getSelectedPerspectiveOptionsCombined()
     // const totalSelected = dax.explorer.isPerspectiveTotalSelected()
+
     // TODO temporary hack, should be handled by tab component
     let tab = dax.explorer.getSelectedTab()
     if (questionMap[question].displaytypes.indexOf(tab) === -1) {
       tab = questionMap[question].displaytypes[0]
-    }
-    // console.log(question, perspective, perspectiveOptions, totalSelected, tab)
-    // const stat = questionData[question][perspective]
-
-    // TODO move to separate function/file/namespace?
-    // TODO handle all flags
-    const queryHash = dax.querydefinition.encodeString(question, perspective, perspectiveOptions, [tab])
-    if (currentHash !== queryHash) {
-      currentHash = queryHash
-      // Set the hash of this window
-      window.location.hash = queryHash
-      // Send a message to parents that hold this page in an iframe to allow the outer page to update its window hash
-      parent.postMessage(queryHash, '*')
     }
 
     // TODO dich subtitle should be handled by a dich subsystem
@@ -189,5 +198,36 @@
     }
     setDescription(question, perspective)
     dax.explorer.chartSetQueryDefinition(tab, 'TIMEPOINTS_ONE', question, perspective, perspectiveOptionsCombined, dichSubtitle)
+
+    // TODO move to separate function/file/namespace?
+    // TODO handle all flags
+    const queryHash = dax.querydefinition.encodeString(question, perspective, perspectiveOptions, [tab])
+    if (currentHash !== queryHash) {
+      currentHash = queryHash
+      // Set the hash of this window
+      window.location.hash = queryHash
+      // Send a message to iframe parent to allow the outer page to update window hash
+      parent.postMessage({ hash: queryHash }, '*')
+    }
+
+    // Hack used as a backup in browsers that don't support ResizeObserver
+    if (!window.ResizeObserver) {
+      postUpdateHeightToParent()
+      setTimeout(postUpdateHeightToParent, 1)
+      setTimeout(postUpdateHeightToParent, 100)
+    }
+  }
+
+  // Update function used as a backup in browsers that don't support ResizeObserver
+  function postUpdateHeightToParent () {
+    const height = Math.max(
+      d3.select('.daxplore-explorer').node().getBoundingClientRect().height,
+      d3.select('.question-panel').node().getBoundingClientRect().height +
+      d3.select('.description-left').node().getBoundingClientRect().height
+    )
+    if (height > maxHeight) {
+      maxHeight = height
+      parent.postMessage({ height: maxHeight }, '*')
+    }
   }
 })(window.dax = window.dax || {})
