@@ -87,14 +87,14 @@
         }
       })
 
-    yAxisElement = chartG.append('g')
-      .classed('y', true)
-      .classed('axis', true)
-
     yAxisReferenceElement = chartG.append('g')
       .classed('y', true)
       .classed('axis', true)
       .style('opacity', 0)
+
+    yAxisElement = chartG.append('g')
+      .classed('y', true)
+      .classed('axis', true)
 
     // X SCALE
     xScale = d3.scaleLinear()
@@ -338,7 +338,8 @@
     width = scrollNeeded ? chartNeededWidth : availableWidth
 
     // SET MAIN ELEMENT WIDTH AND HEIGHT
-    conditionalApplyTransition(chart, elementTransition, animateNextUpdate)
+    // conditionalApplyTransition(chart, elementTransition, animateNextUpdate)
+    chart
       .attr('width', width)
       .attr('height', yStop + margin.top + margin.bottom)
 
