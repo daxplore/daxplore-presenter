@@ -1,0 +1,39 @@
+<html>
+  <head>
+    <!-- Style to simulate a surrounding webpage, not for actual use -->
+    <style>
+      body {
+        background: #AFA;
+      }
+    </style>
+
+    <!-- Example style for embedding iframe -->
+    <style>
+      .daxplore-presenter-wrapper {
+        margin: 0 calc(50% - 50vw + 40px);
+      }
+      .daxplore-presenter-iframe {
+        border: none;
+        height: 1000px; // should be overwritten by embed-script on page load
+        overflow: hidden;
+        width: calc(100vw - 80px);
+      }
+    </style>
+
+    <!-- Script for communicating with iframe content. Handles hash updates in both direction and iframe resizing -->
+    <!-- Depends on finding an iframe with class daxplore-presenter-iframe -->
+    <script type="text/javascript" src="http://daxplore.test/embed/daxplore-explorer-embed.js"></script>
+  </head>
+  <body>
+    <!-- Example of div wrapper for handling width sizing of iframe -->
+    <div class="daxplore-presenter-wrapper">
+      <!--
+        Example of iframe to embed in other page. Class name is used in daxplore-explorer-embed.js. 
+      -->
+      <iframe
+        class="daxplore-presenter-iframe"
+        src="http://daxplore.test/explorer.html"
+      />
+    </div>
+  </body>
+</html>
