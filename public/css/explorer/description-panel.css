@@ -21,12 +21,18 @@
   display: flex;
   justify-content: space-between;
   min-width: 0;
-  /* position: relative; */
   width: 100%;
 }
 
 .description-panel.description-left {
   margin-left: 0;
-  margin-right: 10px;
-  position: absolute;
+  max-width: fit-content;
+}
+
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  /* IE10+ CSS styles go here */
+  .description-left {
+    margin-right: 10px;
+    position: absolute;
+  }
 }
