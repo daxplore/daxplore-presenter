@@ -44,6 +44,8 @@
     }
 
     setSelectedPerspective(perspectiveID)
+    setSelectedSecondaryPerspective(perspectiveSecondaryID)
+
     // Remap options from array of ints to array of bools
     selectedOptions = new Set()
     perspectiveOptionsIntArray.forEach(function (opt) { selectedOptions.add(opt) })

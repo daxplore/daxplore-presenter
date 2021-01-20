@@ -1,5 +1,6 @@
 <html>
   <head>
+    <title>Daxplore Presenter: Example embed of Explorer</title>
     <!-- Style to simulate a surrounding webpage, not for actual use -->
     <style>
       body {
@@ -21,18 +22,17 @@
     </style>
 
     <!-- Script for communicating with iframe content. Handles hash updates in both direction and iframe resizing -->
-    <!-- Depends on finding an iframe with class daxplore-presenter-iframe -->
+    <!-- Depends on finding an iframe with the class daxplore-presenter-iframe -->
     <script type="text/javascript" src="http://daxplore.test/embed/daxplore-explorer-embed.js"></script>
   </head>
   <body>
     <!-- Example of div wrapper for handling width sizing of iframe -->
     <div class="daxplore-presenter-wrapper">
-      <!--
-        Example of iframe to embed in other page. Class name is used in daxplore-explorer-embed.js. 
-      -->
+      <!-- Example of embedded iframe. Class name is used when styling and in daxplore-explorer-embed.js. -->
+      <!-- Hash ID defines the initial chart, if the browser location hash doesn't define a chart. -->
       <iframe
         class="daxplore-presenter-iframe"
-        src="http://daxplore.test/explorer.html"
+        src="http://daxplore.test/explorer.html#cT1RRF9TVyZwPUJSQU5DSF9kYXRhYmFzJm89MCwxLDImZj00"
       />
     </div>
   </body>

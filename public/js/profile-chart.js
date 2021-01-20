@@ -90,20 +90,20 @@
   function computeDimensions () {
     const wrapperClientBB = d3.select('.chart-wrapper').node().getBoundingClientRect()
     chartwrapperBB = {}
-    chartwrapperBB.left = wrapperClientBB.left + pageXOffset
-    chartwrapperBB.top = wrapperClientBB.top + pageYOffset
-    chartwrapperBB.width = wrapperClientBB.width
-    chartwrapperBB.height = wrapperClientBB.height - 10
+    chartwrapperBB.left = Math.floor(wrapperClientBB.left + pageXOffset)
+    chartwrapperBB.top = Math.floor(wrapperClientBB.top + pageYOffset)
+    chartwrapperBB.width = Math.floor(wrapperClientBB.width)
+    chartwrapperBB.height = Math.floor(wrapperClientBB.height - 10)
     xAxisTopHeight = 30
-    margin = { top: 0, right: 13, bottom: xAxisTopHeight, left: 0 }
-    width = chartwrapperBB.width - margin.left - margin.right
-    height = chartwrapperBB.height - margin.top - margin.bottom
+    margin = { top: 0, right: 10, bottom: xAxisTopHeight, left: 0 }
+    width = Math.floor(chartwrapperBB.width - margin.left - margin.right)
+    height = Math.floor(chartwrapperBB.height - margin.top - margin.bottom)
   }
 
   function generateChartElements () {
     // CHART
     const chart = d3.select('.chart')
-      .attr('width', width + margin.left + margin.right)
+      .attr('width', width + margin.left + margin.right + 10)
       .attr('height', height + margin.top + margin.bottom)
 
     // WHITE BACKGROUND
@@ -473,12 +473,6 @@
 
   exports.generateImage =
   function () {
-    const chartBB = d3.select('.chart').node().getBoundingClientRect()
-
-    const chartWidth = chartBB.width
-    const chartHeight = d3.select('.x.axis.top').node().getBBox().height +
-                        d3.select('.x.axis.bottom').node().getBBox().height
-
     const doctype = '<?xml version="1.0" standalone="no"?>' +
       '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
 
@@ -491,16 +485,14 @@
     const url = window.URL.createObjectURL(blob)
 
     const imgSelection = d3.select('body').append('img')
-      .attr('width', chartWidth)
-      .attr('height', chartHeight)
       .style('visibility', 'hidden')
 
     const img = imgSelection.node()
 
     img.onload = function () {
       const canvasChartSelection = d3.select('body').append('canvas')
-        .attr('width', chartWidth)
-        .attr('height', chartHeight)
+        .attr('width', img.width)
+        .attr('height', img.height)
         .style('visibility', 'hidden')
       const canvasChart = canvasChartSelection.node()
 
@@ -516,8 +508,8 @@
 
       const imgMargin = { top: 10, right: 20, bottom: 20, left: 10 }
 
-      const completeWidth = imgMargin.left + chartWidth + imgMargin.right
-      const completeHeight = imgMargin.top + headerHeight + chartHeight + imgMargin.bottom
+      const completeWidth = imgMargin.left + img.width + imgMargin.right
+      const completeHeight = imgMargin.top + headerHeight + img.height + imgMargin.bottom
       const canvasCompleteSelection = d3.select('body').append('canvas')
         .attr('width', completeWidth + 'px')
         .attr('height', completeHeight + 'px')

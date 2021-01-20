@@ -1,13 +1,25 @@
 (function (namespace) {
+  // The daxplore presenter iframe
+  let iframe, iframeBaseURL
   // Find URL for this script (as opposed to URL for the current window)
-  const scriptElement = document.currentScript || document.querySelector('script[src*="daxplore-explorer-embed.js"]')
+  const scriptElement = document.currentScript
   const scriptSrcElement = document.createElement('a')
-  scriptSrcElement.href = scriptElement.src
+  const isIE11 = /Trident.*rv[ :]*11\./.test(navigator.userAgent)
+  if (!isIE11) {
+    scriptSrcElement.href = scriptElement.src
+  }
 
   // Handle messages from inside the iframe
   function receiveMessage (event) {
-    // Recieve messages only from same server as this script is on
-    if (event.origin === scriptSrcElement.origin) {
+    // Receive messages only from same server this script is hosted on.
+    // Ignore origin check on IE11, due to broken currentScript/readyScript implementation.
+    const isIE11 = /Trident.*rv[ :]*11\./.test(navigator.userAgent)
+    if (isIE11 || event.origin === scriptSrcElement.origin) {
+      // Do manual origin check. Not secure, but prevents accidentally picking up other events.
+      if (!(event.data && event.data.source === 'DAXPLORE')) {
+        return
+      }
+
       // Handle change hash message sent from Explorer
       if (event.data.hash) {
         if (history.pushState) {
@@ -23,15 +35,24 @@
     }
   }
 
-  // Add event listener
-  if (window.addEventListener) {
-    window.addEventListener('message', receiveMessage, false)
-  } else if (window.attachEvent) {
-    window.attachEvent('message', receiveMessage)
+  // Handle hash changes in parent window/browser
+  function hashUpdate () {
+    // Send changed hash message to iframe, when the hash is updated in the parent page
+    const hash = window.location.hash
+    if (!iframe) {
+      iframe = document.querySelector('.daxplore-presenter-iframe')
+      iframeBaseURL = iframe.src.split('#')[0]
+    }
+    if (typeof hash === 'string') {
+      if (iframe.src !== iframeBaseURL + hash) {
+        iframe.src = iframeBaseURL + hash
+      }
+    }
   }
 
-  // Send changed hash message to iframe, when URL is updated due to history change in own window
-  window.onpopstate = function (event) {
-    document.querySelector('.daxplore-presenter-iframe').postMessage({ hash: window.location.hash }, '*')
-  }
+  // Add event listeners
+  window.addEventListener('message', receiveMessage, false)
+  window.addEventListener('load', hashUpdate, false)
+  window.addEventListener('hashchange', hashUpdate, false)
+  window.addEventListener('popstate', hashUpdate, false)
 })(window.dax = window.dax || {})

@@ -14,6 +14,23 @@
 
   let maxHeight = -1
 
+  // Handle messages from outside the iframe
+  function receiveMessage (event) {
+    // Do manual origin check. Not secure, but prevents accidentally picking up other events.
+    if (!(event.data && event.data.source === 'DAXPLORE')) {
+      return
+    }
+
+    // Handle change hash message sent from Explorer
+    if (event.data.hash) {
+      if (history.pushState) {
+        window.history.replaceState(null, window.document.title, '#' + event.data.hash)
+      } else {
+        window.location.hash = event.data.hash
+      }
+    }
+  }
+
   function onHashUpdate () {
     if (currentHash === window.location.hash.slice(1)) {
       return
@@ -98,6 +115,7 @@
         dax.explorer.generateChartPanel(questions, groups, null, null, dichselectedMap, optionsMap, timepointsMap) // TODO fix constructor
 
         onHashUpdate()
+        window.addEventListener('message', receiveMessage, false)
         window.addEventListener('hashchange', onHashUpdate, false)
 
         // Send height changes to parent window, so it can update iframe size
@@ -108,7 +126,7 @@
               if (entries[i].target === outerElement) {
                 if (entries[i].contentRect.height > maxHeight) {
                   maxHeight = entries[i].contentRect.height
-                  parent.postMessage({ height: maxHeight }, '*')
+                  parent.postMessage({ source: 'DAXPLORE', height: maxHeight }, '*')
                 }
                 break
               }
@@ -207,7 +225,7 @@
       // Set the hash of this window
       window.location.hash = queryHash
       // Send a message to iframe parent to allow the outer page to update window hash
-      parent.postMessage({ hash: queryHash }, '*')
+      parent.postMessage({ source: 'DAXPLORE', hash: queryHash }, '*')
     }
 
     // Hack used as a backup in browsers that don't support ResizeObserver
@@ -227,7 +245,7 @@
     )
     if (height > maxHeight) {
       maxHeight = height
-      parent.postMessage({ height: maxHeight }, '*')
+      parent.postMessage({ source: 'DAXPLORE', height: maxHeight }, '*')
     }
   }
 })(window.dax = window.dax || {})

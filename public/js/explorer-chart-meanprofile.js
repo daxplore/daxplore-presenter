@@ -17,8 +17,10 @@
   const elementTransition = d3.transition().duration(300).ease(d3.easeLinear)
 
   // SIZE VARIABLES
+  const saveImageWidth = 600
   let availableWidth = 600 // initial placeholder value
   let width = availableWidth
+  let tallestChartSoFar = 0
 
   // CURRENT CHART
   // HEADER
@@ -152,6 +154,19 @@
     tooltipArrow = chartContainer.append('div')
       .classed('meanprofile__tooltip-arrow', true)
       .style('opacity', 0)
+
+    // SAVE IMAGE BUTTON
+    // TODO use Modernizr instead of IE-check
+    // Hide save image button in IE11 because of a known svg bug
+    // https://connect.microsoft.com/IE/feedbackdetail/view/925655
+    const isIE11 = /Trident.*rv[ :]*11\./.test(navigator.userAgent)
+
+    chartContainer.append('div')
+      .classed('dashed-button', true)
+      .classed('meanprofile__save-image', true)
+      .on('click', generateImage)
+      .text(dax.text('imageSaveButton')) // TODO use new text ID style
+      .style('display', isIE11 ? 'none' : null)
   }
 
   exports.populateChart =
@@ -338,10 +353,15 @@
     width = scrollNeeded ? chartNeededWidth : availableWidth
 
     // SET MAIN ELEMENT WIDTH AND HEIGHT
-    // conditionalApplyTransition(chart, elementTransition, animateNextUpdate)
     chart
       .attr('width', width)
-      .attr('height', yStop + margin.top + margin.bottom)
+
+    // Skip animation if it would result in an iframe resize.
+    const newHeight = yStop + margin.top + margin.bottom
+    const isSmaller = newHeight <= tallestChartSoFar
+    tallestChartSoFar = Math.max(newHeight, tallestChartSoFar)
+    conditionalApplyTransition(chart, elementTransition, animateNextUpdate && isSmaller)
+      .attr('height', newHeight)
 
     width = width - margin.left - margin.right
 
@@ -426,6 +446,8 @@
       .attr('y', xAxisTopHeight)
       .attr('height', yStop - xAxisTopHeight)
       .raise()
+
+    updateStyles()
   }
 
   // Populate, position and show tooltip on mouse hover on bar
@@ -447,21 +469,17 @@
       tooltipText += '<br>'
       tooltipText += dax.text('meanbars_tooltip_respondents', option.count)
     }
-    // Update tooltip position, color and visibility
-    const chartTop = chart.node().getBoundingClientRect().top + window.pageYOffset + margin.top
 
     tooltipArrow
       .classed('meanprofile__tooltip-arrow--right', false)
-      .classed('meanprofile__tooltip-arrow--up', true)
+      .classed('meanprofile__tooltip-arrow--down', true)
       .style('border-bottom-color', option.nodata ? '#DDD' : dax.colors.colorTooltipBackground(option.mean, questionReferenceValue, questionReferenceDirection))
       .style('border-left-color', null)
-      .style('top', (chartTop + yScale(option.type + '|' + option.index) + yScale.bandwidth() + tooltipBarArrowDistance) + 'px')
+      .style('top', (yScale(option.type + '|' + option.index) - tooltipBarArrowDistance) + 'px')
 
     tooltipBody.html(tooltipText) // TODO construct elements via d3 instead of string->html
 
     const tooltipArrowBB = tooltipArrow.node().getBoundingClientRect()
-    tooltipBody
-      .style('top', (chartTop + yScale(option.type + '|' + option.index) + yScale.bandwidth() + tooltipBarArrowDistance + tooltipArrowBB.height / 2 - 3) + 'px')
 
     bars.selectAll('.barrect')
       .style('fill', function (opt) {
@@ -476,6 +494,10 @@
         const optSplit = opt.split('|')
         return optSplit[0] === 'DATA' && parseInt(optSplit[1]) === option.index
       })
+
+    const tooltipBodyBB = tooltipBody.node().getBoundingClientRect()
+    tooltipBody
+      .style('top', (yScale(option.type + '|' + option.index) - tooltipBodyBB.height - tooltipBarArrowDistance + tooltipArrowBB.height / 2 - 2) + 'px')
 
     tooltipBarMove()
     setDescriptionContent(option)
@@ -535,11 +557,11 @@
   function tooltipBarMove () {
     const tooltipBodyBB = tooltipBody.node().getBoundingClientRect()
     const tooltipArrowBB = tooltipArrow.node().getBoundingClientRect()
-    let mouseX = d3.event.pageX
+    const chartLeft = chart.node().getBoundingClientRect().left + window.pageXOffset
+    let mouseX = d3.event.pageX - chartLeft
     if (tooltipBodyBB.width / 2 + mouseX > window.innerWidth) {
       mouseX = window.innerWidth - tooltipBodyBB.width / 2
     }
-    mouseX -= 7
     tooltipBody.style('left', (mouseX - tooltipBodyBB.width / 2) + 'px')
     tooltipArrow.style('left', (mouseX - tooltipArrowBB.width / 2) + 'px')
   }
@@ -548,8 +570,6 @@
   function tooltipOverReferenceLine () {
     tooltipBody.style('opacity', 1)
     tooltipArrow.style('opacity', 1)
-
-    const chartLeft = chart.node().getBoundingClientRect().left + window.pageXOffset + margin.left + yAxisWidth
 
     tooltipBody.html('')
     tooltipBody.append('span')
@@ -560,7 +580,7 @@
 
     const tooltipBodyBB = tooltipBody.node().getBoundingClientRect()
     const tooltipArrowBB = tooltipArrow.node().getBoundingClientRect()
-    const leftPosition = chartLeft + xScale(questionReferenceValue) - tooltipBarArrowDistance
+    const leftPosition = margin.left + yAxisWidth + xScale(questionReferenceValue) - tooltipBarArrowDistance
 
     tooltipBody
       .style('left', (leftPosition - tooltipBodyBB.width - tooltipArrowBB.width / 2 - 2) + 'px')
@@ -568,18 +588,20 @@
     tooltipArrow
       .style('border-bottom-color', null)
       .classed('meanprofile__tooltip-arrow--right', true)
-      .classed('meanprofile__tooltip-arrow--up', false)
+      .classed('meanprofile__tooltip-arrow--down', false)
       .style('left', (leftPosition - tooltipArrowBB.width) + 'px')
 
     referenceLine.style('stroke', '#454545')
   }
 
-  // Update tooltip X position on bar
+  // Update tooltip X position on reference line
   function tooltipReferenceLineMove () {
     const tooltipBodyBB = tooltipBody.node().getBoundingClientRect()
     const tooltipArrowBB = tooltipArrow.node().getBoundingClientRect()
-    tooltipBody.style('top', (d3.event.pageY - tooltipBodyBB.height / 2) + 'px')
-    tooltipArrow.style('top', (d3.event.pageY - tooltipArrowBB.height / 2 + 2) + 'px')
+    const chartTop = chart.node().getBoundingClientRect().top + window.pageYOffset
+    const mouseY = d3.event.pageY - chartTop + 5
+    tooltipBody.style('top', (mouseY - tooltipBodyBB.height / 2) + 'px')
+    tooltipArrow.style('top', (mouseY - tooltipArrowBB.height / 2 + 2) + 'px')
   }
 
   // Hide all tooltip components
@@ -596,97 +618,134 @@
       .classed('meanprofile__y-axis--hover', false)
   }
 
+  function updateStyles () {
+    chart.selectAll('.axis .domain')
+      .style('visibility', 'hidden')
+
+    chart.selectAll('.axis path, .axis line')
+      .style('fill', 'none')
+      .style('stroke', '#bbb')
+      .style('shape-rendering', 'geometricPrecision')
+
+    chart.selectAll('text')
+      .style('fill', '#555')
+      .style('font-size', '12px')
+      .style('font-family', 'font-family:"Raleway", sans-serif')
+      .style('cursor', 'default')
+
+    chart.selectAll('.y path, .y line')
+      .style('visibility', 'hidden')
+
+    chart.selectAll('.reference rect, .reference path')
+      .style('fill', '#444')
+  }
+
   // Helper
   function conditionalApplyTransition (selection, transition, useTransition) {
     return useTransition ? selection.transition(transition) : selection
   }
 
-  // exports.generateImage = function () {
-  //   let chartBB = d3.select('.chart').node().getBoundingClientRect()
-  //
-  //   let chartWidth = chartBB.width
-  //   let chartHeight = d3.select('.x.axis.top').node().getBoundingClientRect().height +
-  //                   d3.select('.x.axis.bottom').node().getBoundingClientRect().height
-  //
-  //   let doctype = '<?xml version="1.0" standalone="no"?>' +
-  //     '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
-  //
-  //   let svg = d3.select('svg').node()
-  //
-  //   let source = (new XMLSerializer()).serializeToString(svg)
-  //
-  //   let blob = new Blob([doctype + source], { type: 'image/svg+xml;charset=utf-8' })
-  //
-  //   let url = window.URL.createObjectURL(blob)
-  //
-  //   let imgSelection = d3.select('body').append('img')
-  //     .attr('width', chartWidth)
-  //     .attr('height', chartHeight)
-  //     .style('visibility', 'hidden')
-  //
-  //   let img = imgSelection.node()
-  //
-  //   img.onload = function () {
-  //     let canvasChartSelection = d3.select('body').append('canvas')
-  //       .attr('width', chartWidth)
-  //       .attr('height', chartHeight)
-  //       .style('visibility', 'hidden')
-  //     let canvasChart = canvasChartSelection.node()
-  //
-  //     let chartCtx = canvasChart.getContext('2d')
-  //     chartCtx.drawImage(img, 0, 0)
-  //
-  //     let headerText = perspectiveOptions[selectedOption]
-  //     let headerPaddingTop = 5
-  //     let headerFontSize = 16
-  //     let headerPaddingBottom = 10
-  //     let headerFont = 'bold ' + headerFontSize + 'px sans-serif'
-  //     let headerHeight = headerPaddingTop + headerFontSize + headerPaddingBottom
-  //
-  //     let imgMargin = { top: 10, right: 20, bottom: 20, left: 10 }
-  //
-  //     let completeWidth = imgMargin.left + chartWidth + imgMargin.right
-  //     let completeHeight = imgMargin.top + headerHeight + chartHeight + imgMargin.bottom
-  //     let canvasCompleteSelection = d3.select('body').append('canvas')
-  //       .attr('width', completeWidth + 'px')
-  //       .attr('height', completeHeight + 'px')
-  //       .style('visibility', 'hidden')
-  //
-  //     let canvasComplete = canvasCompleteSelection.node()
-  //
-  //     let ctx = canvasCompleteSelection.node().getContext('2d')
-  //
-  //     ctx.fillStyle = 'white'
-  //     ctx.fillRect(0, 0, completeWidth, completeHeight)
-  //     ctx.fillStyle = 'black'
-  //
-  //     ctx.font = headerFont
-  //
-  //     let headerWidth = ctx.measureText(headerText).width
-  //
-  //     let barAreaWidth = (width - yAxisWidth)
-  //     let headerHorizontalShift = yAxisWidth + barAreaWidth / 2 - headerWidth / 2
-  //
-  //     ctx.fillText(headerText, headerHorizontalShift + imgMargin.left, headerPaddingTop + headerFontSize + imgMargin.top)
-  //
-  //     let sourceText = dax.text('imageWaterStamp') // TODO new text ID style
-  //     let sourceFontHeight = 11
-  //     ctx.font = sourceFontHeight + 'px sans-serif'
-  //     ctx.fillStyle = '#555'
-  //     // TODO unused: let sourceTextWidth = ctx.measureText(sourceText).width
-  //     ctx.fillText(sourceText, 5, completeHeight - 5)
-  //
-  //     ctx.drawImage(canvasChart, imgMargin.left, imgMargin.top + headerHeight)
-  //
-  //     canvasComplete.toBlob(function (blob) {
-  //       saveAs(blob, headerText + '.png')
-  //     })
-  //
-  //     imgSelection.remove()
-  //     canvasChartSelection.remove()
-  //     canvasCompleteSelection.remove()
-  //   }
-  //
-  //   img.src = url
-  // }
+  function generateImage () {
+    animateNextUpdate = false
+    const initiaAvailablelWidth = availableWidth
+    exports.setSize(saveImageWidth)
+
+    const doctype = '<?xml version="1.0" standalone="no"?>' +
+      '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
+
+    const source = (new XMLSerializer()).serializeToString(chart.node())
+
+    const blob = new Blob([doctype + source], { type: 'image/svg+xml;charset=utf-8' })
+
+    const url = window.URL.createObjectURL(blob)
+
+    const imgSelection = d3.select('body').append('img')
+      .style('visibility', 'hidden')
+      .style('border', '1px solid red')
+
+    const img = imgSelection.node()
+
+    img.onload = function () {
+      // imgSelection
+      const canvasChartSelection = d3.select('body').append('canvas')
+        .attr('width', img.width)
+        .attr('height', img.height)
+        .style('visibility', 'hidden')
+
+      const canvasChart = canvasChartSelection.node()
+
+      const chartCtx = canvasChart.getContext('2d')
+      chartCtx.drawImage(img, 0, 0)
+
+      // const longText = dax.data.getQuestionFullText(questionID)
+      // headerMain.text(shortText)
+      // headerSub
+      //   .text(longText)
+      //   .style('display', longText === '' || shortText === longText ? 'none' : null)
+
+      const headerText = dax.data.getQuestionShortText(questionID)
+      const headerPaddingTop = 5
+      const headerFontSize = 16
+      const headerPaddingBottom = 10
+      const headerFont = 'bold ' + headerFontSize + 'px "Raleway"'
+      const headerHeight = headerPaddingTop + headerFontSize + headerPaddingBottom
+
+      const imgMargin = { top: 10, right: 10, bottom: 20, left: 0 }
+
+      const completeWidth = imgMargin.left + img.width + imgMargin.right
+      const completeHeight = imgMargin.top + headerHeight + img.height + imgMargin.bottom
+      const canvasCompleteSelection = d3.select('body').append('canvas')
+        .attr('width', completeWidth + 'px')
+        .attr('height', completeHeight + 'px')
+        .style('visibility', 'hidden')
+
+      const canvasComplete = canvasCompleteSelection.node()
+
+      const ctx = canvasCompleteSelection.node().getContext('2d')
+
+      ctx.fillStyle = 'white'
+      ctx.fillRect(0, 0, completeWidth, completeHeight)
+      ctx.fillStyle = 'black'
+
+      ctx.font = headerFont
+
+      const headerWidth = ctx.measureText(headerText).width
+
+      const barAreaWidth = img.width - yAxisWidth
+      const headerHorizontalShift = yAxisWidth + barAreaWidth / 2 - headerWidth / 2
+
+      ctx.fillText(headerText, headerHorizontalShift + imgMargin.left, headerPaddingTop + headerFontSize + imgMargin.top)
+
+      let watermarkText = dax.text('explorer.image.watermark')
+      const date = new Date()
+      watermarkText = watermarkText.replace(
+        '{date}',
+        date.getFullYear() + '-' +
+        ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
+        ('0' + date.getDate()).slice(-2))
+
+      const fileName = dax.text('explorer.meanprofile.image.filename')
+        .replaceAll('{question}', headerText)
+        .replaceAll('{perspective}', dax.data.getQuestionShortText(perspectives))
+
+      const sourceFontHeight = 11
+      ctx.font = sourceFontHeight + 'px "Raleway"'
+      ctx.fillStyle = '#555'
+      // TODO unused: let sourceTextWidth = ctx.measureText(sourceText).width
+      ctx.fillText(watermarkText, 5, completeHeight - 5)
+
+      ctx.drawImage(canvasChart, imgMargin.left, imgMargin.top + headerHeight)
+
+      canvasComplete.toBlob(function (blob) {
+        saveAs(blob, fileName + '.png')
+      })
+
+      imgSelection.remove()
+      canvasChartSelection.remove()
+      canvasCompleteSelection.remove()
+    }
+
+    img.src = url
+    exports.setSize(initiaAvailablelWidth)
+  }
 })(window.dax = window.dax || {})

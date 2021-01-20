@@ -1,5 +1,6 @@
 .explorer-meanprofile {
   padding: 10px 0;
+  position: relative;
 }
 
 .meanprofile__tooltip-body {
@@ -33,6 +34,10 @@
 
 .meanprofile__tooltip-arrow--right {
   transform: rotate(135deg);
+}
+
+.meanprofile__tooltip-arrow--down {
+  transform: rotate(225deg);
 }
 
 .meanprofile__y-axis--hover text {
@@ -94,4 +99,10 @@
 
 .meanprofile__description-comparison {
   margin-bottom: 10px;
+}
+
+.meanprofile__save-image {
+  position: absolute;
+  right: 0;
+  top: -33px
 }

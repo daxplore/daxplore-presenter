@@ -4,7 +4,7 @@
 
   function populateProfileDOM (perspectiveID, qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, perspectiveOptions, means) {
     d3.select('.save-image')
-      .text(dax.text('imageSaveButton')) // TODO new text ID f
+      .text(dax.text('imageSaveButton')) // TODO use new text format
 
     dax.profile.generateListChart(qIDs, meanReferenceMap, shorttextMap, directionMap, 0)
     dax.profile.setChartData(perspectiveOptions, means)

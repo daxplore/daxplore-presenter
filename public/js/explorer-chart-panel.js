@@ -24,8 +24,6 @@
     optionsMapInput,
     timepointsMapInput
   ) {
-    // primaryColors = primaryColorsInput
-    // hoverColors = hoverColorsInput
     dichselectedMap = dichselectedMapInput
     optionsMap = optionsMapInput
     timepointsMap = timepointsMapInput
@@ -119,6 +117,7 @@
     dax.chart.meanbars.hide()
     dax.chart.meanprofile.hide()
     // dax.chart.dichtimeline.hide() // TODO
+
     // TODO allow for animated updates of same chart type
     // d3.select('.chart')
     //     .selectAll(function () { return this.childNodes })

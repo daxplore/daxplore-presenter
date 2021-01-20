@@ -2,7 +2,10 @@
 
 .question-panel {
   padding-right: 5px;
-  position: relative;
+  width: min-content;
+  /* position: relative; */
+  display: -ms-inline-grid;
+  -ms-grid-columns: min-content;
 }
 
 .question-panel.perspective-is-top {

@@ -26,13 +26,13 @@
 
 .description-panel.description-left {
   margin-left: 0;
-  max-width: fit-content;
+  display: inherit;
 }
 
 @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-  /* IE10+ CSS styles go here */
+  /* IE11 CSS styles go here */
   .description-left {
-    margin-right: 10px;
-    position: absolute;
+    -ms-grid-row: 2;
+    display: inline-block !important;
   }
 }

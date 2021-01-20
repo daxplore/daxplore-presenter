@@ -56,6 +56,11 @@
 
   exports.getQuestionShortText =
   function (questionID) {
+    if (Array.isArray(questionID)) {
+      return questionID.map(function (subQuestionID) {
+        return exports.getQuestionShortText(subQuestionID)
+      }).join(', ')
+    }
     return questionMeta[questionID].short.trim()
   }
 
