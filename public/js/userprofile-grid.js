@@ -594,17 +594,17 @@
       const canvasChart = canvasChartSelection.node()
       const ctx = canvasChart.getContext('2d')
 
-      let sourceText = dax.text('profile_user.image.watermark')
+      let watermarkText = dax.text('profile_user.image.watermark')
       const date = new Date()
-      sourceText = sourceText.replace(
+      watermarkText = watermarkText.replace(
         '{date}',
         date.getFullYear() + '-' +
-        ('0' + date.getMonth()).slice(-2) + '-' +
+        ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
         ('0' + date.getDate()).slice(-2))
 
       const sourceFontHeight = 11
       ctx.font = sourceFontHeight + 'px "Raleway"'
-      const sourceTextWidth = ctx.measureText(sourceText).width
+      const sourceTextWidth = ctx.measureText(watermarkText).width
 
       if (sourceTextWidth + 2 * hMargin > chartWidth) {
         generateAndSaveImage(dataUrl, sourceTextWidth + 2 * hMargin, heightOffset)
@@ -619,7 +619,7 @@
       ctx.drawImage(img, hMargin, topMargin + heightOffset)
 
       ctx.fillStyle = '#555'
-      ctx.fillText(sourceText, hMargin, canvasHeight - 5)
+      ctx.fillText(watermarkText, hMargin, canvasHeight - 5)
 
       canvasChart.toBlob(function (blob) {
         saveAs(blob, dax.text('profile_user.grid_image.filename') + '.png')

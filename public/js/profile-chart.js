@@ -537,7 +537,7 @@
       watermarkText = watermarkText.replace(
         '{date}',
         date.getFullYear() + '-' +
-        ('0' + date.getMonth()).slice(-2) + '-' +
+        ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
         ('0' + date.getDate()).slice(-2))
 
       const fileName = dax.text('profile.image.filename')
