@@ -51,7 +51,7 @@
     perspectiveOptionsIntArray.forEach(function (opt) { selectedOptions.add(opt) })
     totalSelected = total
     if (initialized) {
-      updateElements(false)
+      updateElements()
     }
   }
 
@@ -143,7 +143,10 @@
         .append('div')
         .classed('pervarpicker-varoption', true)
         .classed('no-select', true)
-        .on('click', function (perspectiveID) { setSelectedPerspective(perspectiveID) })
+        .on('click', function (perspectiveID) {
+          setSelectedPerspective(perspectiveID)
+          dax.explorer.selectionUpdateCallback()
+        })
         .text(function (perspectiveID) { return dax.data.getQuestionShortText(perspectiveID) })
 
     d3.selectAll('.peropt-all-button')
@@ -151,14 +154,16 @@
         for (let i = 0; i < dax.data.getQuestionOptionCount(selectedPerspectiveID); i++) {
           selectedOptions.add(i)
         }
-        updateElements(true)
+        updateElements()
+        dax.explorer.selectionUpdateCallback()
       })
       .text(dax.text('perspectivesAllButton')) // TODO use new text ID style
 
     d3.selectAll('.peropt-none-button')
       .on('click', function () {
         selectedOptions.clear()
-        updateElements(true)
+        updateElements()
+        dax.explorer.selectionUpdateCallback()
       })
       .text(dax.text('perspectivesNoneButton')) // TODO use new text ID style
 
@@ -189,6 +194,7 @@
         })
         .on('click', function (d) {
           setSelectedSecondaryPerspective(d.type === 'perspective' ? d.id : null)
+          dax.explorer.selectionUpdateCallback()
         })
 
     initializeSelection()
@@ -273,7 +279,8 @@
     } else {
       selectedOptions.add(option.index)
     }
-    updateElements(true)
+    updateElements()
+    dax.explorer.selectionUpdateCallback()
   }
 
   function setSelectedPerspective (perspectiveID) {
@@ -566,7 +573,7 @@
       .style('display', !dax.data.isCombinedPerspective(selectedPerspectiveID) && hasRemainder ? null : 'none')
       .text(collapsed ? dax.text('perspectivesMoreButton') + '>' : '<' + dax.text('perspectivesLessButton')) // TODO use new text ID style
 
-    updateElements(changed && initialized)
+    updateElements()
   }
 
   function setSelectedSecondaryPerspective (perspectiveID) {
@@ -575,7 +582,7 @@
     updateElements(selectedSecondaryPerspectiveID !== oldSecondaryPerspective)
   }
 
-  function updateElements (fireUpdateEvent) {
+  function updateElements () {
     // const showSelectTotal = settings.showSelectTotal
     // const totalCount = (showSelectTotal ? 1 : 0)
     // d3.select('.peropt-extra-columns')
@@ -600,9 +607,5 @@
       .classed('peropt-second-button--redundant', function (d) {
         return d.type === 'perspective' && d.id === selectedPerspectiveID
       })
-
-    if (fireUpdateEvent) {
-      dax.explorer.selectionUpdateCallback()
-    }
   }
 })(window.dax = window.dax || {})

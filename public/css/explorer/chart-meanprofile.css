@@ -102,7 +102,7 @@
 }
 
 .meanprofile__save-image {
-  position: absolute;
-  right: 0;
-  top: -33px
+  float: right;
+  position: relative;
+  top: 5px;
 }

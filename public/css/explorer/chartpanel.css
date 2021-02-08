@@ -17,6 +17,7 @@
 
 .chart-scroll {
   overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .chart-header-panel {

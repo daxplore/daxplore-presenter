@@ -38,6 +38,9 @@
   let yScale, yAxis, yAxisElement, yAxisReferenceElement
   let yAxisWidth = 50
 
+  // BUTTONS
+  let saveImageButton
+
   // STATE TRACKING
   let animateNextUpdate = false
 
@@ -161,7 +164,7 @@
     // https://connect.microsoft.com/IE/feedbackdetail/view/925655
     const isIE11 = /Trident.*rv[ :]*11\./.test(navigator.userAgent)
 
-    chartContainer.append('div')
+    saveImageButton = d3.selectAll('.chart-panel').append('div')
       .classed('dashed-button', true)
       .classed('meanprofile__save-image', true)
       .on('click', generateImage)
@@ -268,6 +271,7 @@
     headerDiv.style('display', show ? null : 'none')
     chartContainer.style('display', show ? null : 'none')
     // legendDiv.style('display', show ? null : 'none')
+    saveImageButton.style('display', show ? null : 'none')
   }
 
   // CHART ELEMENTS
@@ -559,8 +563,11 @@
     const tooltipArrowBB = tooltipArrow.node().getBoundingClientRect()
     const chartLeft = chart.node().getBoundingClientRect().left + window.pageXOffset
     let mouseX = d3.event.pageX - chartLeft
-    if (tooltipBodyBB.width / 2 + mouseX > window.innerWidth) {
-      mouseX = window.innerWidth - tooltipBodyBB.width / 2
+    if (mouseX - tooltipBodyBB.width / 2 < 0) {
+      mouseX = tooltipBodyBB.width / 2
+    }
+    if (mouseX + tooltipBodyBB.width / 2 > width) {
+      mouseX = width - tooltipBodyBB.width / 2
     }
     tooltipBody.style('left', (mouseX - tooltipBodyBB.width / 2) + 'px')
     tooltipArrow.style('left', (mouseX - tooltipArrowBB.width / 2) + 'px')
