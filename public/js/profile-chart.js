@@ -5,6 +5,7 @@
   let firstUpdate = true
 
   let qIDs, means, meanReferences, perspectiveOptions, directions
+  let customDataChart
   let shorttexts
   let selectedOption = 0
   let selectedQIDs = []
@@ -437,13 +438,15 @@
       referencesMap,
       shorttextsMap,
       directionsMap,
-      selectedSelectedOption) {
+      selectedSelectedOption,
+      customDataChartInput
+    ) {
       qIDs = qIDsArray
       meanReferences = referencesMap
       shorttexts = shorttextsMap
       directions = directionsMap
-
       selectedOption = selectedSelectedOption
+      customDataChart = customDataChartInput
 
       computeDimensions()
 
@@ -531,8 +534,8 @@
       const headerHorizontalShift = yAxisWidth + barAreaWidth / 2 - headerWidth / 2
 
       ctx.fillText(headerText, headerHorizontalShift + imgMargin.left, headerPaddingTop + headerFontSize + imgMargin.top)
+      let watermarkText = dax.text(customDataChart ? 'profile_user.image.watermark' : 'profile.image.watermark')
 
-      let watermarkText = dax.text('profile.image.watermark')
       const date = new Date()
       watermarkText = watermarkText.replace(
         '{date}',
@@ -540,8 +543,8 @@
         ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
         ('0' + date.getDate()).slice(-2))
 
-      const fileName = dax.text('profile.image.filename')
-        .replace('{perspective_option}', headerText)
+      const fileName = dax.text(customDataChart ? 'profile_user.chart_image.filename' : 'profile.image.filename')
+        .replace('{option}', headerText)
 
       const sourceFontHeight = 11
       ctx.font = sourceFontHeight + 'px "Raleway"'

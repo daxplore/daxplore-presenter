@@ -34,7 +34,7 @@
 
     dax.userprofile.generateGrid(qIDs, meanReferenceMap, shorttextMap, directionMap, titleRegexpMap)
 
-    dax.profile.generateListChart(qIDs, meanReferenceMap, shorttextMap, directionMap, 0)
+    dax.profile.generateListChart(qIDs, meanReferenceMap, shorttextMap, directionMap, 0, true)
 
     dax.userprofile.addGridUpdateCallback(function (names, means) {
       dax.profile.setChartData(names, means)

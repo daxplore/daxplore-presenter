@@ -6,7 +6,7 @@
     d3.select('.save-image')
       .text(dax.text('imageSaveButton')) // TODO use new text format
 
-    dax.profile.generateListChart(qIDs, meanReferenceMap, shorttextMap, directionMap, 0)
+    dax.profile.generateListChart(qIDs, meanReferenceMap, shorttextMap, directionMap, 0, false)
     dax.profile.setChartData(perspectiveOptions, means)
   }
 
