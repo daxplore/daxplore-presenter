@@ -103,6 +103,17 @@
 
 .meanprofile__save-image {
   float: right;
+  margin-bottom: 5px;
   position: relative;
   top: 5px;
+}
+
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  /* IE11 CSS styles go here */
+  /* TODO use Modernizr instead of IE-check */
+  /* Hide save image button in IE11 because of a known svg bug */
+  /* https://connect.microsoft.com/IE/feedbackdetail/view/925655 */
+  .meanprofile__save-image {
+    display: none;
+  }
 }

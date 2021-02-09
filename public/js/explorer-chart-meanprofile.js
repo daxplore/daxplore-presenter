@@ -159,17 +159,11 @@
       .style('opacity', 0)
 
     // SAVE IMAGE BUTTON
-    // TODO use Modernizr instead of IE-check
-    // Hide save image button in IE11 because of a known svg bug
-    // https://connect.microsoft.com/IE/feedbackdetail/view/925655
-    const isIE11 = /Trident.*rv[ :]*11\./.test(navigator.userAgent)
-
-    saveImageButton = d3.selectAll('.chart-panel').append('div')
+    saveImageButton = d3.select('.chart-panel').append('div')
       .classed('dashed-button', true)
       .classed('meanprofile__save-image', true)
       .on('click', generateImage)
       .text(dax.text('imageSaveButton')) // TODO use new text ID style
-      .style('display', isIE11 ? 'none' : null)
   }
 
   exports.populateChart =
