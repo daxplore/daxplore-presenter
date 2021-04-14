@@ -1,0 +1,46 @@
+.chart-tabs {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.chart-tab {
+  align-self: flex-end;
+  border: 1px solid #BBB;
+  color: #666;
+  cursor: pointer;
+  padding: 7px 14px 7px 14px;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.chart-tab:hover {
+  color: #333;
+}
+
+.chart-tab:active {
+  color: #000;
+}
+
+.chart-tab-selected {
+  border-bottom: none;
+  color: black;
+}
+
+.chart-tab-spacing {
+  border-bottom: 1px solid #BBB;
+  width: 20px;
+}
+
+.chart-tab-filler {
+  border-bottom: 1px solid #BBB;
+  flex: 1
+}
+
+.chart-container {
+  border: 1px solid #BBB;
+  border-top: none;
+}
+
+.chart-tab-spacing--pre-header {
+  width: 30px;
+}

@@ -15,7 +15,7 @@
 }
 
 .perspective-header {
-	padding-bottom: 7px;
+	padding-bottom: 5px;
   padding-top: 10px;
 }
 
@@ -217,7 +217,6 @@
 }
 
 .peropt-checkbox-expand {
-  font-size: 12px;
   margin-left: auto;
   margin-right: 0;
   padding-bottom: 2px;
@@ -284,6 +283,7 @@
 .perspective-secondary-title {
   align-self: center;
   margin-right: 5px;
+  margin-top: 4px;
 }
 
 .peropt-second-button--selected {

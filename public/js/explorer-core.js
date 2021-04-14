@@ -76,12 +76,25 @@
         return
       }
 
+      const shorttextMap = {}
+      const descriptionMap = {}
+      const directionMap = {}
+      const meanReferenceMap = {}
+
       for (let i = 0; i < questions.length; i++) {
         const q = questions[i]
         questionMap[q.column] = q
         dichselectedMap[q.column] = q.dichselected
         optionsMap[q.column] = q.options
         timepointsMap[q.column] = q.timepoints
+        shorttextMap[q.column] = q.short
+        descriptionMap[q.column] = unescape(q.description)
+        if ('gooddirection' in q) {
+          directionMap[q.column] = q.gooddirection
+        }
+        if (q.use_mean_reference) {
+          meanReferenceMap[q.column] = q.mean_reference
+        }
       }
 
       // Download all question data
@@ -108,6 +121,7 @@
 
         // Initialize elements that depend on the metadata
         dax.text.initializeResources(usertexts)
+        dax.profile.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap)
         dax.settings.initializeResources(settings)
         dax.data.initializeResources(groups, perspectives, questionMap, questionData)
         dax.explorer.generateQuestionPicker(questions, groups, settings)
@@ -134,8 +148,12 @@
           })
           resizeObserver.observe(outerElement)
         }
+      }).catch(function (error) {
+        console.error(error)
       })
-    }))
+    })).catch(function (error) {
+      console.error(error)
+    })
   }
 
   function dichotomizedSubtitle (optionTexts) {

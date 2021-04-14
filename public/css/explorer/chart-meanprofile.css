@@ -6,8 +6,6 @@
 .meanprofile__tooltip-body {
   background-color: white;
   border: #ABABAB solid 2px;
-  font-family: 'Raleway', sans-serif;
-  font-size: 12px;
   height: auto;
   line-height: 1.4;
   padding: 10px 15px;
@@ -62,8 +60,6 @@
 .explorer-meanprofile text {
   cursor: default;
   fill: #555;
-  font-family: 'Raleway', sans-serif;
-  font-size: 12px;
 }
 
 .meanprofile__y-tick text {
@@ -83,7 +79,9 @@
   fill: #444;
 }
 
-.meanprofile__description-header {
+/* TODO collect all desciption text */
+.description-header {
+  font-size: 14px;
   font-weight: bold;
   margin-bottom: 8px;
   overflow-wrap: break-word;
@@ -92,7 +90,6 @@
 .meanprofile__description-option,
 .meanprofile__description-reference,
 .meanprofile__description-comparison {
-  font-size: 12px;
   font-weight: bold;
   margin-bottom: 5px;
 }

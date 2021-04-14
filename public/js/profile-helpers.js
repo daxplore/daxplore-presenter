@@ -25,34 +25,42 @@
   }
 
   exports.setDescriptionFull =
-  function (element, groupName, qID, mean) {
+  function (element, headerText, qID, mean) {
     const shorttext = shorttexts[qID]
     const description = descriptions[qID]
     const reference = meanReferences[qID]
     const direction = directions[qID]
 
+    const noData = mean === -1 || isNaN(mean)
+
     element.style('opacity', 1)
 
-    const color = dax.colors.colorTextForValue(mean, reference, direction)
-    // TODO externalize all text?
-    const header = "<span class='description-header'>" + groupName + '</span><br><b>' + shorttext + ': ' + d3.format('d')(mean) + '</b><br>'
-    // TODO externalize all text?
-    const subheader = '<b>' + dax.text('listReferenceValue') + ': ' + d3.format('d')(reference) + '</b><br>' // TODO use new text ID format
+    const header = "<div class='description-header'>" + headerText + '</div>'
 
-    const trueDiff = mean - reference
-    const diff = direction === 'LOW' ? reference - mean : trueDiff
-
-    let referenceComparison
-    if (diff < -5) {
-      referenceComparison = dax.text('listReferenceWorse') // TODO use new text ID style
-    } else if (diff > 5) {
-      referenceComparison = dax.text('listReferenceBetter') // TODO use new text ID style
+    if (noData) {
+      const subheader = '<b>' + dax.text('explorer.freq.legend.missing_data') + '</b><br><br>' // TODO create more generic missing data text export
+      element.html(header + subheader + description)
     } else {
-      referenceComparison = dax.text('listReferenceComparable') // TODO use new text ID style
-    }
-    // TODO externalize all text?
-    referenceComparison = '<span style="color: ' + color + '; font-weight: bold">' + referenceComparison + ': ' + d3.format('+d')(trueDiff) + '</span></b><br><br>'
+      const color = dax.colors.colorTextForValue(mean, reference, direction)
+      // TODO externalize all text?
+      const subheader = '<b>' + shorttext + ': ' + d3.format('d')(mean) + '</b><br>' +
+      '<b>' + dax.text('listReferenceValue') + ': ' + d3.format('d')(reference) + '</b><br>' // TODO use new text ID format
 
-    element.html(header + subheader + referenceComparison + description)
+      const trueDiff = mean - reference
+      const diff = direction === 'LOW' ? reference - mean : trueDiff
+
+      let referenceComparison
+      if (diff < -5) {
+        referenceComparison = dax.text('listReferenceWorse') // TODO use new text ID style
+      } else if (diff > 5) {
+        referenceComparison = dax.text('listReferenceBetter') // TODO use new text ID style
+      } else {
+        referenceComparison = dax.text('listReferenceComparable') // TODO use new text ID style
+      }
+      // TODO externalize all text?
+      referenceComparison = '<span style="color: ' + color + '; font-weight: bold">' + referenceComparison + ': ' + d3.format('+d')(trueDiff) + '</span></b><br><br>'
+
+      element.html(header + subheader + referenceComparison + description)
+    }
   }
 })(window.dax = window.dax || {})

@@ -1,25 +1,59 @@
 (function (namespace) {
-  namespace.profile = namespace.profile || {}
-  const exports = namespace.profile
+  namespace.profileradargraph = namespace.profileradargraph || {}
+  const exports = namespace.profileradargraph
 
   function populateProfileDOM (perspectiveID, qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, perspectiveOptions, means) {
     d3.select('.profile-save-image')
       .text(dax.text('imageSaveButton')) // TODO use new text format
-
     dax.profile.generateListChart(qIDs, meanReferenceMap, shorttextMap, directionMap, 0, false)
     dax.profile.setChartData(perspectiveOptions, means)
+  }
+
+  function populateRadarDOM (questions, qIDs, perspectiveOptions, means) {
+    d3.select('.radargraph-save-image')
+      .text(dax.text('imageSaveButton'))
+    d3.select('.radarchart-save-image')
+      .text(dax.text('imageSaveButton'))
+    dax.radargraph.initializeRadarGraph(questions, qIDs)
+    dax.radargraph.setChartData(perspectiveOptions, means)
+  }
+
+  function onTabClick () {
+    const classes = this.classList
+    let tab
+    for (let i = 0; i < classes.length; i++) {
+      if (classes[i] === 'profile') {
+        tab = 'profile'
+        break
+      } else if (classes[i] === 'radar') {
+        tab = 'radar'
+        break
+      }
+    }
+
+    if (typeof tab !== 'undefined') {
+      d3.selectAll('.chart-tab')
+        .classed('chart-tab-selected', false)
+      d3.select('.chart-tab.' + tab)
+        .classed('chart-tab-selected', true)
+
+      d3.select('.profile-chart-row')
+        .classed('hidden', tab !== 'profile')
+      d3.select('.radar-main')
+        .classed('hidden', tab !== 'radar')
+    }
   }
 
   exports.initializeProfile =
   function () {
     // Use Axios to download all needed metadata files from the server
     // Define functions for all metadata files to be downloaded
-    function getQuestions () { return axios.get('data/questions.json') }
-    function getPerspectives () { return axios.get('data/perspectives.json') }
-    function getSettings () { return axios.get('data/settings.json') }
-    function getUsertexts () { return axios.get('data/usertexts.json') }
-    function getListview () { return axios.get('data/listview.json') }
-    function getManifest () { return axios.get('data/manifest.json') }
+    function getQuestions () { return axios.get('../../../../data/questions.json') }
+    function getPerspectives () { return axios.get('../../../../data/perspectives.json') }
+    function getSettings () { return axios.get('../../../../data/settings.json') }
+    function getUsertexts () { return axios.get('../../../../data/usertexts.json') }
+    function getListview () { return axios.get('../../../../data/listview.json') }
+    function getManifest () { return axios.get('../../../../data/manifest.json') }
 
     // Get URL parameters
     const urlParams = new URLSearchParams(window.location.search)
@@ -69,6 +103,16 @@
         return
       }
 
+      // Add click events to the tabs
+      d3.selectAll('.chart-tab')
+        .on('click', onTabClick)
+
+      // Set chart tab names
+      d3.select('.chart-tab.profile')
+        .text('Profildiagram') // TODO externalize
+      d3.select('.chart-tab.radar')
+        .text('Radardiagram') // TODO externalize
+
       // TODO do data parsing as a Promise, to prevent blocking of the rest of the data download?
       let perspectiveOptions = []
       const shorttextMap = {}
@@ -98,16 +142,18 @@
       dax.profile.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap)
 
       // Get the data used in the listview
-      function getQuestionData (questionID) { return axios.get('data/questions/' + questionID + '.json') }
+      function getQuestionData (questionID) { return axios.get('../../../../data/questions/' + questionID + '.json') }
       const variableRequests = listview.map(function (qID) { return getQuestionData(qID) })
       axios.all(variableRequests).then(function (responsesArray) {
         const qIDs = []
         const means = []
+        const meanAllMap = {}
         responsesArray.forEach(function (response) {
           for (let i = 0; i < response.data.length; i++) {
             const d = response.data[i]
             if (d.p.length === 1 && d.p[0] === perspectiveID) {
               const qID = d.q
+              meanAllMap[qID] = d.mean[timepoint].mean
               qIDs.push(qID)
               means.push(d.mean[timepoint].mean)
               break
@@ -118,9 +164,11 @@
         if (document.readyState === 'loading') {
           document.addEventListener('DOMContentLoaded', function (e) {
             populateProfileDOM(perspectiveID, qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, perspectiveOptions, means)
+            populateRadarDOM(questions, qIDs, perspectiveOptions, means)
           })
         } else {
           populateProfileDOM(perspectiveID, qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, perspectiveOptions, means)
+          populateRadarDOM(questions, qIDs, perspectiveOptions, means)
         }
       }).catch(function (error) {
         console.error(error)
@@ -133,5 +181,6 @@
   exports.headerChange =
   function (select) {
     dax.profile.setPerspectiveOption(select.value)
+    dax.radargraph.setPerspectiveOption(Number(select.value))
   }
 })(window.dax = window.dax || {})

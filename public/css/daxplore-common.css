@@ -1,3 +1,13 @@
+body {
+	font-family: 'Varta', sans-serif;
+	font-size: 13px;
+}
+
+text {
+	font-family: 'Varta', sans-serif;
+	font-size: 13px;
+}
+
 .no-select {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -15,8 +25,6 @@
 	height: 13px;
 	display: inline-block;
 	cursor: pointer;
-	font-family: 'Raleway', sans-serif;
-	font-size: 12px;
 	font-weight: bold;
 	padding: 6px 10px 4px 10px;
 	text-decoration: none;
@@ -37,8 +45,12 @@
 }
 
 .dashed-button:active {
+	border-color: #333;
+	color: #333;
 	margin-bottom: 4px;
 	margin-top: 2px;
+	transition: border-color 0.3s;
+	transition: color 0.3s;
 }
 
 /* img-preload elements are hidden, while still forcing the browser to load the cointained image */
@@ -52,6 +64,17 @@
 .hidden {
 	left: -9999px !important;
 	opacity: 0 !important;
+	pointer-events: none !important;
 	position: absolute !important;
 	top: -9999px !important;
+}
+
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  /* IE11 CSS styles go here */
+  /* TODO use Modernizr instead of IE-check */
+  /* Hide save image button in IE11 because of a known svg bug */
+  /* https://connect.microsoft.com/IE/feedbackdetail/view/925655 */
+  .save-image {
+    display: none;
+  }
 }

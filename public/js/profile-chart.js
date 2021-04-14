@@ -4,6 +4,7 @@
 
   let firstUpdate = true
 
+  let chart
   let qIDs, means, meanReferences, perspectiveOptions, directions
   let customDataChart
   let shorttexts
@@ -49,7 +50,7 @@
     computeDimensions()
     lastHoveredBar = i
     const qID = getQid(i)
-    const tooltipdiv = d3.select('.tooltipdiv')
+    const tooltipdiv = d3.select('.profile-tooltipdiv')
 
     tooltipdiv.transition()
       .duration(200)
@@ -59,9 +60,8 @@
       shorttexts[qID] + ': <b>' + d3.format('d')(getMean(qID, selectedOption)) + '</b><br>' +
         dax.text('listReferenceValue') + ': <b>' + d3.format('d')(meanReferences[qID]) + '</b>') // TODO use new text ID style
       .style('left', (chartwrapperBB.left + xScale(Math.max(getMean(qID, selectedOption), meanReferences[qID])) + yAxisWidth + 15.5) + 'px')
-      .style('top', (chartwrapperBB.top + yScale(qID) + yScale.bandwidth() / 2 - tooltipdiv.node().getBoundingClientRect().height / 2 + 0.5) + 'px')
-
-    const arrowleft = d3.select('.arrow-left')
+      .style('top', (yScale(qID) + yScale.bandwidth() / 2 - tooltipdiv.node().getBoundingClientRect().height / 2 + 0.5) + 'px')
+    const arrowleft = d3.select('.profile-arrow-left')
 
     arrowleft.transition()
       .duration(200)
@@ -69,18 +69,17 @@
 
     arrowleft
       .style('left', (chartwrapperBB.left + xScale(Math.max(getMean(qID, selectedOption), meanReferences[qID])) + yAxisWidth + 10) + 'px')
-      .style('top', (chartwrapperBB.top + yScale(qID) + yScale.bandwidth() / 2 - arrowleft.node().getBoundingClientRect().height / 2 + 3) + 'px')
-
-    dax.profile.setDescriptionFull(d3.select('#chart-description'), perspectiveOptions[selectedOption], qID, getMean(qID, selectedOption))
+      .style('top', (yScale(qID) + yScale.bandwidth() / 2 - arrowleft.node().getBoundingClientRect().height / 2 + 2) + 'px')
+    dax.profile.setDescriptionFull(d3.select('#profile-description'), perspectiveOptions[selectedOption], qID, getMean(qID, selectedOption))
   }
 
   function tooltipOut () {
-    d3.select('.tooltipdiv')
+    d3.select('.profile-tooltipdiv')
       .transition()
         .duration(300)
         .style('opacity', 0)
 
-    d3.select('.arrow-left')
+    d3.select('.profile-arrow-left')
       .transition()
         .duration(300)
         .style('opacity', 0)
@@ -89,7 +88,7 @@
   // CHART ELEMENTS
 
   function computeDimensions () {
-    const wrapperClientBB = d3.select('.chart-wrapper').node().getBoundingClientRect()
+    const wrapperClientBB = d3.select('.profile-chart-wrapper').node().getBoundingClientRect()
     chartwrapperBB = {}
     chartwrapperBB.left = Math.floor(wrapperClientBB.left + pageXOffset)
     chartwrapperBB.top = Math.floor(wrapperClientBB.top + pageYOffset)
@@ -103,7 +102,7 @@
 
   function generateChartElements () {
     // CHART
-    const chart = d3.select('.chart')
+    chart = d3.select('.profile-chart')
       .attr('width', width + margin.left + margin.right + 10)
       .attr('height', height + margin.top + margin.bottom)
 
@@ -126,25 +125,25 @@
     // X AXIS TOP
     chart.append('g')
       .attr('class', 'x axis top')
-    .append('text')
-      .classed('x-top-description', true)
-      .text(dax.text('listXAxisDescription')) // TODO use new text ID style
+      .append('text')
+        .classed('x-top-description', true)
+        .text(dax.text('listXAxisDescription')) // TODO use new text ID style
 
     // X AXIS BOTTOM
     chart.append('g')
       .attr('class', 'x axis bottom')
-    .append('text')
-      .attr('class', 'x-bottom-description')
-      .attr('text-anchor', 'middle')
-      .style('text-anchor', 'middle')
-      .text(dax.text('listXAxisDescription')) // TODO use new text ID style
+      .append('text')
+        .attr('class', 'x-bottom-description')
+        .attr('text-anchor', 'middle')
+        .style('text-anchor', 'middle')
+        .text(dax.text('listXAxisDescription')) // TODO use new text ID style
 
     // TODO use Modernizr instead of IE-check
     // Hide save image button in IE11 because of a known svg bug
     // https://connect.microsoft.com/IE/feedbackdetail/view/925655
     const isIE11 = /Trident.*rv[ :]*11\./.test(navigator.userAgent)
     if (isIE11) {
-      d3.selectAll('.save-image')
+      d3.selectAll('.profile-save-image')
        .style('display', 'none')
     }
   }
@@ -155,7 +154,7 @@
       elTransition = d3.transition().duration(0)
     }
 
-    const chart = d3.selectAll('.chart')
+    const chart = d3.selectAll('.profile-chart')
 
     const paddingInner = 0.3
     const paddingOuter = 0.4
@@ -364,7 +363,7 @@
     if (selectedQIDs.length > 0) {
       tooltipOver(Math.min(lastHoveredBar, selectedQIDs.length - 1))
     } else {
-      d3.selectAll('#chart-description')
+      d3.select('#chart-description')
         .style('opacity', '0')
     }
     tooltipOut()
@@ -399,24 +398,24 @@
   }
 
   function updateStyles () {
-    d3.selectAll('.axis .domain')
+    chart.selectAll('.axis .domain')
       .style('visibility', 'hidden')
 
-    d3.selectAll('.axis path, .axis line')
+    chart.selectAll('.axis path, .axis line')
       .style('fill', 'none')
       .style('stroke', '#bbb')
       .style('shape-rendering', 'geometricPrecision')
 
-    d3.selectAll('text')
+    chart.selectAll('text')
       .style('fill', '#555')
-      .style('font-size', '12px')
-      .style('font-family', 'font-family:"Raleway", sans-serif')
+      .style('font-size', '13px')
+      .style('font-family', '"Varta", sans-serif')
       .style('cursor', 'default')
 
-    d3.selectAll('.y path, .y line')
+    chart.selectAll('.y path, .y line')
       .style('visibility', 'hidden')
 
-    d3.selectAll('.reference rect, .reference path')
+    chart.selectAll('.reference rect, .reference path')
       .style('fill', '#444')
   }
 
@@ -460,12 +459,12 @@
     means = meansArray
     selectedQIDs = getSelectedQIDs(means, selectedOption)
 
-    dax.profile.updateSelectorOption(selectedOption)
+    dax.profile.setPerspectiveOption(selectedOption)
 
     firstUpdate = false
   }
 
-  exports.updateSelectorOption =
+  exports.setPerspectiveOption =
   function (selectedSelectedOption) {
     selectedOption = selectedSelectedOption
     selectedQIDs = getSelectedQIDs(means, selectedOption)
@@ -506,7 +505,7 @@
       const headerPaddingTop = 5
       const headerFontSize = 16
       const headerPaddingBottom = 10
-      const headerFont = 'bold ' + headerFontSize + 'px "Raleway"'
+      const headerFont = 'bold ' + headerFontSize + 'px "Varta"'
       const headerHeight = headerPaddingTop + headerFontSize + headerPaddingBottom
 
       const imgMargin = { top: 10, right: 20, bottom: 20, left: 10 }
@@ -547,7 +546,7 @@
         .replace('{option}', headerText)
 
       const sourceFontHeight = 11
-      ctx.font = sourceFontHeight + 'px "Raleway"'
+      ctx.font = sourceFontHeight + 'px "Varta"'
       ctx.fillStyle = '#555'
       // TODO unused: let sourceTextWidth = ctx.measureText(sourceText).width
       ctx.fillText(watermarkText, 5, completeHeight - 5)

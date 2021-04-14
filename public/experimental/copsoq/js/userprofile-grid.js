@@ -573,6 +573,7 @@
       })['catch'](function (error) { // eslint-disable-line dot-notation
         if (error) { // TODO standard-js forces if(error) (see handle-callback-error)
           // TODO error handling: console.error('Failed to generate image', error)
+          console.log(error)
         }
       })
   }
@@ -603,7 +604,7 @@
         ('0' + date.getDate()).slice(-2))
 
       const sourceFontHeight = 11
-      ctx.font = sourceFontHeight + 'px "Raleway"'
+      ctx.font = sourceFontHeight + 'px "Varta"'
       const sourceTextWidth = ctx.measureText(watermarkText).width
 
       if (sourceTextWidth + 2 * hMargin > chartWidth) {

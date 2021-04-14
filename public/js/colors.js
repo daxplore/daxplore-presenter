@@ -5,21 +5,25 @@
   // TODO export colors from producer
   const colors = {}
 
-  colors.good = '#509a5c' // =  hsl(130, 32%, 46%)
-  colors.average = '#c5c2bd' // = hsl(37, 6%, 76%)
-  colors.bad = '#d13d40' // = hsl(359, 62%, 53%)
+  // colors.good = '#C5E1A5'
+  // colors.average = '#FFF59D'
+  // colors.bad = '#FFAB91'
+  colors.good = '#B8E18A'
+  colors.average = '#FFF59D'
+  colors.bad = '#FF9675'
 
-  colors.goodHover = 'hsl(130, 32%, 39%)'
-  colors.averageHover = 'hsl(37, 6%, 66%)'
-  colors.badHover = 'hsl(359, 62%, 43%)'
+  colors.goodHover = '#A1C579'
+  colors.averageHover = '#EFE699'
+  colors.badHover = '#DF8366'
 
+  colors.goodText = '#356400'
+  colors.averageText = '#655900'
+  colors.badText = '#a82800'
+
+  // TODO REMOVE
   colors.goodTooltipBackground = 'hsl(130, 32%, 56%)'
   colors.averageTooltipBackground = 'hsl(37, 6%, 86%)'
   colors.badTooltipBackground = 'hsl(359, 62%, 63%)'
-
-  colors.goodText = 'hsl(95, 38%, 34%)'
-  colors.averageText = 'hsl(60, 0%, 31%)'
-  colors.badText = 'hsl(359, 62%, 53%)'
 
   exports.colorForValue =
   function (value, reference, direction) {

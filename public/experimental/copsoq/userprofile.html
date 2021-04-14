@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- This page was generated using the free and open source project dax. -->
+    <!-- For usage information, license terms and contact information please visit: -->
+    <!-- https://github.com/daxplore -->
+
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Daxplore Presenter: User Profile</title>
+    <link rel="icon" href="../../../favicon.ico">
+
+    <!-- Import style sheets -->
+    <!-- Normalize all browser default css values: https://necolas.github.io/normalize.css/ -->
+    <link rel="stylesheet" href="../../../css/normalize/8.0.1/normalize.css">
+    <!-- Style for different Daxplore components -->
+    <link rel="stylesheet" href="../../../css/daxplore-common.css">
+    <link rel="stylesheet" href="../../../css/profile/profile-chart.css">
+    <link rel="stylesheet" href="css/userprofile.css">
+    <link rel="stylesheet" href="css/profile-radar-panel.css">
+    <link rel="stylesheet" href="css/radargraph.css">
+    <link rel="stylesheet" href="css/radarchart.css">
+    <link rel="stylesheet" href="../../../css/tabs.css">
+
+    <!-- Import Font Awesome icons -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+
+    <!-- Import library dependencies -->
+    <!-- Import shims and polyfills for older browsers-->
+    <script type="text/javascript" src="../../../js/libraries/es5-shim/4.5.7/es5-shim.min.js"></script>
+    <script type="text/javascript" src="../../../js/libraries/es6-promise/4.2.6/es6-promise.auto.min.js"></script>
+    <script type="text/javascript" src="../../../js/libraries/url-search-params/0.1.2/url-search-params.min.js"></script>
+    <!-- Import Modernizr feature checking for features that can't be polyfilled -->
+    <script type="text/javascript" src="../../../js/libraries/modernizr/3.6.0/modernizr-svgforeignobject.js"></script>
+    <!-- Use d3 to design all charts, interactive elements and manipulate the DOM: https://d3js.org/ -->
+    <script type="text/javascript" src="../../../js/libraries/d3/5.12.0/d3.v5.min.js"></script>
+    <!-- Use axios to download data from the server: https://github.com/axios/axios -->
+    <script type="text/javascript" src="../../../js/libraries/axios/0.19.0/axios.min.js"></script>
+    <!-- Use dom-to-image to turn DOM elements into an image: https://github.com/tsayen/dom-to-image-->
+    <script type="text/javascript" src="../../../js/libraries/dom-to-image/2017-06-10/dom-to-image.min.js"></script>
+    <!-- Use Canvas to Blob to turn canvas data into blob data that can saved -->
+    <script type="text/javascript" src="../../../js/libraries/canvas-toBlob/2016-05-26/canvas-toBlob.js"></script>
+    <!-- Use File Saver to save data as local files -->
+    <script type="text/javascript" src="../../../js/libraries/FileSaver/2020-09-24/FileSaver.min.js"></script>
+
+    <!-- Import Daxplore helpers -->
+    <script type="text/javascript" src="../../../js/colors.js"></script>
+    <script type="text/javascript" src="../../../js/daxplore-common.js"></script>
+    <script type="text/javascript" src="../../../js/profile-helpers.js"></script>
+    <script type="text/javascript" src="../../../js/text.js"></script>
+
+    <!-- Import Daxplore chart -->
+    <script type="text/javascript" src="../../../js/profile-chart.js"></script>
+    <script type="text/javascript" src="js/radarchart.js"></script>
+    <script type="text/javascript" src="js/radargraph-panel.js"></script>
+
+    <!-- Import Daxplore User Profile -->
+    <script type="text/javascript" src="js/userprofile-grid.js"></script>
+    <script type="text/javascript" src="js/userprofile-core.js"></script>
+
+    <!-- Webfont loader -->
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+    <script type="text/javascript">
+      try {
+        WebFont.load({
+          google: {
+            families: ['Varta']
+          },
+          active: dax.userprofile.initializeUserProfile, // Generate chart after loading the font
+          inactive: dax.userprofile.initializeUserProfile, // Generate chart after failing to load the font
+        })
+      } catch (e) {
+        dax.userprofile.initializeUserProfile() // Generate chart if WebFont loading failed
+      }
+    </script>
+  </head>
+
+  <body style="overflow:hidden">
+    <div class="grid-main">
+      <div class="grid-row">
+        <span class="grid"></span>
+        <div class='grid-column-right'>
+          <div class='grid-buttons'>
+            <span class="add-column-button dashed-button" onClick="dax.userprofile.addColumn()"></span>
+            <span class="save-grid-image-button dashed-button"></span>
+          </div>
+          <div class='grid-info'>
+            <table class='grid-legend'>
+              <tr><td class='grid-legend-symbol cell-good-reference'></td><td class='grid-legend-text good'></td></tr>
+              <tr><td class='grid-legend-symbol cell-avg-reference'></td><td class='grid-legend-text avg'></td></tr>
+              <tr><td class='grid-legend-symbol cell-bad-reference'></td><td class='grid-legend-text bad'></td></tr>
+            </table>
+            <div id='grid-description' class='description'></div>
+          </div>
+        </div>
+      </div>
+      <div class="user-paste-data">
+        <div class="user-paste-data-header">
+          <div class="user-paste-data-header-arrow-wrapper">
+            <div class="user-paste-data-header-arrow" style="transform: rotate(0deg);"></div>
+          </div>
+          <div class="user-paste-data-header-text"></div>
+        </div>
+        <div class="user-paste-data-content-wrapper">
+          <div>
+            <div class="user-paste-data-content">
+              <div class="user-paste-data-description"></div>
+              <textarea class='user-paste-data-textarea'></textarea>
+              <div class='user-paste-data-submit-wrapper'>
+                <span class='user-paste-data-submit-explanation'></span>
+                <select class='user-paste-data-submit-column-select'></select>
+                <span class='user-paste-data-submit-button dashed-button'></span>
+              </div>
+            </div>
+          </div>
+          <div  class="user-paste-data-error-log-wrapper">
+            <div class="user-paste-data-error-log">
+              <div class="user-paste-data-error-log-header">
+                <i class="fas fa-exclamation-triangle user-paste-data-error-log-header-icon"></i>
+                <span class="user-paste-data-error-log-header-text"><span/>
+              </div>
+              <div class="user-paste-data-error-text-area">
+                <div class="user-paste-data-error-text-number-bounds-errors"></div>
+                <div class="user-paste-data-error-text-no-number-errors"></div>
+                <div class="user-paste-data-error-text-multiple-rows-errors"></div>
+                <div class="user-paste-data-error-text-no-row-errors"></div>
+              </div>
+            </diV>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-main">
+      <!-- Tabs used to select the chart to display -->
+      <div class="tabbed-section">
+        <div class="chart-tabs">
+          <div class="chart-tab-spacing"></div>
+          <div class="chart-tab profile chart-tab-selected"></div>
+          <div class="chart-tab-spacing"></div>
+          <div class="chart-tab radar"></div>
+          <div class="chart-tab-spacing chart-tab-spacing--pre-header"></div>
+          <select class="header-select" onchange="dax.userprofile.headerChange(this)"></select>
+          <div class="chart-tab-filler"></div>
+        </div>
+        <div class="chart-section-wrapper">
+          <div class="profile-chart-row tab-content">
+            <span class="dashed-button save-image profile-save-image" onClick="dax.profile.generateImage()"></span>
+            <div class="profile-column-left">
+              <div class="profile-chart-wrapper">
+                <svg class="profile-chart"></svg>
+                <div class="profile-tooltipdiv"></div>
+                <div class="profile-arrow-left"></div>
+              </div>
+            </div>
+            <div class="profile-column-right">
+              <div class="profile-description-wrapper">
+                <div id='profile-description' class="description profile-description"></div>
+              </div>
+            </div>
+          </div>
+          <div class="radar-main tab-content hidden">
+            <div class="radar-chart-row">
+              <span class="dashed-button save-image radarchart-save-image" onClick="dax.radargraph.generateActiveRadarChartImage()"></span>
+              <div class="radar-chart-full-column">
+                <div class='radar-chart-full-header'></div>
+                <svg class="radar-chart-full" id="radar-chart-full-0"></svg>
+                <svg class="radar-chart-full" id="radar-chart-full-1"></svg>
+                <svg class="radar-chart-full" id="radar-chart-full-2"></svg>
+                <svg class="radar-chart-full" id="radar-chart-full-3"></svg>
+                <svg class="radar-chart-full" id="radar-chart-full-4"></svg>
+              </div>
+              <div class="description radar-description"></div>
+            </div>
+            <div class="radar-graph-row">
+              <span class="dashed-button save-image radargraph-save-image" onClick="dax.radargraph.generateRadarGraphImage()"></span>
+              <div class="radar-graph-title">Välj ett område i modellen</div>
+              <svg id="radar-graph">
+                <g id="radar-graph-group">
+                  <path id="radar-node-path"></path>
+                  <g class="radar-node" id="radar-node-0"></g>
+                  <g class="radar-node" id="radar-node-1"></g>
+                  <g class="radar-node" id="radar-node-2"></g>
+                  <g class="radar-node" id="radar-node-3"></g>
+                  <g class="radar-node" id="radar-node-4"></g>
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <noscript>
+      <div class="noscript">
+        <p class="warning-sub">To show this page you must allow it to run JavaScript.</p>
+      </div>
+    </noscript>
+  </body>
+</html>

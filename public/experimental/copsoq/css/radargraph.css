@@ -1,0 +1,66 @@
+.radar-main {
+  align-items: center;
+  display: inline-flex;
+  flex-direction: column;
+  height: min-content;
+  padding: 15px;
+  padding-top: 8px;
+  position: relative;
+}
+
+.radar-graph-title {
+  font-size: 15px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.radar-chart-row {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+}
+
+.radar-chart-full-column {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 25px;
+  margin-right: 10px;
+  margin-top: 20px;
+}
+
+.radar-node {
+  cursor: pointer;
+}
+
+.radar-node--highlighted {
+  filter: drop-shadow(0 0 1px black) drop-shadow(0 0 1px black) drop-shadow(0 0 1px black) !important;
+}
+
+.radar-node:hover {
+  filter: drop-shadow(0 0 1px black) drop-shadow(0 0 1px black) drop-shadow(0 0 1px black) !important;
+}
+
+.radar-node--highlighted:hover {
+  filter: drop-shadow(0 0 1px black) drop-shadow(0 0 1px black) drop-shadow(0 0 1px black) drop-shadow(0 0 1px black) !important;
+}
+
+.radar-description {
+	color: #444;
+  margin-left: 5px;
+	margin-top: 40px;
+	padding: 5px;
+	width: 280px;
+}
+
+.radar-chart-full-header {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.radargraph-save-image {
+  bottom:  0;
+  position: absolute;
+  right: 0;
+}

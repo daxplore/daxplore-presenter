@@ -3,8 +3,12 @@ html, body {
 		margin: 0;
 }
 
-.chart {
+.profile-chart {
 	overflow: visible !important;
+}
+
+.profile-chart text {
+	user-select: none;
 }
 
 .chart-main {
@@ -17,34 +21,37 @@ html, body {
   top: 0;
 }
 
-.chart-wrapper {
+.chart-section-wrapper {
+  display: flex;
+  flex: 1;
+}
+
+.profile-chart-wrapper {
 	width: 700px;
 }
 
-.content-row {
-
+.profile-chart-row {
+  display: flex;
+  position: relative;
 }
 
-.chart-row {
-	display: flex;
-	flex: 1;
-}
-
-.column-left {
+.profile-column-left {
 	display: flex;
 	flex-direction: column;
 }
 
-.chart-wrapper {
+.profile-chart-wrapper {
 	flex: 1;
+	position: relative;
 }
 
-.column-right {
+.profile-column-right {
   display: flex;
   flex-direction: column;
 }
 
 .header {
+	display: flex;
   padding-bottom: 10px;
 }
 
@@ -59,7 +66,7 @@ html, body {
 
 .header-select {
   background: transparent;
-	border: 1px solid #DDD;
+	border: 1px solid #BBB;
   font-size: 16px;
   font-weight: bold;
   height: 34px;
@@ -89,23 +96,14 @@ html, body {
   fill: black;
 }
 
-
-/* text font needs to be duplicated here and in list.js for sizing to work correctly */
-text {
-	font-family: 'Raleway', sans-serif;
-	font-size: 12px;
-}
-
 .y path,
 .y line {
   visibility: hidden;
 }
 
-.tooltipdiv {
+.profile-tooltipdiv {
   background-color: white;
   border: #ABABAB solid 2px;
-  font-family: 'Raleway', sans-serif;
-  font-size: 12px;
   height: auto;
   line-height: 1.4;
   padding: 10px;
@@ -118,7 +116,7 @@ text {
   z-index: 100;
 }
 
-.arrow-left {
+.profile-arrow-left {
   background-color: white;
   border-left: #ABABAB solid 2px;
   border-radius: 0 0 10px 0;
@@ -131,20 +129,14 @@ text {
   z-index: 100;
 }
 
-.save-image {
-	align-self: flex-start;
-	margin-left: 10px;
-}
-
-.description-wrapper {
-	display: flex;
-  flex: 1;
+.profile-save-image {
+  position: absolute;
+  right: 7px;
+  top:  7px;
 }
 
 .description {
 	color: #444;
-	font-family: 'Raleway', sans-serif;
-	font-size: 12px;
   margin-left: 5px;
 	margin-top: 40px;
 	padding: 5px;
@@ -157,6 +149,6 @@ text {
   line-height: 1.6;
 }
 
-.description ul {
+.profile-description ul {
   padding-left: 20px;
 }

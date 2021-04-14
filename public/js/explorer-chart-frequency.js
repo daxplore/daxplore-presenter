@@ -637,7 +637,7 @@
 
     chartG.selectAll('text')
       .style('fill', '#555')
-      .style('font-size', '12px')
+      .style('font-size', '13px')
 
       .style('cursor', 'default')
   }

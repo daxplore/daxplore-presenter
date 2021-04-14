@@ -27,7 +27,7 @@
     d3.select('.user-paste-data-error-text-no-row-errors')
       .text(dax.text('userPasteDataErrorTextNoRowErrors')) // TODO use new text ID style
 
-    d3.select('.save-image')
+    d3.select('.profile-save-image')
       .text(dax.text('imageSaveButton')) // TODO use new text ID style
 
     dax.userprofile.generateUserPasteSection()
@@ -41,15 +41,52 @@
     })
   }
 
+  function populateRadarDOM (questions, qIDs) {
+    d3.select('.radargraph-save-image')
+      .text(dax.text('imageSaveButton'))
+    d3.select('.radarchart-save-image')
+      .text(dax.text('imageSaveButton'))
+    dax.radargraph.initializeRadarGraph(questions, qIDs)
+    dax.userprofile.addGridUpdateCallback(function (names, means) {
+      dax.radargraph.setChartData(names, means)
+    })
+  }
+
+  function onTabClick () {
+    const classes = this.classList
+    let tab
+    for (let i = 0; i < classes.length; i++) {
+      if (classes[i] === 'profile') {
+        tab = 'profile'
+        break
+      } else if (classes[i] === 'radar') {
+        tab = 'radar'
+        break
+      }
+    }
+
+    if (typeof tab !== 'undefined') {
+      d3.selectAll('.chart-tab')
+        .classed('chart-tab-selected', false)
+      d3.select('.chart-tab.' + tab)
+        .classed('chart-tab-selected', true)
+
+      d3.select('.profile-chart-row')
+        .classed('hidden', tab !== 'profile')
+      d3.select('.radar-main')
+        .classed('hidden', tab !== 'radar')
+    }
+  }
+
   exports.initializeUserProfile =
   function () {
     // Use Axios to download all needed metadata files from the server
     // Define functions for all metadata files to be downloaded
-    function getQuestions () { return axios.get('data/questions.json') }
-    function getSettings () { return axios.get('data/settings.json') }
-    function getUsertexts () { return axios.get('data/usertexts.json') }
-    function getListview () { return axios.get('data/listview.json') }
-    function getManifest () { return axios.get('data/manifest.json') }
+    function getQuestions () { return axios.get('../../../../data/questions.json') }
+    function getSettings () { return axios.get('../../../../data/settings.json') }
+    function getUsertexts () { return axios.get('../../../../data/usertexts.json') }
+    function getListview () { return axios.get('../../../../data/listview.json') }
+    function getManifest () { return axios.get('../../../../data/manifest.json') }
 
     // Make a batch Axios request to download all metadata and data asynchronously
     axios.all([getQuestions(), getSettings(), getUsertexts(), getListview(), getManifest()])
@@ -67,6 +104,16 @@
       if (!dax.common.hasMatchingDataFileVersions(manifest.dataPackageVersion)) {
         return
       }
+
+      // Add click events to the tabs
+      d3.selectAll('.chart-tab')
+        .on('click', onTabClick)
+
+      // Set chart tab names
+      d3.select('.chart-tab.profile')
+        .text('Profildiagram') // TODO externalize
+      d3.select('.chart-tab.radar')
+        .text('Radardiagram') // TODO externalize
 
       const shorttextMap = {}
       const descriptionMap = {}
@@ -98,15 +145,20 @@
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function (e) {
           populateUserProfileDOM(listview, meanReferenceMap, shorttextMap, descriptionMap, directionMap, titleRegexpMap)
+          populateRadarDOM(questions, [], [], [])
         })
       } else {
         populateUserProfileDOM(listview, meanReferenceMap, shorttextMap, descriptionMap, directionMap, titleRegexpMap)
+        populateRadarDOM(questions, listview)
       }
-    }))
+    })).catch(function (error) {
+      console.error(error)
+    })
   }
 
   exports.headerChange =
   function (select) {
-    dax.profile.updateSelectorOption(select.value)
+    dax.profile.setPerspectiveOption(select.value)
+    dax.radargraph.setPerspectiveOption(select.value)
   }
 })(window.dax = window.dax || {})

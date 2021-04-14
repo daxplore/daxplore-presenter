@@ -1,0 +1,24 @@
+.circle-axis-text, .line-axis-text {
+  fill: #444;
+}
+
+.radar-main text {
+  user-select: none;
+}
+
+.datapoint-symbol--highlighted {
+  fill: #333;
+  transform: scale(1.25);
+  transition: fill 0.1s;
+  transition: transform 0.1s;
+}
+
+.line-axis-text--highlighted {
+  fill: black;
+}
+
+.radarchart-save-image {
+  bottom:  0;
+  position: absolute;
+  right: 0;
+}

@@ -505,50 +505,52 @@
     if (option.type !== 'DATA') {
       return
     }
-    // Add a zero-width space after slashes to encourage linebreaks after slashes
+    // // Add a zero-width space after slashes to encourage linebreaks after slashes
     const shorttext = dax.data.getQuestionShortText(questionID).replace(/\//g, '/&#8203;')
-    const optiontext = dax.data.getPerspectivesOptionTexts(perspectives, option.index).join(', ').replace(/\//g, '/&#8203;')
-    const description = dax.data.getQuestionDescription(questionID)
-    const reference = questionReferenceValue // TODO not assaign
-    const direction = questionReferenceDirection
-
-    // TODO externalize all text?
-    let header = '<div class="meanprofile__description-header">' + shorttext + '</div>'
-    header += '<div class="meanprofile__description-option">' + optiontext + ':&nbsp;' + d3.format('d')(option.mean) + '</div>'
-
-    // TODO externalize all text?
-    const subheader = '<div class="meanprofile__description-reference">' + dax.text('listReferenceValue') + ': ' + d3.format('d')(reference) + '</div>' // TODO use new text ID format
-
-    const trueDiff = option.mean - reference
-    const diff = direction === 'LOW' ? reference - option.mean : trueDiff
-
-    let referenceComparison
-    if (diff < -5) {
-      referenceComparison = dax.text('listReferenceWorse') // TODO use new text ID style
-    } else if (diff > 5) {
-      referenceComparison = dax.text('listReferenceBetter') // TODO use new text ID style
-    } else {
-      referenceComparison = dax.text('listReferenceComparable') // TODO use new text ID style
-    }
-    // TODO externalize all text?
-    const color = dax.colors.colorTextForValue(option.mean, reference, direction)
-    referenceComparison = '<div class="meanprofile__description-comparison" style="color: ' + color + ';"">' + referenceComparison + ': ' + d3.format('+d')(trueDiff) + '</div>'
-
-    let html = header + subheader + referenceComparison + description
-
-    perspectives.forEach(function (perspectiveID) {
-      const perspectiveDescription = dax.data.getQuestionDescription(perspectiveID)
-      if (perspectiveDescription !== null && perspectiveDescription !== undefined && perspectiveDescription.trim().length > 0) {
-        if (html.length > 0) {
-          html += '<hr>'
-        }
-        const title = dax.data.getQuestionShortText(perspectiveID)
-        html += '<b>' + title + '</b><p>' + perspectiveDescription + '</p>'
-      }
-    })
-
-    d3.selectAll('.description-panel')
-      .html(html)
+    // const optiontext = dax.data.getPerspectivesOptionTexts(perspectives, option.index).join(', ').replace(/\//g, '/&#8203;')
+    // const description = dax.data.getQuestionDescription(questionID)
+    // const reference = questionReferenceValue // TODO not assaign
+    // const direction = questionReferenceDirection
+    //
+    // // TODO externalize all text?
+    // let header = '<div class="meanprofile__description-header">' + shorttext + '</div>'
+    // header += '<div class="meanprofile__description-option">' + optiontext + ':&nbsp;' + d3.format('d')(option.mean) + '</div>'
+    //
+    // // TODO externalize all text?
+    // const subheader = '<div class="meanprofile__description-reference">' + dax.text('listReferenceValue') + ': ' + d3.format('d')(reference) + '</div>' // TODO use new text ID format
+    //
+    // const trueDiff = option.mean - reference
+    // const diff = direction === 'LOW' ? reference - option.mean : trueDiff
+    //
+    // let referenceComparison
+    // if (diff < -5) {
+    //   referenceComparison = dax.text('listReferenceWorse') // TODO use new text ID style
+    // } else if (diff > 5) {
+    //   referenceComparison = dax.text('listReferenceBetter') // TODO use new text ID style
+    // } else {
+    //   referenceComparison = dax.text('listReferenceComparable') // TODO use new text ID style
+    // }
+    // // TODO externalize all text?
+    // const color = dax.colors.colorTextForValue(option.mean, reference, direction)
+    // referenceComparison = '<div class="meanprofile__description-comparison" style="color: ' + color + ';"">' + referenceComparison + ': ' + d3.format('+d')(trueDiff) + '</div>'
+    //
+    // let html = header + subheader + referenceComparison + description
+    //
+    // perspectives.forEach(function (perspectiveID) {
+    //   const perspectiveDescription = dax.data.getQuestionDescription(perspectiveID)
+    //   if (perspectiveDescription !== null && perspectiveDescription !== undefined && perspectiveDescription.trim().length > 0) {
+    //     if (html.length > 0) {
+    //       html += '<hr>'
+    //     }
+    //     const title = dax.data.getQuestionShortText(perspectiveID)
+    //     html += '<b>' + title + '</b><p>' + perspectiveDescription + '</p>'
+    //   }
+    // })
+    //
+    // d3.selectAll('.description-panel')
+    //   .html(html)
+    // (element, groupName, qID, mean)
+    dax.profile.setDescriptionFull(d3.select('.description-panel'), shorttext, questionID, option.mean)
   }
 
   // Update tooltip X position on bar
@@ -630,8 +632,8 @@
 
     chart.selectAll('text')
       .style('fill', '#555')
-      .style('font-size', '12px')
-      .style('font-family', 'font-family:"Raleway", sans-serif')
+      .style('font-size', '13px')
+      .style('font-family', '"Varta", sans-serif')
       .style('cursor', 'default')
 
     chart.selectAll('.y path, .y line')
@@ -688,7 +690,7 @@
       const headerPaddingTop = 5
       const headerFontSize = 16
       const headerPaddingBottom = 10
-      const headerFont = 'bold ' + headerFontSize + 'px "Raleway"'
+      const headerFont = 'bold ' + headerFontSize + 'px "Varta"'
       const headerHeight = headerPaddingTop + headerFontSize + headerPaddingBottom
 
       const imgMargin = { top: 10, right: 10, bottom: 20, left: 0 }
@@ -730,7 +732,7 @@
         .replaceAll('{perspective}', dax.data.getQuestionShortText(perspectives))
 
       const sourceFontHeight = 11
-      ctx.font = sourceFontHeight + 'px "Raleway"'
+      ctx.font = sourceFontHeight + 'px "Varta"'
       ctx.fillStyle = '#555'
       // TODO unused: let sourceTextWidth = ctx.measureText(sourceText).width
       ctx.fillText(watermarkText, 5, completeHeight - 5)

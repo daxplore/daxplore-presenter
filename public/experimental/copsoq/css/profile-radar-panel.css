@@ -1,0 +1,33 @@
+.profile-chart-row {
+  padding: 15px;
+  padding-top: 25px;
+  position: relative;
+}
+
+.radar-graph-row {
+  align-items: center;
+  border-top: 1px solid #AAA;
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  padding-top: 20px;
+  position: relative;
+  width: 100%;
+}
+
+.tab-content {
+  border: 1px solid #BBB;
+  border-top: 0;
+}
+
+.tabbed-section {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: min-content;
+}
+
+.description-wrapper {
+	display: flex;
+  flex: 1;
+}

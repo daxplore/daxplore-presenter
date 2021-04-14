@@ -11,14 +11,12 @@
     <link rel="icon" href="favicon.ico">
 
     <!-- Import style sheets -->
-    <!-- Web fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
-
     <!-- Normalize all browser default css values: https://necolas.github.io/normalize.css/ -->
     <link rel="stylesheet" href="css/normalize/8.0.1/normalize.css">
 
     <!-- Style for different Daxplore components -->
     <link rel="stylesheet" href="css/daxplore-common.css">
+    <link rel="stylesheet" href="css/tabs.css">
     <link rel="stylesheet" href="css/explorer/chart-frequency.css">
     <link rel="stylesheet" href="css/explorer/chart-meanbars.css">
     <link rel="stylesheet" href="css/explorer/chart-meanprofile.css">
@@ -45,6 +43,7 @@
 
     <!-- Import Daxplore helpers -->
     <script type="text/javascript" src="js/colors.js"></script>
+    <script type="text/javascript" src="js/profile-helpers.js"></script>
     <script type="text/javascript" src="js/data.js"></script>
     <script type="text/javascript" src="js/daxplore-common.js"></script>
     <script type="text/javascript" src="js/querydefinition.js"></script>
@@ -63,8 +62,20 @@
     <script type="text/javascript" src="js/explorer-chart-meanbars.js"></script>
     <script type="text/javascript" src="js/explorer-chart-meanprofile.js"></script>
 
-    <script type="text/javascript" charset="UTF-8">
-      dax.explorer.initializeExplorer()
+    <!-- Webfont loader -->
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+    <script type="text/javascript">
+      try {
+        WebFont.load({
+          google: {
+            families: ['Varta']
+          },
+          active: dax.explorer.initializeExplorer, // Generate chart after loading the font
+          inactive: dax.explorer.initializeExplorer, // Generate chart after failing to load the font
+        })
+      } catch (e) {
+        dax.explorer.initializeExplorer()// Generate chart if WebFont loading failed
+      }
     </script>
   </head>
 
@@ -110,7 +121,7 @@
             <div class="chart-tab mean"></div>
             <div class="chart-tab-spacing dich"></div>
             <div class="chart-tab dich"></div>
-            <div class="chart-tab-remainder"></div>
+            <div class="chart-tab-filler"></div>
           </div>
 
           <!-- Wrapper for the actual chart, populated by different chart-*.js -->
