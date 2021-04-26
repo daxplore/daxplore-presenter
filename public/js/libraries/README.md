@@ -1,8 +1,8 @@
 axios
 --------------------
 - **Description**: Promise based HTTP client for the browser. Used to dynamically download needed data from the server.
-- **Version**: 0.19.0
-- **Downloaded**: 2019-06-01
+- **Version**: 0.21.1
+- **Downloaded**: 2021-04-26
 - **Link**: https://github.com/axios/axios
 - **License**: MIT License
 
