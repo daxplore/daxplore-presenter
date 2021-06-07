@@ -48,7 +48,7 @@
 .radar-description {
 	color: #444;
   margin-left: 5px;
-	margin-top: 40px;
+	margin-top: 10px;
 	padding: 5px;
 	width: 280px;
 }
@@ -59,8 +59,21 @@
   margin-bottom: 5px;
 }
 
+.radar-description-header {
+  margin-top: 0;
+  margin-bottom: 3px;
+}
+
+.radar-description-scale-variable-header {
+  margin-top: 10px;
+  margin-bottom: 3px;
+}
+.radar-description-variable {
+  line-height: 1.5em;
+}
+
 .radargraph-save-image {
-  bottom:  0;
   position: absolute;
-  right: 0;
+  right: -10px;
+  top:  -10px;
 }

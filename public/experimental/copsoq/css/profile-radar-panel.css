@@ -6,13 +6,17 @@
 
 .radar-graph-row {
   align-items: center;
-  border-top: 1px solid #AAA;
   display: flex;
   flex-direction: column;
-  margin-top: 20px;
-  padding-top: 20px;
+  margin-top: 10px;
   position: relative;
   width: 100%;
+}
+
+.radar-chart-row {
+  border-top: 1px solid #AAA;
+  margin-top: 20px;
+  padding-top: 20px;
 }
 
 .tab-content {

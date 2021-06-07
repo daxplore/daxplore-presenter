@@ -9,12 +9,12 @@
     dax.profile.setChartData(perspectiveOptions, means)
   }
 
-  function populateRadarDOM (questions, qIDs, perspectiveOptions, means) {
+  function populateRadarDOM (radargraphData, questions, qIDs, perspectiveOptions, means) {
     d3.select('.radargraph-save-image')
       .text(dax.text('imageSaveButton'))
     d3.select('.radarchart-save-image')
       .text(dax.text('imageSaveButton'))
-    dax.radargraph.initializeRadarGraph(questions, qIDs)
+    dax.radargraph.initializeRadarGraph(radargraphData, questions, qIDs)
     dax.radargraph.setChartData(perspectiveOptions, means)
   }
 
@@ -48,12 +48,13 @@
   function () {
     // Use Axios to download all needed metadata files from the server
     // Define functions for all metadata files to be downloaded
-    function getQuestions () { return axios.get('../../../../data/questions.json') }
-    function getPerspectives () { return axios.get('../../../../data/perspectives.json') }
-    function getSettings () { return axios.get('../../../../data/settings.json') }
-    function getUsertexts () { return axios.get('../../../../data/usertexts.json') }
-    function getListview () { return axios.get('../../../../data/listview.json') }
-    function getManifest () { return axios.get('../../../../data/manifest.json') }
+    function getQuestions () { return axios.get('../../data/questions.json') }
+    function getPerspectives () { return axios.get('../../data/perspectives.json') }
+    function getSettings () { return axios.get('../../data/settings.json') }
+    function getUsertexts () { return axios.get('../../data/usertexts.json') }
+    function getListview () { return axios.get('../../data/listview.json') }
+    function getManifest () { return axios.get('../../data/manifest.json') }
+    function getRadargraph () { return axios.get('../../data/radargraph.json') }
 
     // Get URL parameters
     const urlParams = new URLSearchParams(window.location.search)
@@ -61,8 +62,8 @@
     const timepoint = urlParams.get('timepoint') != null ? urlParams.get('timepoint') : '0'
 
     // Make a batch Axios request to download all metadata and data asynchronously
-    axios.all([getQuestions(), getPerspectives(), getSettings(), getUsertexts(), getListview(), getManifest()])
-    .then(axios.spread(function (questionsResponse, perspectivesResponse, settingsResponse, usertextsResponse, listviewResponse, manifestResponse) {
+    axios.all([getQuestions(), getPerspectives(), getSettings(), getUsertexts(), getListview(), getManifest(), getRadargraph()])
+    .then(axios.spread(function (questionsResponse, perspectivesResponse, settingsResponse, usertextsResponse, listviewResponse, manifestResponse, radargraphResponse) {
       // Get the downloaded metadata
       const questions = questionsResponse.data
       const perspectives = perspectivesResponse.data
@@ -70,6 +71,7 @@
       const usertexts = usertextsResponse.data
       const listview = listviewResponse.data
       const manifest = manifestResponse.data
+      const radargraphData = radargraphResponse.data
 
       // Validate the perspective URL parameter
       // In case of problems, give feedback directed at the person setting up the presentation
@@ -142,7 +144,7 @@
       dax.profile.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap)
 
       // Get the data used in the listview
-      function getQuestionData (questionID) { return axios.get('../../../../data/questions/' + questionID + '.json') }
+      function getQuestionData (questionID) { return axios.get('../../data/questions/' + questionID + '.json') }
       const variableRequests = listview.map(function (qID) { return getQuestionData(qID) })
       axios.all(variableRequests).then(function (responsesArray) {
         const qIDs = []
@@ -164,11 +166,11 @@
         if (document.readyState === 'loading') {
           document.addEventListener('DOMContentLoaded', function (e) {
             populateProfileDOM(perspectiveID, qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, perspectiveOptions, means)
-            populateRadarDOM(questions, qIDs, perspectiveOptions, means)
+            populateRadarDOM(radargraphData, questions, qIDs, perspectiveOptions, means)
           })
         } else {
           populateProfileDOM(perspectiveID, qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, perspectiveOptions, means)
-          populateRadarDOM(questions, qIDs, perspectiveOptions, means)
+          populateRadarDOM(radargraphData, questions, qIDs, perspectiveOptions, means)
         }
       }).catch(function (error) {
         console.error(error)

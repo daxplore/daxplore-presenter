@@ -4,7 +4,7 @@
 
   let firstUpdate = true
 
-  let chart
+  let chart, chartSvg
   let qIDs, means, meanReferences, perspectiveOptions, directions
   let customDataChart
   let shorttexts
@@ -102,15 +102,19 @@
 
   function generateChartElements () {
     // CHART
-    chart = d3.select('.profile-chart')
-      .attr('width', width + margin.left + margin.right + 10)
+    chartSvg = d3.select('.profile-chart')
+      .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.top + margin.bottom)
 
     // WHITE BACKGROUND
-    chart.append('rect')
+    chartSvg.append('rect')
       .attr('width', '100%')
       .attr('height', '100%')
       .attr('fill', 'white')
+
+    chart = chartSvg.append('g')
+      .classed('profile-chart-content', true)
+      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
     // Y AXIS
     yAxisElement = chart.append('g')
@@ -154,7 +158,7 @@
       elTransition = d3.transition().duration(0)
     }
 
-    const chart = d3.selectAll('.profile-chart')
+    // const chart = d3.selectAll('.profile-chart')
 
     const paddingInner = 0.3
     const paddingOuter = 0.4
@@ -326,7 +330,7 @@
           setToNormalColor(i)
         })
       .attr('transform', function (d, i) { return 'translate(' + (yAxisWidth + xScale(meanReferences[getQid(i)]) - referenceWidth / 2) + ',' + (yScale(d) - referenceExtraHeight / 2) + ')' })
-      .style('shape-rendering', 'crispEdges')
+      .style('shape-rendering', 'geometricPrecision')
       .append('rect')
         .classed('reference-line', true)
         .attr('width', referenceWidth)
@@ -478,18 +482,18 @@
     const doctype = '<?xml version="1.0" standalone="no"?>' +
       '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
 
-    const svg = d3.select('svg').node()
+    const descriptionRightPosition = d3.select('.x-top-description').node().getBoundingClientRect()
+    chartSvg.attr('width', Math.max(width + margin.left + margin.right, descriptionRightPosition.x + descriptionRightPosition.width + 5))
 
+    const svg = chartSvg.node()
     const source = (new XMLSerializer()).serializeToString(svg)
-
     const blob = new Blob([doctype + source], { type: 'image/svg+xml;charset=utf-8' })
-
     const url = window.URL.createObjectURL(blob)
-
     const imgSelection = d3.select('body').append('img')
       .style('visibility', 'hidden')
-
     const img = imgSelection.node()
+
+    chartSvg.attr('width', width + margin.left + margin.right)
 
     img.onload = function () {
       const canvasChartSelection = d3.select('body').append('canvas')

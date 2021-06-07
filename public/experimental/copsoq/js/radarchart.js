@@ -28,18 +28,28 @@
   // const dataPointFillColor = '#666'
   // const dataPointFillOpacity = '0.0'
 
-  const overlayTextWidth = 1.6 // Measured in radius units
+  const overlayTextWidth = 0.9 // Measured in radius units
   const overlayTextLineHeight = 1.05 // Factor of font size
 
   const margin = { top: 0, bottom: 0, left: 0, right: 0 }
-
-  const elementTransition = d3.transition()
-    .duration(300)
-    .ease(d3.easeLinear)
+  //
+  // function myTransitionSettings (transition) {
+  //   transition
+  //       .duration(100)
+  //       .delay(0)
+  // }
+  //
+  // const elementTransition = d3.transition()
+  //   .duration(3000)
+  //   .ease(d3.easeLinear)
 
   // Helper
-  function conditionalApplyTransition (selection, transition, useTransition) {
-    return useTransition ? selection.transition(transition) : selection
+  function conditionalTransition (selection, applyTransition) {
+    if (applyTransition) {
+      const t = d3.transition().duration(300).ease(d3.easeLinear)
+      return selection.transition(t)
+    }
+    return selection
   }
 
   // const DRAW_DATA_LINE = false
@@ -67,7 +77,7 @@
       const goodDirection = goodDirectionInput
       const overlayTextArray = overlayTextArrayInput
 
-      let animateNextUpdate = false
+      // let animateNextUpdate = false
       const radarChart = {}
 
       const angleSlice = 2 * Math.PI / referenceData.length
@@ -89,6 +99,8 @@
 
       let selectedPerspectiveOption = 0
       let activeOverlayTransform = ''
+
+      let perspectiveOptionText
 
       hoverCallbackFunctions.push(mouseoverHighlight)
 
@@ -153,7 +165,7 @@
       // INTERNAL FUNCTIONS
 
       // Reposition and redraw chart elements
-      function updateChartElements () {
+      function updateChartElements (animate) {
         // INTERPOLATION
         // Interpolate values for 2 or less datapoints
         let referenceDataInterpolated = referenceData
@@ -259,7 +271,7 @@
           .on('mouseout', mouseoutHighlight)
 
         // DATA POINTS
-        updateDataPointPositions()
+        updateDataPointPositions(animate)
 
         // OVERLAY TEXT
         overlayTextElement
@@ -290,7 +302,7 @@
           .attr('transform', 'translate(' + offsetLeft + ',' + offsetTop + ')')
         radarGroup
           .attr('transform', 'translate(' + offsetLeft + ',' + offsetTop + ')')
-          .style('filter', displayModeMiniaturized ? 'blur(' + (0.02 * radius) + 'px)' : '')
+          // .style('filter', displayModeMiniaturized ? 'blur(' + (0.02 * radius) + 'px)' : '')
           .style('opacity', displayModeMiniaturized ? 0.75 : 1)
         chart
           .attr('width', margin.left + margin.right + radarGroupBBox.width)
@@ -301,7 +313,7 @@
           .style('font-family', '"Varta", sans-serif')
       }
 
-      function updateDataPointPositions () {
+      function updateDataPointPositions (animate) {
         const pointDataForOption = pointData.map(function (subarray) { return subarray[selectedPerspectiveOption] })
         radarGroup.selectAll('.datapoint')
           .data(pointDataForOption).enter()
@@ -318,24 +330,9 @@
         radarGroup.selectAll('.datapoint')
           .style('display', function (d) { return d === -1 || isNaN(d) ? 'none' : '' })
         const dataPointElements = radarGroup.selectAll('.datapoint')
-        dataPointElements.interrupt().selectAll('*').interrupt()
-        conditionalApplyTransition(dataPointElements, elementTransition, animateNextUpdate)
+
+        conditionalTransition(dataPointElements, animate)
           .attr('transform', function (d, i) { return d === -1 || isNaN(d) ? '' : 'translate(' + d3.pointRadial(i * angleSlice, radiusScale(d)).join(',') + ')' })
-        // radarGroup.selectAll('.datapoint')
-        // .append('path')
-        //   .classed('datapoint-symbol', true)
-        //   .attr('d', dataPointSymbol)
-        //   .attr('fill', dataPointColor)
-        //   .on('mouseover', (d, i, n) => hoverCallbackFunctions.forEach(callback => callback(d, i, n)))
-
-        // radarGroup.selectAll('.datapoint')
-
-        // if (DRAW_DATA_LINE) {
-        // // DATA POINT PATH
-        //   dataPointLine
-        //     .style('stroke-width', dataPointStrokeWidth * radius)
-        //     .attr('d', dataPointLineGenerator(pointDataInterpolated))
-        // }
       }
 
       // Add svg tspans to svg text element with word wrap
@@ -464,28 +461,27 @@
       // --- EXPORTED FUNCTIONS FOR RADAR CHART OBJECT --- //
       // ------------------------------------------------- //
 
-      radarChart.setData = function (pointDataArray) {
+      radarChart.setData = function (pointDataArray, animate) {
         if (axisTextArray.length !== pointDataArray.length) {
           throw new Error('Invalid radar chart input data, different array lengths.')
         }
         pointData = pointDataArray
-        updateDataPointPositions()
-        animateNextUpdate = true
+        updateDataPointPositions(animate)
       }
 
       radarChart.setWidth = function (width) {
         radius = width / 2
-        updateChartElements()
+        updateChartElements(false)
       }
 
       radarChart.setDisplayModeFull = function () {
         displayModeMiniaturized = false
-        updateChartElements()
+        updateChartElements(false)
       }
 
       radarChart.setDisplayModeMiniature = function () {
         displayModeMiniaturized = true
-        updateChartElements()
+        updateChartElements(false)
       }
 
       radarChart.getCalculatedOverlayTextScaling = function () {
@@ -494,7 +490,7 @@
 
       radarChart.setOverlayTextScaling = function (overlayTextScaling) {
         forcedOverlayTextScaling = overlayTextScaling
-        updateChartElements()
+        updateChartElements(false)
       }
 
       radarChart.getCircleCenterOffsets = function () {
@@ -506,9 +502,10 @@
         hoverCallbackFunctions.push(callbackFunction)
       }
 
-      radarChart.setPerspectiveOption = function (perspectiveOption) {
+      radarChart.setPerspectiveOption = function (perspectiveText, perspectiveOption, animate) {
+        perspectiveOptionText = perspectiveText
         selectedPerspectiveOption = perspectiveOption
-        updateChartElements()
+        updateChartElements(animate)
       }
 
       // Helper function to allow radargraph-panel to set overlay text size when saving as image
@@ -597,8 +594,7 @@
             const chartCtx = canvasChart.getContext('2d')
             chartCtx.drawImage(img, 0, 0)
 
-            const headerText = d3.select('.radar-description > .description-header').text() + ': ' + d3.select('.radar-chart-full-header').text() // TODO take as input instead
-            console.log('TODO text should be read from data rather than DOM')
+            const headerText = perspectiveOptionText + ': ' + d3.select('.radar-chart-full-header').text()
             const headerFontSize = 16 * imageScaling
             const headerPaddingBottom = 10 * imageScaling
             const headerFont = 'bold ' + headerFontSize + 'px "Varta"'

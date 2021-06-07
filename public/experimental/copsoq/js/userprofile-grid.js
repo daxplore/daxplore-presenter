@@ -133,7 +133,7 @@
             callCallbacks()
 
             d3.select(el)
-                .attr('class', colorClassForValue(val, meanReferences[d.qID], directions[d.qID]))
+              .attr('class', colorClassForValue(val, meanReferences[d.qID], directions[d.qID]))
           })
 
     callCallbacks()
@@ -422,15 +422,15 @@
     titleRegexpMap = titleRegexpMapInput
 
     d3.select('.add-column-button')
-          .text('+ Lägg till grupp')
+      .text('+ Lägg till grupp')
 
     if (Modernizr.svgforeignobject) {
       d3.select('.save-grid-image-button')
-            .text('Spara som bild') // TODO externalize text
-            .on('click', dax.userprofile.saveGridImage)
+        .text('Spara som bild') // TODO externalize text
+        .on('click', dax.userprofile.saveGridImage)
     } else {
       d3.select('.save-grid-image-button')
-            .remove()
+        .remove()
     }
 
     d3.select('.grid-legend-text.good').text(dax.text('listReferenceBetter')) // TODO use new text ID style
@@ -463,27 +463,27 @@
 
     // GRID HEADER
     const header = thead.append('tr')
-          .classed('grid-header', true)
+      .classed('grid-header', true)
 
     header
-          .append('th')
-          .classed('rowtext', true)
-          .classed('groupname', true)
-          .text('Gruppnamn:') // TODO externalize
+      .append('th')
+      .classed('rowtext', true)
+      .classed('groupname', true)
+      .text('Gruppnamn:') // TODO externalize
 
     // GRID ROWS
     gridRows = tbody.selectAll('tr')
-          .data(systemdata)
-          .enter()
-            .append('tr')
-              .attr('class', function (d) { return 'gridrow-' + d.qID })
-              .on('mouseover', function (d, i) {
-                dax.profile.setDescriptionShort(d3.select('#grid-description'), d.qID)
-              })
+      .data(systemdata)
+      .enter()
+        .append('tr')
+          .attr('class', function (d) { return 'gridrow-' + d.qID })
+          .on('mouseover', function (d, i) {
+            dax.profile.setDescriptionShort(d3.select('#grid-description'), d.qID)
+          })
 
     gridRows.append('td')
-          .classed('rowtext', true)
-          .text(function (d) { return shorttextsMap[d.qID] })
+      .classed('rowtext', true)
+      .text(function (d) { return shorttextsMap[d.qID] })
 
     generateColumns(usernames, usermeans)
   }

@@ -41,12 +41,12 @@
     })
   }
 
-  function populateRadarDOM (questions, qIDs) {
+  function populateRadarDOM (radargraphData, questions, qIDs) {
     d3.select('.radargraph-save-image')
       .text(dax.text('imageSaveButton'))
     d3.select('.radarchart-save-image')
       .text(dax.text('imageSaveButton'))
-    dax.radargraph.initializeRadarGraph(questions, qIDs)
+    dax.radargraph.initializeRadarGraph(radargraphData, questions, qIDs)
     dax.userprofile.addGridUpdateCallback(function (names, means) {
       dax.radargraph.setChartData(names, means)
     })
@@ -82,21 +82,23 @@
   function () {
     // Use Axios to download all needed metadata files from the server
     // Define functions for all metadata files to be downloaded
-    function getQuestions () { return axios.get('../../../../data/questions.json') }
-    function getSettings () { return axios.get('../../../../data/settings.json') }
-    function getUsertexts () { return axios.get('../../../../data/usertexts.json') }
-    function getListview () { return axios.get('../../../../data/listview.json') }
-    function getManifest () { return axios.get('../../../../data/manifest.json') }
+    function getQuestions () { return axios.get('../../data/questions.json') }
+    function getSettings () { return axios.get('../../data/settings.json') }
+    function getUsertexts () { return axios.get('../../data/usertexts.json') }
+    function getListview () { return axios.get('../../data/listview.json') }
+    function getManifest () { return axios.get('../../data/manifest.json') }
+    function getRadargraph () { return axios.get('../../data/radargraph.json') }
 
     // Make a batch Axios request to download all metadata and data asynchronously
-    axios.all([getQuestions(), getSettings(), getUsertexts(), getListview(), getManifest()])
-    .then(axios.spread(function (questionsResponse, settingsResponse, usertextsResponse, listviewResponse, manifestResponse) {
+    axios.all([getQuestions(), getSettings(), getUsertexts(), getListview(), getManifest(), getRadargraph()])
+    .then(axios.spread(function (questionsResponse, settingsResponse, usertextsResponse, listviewResponse, manifestResponse, radargraphResponse) {
       // Get the downloaded metadata
       const questions = questionsResponse.data
       // const settings = settingsResponse.data
       const usertexts = usertextsResponse.data
       const listview = listviewResponse.data
       const manifest = manifestResponse.data
+      const radargraphData = radargraphResponse.data
 
       // The function logs the error as a side effect,
       // so if the versions don't match all we have to do here is exit
@@ -145,11 +147,11 @@
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function (e) {
           populateUserProfileDOM(listview, meanReferenceMap, shorttextMap, descriptionMap, directionMap, titleRegexpMap)
-          populateRadarDOM(questions, [], [], [])
+          populateRadarDOM(radargraphData, questions, [])
         })
       } else {
         populateUserProfileDOM(listview, meanReferenceMap, shorttextMap, descriptionMap, directionMap, titleRegexpMap)
-        populateRadarDOM(questions, listview)
+        populateRadarDOM(radargraphData, questions, listview)
       }
     })).catch(function (error) {
       console.error(error)
@@ -157,7 +159,7 @@
   }
 
   exports.headerChange =
-  function (select) {
+  function (select, animateUpdate) {
     dax.profile.setPerspectiveOption(select.value)
     dax.radargraph.setPerspectiveOption(select.value)
   }

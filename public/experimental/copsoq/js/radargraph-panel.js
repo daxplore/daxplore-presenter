@@ -4,33 +4,8 @@
 
   const connectionLineColor = '#666'
 
-  // Group IDs
-  const groupQIDs = [
-    ['JU_SW', 'RE_SW', 'SS_SW', 'QL_SW', 'PR_SW', 'TM_SW'],
-    ['SC_SW', 'TE_SW', 'CL_SW', 'VA_SW', 'PD_SW', 'IN_SW', 'MW_SW'],
-    ['QD_SW', 'WP_SW', 'ED_SW', 'CO_SW', 'WF_SW', 'JI_SW', 'IW_SW'],
-    ['JS_SW', 'CW_SW', 'ENG_SW', 'QW_SW'],
-    ['ST_SW', 'BO_SW'],
-  ]
-
-  const headerTexts = [
-    'Ledningsfaktorer',
-    'Resurser',
-    'Belastningar',
-    'Inställning till arbetet',
-    'Belastningssymptom',
-  ]
-
-  const overlayTexts = [
-    ['Lednings-', 'faktorer'],
-    ['Resurser'],
-    ['Belastningar'],
-    ['Inställning', 'till arbetet'],
-    ['Belastnings-', 'symptom'],
-  ]
-
   const margin = { top: 5, bottom: 5, left: 5, right: 5 }
-  const miniRadarWidth = 100
+  const miniRadarWidth = 200
   const graphMidSpacing = 50
   const graphFirstSpacing = 80 // 40
   const graphSecondSpacing = 120 // 80
@@ -63,28 +38,27 @@
   const fullChartMaxOffset = {}
   let fullCircleCenterOffsets
 
-  // let values, perspectiveOptions
-
+  let nodes
   let texts, goodDirections, referenceValues
   let qIDs, perspectiveOptions, values
 
   exports.initializeRadarGraph =
-  function (questionsInput, qIDsInput) {
+  function (radargraphData, questionsInput, qIDsInput) {
     const questions = questionsInput
     qIDs = qIDsInput
-    texts = groupQIDs.map(function (sublist) {
-      return sublist.map(function (qid) {
+    nodes = radargraphData.nodes
+
+    texts = nodes.map(function (node) {
+      return node.qIDs.map(function (qid) {
         for (let i = 0; i < questions.length; i++) {
           if (questions[i].column === qid) {
             return questions[i].short
           }
         }
-        // return questions.find(function (q) { return q.column === qid }).short
       })
     })
-    goodDirections = groupQIDs.map(function (sublist) {
-      return sublist.map(function (qid) {
-        // return questions.find(function (q) { return q.column === qid }).gooddirection
+    goodDirections = nodes.map(function (node) {
+      return node.qIDs.map(function (qid) {
         for (let i = 0; i < questions.length; i++) {
           if (questions[i].column === qid) {
             return questions[i].gooddirection
@@ -92,9 +66,8 @@
         }
       })
     })
-    referenceValues = groupQIDs.map(function (sublist) {
-      return sublist.map(function (qid) {
-        // return questions.find(function (q) { return q.column === qid }).mean_reference
+    referenceValues = nodes.map(function (node) {
+      return node.qIDs.map(function (qid) {
         for (let i = 0; i < questions.length; i++) {
           if (questions[i].column === qid) {
             return questions[i].mean_reference
@@ -122,7 +95,7 @@
     fullCharts = []
     const overlayTextScaling = []
     for (let i = 0; i < 5; i++) {
-      chartNodes[i] = dax.radarchart.createRadarChart('#radar-node-' + i, texts[i], referenceValues[i], goodDirections[i][0], overlayTexts[i])
+      chartNodes[i] = dax.radarchart.createRadarChart('#radar-node-' + i, texts[i], referenceValues[i], goodDirections[i][0], nodes[i].overlayTextArray)
       chartNodes[i].setWidth(miniRadarWidth)
       overlayTextScaling.push(chartNodes[i].getCalculatedOverlayTextScaling())
       d3.select('#radar-node-' + i)
@@ -130,11 +103,11 @@
         .style('filter', 'drop-shadow(0 0 1px black) drop-shadow(0 0 1px black)')
 
       // cycle through all charts to find sizes
-      fullCharts[i] = dax.radarchart.createRadarChart('#radar-chart-full-' + i, texts[i], referenceValues[i], goodDirections[i][0], overlayTexts[i])
+      fullCharts[i] = dax.radarchart.createRadarChart('#radar-chart-full-' + i, texts[i], referenceValues[i], goodDirections[i][0], nodes[i].overlayTextArray)
       fullCharts[i].setDisplayModeFull()
       fullCharts[i].setWidth(fullRadarWidth)
       fullCircleCenterOffsets[i] = fullCharts[i].getCircleCenterOffsets()
-      fullCharts[i].addHoverCallback(function (d, i, n) { return setDescription(i) })
+      // fullCharts[i].addHoverCallback(function (d, i, n) { return setDescription(i) })
       fullCharts[i].setDisplayModeFull()
       fullCharts[i].setWidth(fullRadarWidth)
     }
@@ -163,14 +136,23 @@
         .style('margin-right', (fullChartMaxOffset.right - fullCircleCenterOffsets[i].right) + 'px')
         .style('margin-bottom', (fullChartMaxOffset.bottom - fullCircleCenterOffsets[i].bottom) + 'px')
     }
+
+    // exports.setPerspectiveOption(0)
   }
 
   exports.setChartData =
   function (perspectiveOptionsInput, means) {
     perspectiveOptions = perspectiveOptionsInput
-    values = groupQIDs.map(function (sublist) { return sublist.map(function (qID) { return means[qIDs.indexOf(qID)] }) })
+    values = nodes.map(function (node) {
+      return node.qIDs.map(function (qID) {
+        return means[qIDs.indexOf(qID)]
+      })
+    })
     for (let i = 0; i < 5; i++) {
-      chartNodes[i].setData(values[i])
+      chartNodes[i].setData(values[i], false)
+      chartNodes[i].setPerspectiveOption(perspectiveOptions[selectedPerspectiveOption], selectedPerspectiveOption, false)
+      fullCharts[i].setData(values[i], false)
+      fullCharts[i].setPerspectiveOption(perspectiveOptions[selectedPerspectiveOption], selectedPerspectiveOption, false)
     }
 
     setFullChart(0)
@@ -184,7 +166,7 @@
     d3.selectAll('.radar-node')
       .classed('radar-node--highlighted', function (d, i) { return i === nodeIndex })
     d3.select('.radar-chart-full-header')
-      .text(headerTexts[nodeIndex])
+      .text(nodes[nodeIndex].headerText)
       .style('margin-left', (Math.max(0, fullChartMaxOffset.left - fullChartMaxOffset.right) + 'px'))
       .style('margin-right', (Math.max(0, fullChartMaxOffset.right - fullChartMaxOffset.left) + 'px'))
     // d3.select('#radar-chart-full').selectAll('*').remove()
@@ -203,29 +185,107 @@
     // )
     // fullChart.addHoverCallback((d, i, n) => setDescription(i))
 
-    fullCharts[nodeIndex].setData(
-      values[selectedNode]
-    )
+    // fullCharts[nodeIndex].setData(values[selectedNode], false)
 
     // d3.select('#radar-chart-full')
     //   .attr('transform', 'translate(' + positions[0].join(',') + ')')
-    setDescription(0) // default to showing first description
+    setDescription(selectedNode)
   }
 
-  function setDescription (optionIndex) {
-    dax.profile.setDescriptionFull(
-      d3.select('.radar-description'),
-      perspectiveOptions[selectedPerspectiveOption],
-      groupQIDs[selectedNode][optionIndex],
-      values[selectedNode][optionIndex][selectedPerspectiveOption]
-    )
+  function appendScaleRow (element, node, i) {
+    const mean = values[node][i][selectedPerspectiveOption]
+    const reference = referenceValues[node][i]
+    const diff = mean - reference
+    const variableRow = element.append('div')
+      .classed('radar-description-variable', true)
+    variableRow.append('span')
+      .text(texts[node][i] + ': ')
+    variableRow.append('span')
+      .text(d3.format('+d')(diff))
+      .style('color', dax.colors.colorTextForValue(mean, referenceValues[node][i], goodDirections[node][i]))
+      .style('font-weight', 'bold')
+  }
+
+  function setDescription (node) {
+    const descriptionElement = d3.select('.radar-description')
+    descriptionElement.html('')
+    descriptionElement
+      .append('h3')
+      .classed('radar-description-header', true)
+      .text(nodes[node].headerText)
+    descriptionElement
+      .append('div')
+      .classed('radar-description-body', true)
+      .text(nodes[node].descriptionText)
+
+    const missing = []
+    const better = []
+    const average = []
+    const worse = []
+    const direction = goodDirections[node] === 'HIGH' ? 1 : -1
+    for (let i = 0; i < values[node].length; i++) {
+      const mean = values[node][i][selectedPerspectiveOption]
+      const reference = referenceValues[node][i]
+      if (mean === -1) {
+        missing.push(i)
+      } else if (Math.abs(mean - reference) < 5) {
+        average.push(i)
+      } else if (direction * mean >= direction * reference) {
+        worse.push(i)
+      } else {
+        better.push(i)
+      }
+    }
+
+    if (better.length > 0) {
+      descriptionElement
+        .append('h4')
+        .classed('radar-description-scale-variable-header', true)
+        .text('Skalor med ett bättre resultat än referensvärdet:')
+      better.forEach(function (i) {
+        appendScaleRow(descriptionElement, node, i)
+      })
+    }
+
+    if (worse.length > 0) {
+      descriptionElement
+        .append('h4')
+        .classed('radar-description-scale-variable-header', true)
+        .text('Skalor med ett sämre resultat än referensvärdet:')
+      worse.forEach(function (i) {
+        appendScaleRow(descriptionElement, node, i)
+      })
+    }
+
+    if (average.length > 0) {
+      descriptionElement
+        .append('h4')
+        .classed('radar-description-scale-variable-header', true)
+        .text('Skalor som ligger ±5 poäng från referensvärdet:')
+      average.forEach(function (i) {
+        appendScaleRow(descriptionElement, node, i)
+      })
+    }
+
+    if (missing.length > 0) {
+      descriptionElement
+        .append('h4')
+        .classed('radar-description-scale-variable-header', true)
+        .text('Skalor som saknar data:')
+      missing.forEach(function (i) {
+        descriptionElement.append('div')
+          .classed('radar-description-variable', true)
+          .text(texts[node][i])
+      })
+    }
   }
 
   exports.setPerspectiveOption = function (perspectiveOption) {
     selectedPerspectiveOption = perspectiveOption
-    chartNodes.forEach(function (node) { node.setPerspectiveOption(perspectiveOption) })
-    fullCharts.forEach(function (chart) { chart.setPerspectiveOption(perspectiveOption) })
-    setDescription(0) // default to showing first description
+    const perspectiveText = perspectiveOptions[selectedPerspectiveOption]
+    chartNodes.forEach(function (node) { node.setPerspectiveOption(perspectiveText, perspectiveOption, true) })
+    fullCharts.forEach(function (chart, i) { chart.setPerspectiveOption(perspectiveText, perspectiveOption, i === selectedNode) })
+    setDescription(selectedNode)
   }
 
   exports.generateActiveRadarChartImage =
@@ -251,16 +311,11 @@
 
     chartNodes.forEach(function (node) { return node.setOverlayFontScaling(0.65) })
     const svg = chart.node()
-
     const source = (new XMLSerializer()).serializeToString(svg)
-
     const blob = new Blob([doctype + source], { type: 'image/svg+xml;charset=utf-8' })
-
     const url = window.URL.createObjectURL(blob)
-
     const imgSelection = d3.select('body').append('img')
       .style('visibility', 'hidden')
-
     const img = imgSelection.node()
 
     // RESTORE SCALE
@@ -279,8 +334,7 @@
       const chartCtx = canvasChart.getContext('2d')
       chartCtx.drawImage(img, 0, 0)
 
-      const headerText = d3.select('.radar-description > .description-header').text()
-      console.log('TODO text should be read from data rather than DOM')
+      const headerText = perspectiveOptions[selectedPerspectiveOption]
       const headerPaddingTop = 0 * imageScaling
       const headerFontSize = 16 * imageScaling
       const headerPaddingBottom = 20 * imageScaling

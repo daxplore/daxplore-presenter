@@ -18,7 +18,7 @@
 }
 
 .radarchart-save-image {
-  bottom:  0;
   position: absolute;
-  right: 0;
+  right: -10px;
+  top:  10px;
 }

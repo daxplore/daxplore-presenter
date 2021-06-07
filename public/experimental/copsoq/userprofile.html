@@ -7,49 +7,49 @@
 
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title>Daxplore Presenter: User Profile</title>
-    <link rel="icon" href="../../../favicon.ico">
+    <link rel="icon" href="../../favicon.ico">
 
     <!-- Import style sheets -->
     <!-- Normalize all browser default css values: https://necolas.github.io/normalize.css/ -->
-    <link rel="stylesheet" href="../../../css/normalize/8.0.1/normalize.css">
+    <link rel="stylesheet" href="../../css/normalize/8.0.1/normalize.css">
     <!-- Style for different Daxplore components -->
-    <link rel="stylesheet" href="../../../css/daxplore-common.css">
-    <link rel="stylesheet" href="../../../css/profile/profile-chart.css">
+    <link rel="stylesheet" href="../../css/daxplore-common.css">
+    <link rel="stylesheet" href="../../css/profile/profile-chart.css">
     <link rel="stylesheet" href="css/userprofile.css">
     <link rel="stylesheet" href="css/profile-radar-panel.css">
     <link rel="stylesheet" href="css/radargraph.css">
     <link rel="stylesheet" href="css/radarchart.css">
-    <link rel="stylesheet" href="../../../css/tabs.css">
+    <link rel="stylesheet" href="../../css/tabs.css">
 
     <!-- Import Font Awesome icons -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
 
     <!-- Import library dependencies -->
     <!-- Import shims and polyfills for older browsers-->
-    <script type="text/javascript" src="../../../js/libraries/es5-shim/4.5.7/es5-shim.min.js"></script>
-    <script type="text/javascript" src="../../../js/libraries/es6-promise/4.2.6/es6-promise.auto.min.js"></script>
-    <script type="text/javascript" src="../../../js/libraries/url-search-params/0.1.2/url-search-params.min.js"></script>
+    <script type="text/javascript" src="../../js/libraries/es5-shim/4.5.7/es5-shim.min.js"></script>
+    <script type="text/javascript" src="../../js/libraries/es6-promise/4.2.6/es6-promise.auto.min.js"></script>
+    <script type="text/javascript" src="../../js/libraries/url-search-params/0.1.2/url-search-params.min.js"></script>
     <!-- Import Modernizr feature checking for features that can't be polyfilled -->
-    <script type="text/javascript" src="../../../js/libraries/modernizr/3.6.0/modernizr-svgforeignobject.js"></script>
+    <script type="text/javascript" src="../../js/libraries/modernizr/3.6.0/modernizr-svgforeignobject.js"></script>
     <!-- Use d3 to design all charts, interactive elements and manipulate the DOM: https://d3js.org/ -->
-    <script type="text/javascript" src="../../../js/libraries/d3/5.12.0/d3.v5.min.js"></script>
+    <script type="text/javascript" src="../../js/libraries/d3/5.12.0/d3.v5.min.js"></script>
     <!-- Use axios to download data from the server: https://github.com/axios/axios -->
-    <script type="text/javascript" src="../../../js/libraries/axios/0.19.0/axios.min.js"></script>
+    <script type="text/javascript" src="../../js/libraries/axios/0.21.1/axios.min.js"></script>
     <!-- Use dom-to-image to turn DOM elements into an image: https://github.com/tsayen/dom-to-image-->
-    <script type="text/javascript" src="../../../js/libraries/dom-to-image/2017-06-10/dom-to-image.min.js"></script>
+    <script type="text/javascript" src="../../js/libraries/dom-to-image/2017-06-10/dom-to-image.min.js"></script>
     <!-- Use Canvas to Blob to turn canvas data into blob data that can saved -->
-    <script type="text/javascript" src="../../../js/libraries/canvas-toBlob/2016-05-26/canvas-toBlob.js"></script>
+    <script type="text/javascript" src="../../js/libraries/canvas-toBlob/2016-05-26/canvas-toBlob.js"></script>
     <!-- Use File Saver to save data as local files -->
-    <script type="text/javascript" src="../../../js/libraries/FileSaver/2020-09-24/FileSaver.min.js"></script>
+    <script type="text/javascript" src="../../js/libraries/FileSaver/2020-09-24/FileSaver.min.js"></script>
 
     <!-- Import Daxplore helpers -->
-    <script type="text/javascript" src="../../../js/colors.js"></script>
-    <script type="text/javascript" src="../../../js/daxplore-common.js"></script>
-    <script type="text/javascript" src="../../../js/profile-helpers.js"></script>
-    <script type="text/javascript" src="../../../js/text.js"></script>
+    <script type="text/javascript" src="../../js/colors.js"></script>
+    <script type="text/javascript" src="../../js/daxplore-common.js"></script>
+    <script type="text/javascript" src="../../js/profile-helpers.js"></script>
+    <script type="text/javascript" src="../../js/text.js"></script>
 
     <!-- Import Daxplore chart -->
-    <script type="text/javascript" src="../../../js/profile-chart.js"></script>
+    <script type="text/javascript" src="../../js/profile-chart.js"></script>
     <script type="text/javascript" src="js/radarchart.js"></script>
     <script type="text/javascript" src="js/radargraph-panel.js"></script>
 
@@ -159,18 +159,6 @@
             </div>
           </div>
           <div class="radar-main tab-content hidden">
-            <div class="radar-chart-row">
-              <span class="dashed-button save-image radarchart-save-image" onClick="dax.radargraph.generateActiveRadarChartImage()"></span>
-              <div class="radar-chart-full-column">
-                <div class='radar-chart-full-header'></div>
-                <svg class="radar-chart-full" id="radar-chart-full-0"></svg>
-                <svg class="radar-chart-full" id="radar-chart-full-1"></svg>
-                <svg class="radar-chart-full" id="radar-chart-full-2"></svg>
-                <svg class="radar-chart-full" id="radar-chart-full-3"></svg>
-                <svg class="radar-chart-full" id="radar-chart-full-4"></svg>
-              </div>
-              <div class="description radar-description"></div>
-            </div>
             <div class="radar-graph-row">
               <span class="dashed-button save-image radargraph-save-image" onClick="dax.radargraph.generateRadarGraphImage()"></span>
               <div class="radar-graph-title">Välj ett område i modellen</div>
@@ -184,6 +172,18 @@
                   <g class="radar-node" id="radar-node-4"></g>
                 </g>
               </svg>
+            </div>
+            <div class="radar-chart-row">
+              <span class="dashed-button save-image radarchart-save-image" onClick="dax.radargraph.generateActiveRadarChartImage()"></span>
+              <div class="radar-chart-full-column">
+                <div class='radar-chart-full-header'></div>
+                <svg class="radar-chart-full" id="radar-chart-full-0"></svg>
+                <svg class="radar-chart-full" id="radar-chart-full-1"></svg>
+                <svg class="radar-chart-full" id="radar-chart-full-2"></svg>
+                <svg class="radar-chart-full" id="radar-chart-full-3"></svg>
+                <svg class="radar-chart-full" id="radar-chart-full-4"></svg>
+              </div>
+              <div class="description radar-description"></div>
             </div>
           </div>
         </div>

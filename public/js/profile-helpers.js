@@ -26,6 +26,7 @@
 
   exports.setDescriptionFull =
   function (element, headerText, qID, mean) {
+    headerText = headerText.replace(/\//g, '/\u200b')
     const shorttext = shorttexts[qID]
     const description = descriptions[qID]
     const reference = meanReferences[qID]
