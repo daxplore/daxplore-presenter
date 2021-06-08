@@ -1,3 +1,9 @@
+.radar-chart-row {
+  border-top: 1px solid #AAA;
+  margin-top: 20px;
+  padding-top: 20px;
+}
+
 .circle-axis-text, .line-axis-text {
   fill: #444;
 }
@@ -7,14 +13,14 @@
 }
 
 .datapoint-symbol--highlighted {
-  fill: #333;
-  transform: scale(1.25);
+  fill: #333 !important;
+  transform: scale(1.15);
   transition: fill 0.1s;
   transition: transform 0.1s;
 }
 
 .line-axis-text--highlighted {
-  fill: black;
+  fill: black !important;
 }
 
 .radarchart-save-image {

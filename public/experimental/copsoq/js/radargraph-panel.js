@@ -364,8 +364,7 @@
       const headerHorizontalShift = img.width / 2 - headerWidth / 2
 
       ctx.fillText(headerText, headerHorizontalShift + imgMargin.left, headerPaddingTop + headerFontSize + imgMargin.top)
-      const CUSTOM_DATA_CHART = false // TODO
-      console.log('TODO custom chart should not be hardcoded')
+      const CUSTOM_DATA_CHART = false // TODO custom chart should not be hardcoded
       let watermarkText = dax.text(CUSTOM_DATA_CHART ? 'profile_user.image.watermark' : 'profile.image.watermark')
 
       const date = new Date()

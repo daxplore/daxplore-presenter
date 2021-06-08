@@ -625,8 +625,7 @@
             ctx.fillStyle = 'black'
             ctx.font = headerFont
             ctx.fillText(headerText, headerHorizontalShift, headerFontSize + imgMargin.top)
-            const customDataChart = false // TODO
-            console.log('TODO custom chart should not be hardcoded')
+            const customDataChart = false // TODO custom chart should not be hardcoded
             let watermarkText = dax.text(customDataChart ? 'profile_user.image.watermark' : 'profile.image.watermark')
 
             const date = new Date()
