@@ -382,7 +382,7 @@
       const sourceFontHeight = 11 * imageScaling
       ctx.font = sourceFontHeight + 'px "Varta"'
       ctx.fillStyle = '#555'
-      ctx.fillText(watermarkText, 5, completeHeight - 5)
+      ctx.fillText(watermarkText, 5, completeHeight - 8)
 
       ctx.drawImage(canvasChart, imgMargin.left, imgMargin.top + headerHeight)
 
