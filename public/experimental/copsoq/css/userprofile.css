@@ -104,10 +104,6 @@
 	padding-left: 5px;
 }
 
-.user-paste-data-error-log-header-icon {
-	color: #d13d40;
-}
-
 .user-paste-data-error-text-area {
 	border: 1px solid #DDD;
   flex: 1;
