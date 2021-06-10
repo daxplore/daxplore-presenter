@@ -1,5 +1,4 @@
-public/data*/
+public/data*
 .*
 node_modules
 *.json
-
