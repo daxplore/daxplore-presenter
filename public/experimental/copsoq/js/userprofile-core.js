@@ -2,6 +2,8 @@
   namespace.userprofile = namespace.userprofile || {}
   const exports = namespace.userprofile
 
+  let maxHeight = -1
+
   function populateUserProfileDOM (qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, titleRegexpMap) {
     d3.select('.user-paste-data-header-text')
       .text(dax.text('userProfileHeaderText')) // TODO use new text ID style
@@ -100,6 +102,23 @@
         })
       } else {
         populateUserProfileDOM(listview, meanReferenceMap, shorttextMap, descriptionMap, directionMap, titleRegexpMap)
+      }
+
+      // Send height changes to parent window, so it can update iframe size
+      if (window.ResizeObserver) {
+        const outerElement = document.querySelector('body')
+        const resizeObserver = new ResizeObserver(function (entries) {
+          for (let i = 0; i < entries.length; i++) {
+            if (entries[i].target === outerElement) {
+              if (entries[i].contentRect.height > maxHeight) {
+                maxHeight = entries[i].contentRect.height
+                parent.postMessage({ source: 'DAXPLORE', height: maxHeight }, '*')
+              }
+              break
+            }
+          }
+        })
+        resizeObserver.observe(outerElement)
       }
     })).catch(function (error) {
       console.error(error)
