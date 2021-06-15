@@ -66,81 +66,83 @@
     </script>
   </head>
 
-  <body style="overflow:hidden">
-    <div class="grid-main">
-      <div class="grid-row">
-        <span class="grid"></span>
-        <div class='grid-column-right'>
-          <div class='grid-buttons'>
-            <span class="add-column-button dashed-button" onClick="dax.userprofile.addColumn()"></span>
-            <span class="save-grid-image-button dashed-button"></span>
-          </div>
-          <div class='grid-info'>
-            <table class='grid-legend'>
-              <tr><td class='grid-legend-symbol cell-good-reference'></td><td class='grid-legend-text good'></td></tr>
-              <tr><td class='grid-legend-symbol cell-avg-reference'></td><td class='grid-legend-text avg'></td></tr>
-              <tr><td class='grid-legend-symbol cell-bad-reference'></td><td class='grid-legend-text bad'></td></tr>
-            </table>
-            <div id='grid-description' class='description'></div>
-          </div>
-        </div>
-      </div>
-      <div class="user-paste-data">
-        <div class="user-paste-data-header">
-          <div class="user-paste-data-header-arrow-wrapper">
-            <div class="user-paste-data-header-arrow" style="transform: rotate(0deg);"></div>
-          </div>
-          <div class="user-paste-data-header-text"></div>
-        </div>
-        <div class="user-paste-data-content-wrapper">
-          <div>
-            <div class="user-paste-data-content">
-              <div class="user-paste-data-description"></div>
-              <textarea class='user-paste-data-textarea'></textarea>
-              <div class='user-paste-data-submit-wrapper'>
-                <span class='user-paste-data-submit-explanation'></span>
-                <select class='user-paste-data-submit-column-select'></select>
-                <span class='user-paste-data-submit-button dashed-button'></span>
-              </div>
+  <body>
+    <div class="userprofile-wrapper">
+      <div class="grid-main">
+        <div class="grid-row">
+          <span class="grid"></span>
+          <div class='grid-column-right'>
+            <div class='grid-buttons'>
+              <span class="add-column-button dashed-button" onClick="dax.userprofile.addColumn()"></span>
+              <span class="save-grid-image-button dashed-button"></span>
+            </div>
+            <div class='grid-info'>
+              <table class='grid-legend'>
+                <tr><td class='grid-legend-symbol cell-good-reference'></td><td class='grid-legend-text good'></td></tr>
+                <tr><td class='grid-legend-symbol cell-avg-reference'></td><td class='grid-legend-text avg'></td></tr>
+                <tr><td class='grid-legend-symbol cell-bad-reference'></td><td class='grid-legend-text bad'></td></tr>
+              </table>
+              <div id='grid-description' class='description'></div>
             </div>
           </div>
-          <div  class="user-paste-data-error-log-wrapper">
-            <div class="user-paste-data-error-log">
-              <div class="user-paste-data-error-log-header">
-                <span>⚠️</span>
-                <span class="user-paste-data-error-log-header-text"><span/>
+        </div>
+        <div class="user-paste-data">
+          <div class="user-paste-data-header">
+            <div class="user-paste-data-header-arrow-wrapper">
+              <div class="user-paste-data-header-arrow" style="transform: rotate(0deg);"></div>
+            </div>
+            <div class="user-paste-data-header-text"></div>
+          </div>
+          <div class="user-paste-data-content-wrapper">
+            <div>
+              <div class="user-paste-data-content">
+                <div class="user-paste-data-description"></div>
+                <textarea class='user-paste-data-textarea'></textarea>
+                <div class='user-paste-data-submit-wrapper'>
+                  <span class='user-paste-data-submit-explanation'></span>
+                  <select class='user-paste-data-submit-column-select'></select>
+                  <span class='user-paste-data-submit-button dashed-button'></span>
+                </div>
               </div>
-              <div class="user-paste-data-error-text-area">
-                <div class="user-paste-data-error-text-number-bounds-errors"></div>
-                <div class="user-paste-data-error-text-no-number-errors"></div>
-                <div class="user-paste-data-error-text-multiple-rows-errors"></div>
-                <div class="user-paste-data-error-text-no-row-errors"></div>
-              </div>
-            </diV>
+            </div>
+            <div  class="user-paste-data-error-log-wrapper">
+              <div class="user-paste-data-error-log">
+                <div class="user-paste-data-error-log-header">
+                  <span>⚠️</span>
+                  <span class="user-paste-data-error-log-header-text"><span/>
+                </div>
+                <div class="user-paste-data-error-text-area">
+                  <div class="user-paste-data-error-text-number-bounds-errors"></div>
+                  <div class="user-paste-data-error-text-no-number-errors"></div>
+                  <div class="user-paste-data-error-text-multiple-rows-errors"></div>
+                  <div class="user-paste-data-error-text-no-row-errors"></div>
+                </div>
+              </diV>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="chart-main">
-      <div class="header">
-        <div class="header-select-div">
-          <select class="header-select" onchange="dax.userprofile.headerChange(this)"></select>
-        </div>
-      </div>
-      <div class="chart-section-wrapper">
-        <div class="profile-chart-row">
-          <span class="dashed-button save-image profile-save-image" onClick="dax.profile.generateImage()"></span>
-          <div class="profile-column-left">
-            <div class="profile-chart-wrapper">
-              <svg class="profile-chart"></svg>
-              <div class="profile-tooltipdiv"></div>
-              <div class="profile-arrow-left"></div>
-            </div>
+      <div class="chart-main">
+        <div class="header">
+          <div class="header-select-div">
+            <select class="header-select" onchange="dax.userprofile.headerChange(this)"></select>
           </div>
-          <div class="profile-column-right">
-            <div class="profile-description-wrapper">
-              <div id='profile-description' class="profile-description description"></div>
+        </div>
+        <div class="chart-section-wrapper">
+          <div class="profile-chart-row">
+            <span class="dashed-button save-image profile-save-image" onClick="dax.profile.generateImage()"></span>
+            <div class="profile-column-left">
+              <div class="profile-chart-wrapper">
+                <svg class="profile-chart"></svg>
+                <div class="profile-tooltipdiv"></div>
+                <div class="profile-arrow-left"></div>
+              </div>
+            </div>
+            <div class="profile-column-right">
+              <div class="profile-description-wrapper">
+                <div id='profile-description' class="profile-description description"></div>
+              </div>
             </div>
           </div>
         </div>

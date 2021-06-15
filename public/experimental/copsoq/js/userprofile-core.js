@@ -106,7 +106,7 @@
 
       // Send height changes to parent window, so it can update iframe size
       if (window.ResizeObserver) {
-        const outerElement = document.querySelector('body')
+        const outerElement = document.querySelector('.userprofile-wrapper')
         const resizeObserver = new ResizeObserver(function (entries) {
           for (let i = 0; i < entries.length; i++) {
             if (entries[i].target === outerElement) {
