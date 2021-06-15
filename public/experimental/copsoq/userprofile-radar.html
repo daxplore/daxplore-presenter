@@ -16,6 +16,9 @@
     <link rel="stylesheet" href="../../css/daxplore-common.css">
     <link rel="stylesheet" href="../../css/profile/profile-chart.css">
     <link rel="stylesheet" href="css/userprofile.css">
+    <link rel="stylesheet" href="css/profile-radar-panel.css">
+    <link rel="stylesheet" href="css/radargraph.css">
+    <link rel="stylesheet" href="css/radarchart.css">
     <link rel="stylesheet" href="../../css/tabs.css">
 
     <!-- Import library dependencies -->
@@ -44,10 +47,12 @@
 
     <!-- Import Daxplore chart -->
     <script type="text/javascript" src="../../js/profile-chart.js"></script>
+    <script type="text/javascript" src="js/radarchart.js"></script>
+    <script type="text/javascript" src="js/radargraph-panel.js"></script>
 
     <!-- Import Daxplore User Profile -->
     <script type="text/javascript" src="js/userprofile-grid.js"></script>
-    <script type="text/javascript" src="js/userprofile-core.js"></script>
+    <script type="text/javascript" src="js/userprofile-radar-core.js"></script>
 
     <!-- Webfont loader -->
     <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
@@ -123,24 +128,59 @@
     </div>
 
     <div class="chart-main">
-      <div class="header">
-        <div class="header-select-div">
+      <!-- Tabs used to select the chart to display -->
+      <div class="tabbed-section">
+        <div class="chart-tabs">
+          <div class="chart-tab-spacing"></div>
+          <div class="chart-tab profile chart-tab-selected"></div>
+          <div class="chart-tab-spacing"></div>
+          <div class="chart-tab radar"></div>
+          <div class="chart-tab-spacing chart-tab-spacing--pre-header"></div>
           <select class="header-select" onchange="dax.userprofile.headerChange(this)"></select>
+          <div class="chart-tab-filler"></div>
         </div>
-      </div>
-      <div class="chart-section-wrapper">
-        <div class="profile-chart-row">
-          <span class="dashed-button save-image profile-save-image" onClick="dax.profile.generateImage()"></span>
-          <div class="profile-column-left">
-            <div class="profile-chart-wrapper">
-              <svg class="profile-chart"></svg>
-              <div class="profile-tooltipdiv"></div>
-              <div class="profile-arrow-left"></div>
+        <div class="chart-section-wrapper">
+          <div class="profile-chart-row tab-content">
+            <span class="dashed-button save-image profile-save-image" onClick="dax.profile.generateImage()"></span>
+            <div class="profile-column-left">
+              <div class="profile-chart-wrapper">
+                <svg class="profile-chart"></svg>
+                <div class="profile-tooltipdiv"></div>
+                <div class="profile-arrow-left"></div>
+              </div>
+            </div>
+            <div class="profile-column-right">
+              <div class="profile-description-wrapper">
+                <div id='profile-description' class="description profile-description"></div>
+              </div>
             </div>
           </div>
-          <div class="profile-column-right">
-            <div class="profile-description-wrapper">
-              <div id='profile-description' class="profile-description description"></div>
+          <div class="radar-main tab-content hidden">
+            <div class="radar-graph-row">
+              <span class="dashed-button save-image radargraph-save-image" onClick="dax.radargraph.generateRadarGraphImage()"></span>
+              <div class="radar-graph-title">Välj ett område i modellen</div>
+              <svg id="radar-graph">
+                <g id="radar-graph-group">
+                  <path id="radar-node-path"></path>
+                  <g class="radar-node" id="radar-node-0"></g>
+                  <g class="radar-node" id="radar-node-1"></g>
+                  <g class="radar-node" id="radar-node-2"></g>
+                  <g class="radar-node" id="radar-node-3"></g>
+                  <g class="radar-node" id="radar-node-4"></g>
+                </g>
+              </svg>
+            </div>
+            <div class="radar-chart-row">
+              <span class="dashed-button save-image radarchart-save-image" onClick="dax.radargraph.generateActiveRadarChartImage()"></span>
+              <div class="radar-chart-full-column">
+                <div class='radar-chart-full-header'></div>
+                <svg class="radar-chart-full" id="radar-chart-full-0"></svg>
+                <svg class="radar-chart-full" id="radar-chart-full-1"></svg>
+                <svg class="radar-chart-full" id="radar-chart-full-2"></svg>
+                <svg class="radar-chart-full" id="radar-chart-full-3"></svg>
+                <svg class="radar-chart-full" id="radar-chart-full-4"></svg>
+              </div>
+              <div class="description radar-description"></div>
             </div>
           </div>
         </div>

@@ -41,6 +41,43 @@
     })
   }
 
+  function populateRadarDOM (radargraphData, questions, qIDs) {
+    d3.select('.radargraph-save-image')
+      .text(dax.text('imageSaveButton'))
+    d3.select('.radarchart-save-image')
+      .text(dax.text('imageSaveButton'))
+    dax.radargraph.initializeRadarGraph(radargraphData, questions, qIDs)
+    dax.userprofile.addGridUpdateCallback(function (names, means) {
+      dax.radargraph.setChartData(names, means)
+    })
+  }
+
+  function onTabClick () {
+    const classes = this.classList
+    let tab
+    for (let i = 0; i < classes.length; i++) {
+      if (classes[i] === 'profile') {
+        tab = 'profile'
+        break
+      } else if (classes[i] === 'radar') {
+        tab = 'radar'
+        break
+      }
+    }
+
+    if (typeof tab !== 'undefined') {
+      d3.selectAll('.chart-tab')
+        .classed('chart-tab-selected', false)
+      d3.select('.chart-tab.' + tab)
+        .classed('chart-tab-selected', true)
+
+      d3.select('.profile-chart-row')
+        .classed('hidden', tab !== 'profile')
+      d3.select('.radar-main')
+        .classed('hidden', tab !== 'radar')
+    }
+  }
+
   exports.initializeUserProfile =
   function () {
     // Use Axios to download all needed metadata files from the server
@@ -50,16 +87,18 @@
     function getUsertexts () { return axios.get('../../data/usertexts.json') }
     function getListview () { return axios.get('../../data/listview.json') }
     function getManifest () { return axios.get('../../data/manifest.json') }
+    function getRadargraph () { return axios.get('../../data/radargraph.json') }
 
     // Make a batch Axios request to download all metadata and data asynchronously
-    axios.all([getQuestions(), getSettings(), getUsertexts(), getListview(), getManifest()])
-    .then(axios.spread(function (questionsResponse, settingsResponse, usertextsResponse, listviewResponse, manifestResponse) {
+    axios.all([getQuestions(), getSettings(), getUsertexts(), getListview(), getManifest(), getRadargraph()])
+    .then(axios.spread(function (questionsResponse, settingsResponse, usertextsResponse, listviewResponse, manifestResponse, radargraphResponse) {
       // Get the downloaded metadata
       const questions = questionsResponse.data
       // const settings = settingsResponse.data
       const usertexts = usertextsResponse.data
       const listview = listviewResponse.data
       const manifest = manifestResponse.data
+      const radargraphData = radargraphResponse.data
 
       // The function logs the error as a side effect,
       // so if the versions don't match all we have to do here is exit
@@ -67,6 +106,17 @@
       if (!dax.common.hasMatchingDataFileVersions(manifest.dataPackageVersion)) {
         return
       }
+
+      // Add click events to the tabs
+      d3.selectAll('.chart-tab')
+        .on('click', onTabClick)
+
+      // Set chart tab names
+      d3.select('.chart-tab.profile')
+        .text('Profildiagram') // TODO externalize
+      d3.select('.chart-tab.radar')
+        .text('Radardiagram') // TODO externalize
+
       const shorttextMap = {}
       const descriptionMap = {}
       const directionMap = {}
@@ -97,9 +147,11 @@
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function (e) {
           populateUserProfileDOM(listview, meanReferenceMap, shorttextMap, descriptionMap, directionMap, titleRegexpMap)
+          populateRadarDOM(radargraphData, questions, [])
         })
       } else {
         populateUserProfileDOM(listview, meanReferenceMap, shorttextMap, descriptionMap, directionMap, titleRegexpMap)
+        populateRadarDOM(radargraphData, questions, listview)
       }
     })).catch(function (error) {
       console.error(error)
@@ -109,5 +161,6 @@
   exports.headerChange =
   function (select, animateUpdate) {
     dax.profile.setPerspectiveOption(select.value)
+    dax.radargraph.setPerspectiveOption(select.value)
   }
 })(window.dax = window.dax || {})
