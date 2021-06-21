@@ -33,6 +33,12 @@
 
   exports.perspectiveSetQueryDefinition =
   function (perspectiveID, perspectiveSecondaryID, perspectiveOptionsIntArray, total) {
+    // When perspectiveID is null, reset the perspective picker to the default state
+    if (perspectiveID === null) {
+      setSelectedPerspective(dax.data.getExplorerPrimaryPerspectiveIDs()[0], true)
+      // exports.perspectiveSetQueryDefinition(dax.data.getExplorerPrimaryPerspectiveIDs()[0], null, [], total)
+      return
+    }
     if (!dax.data.isExplorerPrimaryPerspective(perspectiveID)) {
       console.warn('Not a valid primary perspective:', perspectiveID)
       return
@@ -43,7 +49,7 @@
       return
     }
 
-    setSelectedPerspective(perspectiveID)
+    setSelectedPerspective(perspectiveID, false)
     setSelectedSecondaryPerspective(perspectiveSecondaryID)
 
     // Remap options from array of ints to array of bools
@@ -144,8 +150,8 @@
         .classed('pervarpicker-varoption', true)
         .classed('no-select', true)
         .on('click', function (perspectiveID) {
-          setSelectedPerspective(perspectiveID)
-          dax.explorer.selectionUpdateCallback()
+          setSelectedPerspective(perspectiveID, false)
+          dax.explorer.selectionUpdateCallback(true)
         })
         .text(function (perspectiveID) { return dax.data.getQuestionShortText(perspectiveID) })
 
@@ -155,7 +161,7 @@
           selectedOptions.add(i)
         }
         updateElements()
-        dax.explorer.selectionUpdateCallback()
+        dax.explorer.selectionUpdateCallback(true)
       })
       .text(dax.text('perspectivesAllButton')) // TODO use new text ID style
 
@@ -163,7 +169,7 @@
       .on('click', function () {
         selectedOptions.clear()
         updateElements()
-        dax.explorer.selectionUpdateCallback()
+        dax.explorer.selectionUpdateCallback(true)
       })
       .text(dax.text('perspectivesNoneButton')) // TODO use new text ID style
 
@@ -194,10 +200,15 @@
         })
         .on('click', function (d) {
           setSelectedSecondaryPerspective(d.type === 'perspective' ? d.id : null)
-          dax.explorer.selectionUpdateCallback()
+          dax.explorer.selectionUpdateCallback(true)
         })
 
-    initializeSelection()
+    if (!selectedPerspectiveID) {
+      setSelectedPerspective(dax.data.getExplorerPrimaryPerspectiveIDs()[0], false)
+    } else {
+      setSelectedPerspective(selectedPerspectiveID, false)
+    }
+
     initialized = true
   }
 
@@ -240,14 +251,6 @@
     return totalSelected
   }
 
-  function initializeSelection () {
-    if (!selectedPerspectiveID) {
-      setSelectedPerspective(dax.data.getExplorerPrimaryPerspectiveIDs()[0])
-    } else {
-      setSelectedPerspective(selectedPerspectiveID)
-    }
-  }
-
   function setSelectedColumnOneHighlight (index) {
     combinedColumnOneHighlight = index
     combinedColumnTwoHighlight = dax.data.getPerspectiveOptionFirstChild(selectedPerspectiveID, combinedColumnOneHighlight)
@@ -280,14 +283,14 @@
       selectedOptions.add(option.index)
     }
     updateElements()
-    dax.explorer.selectionUpdateCallback()
+    dax.explorer.selectionUpdateCallback(true)
   }
 
-  function setSelectedPerspective (perspectiveID) {
+  function setSelectedPerspective (perspectiveID, forceUpdate) {
     if (!dax.data.isExplorerPrimaryPerspective(perspectiveID)) {
       throw new Error('Perspective does not exist: ' + perspectiveID)
     }
-    const changed = selectedPerspectiveID !== perspectiveID
+    const changed = selectedPerspectiveID !== perspectiveID || forceUpdate
     selectedPerspectiveID = perspectiveID
 
     if (changed) {

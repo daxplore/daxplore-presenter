@@ -87,7 +87,7 @@
           // TODO replace with callback to js page handler
           // gwtQuestionCallback()
           // }
-          dax.explorer.selectionUpdateCallback()
+          dax.explorer.selectionUpdateCallback(true)
         })
 
     openGroup = groupMap[selectedQuestion]
@@ -108,7 +108,12 @@
 
   exports.questionSetQueryDefinition =
   function (questionID) {
-    if (!questionIDs.has(questionID)) { return } // TODO log error?
+    // When questionID is null, reset the question picker to the default state
+    if (questionID === null) {
+       questionID = groups[0].questions[0]
+    } else if (!questionIDs.has(questionID)) {
+       return // TODO log error?
+    }
     selectedQuestion = questionID
     openGroup = groupMap[selectedQuestion]
     updateTree()

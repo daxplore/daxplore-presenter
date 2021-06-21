@@ -214,7 +214,7 @@
       return
     }
     selectedTab = tab
-    dax.explorer.selectionUpdateCallback()
+    dax.explorer.selectionUpdateCallback(true)
   }
 
   exports.updateChartPanelSize =
