@@ -36,7 +36,6 @@
     // When perspectiveID is null, reset the perspective picker to the default state
     if (perspectiveID === null) {
       setSelectedPerspective(dax.data.getExplorerPrimaryPerspectiveIDs()[0], true)
-      // exports.perspectiveSetQueryDefinition(dax.data.getExplorerPrimaryPerspectiveIDs()[0], null, [], total)
       return
     }
     if (!dax.data.isExplorerPrimaryPerspective(perspectiveID)) {
