@@ -222,8 +222,8 @@
     const better = []
     const average = []
     const worse = []
-    const directionHigh = goodDirections[node] === 'HIGH'
     for (let i = 0; i < values[node].length; i++) {
+      const directionHigh = goodDirections[node][i] === 'HIGH'
       const mean = values[node][i][selectedPerspectiveOption]
       const reference = referenceValues[node][i]
       if (mean === -1) {
