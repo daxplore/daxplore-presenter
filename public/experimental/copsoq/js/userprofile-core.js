@@ -112,7 +112,7 @@
             if (entries[i].target === outerElement) {
               if (entries[i].contentRect.height > maxHeight) {
                 maxHeight = entries[i].contentRect.height
-                parent.postMessage({ source: 'DAXPLORE', height: maxHeight }, '*')
+                parent.postMessage({ source: 'DAXPLORE_USERPROFILE', height: maxHeight }, '*')
               }
               break
             }
