@@ -11,7 +11,7 @@
   let selectedOption = 0
   let selectedQIDs = []
   let chartwrapperBB, xAxisTopHeight, margin, width, height
-  let xScale, yScale, yAxisElement, yAxisReferenceElement // TODO unused: chart
+  let xScale, yScale, yAxisElement, yAxisReferenceElement
   let yAxisWidth
 
   const elementTransition = d3.transition()
@@ -158,13 +158,11 @@
       elTransition = d3.transition().duration(0)
     }
 
-    // const chart = d3.selectAll('.profile-chart')
-
     const paddingInner = 0.3
     const paddingOuter = 0.4
     const maxBandwidth = 50
 
-    // rearranged equation from d3's source file band.js, ignoring the floor call
+    // Rearranged equation from d3's source file band.js, ignoring the floor call
     // https://github.com/d3/d3-scale/blob/fd07dd8ceeaeaec612f675050ac134243b406f64/src/band.js#L26
     const yHeightWithMaxBand = Math.max(1, selectedQIDs.length - paddingInner + paddingOuter * 2) * maxBandwidth / (1 - paddingInner)
 
@@ -256,13 +254,13 @@
     let bars = chart.selectAll('.bar')
       .data(
         selectedQIDs, // data
-        function (option) { return option } // key function
+        function (option) { return option }, // key function
       )
 
-    // remove old bars
+    // Remove old bars
     bars.exit().remove()
 
-    // add new bars
+    // Add new bars
     bars.enter().append('g')
       .classed('bar', true)
       .attr('transform', function (d, i) { return 'translate(' + (oldYAxisWidth + 1) + ',' + yScale(d) + ')' })
@@ -311,10 +309,10 @@
     let references = chart.selectAll('.reference')
       .data(selectedQIDs)
 
-    // remove old reference lines
+    // Remove old reference lines
     references.exit().remove()
 
-    // add new reference lines
+    // Add new reference lines
     references.enter().append('g')
       .classed('reference', true)
       .on('mouseover',
@@ -342,8 +340,7 @@
         .attr('height', referenceHeight + 2)
         .attr('opacity', '0')
 
-    // update all reference lines
-
+    // Update all reference lines
     references = d3.selectAll('.reference')
 
     references.interrupt().selectAll('*').interrupt()
@@ -373,6 +370,7 @@
     tooltipOut()
 
     // HEADER SELECT
+    // TODO should header be in separate component or in core instead?
     const headerSelectDiv = d3.select('.header-select-div')
     const headerSelect = d3.select('.header-select')
 
@@ -442,7 +440,7 @@
       shorttextsMap,
       directionsMap,
       selectedSelectedOption,
-      customDataChartInput
+      customDataChartInput,
     ) {
       qIDs = qIDsArray
       meanReferences = referencesMap

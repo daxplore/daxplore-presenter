@@ -1,0 +1,28 @@
+/* https://codepen.io/ericrasch/pen/zjDBx */
+/* Select Box Styles: bavotasan.com Method (with special adaptations by ericrasch.com) */
+/* Source: https://bavotasan.com/2011/style-select-box-using-only-css/ */
+.header-select-div {
+/*   background: url(../img/list-select-downarrow.jpg) no-repeat right center; */
+  height: 34px;
+  overflow: hidden;
+}
+
+.header-select {
+  background: transparent;
+  border: 1px solid #BBB;
+  font-size: 16px;
+  font-weight: bold;
+  height: 34px;
+  padding: 5px; /* If you add too much padding here, the options won't show in IE */
+  text-indent: 0px;
+}
+
+@-moz-document url-prefix() {
+  select:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 #000;
+  }
+  .header-select:focus {
+    border: 1px gray dotted;
+  }
+}

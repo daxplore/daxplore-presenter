@@ -11,6 +11,40 @@
     dax.radargraph.setChartData(perspectiveOptions, means)
   }
 
+  function initializeHeaderSelect (perspectiveOptions) {
+    const headerSelect = d3.select('.header-select')
+    const options = headerSelect.selectAll('option')
+      .data(perspectiveOptions, function (d) { return d })
+
+    options.exit().remove()
+
+    options.enter()
+      .append('option')
+        .text(function (d) { return d })
+        .attr('value', function (d, i) { return i })
+  }
+
+  function updateHeaderSelectPosition (animate) {
+    const headerSelectDiv = d3.select('.header-select-div')
+
+    const radarSvgBounds = d3.select('#radar-graph').node().getBoundingClientRect()
+    const selectWidth = d3.select('.header-select').node().getBoundingClientRect().width
+
+    headerSelectDiv.interrupt()
+
+    conditionalTransition(headerSelectDiv, animate)
+      .style('margin-left', radarSvgBounds.x + radarSvgBounds.width / 2 - selectWidth / 2 + 'px')
+  }
+
+  // Helper
+  function conditionalTransition (selection, applyTransition) {
+    if (applyTransition) {
+      const t = d3.transition().duration(300).ease(d3.easeLinear)
+      return selection.transition(t)
+    }
+    return selection
+  }
+
   exports.initialize =
   function () {
     // Use Axios to download all needed metadata files from the server
@@ -51,10 +85,8 @@
       }
       // TODO communicate the error directly in the DOM?
       if (!isValidPerspective) {
-        // const location = new URL(window.location.href)
         if (perspectiveID === null || typeof perspectiveID === 'undefined' || perspectiveID.length === 0) {
-          // TODO find IE compatible way to do this
-          // location.search = 'perspective=' + perspectives[0]
+          // TODO find IE11 compatible way to do this
           dax.common.logError('The URL must contain the perspective parameter, for example: ?perspective=' + perspectives[0].q) //, location.href)
         } else {
           dax.common.logError('The used perspective URL paremter is not supported: ?perspective=' + perspectiveID)
@@ -99,6 +131,7 @@
 
       dax.text.initializeResources(usertexts)
       dax.profile.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap)
+      initializeHeaderSelect(perspectiveOptions)
 
       // Get the data used in the listview
       function getQuestionData (questionID) { return axios.get('../../data/questions/' + questionID + '.json') }
@@ -123,9 +156,11 @@
         if (document.readyState === 'loading') {
           document.addEventListener('DOMContentLoaded', function (e) {
             populateRadarDOM(radargraphData, questions, qIDs, perspectiveOptions, means)
+            updateHeaderSelectPosition(false)
           })
         } else {
           populateRadarDOM(radargraphData, questions, qIDs, perspectiveOptions, means)
+          updateHeaderSelectPosition(false)
         }
       }).catch(function (error) {
         console.error(error)
@@ -137,7 +172,7 @@
 
   exports.headerChange =
   function (select) {
-    dax.profile.setPerspectiveOption(select.value)
+    updateHeaderSelectPosition(true)
     dax.radargraph.setPerspectiveOption(Number(select.value))
   }
 })(window.dax = window.dax || {})

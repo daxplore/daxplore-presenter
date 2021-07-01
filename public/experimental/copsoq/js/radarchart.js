@@ -23,25 +23,11 @@
   const outerTickLineHeight = 1.3 // Factor of font size
 
   const dataPointColor = '#555'
-  // const dataPointStrokeColor = '#666'
-  // const dataPointStrokeWidth = 0.02 // Measured in radius units
-  // const dataPointFillColor = '#666'
-  // const dataPointFillOpacity = '0.0'
 
   const overlayTextWidth = 0.9 // Measured in radius units
   const overlayTextLineHeight = 1.05 // Factor of font size
 
   const margin = { top: 0, bottom: 0, left: 0, right: 0 }
-  //
-  // function myTransitionSettings (transition) {
-  //   transition
-  //       .duration(100)
-  //       .delay(0)
-  // }
-  //
-  // const elementTransition = d3.transition()
-  //   .duration(3000)
-  //   .ease(d3.easeLinear)
 
   // Helper
   function conditionalTransition (selection, applyTransition) {
@@ -51,8 +37,6 @@
     }
     return selection
   }
-
-  // const DRAW_DATA_LINE = false
 
   // Alternative mod implementation, since % of negative numbers returns negative numbers in JS
   function mod (n, m) {
@@ -67,7 +51,7 @@
       axisTextArray,
       referenceValueArray,
       goodDirectionInput,
-      overlayTextArrayInput
+      overlayTextArrayInput,
     ) {
       if (axisTextArray.length !== referenceValueArray.length) {
         throw new Error('Invalid radar chart input data, different array lengths.')
@@ -77,7 +61,6 @@
       const goodDirection = goodDirectionInput
       const overlayTextArray = overlayTextArrayInput
 
-      // let animateNextUpdate = false
       const radarChart = {}
 
       const angleSlice = 2 * Math.PI / referenceData.length
@@ -151,11 +134,6 @@
           .style('fill', '#444')
           .text(function (d) { return d }) // TODO externalize formatting
 
-      // const dataPointLine = radarGroup.append('path')
-      //   .style('fill', dataPointFillColor)
-      //   .style('fill-opacity', dataPointFillOpacity)
-      //   .style('stroke', dataPointStrokeColor)
-
       // OVERLAY TEXT
       const overlayTextElement = chart.append('text')
         .style('fill', 'black')
@@ -171,7 +149,7 @@
         let referenceDataInterpolated = referenceData
 
         // let pointDataInterpolated = pointDataForOption
-        // TODO kollapsa tomma datapunkter, eller rita inte ut dem?
+        // TODO collapse empty datapoints or don't draw th
         if (referenceData.length === 2) {
           // TODO do non-linear interpolation using smooth.js?
           const referenceStep = (referenceData[1] - referenceData[0]) / lowDataInterpolationStepCount
@@ -231,7 +209,7 @@
           .style('display', displayModeMiniaturized ? 'none' : '')
           .style('position', displayModeMiniaturized ? 'absolute' : '')
           .attr('transform',
-            function (d) { return 'translate(' + (radius * axisCircleTextFontSize) / 8 + ',' + (-radiusScale(d - axisXRingStepSize / 2) + (radius * axisCircleTextFontSize) / 5) + ')' }
+            function (d) { return 'translate(' + (radius * axisCircleTextFontSize) / 8 + ',' + (-radiusScale(d - axisXRingStepSize / 2) + (radius * axisCircleTextFontSize) / 5) + ')' },
           )
 
         // LINE AXIS
@@ -528,11 +506,6 @@
           const scaleTransform = ' scale(0.8)'
           const angleSlice = 2 * Math.PI / referenceData.length
 
-          // SCALE DOWN, TO FIT TEXT INSIDE IMAGE BECAUSE IT'S TOO BIG IN IMAGE FOR SOME REASON
-          // RESIZE BEFORE POSITIONING
-          // radarGroup.selectAll('.line-axis-text')
-          //   .attr('transform', scaleTransform)
-
           // TODO DUPLICATED POSITIONING CODE TO MAKE SCALE RESIZE WORK IN FF, TURN INTO FUNCTION
           // SCALE DOWN, TO FIT TEXT INSIDE IMAGE BECAUSE IT'S TOO BIG IN IMAGE FOR SOME REASON
           const leftAdjust = 20
@@ -551,11 +524,6 @@
               const coordinates = getTextCoordinates(radius, angle, textBBox.width, textBBox.height)
               return 'translate(' + coordinates.join(',') + ')' + scaleTransform
             })
-
-          // const allTexts = chart.selectAll('text')
-          // .style('transform', (d, i, n) => d3.select(n[i]).style('transform').replace('none', '') + scaleTransform)
-          // const transformBefore = chart.selectAll('text').style('transform')
-          // console.log(transformBefore)
 
           const source = (new XMLSerializer()).serializeToString(svg)
 

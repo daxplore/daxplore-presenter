@@ -55,6 +55,7 @@
             return questions[i].short
           }
         }
+        throw new Error('Missing question ID in questions array:', qid)
       })
     })
     goodDirections = nodes.map(function (node) {
@@ -64,6 +65,7 @@
             return questions[i].gooddirection
           }
         }
+        throw new Error('Missing question ID in questions array:', qid)
       })
     })
     referenceValues = nodes.map(function (node) {
@@ -73,6 +75,7 @@
             return questions[i].mean_reference
           }
         }
+        throw new Error('Missing question ID in questions array:', qid)
       })
     })
 
@@ -136,8 +139,6 @@
         .style('margin-right', (fullChartMaxOffset.right - fullCircleCenterOffsets[i].right) + 'px')
         .style('margin-bottom', (fullChartMaxOffset.bottom - fullCircleCenterOffsets[i].bottom) + 'px')
     }
-
-    // exports.setPerspectiveOption(0)
   }
 
   exports.setChartData =
@@ -169,26 +170,7 @@
       .text(nodes[nodeIndex].headerText)
       .style('margin-left', (Math.max(0, fullChartMaxOffset.left - fullChartMaxOffset.right) + 'px'))
       .style('margin-right', (Math.max(0, fullChartMaxOffset.right - fullChartMaxOffset.left) + 'px'))
-    // d3.select('#radar-chart-full').selectAll('*').remove()
-    // d3.select('#radar-chart-full')
-    //   .style('margin-left', (fullChartMaxOffset.left - fullCircleCenterOffsets[nodeIndex].left) + 'px')
-    //   .style('margin-top', (fullChartMaxOffset.top - fullCircleCenterOffsets[nodeIndex].top) + 'px')
-    //   .style('margin-right', (fullChartMaxOffset.right - fullCircleCenterOffsets[nodeIndex].right) + 'px')
-    //   .style('margin-bottom', (fullChartMaxOffset.bottom - fullCircleCenterOffsets[nodeIndex].bottom) + 'px')
 
-    // fullChart = dax.radarchart.createRadarChart(
-    //   '#radar-chart-full',
-    //   texts[selectedNode],
-    //   referenceValues[selectedNode],
-    //   goodDirections[selectedNode][0],
-    //   overlayTexts[selectedNode]
-    // )
-    // fullChart.addHoverCallback((d, i, n) => setDescription(i))
-
-    // fullCharts[nodeIndex].setData(values[selectedNode], false)
-
-    // d3.select('#radar-chart-full')
-    //   .attr('transform', 'translate(' + positions[0].join(',') + ')')
     setDescription(selectedNode)
   }
 
