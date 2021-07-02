@@ -66,7 +66,7 @@
       const angleSlice = 2 * Math.PI / referenceData.length
 
       // CHART INSTANCE VARIABLES
-      const chart = d3.selectAll(elementClassName)
+      const chart = d3.select(elementClassName)
       let radius = 250
       const radiusScale = d3.scaleLinear()
       const dataPointSymbol = d3.symbol().type(d3.symbolCircle)
@@ -496,30 +496,30 @@
 
       radarChart.generateImage =
         function () {
+          const imageScaling = 2
           const doctype = '<?xml version="1.0" standalone="no"?>' +
             '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
 
-          const imageScaling = 2
-          const svg = chart.node()
+          const chartCopy = d3.select(chart.node().cloneNode(true))
+          const radarGroupCopy = d3.select(radarGroup.node().cloneNode(true))
 
-          const marginBefore = chart.style('margin') // copy existing margins
-          chart.style('margin', 0) // remove margins
+          const svg = chartCopy.node()
+
+          chartCopy.style('margin', 0)
 
           const scaleTransform = ' scale(0.8)'
           const angleSlice = 2 * Math.PI / referenceData.length
 
-          // TODO DUPLICATED POSITIONING CODE TO MAKE SCALE RESIZE WORK IN FF, TURN INTO FUNCTION
-          // SCALE DOWN, TO FIT TEXT INSIDE IMAGE BECAUSE IT'S TOO BIG IN IMAGE FOR SOME REASON
           const leftAdjust = 20
           const widthAdjust = 40
-          const widthBefore = chart.attr('width')
-          chart.attr('width', imageScaling * (Number(widthBefore) + widthAdjust))
-          const heightBefore = chart.attr('height')
-          chart.attr('height', imageScaling * Number(heightBefore))
-          chart.style('transform', 'scale(' + imageScaling + ')' +
+          const widthBefore = chartCopy.attr('width')
+          chartCopy.attr('width', imageScaling * (Number(widthBefore) + widthAdjust))
+          const heightBefore = chartCopy.attr('height')
+          chartCopy.attr('height', imageScaling * Number(heightBefore))
+          chartCopy.style('transform', 'scale(' + imageScaling + ')' +
             'translate(' + ((Number(widthBefore) + widthAdjust) / 2 + leftAdjust) + 'px,' + (Number(heightBefore) / 2) + 'px)')
 
-          radarGroup.selectAll('.line-axis-text')
+          radarGroupCopy.selectAll('.line-axis-text')
             .attr('transform', function (d, i, nodes) {
               const textBBox = nodes[i].getBBox()
               const angle = 0.75 * TAU + i * angleSlice
@@ -528,31 +528,11 @@
             })
 
           const source = (new XMLSerializer()).serializeToString(svg)
-
           const blob = new Blob([doctype + source], { type: 'image/svg+xml;charset=utf-8' })
-
           const url = window.URL.createObjectURL(blob)
-
           const imgSelection = d3.select('body').append('img')
             .style('visibility', 'hidden')
-
           const img = imgSelection.node()
-
-          chart.style('margin', marginBefore) // restore margins
-          // chart.style('transform', '')
-
-          // TODO DUPLICATED POSITIONING CODE TO MAKE SCALE RESIZE WORK IN FF, TURN INTO FUNCTION
-          // RESTORE SCALE
-          chart.attr('width', widthBefore)
-          chart.attr('height', heightBefore)
-          chart.style('transform', '')
-          radarGroup.selectAll('.line-axis-text')
-            .attr('transform', function (d, i, nodes) {
-              const textBBox = nodes[i].getBBox()
-              const angle = 0.75 * TAU + i * angleSlice
-              const coordinates = getTextCoordinates(radius, angle, textBBox.width, textBBox.height)
-              return 'translate(' + coordinates.join(',') + ')'
-            })
 
           img.onload = function () {
             const canvasChartSelection = d3.select('body').append('canvas')
