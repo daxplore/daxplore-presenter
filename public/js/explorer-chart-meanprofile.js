@@ -354,7 +354,7 @@
     chart
       .attr('width', width)
 
-    // Skip animation if it would result in an iframe resize.
+    // Skip animation if it would result in an iframe resize
     const newHeight = yStop + margin.top + margin.bottom
     const isSmaller = newHeight <= tallestChartSoFar
     tallestChartSoFar = Math.max(newHeight, tallestChartSoFar)
@@ -649,19 +649,28 @@
   }
 
   function generateImage () {
+    const imageScaling = 2
     animateNextUpdate = false
     const initiaAvailablelWidth = availableWidth
     exports.setSize(saveImageWidth)
 
+    const chartCopy = d3.select(chart.node().cloneNode(true))
+
+    const leftAdjust = 0
+    const widthAdjust = 0
+    const widthBefore = chartCopy.attr('width')
+    chartCopy.attr('width', imageScaling * (Number(widthBefore) + widthAdjust))
+    const heightBefore = chartCopy.attr('height')
+    chartCopy.attr('height', imageScaling * Number(heightBefore))
+    chartCopy.style('transform', 'scale(' + imageScaling + ')' +
+      'translate(' + ((Number(widthBefore) + widthAdjust) / 2 + leftAdjust) + 'px,' + (Number(heightBefore) / 2) + 'px)')
+
     const doctype = '<?xml version="1.0" standalone="no"?>' +
       '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
 
-    const source = (new XMLSerializer()).serializeToString(chart.node())
-
+    const source = (new XMLSerializer()).serializeToString(chartCopy.node())
     const blob = new Blob([doctype + source], { type: 'image/svg+xml;charset=utf-8' })
-
     const url = window.URL.createObjectURL(blob)
-
     const imgSelection = d3.select('body').append('img')
       .style('visibility', 'hidden')
       .style('border', '1px solid red')
@@ -669,7 +678,6 @@
     const img = imgSelection.node()
 
     img.onload = function () {
-      // imgSelection
       const canvasChartSelection = d3.select('body').append('canvas')
         .attr('width', img.width)
         .attr('height', img.height)
@@ -687,13 +695,13 @@
       //   .style('display', longText === '' || shortText === longText ? 'none' : null)
 
       const headerText = dax.data.getQuestionShortText(questionID)
-      const headerPaddingTop = 5
-      const headerFontSize = 16
-      const headerPaddingBottom = 10
+      const headerPaddingTop = 5 * imageScaling
+      const headerFontSize = 16 * imageScaling
+      const headerPaddingBottom = 10 * imageScaling
       const headerFont = 'bold ' + headerFontSize + 'px "Varta"'
       const headerHeight = headerPaddingTop + headerFontSize + headerPaddingBottom
 
-      const imgMargin = { top: 10, right: 10, bottom: 20, left: 0 }
+      const imgMargin = { top: 1 * imageScaling, right: 10 * imageScaling, bottom: 20 * imageScaling, left: 10 * imageScaling }
 
       const completeWidth = imgMargin.left + img.width + imgMargin.right
       const completeHeight = imgMargin.top + headerHeight + img.height + imgMargin.bottom
@@ -714,8 +722,9 @@
 
       const headerWidth = ctx.measureText(headerText).width
 
-      const barAreaWidth = img.width - yAxisWidth
-      const headerHorizontalShift = yAxisWidth + barAreaWidth / 2 - headerWidth / 2
+      const yAxisSectionWidth = yAxisWidth * imageScaling + margin.left * imageScaling + imgMargin.left
+      const barAreaWidth = img.width - yAxisSectionWidth - margin.right * imageScaling - imgMargin.right
+      const headerHorizontalShift = yAxisSectionWidth + barAreaWidth / 2 - headerWidth / 2
 
       ctx.fillText(headerText, headerHorizontalShift + imgMargin.left, headerPaddingTop + headerFontSize + imgMargin.top)
 
@@ -731,11 +740,11 @@
         .replaceAll('{question}', headerText)
         .replaceAll('{perspective}', dax.data.getQuestionShortText(perspectives))
 
-      const sourceFontHeight = 11
+      const sourceFontHeight = 11 * imageScaling
       ctx.font = sourceFontHeight + 'px "Varta"'
       ctx.fillStyle = '#555'
       // TODO unused: let sourceTextWidth = ctx.measureText(sourceText).width
-      ctx.fillText(watermarkText, 5, completeHeight - 5)
+      ctx.fillText(watermarkText, 5 * imageScaling, completeHeight - 5 * imageScaling)
 
       ctx.drawImage(canvasChart, imgMargin.left, imgMargin.top + headerHeight)
 
