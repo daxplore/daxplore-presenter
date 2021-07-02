@@ -51,7 +51,7 @@
       axisTextArray,
       referenceValueArray,
       goodDirectionInput,
-      overlayTextArrayInput,
+      overlayTextArrayInput
     ) {
       if (axisTextArray.length !== referenceValueArray.length) {
         throw new Error('Invalid radar chart input data, different array lengths.')
@@ -209,7 +209,9 @@
           .style('display', displayModeMiniaturized ? 'none' : '')
           .style('position', displayModeMiniaturized ? 'absolute' : '')
           .attr('transform',
-            function (d) { return 'translate(' + (radius * axisCircleTextFontSize) / 8 + ',' + (-radiusScale(d - axisXRingStepSize / 2) + (radius * axisCircleTextFontSize) / 5) + ')' },
+            function (d) {
+              return 'translate(' + (radius * axisCircleTextFontSize) / 8 + ',' + (-radiusScale(d - axisXRingStepSize / 2) + (radius * axisCircleTextFontSize) / 5) + ')'
+            }
           )
 
         // LINE AXIS

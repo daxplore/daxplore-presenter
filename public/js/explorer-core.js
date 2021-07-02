@@ -128,7 +128,7 @@
   // Send a message to iframe parent to allow the outer page to update window hash
   function postUpdateHashToParent (hash) {
     if (window.self !== window.top) {
-      parent.postMessage({ source: 'DAXPLORE_EXPLORER', hash }, '*')
+      parent.postMessage({ source: 'DAXPLORE_EXPLORER', hash: hash }, '*')
     }
   }
 

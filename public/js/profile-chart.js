@@ -254,7 +254,7 @@
     let bars = chart.selectAll('.bar')
       .data(
         selectedQIDs, // data
-        function (option) { return option }, // key function
+        function (option) { return option } // key function
       )
 
     // Remove old bars
@@ -440,7 +440,7 @@
       shorttextsMap,
       directionsMap,
       selectedSelectedOption,
-      customDataChartInput,
+      customDataChartInput
     ) {
       qIDs = qIDsArray
       meanReferences = referencesMap
