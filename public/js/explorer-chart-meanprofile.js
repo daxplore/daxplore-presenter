@@ -650,20 +650,22 @@
 
   function generateImage () {
     const imageScaling = 2
+    const leftAdjust = 10
+    const widthAdjust = 10
+
     animateNextUpdate = false
     const initiaAvailablelWidth = availableWidth
     exports.setSize(saveImageWidth)
 
     const chartCopy = d3.select(chart.node().cloneNode(true))
+    chartCopy.select('g').attr('transform', 'translate(' + (margin.left + leftAdjust) + ',' + margin.top + ')')
 
-    const leftAdjust = 0
-    const widthAdjust = 0
     const widthBefore = chartCopy.attr('width')
     chartCopy.attr('width', imageScaling * (Number(widthBefore) + widthAdjust))
     const heightBefore = chartCopy.attr('height')
     chartCopy.attr('height', imageScaling * Number(heightBefore))
     chartCopy.style('transform', 'scale(' + imageScaling + ')' +
-      'translate(' + ((Number(widthBefore) + widthAdjust) / 2 + leftAdjust) + 'px,' + (Number(heightBefore) / 2) + 'px)')
+      'translate(' + ((Number(widthBefore) + widthAdjust) / 2) + 'px,' + (Number(heightBefore) / 2) + 'px)')
 
     const doctype = '<?xml version="1.0" standalone="no"?>' +
       '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
@@ -722,11 +724,11 @@
 
       const headerWidth = ctx.measureText(headerText).width
 
-      const yAxisSectionWidth = yAxisWidth * imageScaling + margin.left * imageScaling + imgMargin.left
-      const barAreaWidth = img.width - yAxisSectionWidth - margin.right * imageScaling - imgMargin.right
+      const yAxisSectionWidth = (yAxisWidth + margin.left + imgMargin.left) * imageScaling
+      const barAreaWidth = completeWidth - yAxisSectionWidth - margin.right * imageScaling - imgMargin.right
       const headerHorizontalShift = yAxisSectionWidth + barAreaWidth / 2 - headerWidth / 2
 
-      ctx.fillText(headerText, headerHorizontalShift + imgMargin.left, headerPaddingTop + headerFontSize + imgMargin.top)
+      ctx.fillText(headerText, headerHorizontalShift, headerPaddingTop + headerFontSize + imgMargin.top)
 
       let watermarkText = dax.text('explorer.image.watermark')
       const date = new Date()
