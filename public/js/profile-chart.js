@@ -477,21 +477,32 @@
 
   exports.generateImage =
   function () {
+    const imageScaling = 2
+    const leftAdjust = 10
+    const widthAdjust = 20
+
+    const chartCopy = d3.select(chartSvg.node().cloneNode(true))
+    chartCopy.select('g').attr('transform', 'translate(' + (margin.left + leftAdjust) + ',' + margin.top + ')')
+
     const doctype = '<?xml version="1.0" standalone="no"?>' +
       '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
 
     const descriptionRightPosition = d3.select('.x-top-description').node().getBoundingClientRect()
-    chartSvg.attr('width', Math.max(width + margin.left + margin.right, descriptionRightPosition.x + descriptionRightPosition.width + 5))
+    chartCopy.attr('width', Math.max(width + margin.left + margin.right, descriptionRightPosition.x + descriptionRightPosition.width + 5) + widthAdjust)
 
-    const svg = chartSvg.node()
-    const source = (new XMLSerializer()).serializeToString(svg)
+    const widthBefore = chartCopy.attr('width')
+    chartCopy.attr('width', imageScaling * (Number(widthBefore) + widthAdjust))
+    const heightBefore = chartCopy.attr('height')
+    chartCopy.attr('height', imageScaling * Number(heightBefore))
+    chartCopy.style('transform', 'scale(' + imageScaling + ')' +
+      'translate(' + ((Number(widthBefore) + widthAdjust) / 2) + 'px,' + (Number(heightBefore) / 2) + 'px)')
+
+    const source = (new XMLSerializer()).serializeToString(chartCopy.node())
     const blob = new Blob([doctype + source], { type: 'image/svg+xml;charset=utf-8' })
     const url = window.URL.createObjectURL(blob)
     const imgSelection = d3.select('body').append('img')
       .style('visibility', 'hidden')
     const img = imgSelection.node()
-
-    chartSvg.attr('width', width + margin.left + margin.right)
 
     img.onload = function () {
       const canvasChartSelection = d3.select('body').append('canvas')
@@ -504,13 +515,13 @@
       chartCtx.drawImage(img, 0, 0)
 
       const headerText = perspectiveOptions[selectedOption]
-      const headerPaddingTop = 5
-      const headerFontSize = 16
-      const headerPaddingBottom = 10
+      const headerPaddingTop = 5 * imageScaling
+      const headerFontSize = 16 * imageScaling
+      const headerPaddingBottom = 10 * imageScaling
       const headerFont = 'bold ' + headerFontSize + 'px "Varta"'
       const headerHeight = headerPaddingTop + headerFontSize + headerPaddingBottom
 
-      const imgMargin = { top: 10, right: 20, bottom: 20, left: 10 }
+      const imgMargin = { top: 10 * imageScaling, right: 0 * imageScaling, bottom: 20 * imageScaling, left: 10 * imageScaling }
 
       const completeWidth = imgMargin.left + img.width + imgMargin.right
       const completeHeight = imgMargin.top + headerHeight + img.height + imgMargin.bottom
@@ -531,10 +542,12 @@
 
       const headerWidth = ctx.measureText(headerText).width
 
-      const barAreaWidth = (width - yAxisWidth)
-      const headerHorizontalShift = yAxisWidth + barAreaWidth / 2 - headerWidth / 2
+      const yAxisSectionWidth = (yAxisWidth + margin.left + imgMargin.left) * imageScaling
+      const barAreaWidth = img.width - yAxisSectionWidth - (margin.right + imgMargin.right + leftAdjust + widthAdjust) * imageScaling
+      const headerHorizontalShift = yAxisSectionWidth + barAreaWidth / 2 - headerWidth / 2
 
-      ctx.fillText(headerText, headerHorizontalShift + imgMargin.left, headerPaddingTop + headerFontSize + imgMargin.top)
+      ctx.fillText(headerText, headerHorizontalShift, headerPaddingTop + headerFontSize + imgMargin.top)
+
       let watermarkText = dax.text(customDataChart ? 'profile_user.image.watermark' : 'profile.image.watermark')
 
       const date = new Date()
@@ -547,11 +560,11 @@
       const fileName = dax.text(customDataChart ? 'profile_user.chart_image.filename' : 'profile.image.filename')
         .replace('{option}', headerText)
 
-      const sourceFontHeight = 11
+      const sourceFontHeight = 11 * imageScaling
       ctx.font = sourceFontHeight + 'px "Varta"'
       ctx.fillStyle = '#555'
       // TODO unused: let sourceTextWidth = ctx.measureText(sourceText).width
-      ctx.fillText(watermarkText, 5, completeHeight - 5)
+      ctx.fillText(watermarkText, 5 * imageScaling, completeHeight - 5 * imageScaling)
 
       ctx.drawImage(canvasChart, imgMargin.left, imgMargin.top + headerHeight)
 
