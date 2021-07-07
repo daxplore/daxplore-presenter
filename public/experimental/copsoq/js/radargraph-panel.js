@@ -208,7 +208,9 @@
       const directionHigh = goodDirections[node][i] === 'HIGH'
       const mean = values[node][i][selectedPerspectiveOption]
       const reference = referenceValues[node][i]
-      if (mean === -1) {
+      if (isNaN(mean)) {
+        continue
+      } else if (mean === -1) {
         missing.push(i)
       } else if (Math.abs(mean - reference) < 5) {
         average.push(i)
@@ -281,15 +283,13 @@
       '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
 
     const imageScaling = 2
-    const widthAdjust = 0
-    const leftAdjust = 0
     const chart = d3.select('#radar-graph')
     const widthBefore = chart.attr('width')
-    chart.attr('width', imageScaling * (Number(widthBefore) + widthAdjust))
+    chart.attr('width', imageScaling * (Number(widthBefore)))
     const heightBefore = chart.attr('height')
     chart.attr('height', imageScaling * Number(heightBefore))
     chart.style('transform', 'scale(' + imageScaling + ')' +
-      'translate(' + ((Number(widthBefore) + widthAdjust) / 2 + leftAdjust) + 'px,' + (Number(heightBefore) / 2) + 'px)')
+      'translate(' + ((Number(widthBefore)) / 2) + 'px,' + (Number(heightBefore) / 2) + 'px)')
 
     chartNodes.forEach(function (node) { return node.setOverlayFontScaling(0.65) })
     const svg = chart.node()
@@ -343,9 +343,9 @@
       ctx.font = headerFont
 
       const headerWidth = ctx.measureText(headerText).width
-      const headerHorizontalShift = img.width / 2 - headerWidth / 2
+      const headerHorizontalShift = 30 + img.width / 2 - headerWidth / 2
 
-      ctx.fillText(headerText, headerHorizontalShift + imgMargin.left, headerPaddingTop + headerFontSize + imgMargin.top)
+      ctx.fillText(headerText, headerHorizontalShift, headerPaddingTop + headerFontSize + imgMargin.top)
       const CUSTOM_DATA_CHART = false // TODO custom chart should not be hardcoded
       let watermarkText = dax.text(CUSTOM_DATA_CHART ? 'profile_user.image.watermark' : 'profile.image.watermark')
 
