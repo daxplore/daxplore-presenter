@@ -57,7 +57,7 @@
         throw new Error('Invalid radar chart input data, different array lengths.')
       }
       const referenceData = referenceValueArray
-      const axisText = axisTextArray
+      const axisTexts = axisTextArray
       const goodDirection = goodDirectionInput
       const overlayTextArray = overlayTextArrayInput
 
@@ -227,7 +227,7 @@
 
         // AXIS TEXT
         radarGroup.selectAll('.line-axis-text')
-          .data(axisText).enter()
+          .data(axisTexts).enter()
           .append('text')
             .classed('line-axis-text', true)
             .style('fill', '#444')
@@ -244,7 +244,6 @@
             const textBBox = nodes[i].getBBox()
             const angle = 0.75 * TAU + i * angleSlice
             const coordinates = getTextCoordinates(radius, angle, textBBox.width, textBBox.height)
-            // coordinates[1] += 10
             return 'translate(' + coordinates.join(',') + ')'
           })
           .on('mouseover', function (d, i, n) { return hoverCallbackFunctions.forEach(function (callback) { return callback(d, i, n) }) })
@@ -501,31 +500,34 @@
             '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
 
           const chartCopy = d3.select(chart.node().cloneNode(true))
-          const radarGroupCopy = d3.select(radarGroup.node().cloneNode(true))
+          const radarGroupCopy = chartCopy.select('g')
+
+          // Extract text and then remove axis tspans
+          const axisTextsSplit = []
+          let textSelection = radarGroupCopy.select('.line-axis-text')
+          while (!textSelection.empty()) {
+            const textRows = []
+            let tspanSelection = textSelection.select('tspan')
+            while (!tspanSelection.empty()) {
+              textRows.push(tspanSelection.text())
+              tspanSelection.remove()
+              tspanSelection = textSelection.select('tspan')
+            }
+            axisTextsSplit.push(textRows)
+            textSelection.remove()
+            textSelection = radarGroupCopy.select('.line-axis-text')
+          }
 
           const svg = chartCopy.node()
 
           chartCopy.style('margin', 0)
 
-          const scaleTransform = ' scale(0.8)'
-          const angleSlice = 2 * Math.PI / referenceData.length
-
-          const leftAdjust = 20
-          const widthAdjust = 40
           const widthBefore = chartCopy.attr('width')
-          chartCopy.attr('width', imageScaling * (Number(widthBefore) + widthAdjust))
+          chartCopy.attr('width', imageScaling * (Number(widthBefore)))
           const heightBefore = chartCopy.attr('height')
           chartCopy.attr('height', imageScaling * Number(heightBefore))
           chartCopy.style('transform', 'scale(' + imageScaling + ')' +
-            'translate(' + ((Number(widthBefore) + widthAdjust) / 2 + leftAdjust) + 'px,' + (Number(heightBefore) / 2) + 'px)')
-
-          radarGroupCopy.selectAll('.line-axis-text')
-            .attr('transform', function (d, i, nodes) {
-              const textBBox = nodes[i].getBBox()
-              const angle = 0.75 * TAU + i * angleSlice
-              const coordinates = getTextCoordinates(radius, angle, textBBox.width, textBBox.height)
-              return 'translate(' + coordinates.join(',') + ')' + scaleTransform
-            })
+            'translate(' + ((Number(widthBefore)) / 2) + 'px,' + (Number(heightBefore) / 2) + 'px)')
 
           const source = (new XMLSerializer()).serializeToString(svg)
           const blob = new Blob([doctype + source], { type: 'image/svg+xml;charset=utf-8' })
@@ -550,7 +552,7 @@
             const headerFont = 'bold ' + headerFontSize + 'px "Varta"'
             const headerHeight = headerFontSize + headerPaddingBottom
 
-            const imgMargin = { top: 10 * imageScaling, right: 10 * imageScaling, bottom: 20 * imageScaling, left: 20 * imageScaling }
+            const imgMargin = { top: 10 * imageScaling, right: 20 * imageScaling, bottom: 20 * imageScaling, left: 20 * imageScaling }
 
             const canvasCompleteSelection = d3.select('body').append('canvas')
               .style('visibility', 'hidden')
@@ -575,7 +577,7 @@
             ctx.fillStyle = 'black'
             ctx.font = headerFont
             ctx.fillText(headerText, headerHorizontalShift, headerFontSize + imgMargin.top)
-            const customDataChart = false // TODO custom chart should not be hardcoded
+            const customDataChart = false // TODO should not be hardcoded, userprofile should set to true
             let watermarkText = dax.text(customDataChart ? 'profile_user.image.watermark' : 'profile.image.watermark')
 
             const date = new Date()
@@ -595,7 +597,27 @@
             ctx.fillStyle = '#555'
             ctx.fillText(watermarkText, 5, completeHeight - 8)
 
-            ctx.drawImage(canvasChart, imgMargin.left + imgAdditionalWidth / 2, imgMargin.top + headerHeight)
+            const imgDrawX = imgMargin.left + imgAdditionalWidth / 2
+            const imgDrawY = imgMargin.top + headerHeight
+            ctx.drawImage(canvasChart, imgDrawX, imgDrawY)
+
+            const axisTextFontHeight = 15 * imageScaling
+            const textBoxHeightEstimation = axisTextFontHeight * 0.7
+            ctx.font = axisTextFontHeight + 'px "Varta"'
+            ctx.fillStyle = '#000'
+            const lineSpacing = 5 * imageScaling
+            const angleSlice = 2 * Math.PI / referenceData.length
+            axisTextsSplit.forEach(function (textArray, i) {
+              const angle = 0.75 * TAU + i * angleSlice
+              const maxTextWidth = textArray.reduce((acc, t) => Math.max(acc, ctx.measureText(t).width), 0)
+              const heightEstimation = textArray.length * textBoxHeightEstimation + (textArray.length - 1) * lineSpacing
+              const coordinates = getTextCoordinates(radius * imageScaling, angle, maxTextWidth, heightEstimation)
+              textArray.forEach(function (text, j) {
+                const x = coordinates[0] + imgDrawX + offsetLeft * imageScaling
+                const y = coordinates[1] + imgDrawY + offsetTop * imageScaling + textBoxHeightEstimation * (j + 1) + lineSpacing * j
+                ctx.fillText(text, x, y)
+              })
+            })
 
             canvasComplete.toBlob(function (blob) {
               saveAs(blob, fileName + '.png')
