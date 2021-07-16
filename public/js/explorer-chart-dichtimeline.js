@@ -239,7 +239,7 @@
     // UPDATE X AXIS
     const xAxis = d3.axisBottom(xScale)
       .tickFormat(function (d) {
-        return dax.text('timepoint' + d) // TODO use new text format
+        return dax.text('timepoint' + d)
       })
 
     const xAxisElement = d3.select('.dichtime-x-axis')

@@ -150,7 +150,7 @@
       .style('background-color', missingDataColor)
     legendMissingData.append('div')
       .attr('class', 'legend__row-text')
-      .text(dax.text('explorer.freq.legend.missing_data'))
+      .text(dax.text('explorer.chart.frequency_bar.legend.missing_data'))
 
     // empty flex element, used to dynamically align the legend content vertically
     legendDiv.append('div')
@@ -311,18 +311,18 @@
           let html
           if (d.key === 'MISSING_DATA') {
             if (singleTimepointMode) {
-              html = dax.text('explorer.freq.tooltip.timepoints_missing_data', 10, perspectiveOptionText) // TODO externalize cutoff
+              html = dax.text('explorer.chart.frequency_bar.tooltip.multiple_timepoints_missing', 10, perspectiveOptionText) // TODO externalize cutoff
             } else {
-              html = dax.text('explorer.freq.tooltip.timepoints_missing_data', 10, perspectiveOptionText, timepointText) // TODO externalize cutoff
+              html = dax.text('explorer.chart.frequency_bar.tooltip.multiple_timepoints_missing', 10, perspectiveOptionText, timepointText) // TODO externalize cutoff
             }
           } else {
             const percentageText = dax.common.percentageFormat(d.end - d.start)
             const questionOptionText = d.key
             const color = barStrokeColor(d.key, tpIndex).darker(0.7)
             if (singleTimepointMode) {
-              html = dax.text('explorer.freq.tooltip.single', percentageText, perspectiveOptionText, questionOptionText, color)
+              html = dax.text('explorer.chart.frequency_bar.tooltip.single_timepoint', percentageText, perspectiveOptionText, questionOptionText, color)
             } else {
-              html = dax.text('explorer.freq.tooltip.timepoints', percentageText, perspectiveOptionText, questionOptionText, color, timepointText)
+              html = dax.text('explorer.chart.frequency_bar.tooltip.multiple_timepoints', percentageText, perspectiveOptionText, questionOptionText, color, timepointText)
             }
           }
           // Set new header tooltip

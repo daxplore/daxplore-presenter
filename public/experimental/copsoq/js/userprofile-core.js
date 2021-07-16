@@ -6,31 +6,31 @@
 
   function populateUserProfileDOM (qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, titleRegexpMap) {
     d3.select('.user-paste-data-header-text')
-      .text(dax.text('userProfileHeaderText')) // TODO use new text ID style
+      .text(dax.text('user_profile.paste_data.header'))
 
     d3.select('.user-paste-data-description')
-      .text(dax.text('userProfilePasteDataDescription')) // TODO use new text ID style
+      .text(dax.text('user_profile.paste_data.instruction'))
 
     d3.select('.user-paste-data-submit-explanation')
-      .text(dax.text('userProfilePasteDataSubmitExplanation')) // TODO use new text ID style
+      .text(dax.text('user_profile.paste_data.submit.explanation'))
 
     d3.select('.user-paste-data-submit-button')
-      .text(dax.text('userPasteDataSubmitButton')) // TODO use new text ID style
+      .text(dax.text('user_profile.paste_data.submit.button'))
 
     d3.select('.user-paste-data-error-log-header-text')
-      .text(dax.text('userProfilePasteDataErrorLogHeader')) // TODO use new text ID style
+      .text(dax.text('user_profile.paste_data.error_log.header'))
 
     d3.select('.user-paste-data-error-text-number-bounds-errors')
-      .text(dax.text('userPasteDataErrorTextNumberBoundsErrors')) // TODO use new text ID style
+      .text(dax.text('user_profile.paste_data.error_log.header.number_bounds'))
 
     d3.select('.user-paste-data-error-text-no-number-errors')
-      .text(dax.text('userPasteDataErrorTextNoNumberErrors')) // TODO use new text ID style
+      .text(dax.text('user_profile.paste_data.error_log.header.no_number'))
 
     d3.select('.user-paste-data-error-text-no-row-errors')
-      .text(dax.text('userPasteDataErrorTextNoRowErrors')) // TODO use new text ID style
+      .text(dax.text('user_profile.paste_data.error_log.header.no_row'))
 
     d3.select('.profile-save-image')
-      .text(dax.text('imageSaveButton')) // TODO use new text ID style
+      .text(dax.text('common.button.save_chart_as_image'))
 
     dax.userprofile.generateUserPasteSection()
 

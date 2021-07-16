@@ -71,10 +71,10 @@
     secondaryPanel = d3.select('.perspective-secondary-picker')
 
     d3.select('.perspective-header')
-      .text(dax.text('explorer.perspective.header'))
+      .text(dax.text('explorer.perspective_picker.header'))
 
     d3.select('.perspective-secondary-title')
-      .text(dax.text('explorer.perspective.header_secondary'))
+      .text(dax.text('explorer.perspective_picker.secondary_perspective.header'))
 
     perspectiveIDs = dax.data.getExplorerPrimaryPerspectiveIDs()
 
@@ -162,7 +162,7 @@
         updateElements()
         dax.explorer.selectionUpdateCallback(true)
       })
-      .text(dax.text('perspectivesAllButton')) // TODO use new text ID style
+      .text(dax.text('explorer.perspective_picker.button.select_all'))
 
     d3.selectAll('.peropt-none-button')
       .on('click', function () {
@@ -170,10 +170,10 @@
         updateElements()
         dax.explorer.selectionUpdateCallback(true)
       })
-      .text(dax.text('perspectivesNoneButton')) // TODO use new text ID style
+      .text(dax.text('explorer.perspective_picker.button.select_none'))
 
     moreButton
-      .text(collapsed ? dax.text('perspectivesMoreButton') + '>' : '<' + dax.text('perspectivesLessButton')) // TODO use new text ID style
+      .text(collapsed ? dax.text('explorer.perspective_picker.button.show_more') + '>' : '<' + dax.text('explorer.perspective_picker.button.show_less'))
       .style('visibility', function () {
         return hasRemainder ? null : 'hidden'
       })
@@ -194,7 +194,7 @@
         .text(function (d) {
           switch (d.type) {
           case 'perspective': return dax.data.getQuestionShortText(d.id)
-          case 'none':return dax.text('explorer.perspective.secondary_none_button')
+          case 'none':return dax.text('explorer.perspective_picker.secondary_perspective.button.none')
           }
         })
         .on('click', function (d) {
@@ -573,7 +573,7 @@
 
     moreButton
       .style('display', !dax.data.isCombinedPerspective(selectedPerspectiveID) && hasRemainder ? null : 'none')
-      .text(collapsed ? dax.text('perspectivesMoreButton') + '>' : '<' + dax.text('perspectivesLessButton')) // TODO use new text ID style
+      .text(collapsed ? dax.text('explorer.perspective_picker.button.show_more') + '>' : '<' + dax.text('explorer.perspective_picker.button.show_less'))
 
     updateElements()
   }

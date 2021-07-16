@@ -34,7 +34,7 @@
       }
     }
 
-    d3.select('.question-header').text(dax.text('questionsHeader')) // TODO use new text ID style
+    d3.select('.question-header').text(dax.text('explorer.question_picker.section_header'))
 
     const sections = d3.select('.question-picker')
       .selectAll('.question-section')

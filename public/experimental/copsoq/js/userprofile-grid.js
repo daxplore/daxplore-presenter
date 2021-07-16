@@ -433,9 +433,9 @@
         .remove()
     }
 
-    d3.select('.grid-legend-text.good').text(dax.text('listReferenceBetter')) // TODO use new text ID style
-    d3.select('.grid-legend-text.avg').text(dax.text('listReferenceComparable')) // TODO use new text ID style
-    d3.select('.grid-legend-text.bad').text(dax.text('listReferenceWorse')) // TODO use new text ID style
+    d3.select('.grid-legend-text.good').text(dax.text('profile.chart.mean_bar_vertical.reference.better'))
+    d3.select('.grid-legend-text.avg').text(dax.text('profile.chart.mean_bar_vertical.reference.comparable'))
+    d3.select('.grid-legend-text.bad').text(dax.text('profile.chart.mean_bar_vertical.reference.worse'))
 
     if (qIDs.length > 0) {
       dax.profile.setDescriptionShort(d3.select('#grid-description'), qIDs[0])
@@ -595,7 +595,7 @@
       const canvasChart = canvasChartSelection.node()
       const ctx = canvasChart.getContext('2d')
 
-      let watermarkText = dax.text('profile_user.image.watermark')
+      let watermarkText = dax.text('user_profile.image.watermark')
       const date = new Date()
       watermarkText = watermarkText.replace(
         '{date}',
@@ -623,7 +623,7 @@
       ctx.fillText(watermarkText, hMargin, canvasHeight - 5)
 
       canvasChart.toBlob(function (blob) {
-        saveAs(blob, dax.text('profile_user.grid_image.filename') + '.png')
+        saveAs(blob, dax.text('user_profile.grid.image.filename') + '.png')
       })
 
       canvasChartSelection.remove()

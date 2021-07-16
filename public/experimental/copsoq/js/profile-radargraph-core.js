@@ -4,16 +4,16 @@
 
   function populateProfileDOM (perspectiveID, qIDs, meanReferenceMap, shorttextMap, descriptionMap, directionMap, perspectiveOptions, means) {
     d3.select('.profile-save-image')
-      .text(dax.text('imageSaveButton')) // TODO use new text format
+      .text(dax.text('common.button.save_chart_as_image'))
     dax.profile.generateListChart(qIDs, meanReferenceMap, shorttextMap, directionMap, 0, false)
     dax.profile.setChartData(perspectiveOptions, means)
   }
 
   function populateRadarDOM (radargraphData, questions, qIDs, perspectiveOptions, means) {
     d3.select('.radargraph-save-image')
-      .text(dax.text('imageSaveButton'))
+      .text(dax.text('common.button.save_chart_as_image'))
     d3.select('.radarchart-save-image')
-      .text(dax.text('imageSaveButton'))
+      .text(dax.text('common.button.save_chart_as_image'))
     dax.radargraph.initializeRadarGraph(radargraphData, questions, qIDs)
     dax.radargraph.setChartData(perspectiveOptions, means)
   }

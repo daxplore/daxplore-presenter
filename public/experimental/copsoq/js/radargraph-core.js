@@ -4,9 +4,9 @@
 
   function populateRadarDOM (radargraphData, questions, qIDs, perspectiveOptions, means) {
     d3.select('.radargraph-save-image')
-      .text(dax.text('imageSaveButton'))
+      .text(dax.text('common.button.save_chart_as_image'))
     d3.select('.radarchart-save-image')
-      .text(dax.text('imageSaveButton'))
+      .text(dax.text('common.button.save_chart_as_image'))
     dax.radargraph.initializeRadarGraph(radargraphData, questions, qIDs)
     dax.radargraph.setChartData(perspectiveOptions, means)
   }

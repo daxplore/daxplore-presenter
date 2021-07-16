@@ -347,7 +347,7 @@
 
       ctx.fillText(headerText, headerHorizontalShift, headerPaddingTop + headerFontSize + imgMargin.top)
       const CUSTOM_DATA_CHART = false // TODO custom chart should not be hardcoded
-      let watermarkText = dax.text(CUSTOM_DATA_CHART ? 'profile_user.image.watermark' : 'profile.image.watermark')
+      let watermarkText = dax.text(CUSTOM_DATA_CHART ? 'user_profile.image.watermark' : 'profile.chart.mean_bar_vertical.image.watermark')
 
       const date = new Date()
       watermarkText = watermarkText.replace(
@@ -357,7 +357,7 @@
         ('0' + date.getDate()).slice(-2))
         .replace('Profildiagram', 'Radarmodell') // TODO externalize Radar as separate text
 
-      const fileName = dax.text(CUSTOM_DATA_CHART ? 'profile_user.chart_image.filename' : 'profile.image.filename')
+      const fileName = dax.text(CUSTOM_DATA_CHART ? 'user_profile.chart.mean_bar_vertical.image.filename' : 'profile.image.filename')
         .replace('Profildiagram', 'Radarmodell')// TODO externalize Radar as separate text
         .replace('{option}', headerText)
 

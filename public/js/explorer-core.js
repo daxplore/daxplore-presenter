@@ -59,15 +59,15 @@
     const optCount = optionTexts.length
     if (optCount === 0) { return '' }
 
-    const subStart = dax.text('dichotomizedSubtitleStart') // TODO use new text ID style
-    const subEnd = dax.text('dichotomizedSubtitleEnd') // TODO use new text ID style
+    const subStart = dax.text('explorer.chart.dichotomized_line.subtitle_start')
+    const subEnd = dax.text('explorer.chart.dichotomized_line.subtitle_end')
 
     if (optionTexts.length === 1) {
       return subStart + optionTexts[0] + subEnd
     }
 
-    const subSeparator = dax.text('dichotomizedSubtitleSeparator') // TODO use new text ID style
-    const subOr = dax.text('dichotomizedSubtitleOr') // TODO use new text ID style
+    const subSeparator = dax.text('explorer.chart.dichotomized_line.subtitle_separator')
+    const subOr = dax.text('explorer.chart.dichotomized_line.subtitle_or')
 
     let sub = subStart
     sub += optionTexts.slice(0, optCount - 1).join(subSeparator)

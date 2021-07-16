@@ -578,7 +578,7 @@
             ctx.font = headerFont
             ctx.fillText(headerText, headerHorizontalShift, headerFontSize + imgMargin.top)
             const customDataChart = false // TODO should not be hardcoded, userprofile should set to true
-            let watermarkText = dax.text(customDataChart ? 'profile_user.image.watermark' : 'profile.image.watermark')
+            let watermarkText = dax.text(customDataChart ? 'user_profile.image.watermark' : 'profile.chart.mean_bar_vertical.image.watermark')
 
             const date = new Date()
             watermarkText = watermarkText.replace(
@@ -588,7 +588,7 @@
               ('0' + date.getDate()).slice(-2))
               .replace('Profildiagram', 'Radardiagram') // TODO externalize Radar as separate text
 
-            const fileName = dax.text(customDataChart ? 'profile_user.chart_image.filename' : 'profile.image.filename')
+            const fileName = dax.text(customDataChart ? 'user_profile.chart.mean_bar_vertical.image.filename' : 'profile.image.filename')
               .replace('{option}', headerText)
               .replace('Profildiagram', 'Radardiagram') // TODO externalize Radar as separate text
 

@@ -60,11 +60,11 @@
 
     // Set chart tab names
     d3.select('.chart-tab.freq')
-      .text(dax.text('chartTabFrequencies')) // TODO use new text format
+      .text(dax.text('explorer.chart_tab.frequency_bar'))
     d3.select('.chart-tab.mean')
-      .text(dax.text('chartTabMeans'))
+      .text(dax.text('explorer.chart_tab.mean_bar'))
     d3.select('.chart-tab.dich')
-      .text(dax.text('chartTabDichotomized'))
+      .text(dax.text('explorer.chart_tab.dichotomized_line'))
 
     // Apply special classes to style the tabs
     // TODO duplicate code, used again in chartSetQueryDefinition function, should probably be unified
