@@ -488,6 +488,7 @@
     generateColumns(usernames, usermeans)
   }
 
+  const imageScaling = 2
   exports.saveGridImage =
   function () {
     let gridclone = d3.select(d3.select('.grid').node().cloneNode(true))
@@ -514,6 +515,17 @@
         .style('top', '-9999px')
         .append(function () { return gridclone.node() })
 
+    const oldWidth = gridclone.node().offsetWidth
+    const oldHeight = gridclone.node().offsetHeight
+    const newWidth = oldWidth * imageScaling
+    const newHeight = oldHeight * imageScaling
+
+    console.log('scale(' + imageScaling + ') translate(' + (gridclone.node().offsetWidth / 2) + 'px,' + (gridclone.node().offsetHeight / 2) + 'px)')
+    const translateX = (newWidth - oldWidth) / 2 // gridclone.node().offsetWidth
+    const translateY = (newHeight - oldHeight) / 2 // gridclone.node().offsetHeight
+    gridclone
+      .style('transform', 'translate(' + translateX + 'px,' + translateY + 'px) scale(' + imageScaling + ')')
+
     gridclone
       .selectAll('.header-cell')
       .remove()
@@ -538,38 +550,34 @@
     for (let i = 0; i < usernames.length; i++) {
       textTest
         .text(usernames[i])
-      maxTitleWidth = Math.max(maxTitleWidth, textTest.node().offsetWidth)
+      maxTitleWidth = Math.max(maxTitleWidth, textTest.node().offsetWidth * imageScaling)
     }
-    const titleHeight = textTest.node().offsetHeight
+
     textTest.remove()
 
-    const rotationAngle = 2 * Math.PI * 1 / 8
-    const headerHeight = gridclone.select('.grid-header').node().offsetHeight
-    const trueHeaderWidth = maxTitleWidth * Math.sin(rotationAngle) + titleHeight * Math.cos(rotationAngle)
-    let heightOffset = trueHeaderWidth - headerHeight
+    const headerNodes = gridclone.select('.grid-header').selectAll('.header-cell-input').nodes()
+    let maxHeaderHeight = Math.max(...headerNodes.map(n => n.getBoundingClientRect().height))
+    maxHeaderHeight += 5 * imageScaling
+    const maxHeaderWidth = Math.max(...headerNodes.map(n => n.getBoundingClientRect().width))
 
-    // true_header height represents a square of the longest header
-    // estimate width based on the largest title being the rightmost header.
-    // This could be computed more accurately by for each header calculating:
-    // vertical overflow = true header width - width of columns to the right
-    const chartWidth = gridclone.node().offsetWidth + trueHeaderWidth - 20
+    const trueHeaderWidth = maxHeaderWidth
 
-    const topMargin = 3 + (heightOffset > 0 ? heightOffset : 0)
+    const topMargin = maxHeaderHeight
+    const bottomMargin = 10 * imageScaling
     gridclone
-      .style('padding-top', topMargin + 'px')
-      .style('padding-bottom', 1 + 'px')
-
-    if (heightOffset > 0) {
-      heightOffset = 0
-    }
+      .style('margin-top', topMargin + 'px')
+      .style('padding-bottom', bottomMargin + 'px')
 
     gridclone.selectAll('.header-cell-input')
       .style('border', 'none')
 
-    domtoimage.toPng(gridclone.node(), { bgcolor: 'white' })
+    const chartWidth = (gridclone.node().offsetWidth + trueHeaderWidth) * imageScaling
+    const chartHeight = gridclone.node().offsetHeight * imageScaling + topMargin + bottomMargin
+
+    domtoimage.toPng(gridclone.node(), { bgcolor: 'white', width: chartWidth, height: chartHeight })
       .then(function (dataUrl) {
         gridclone.remove()
-        generateAndSaveImage(dataUrl, chartWidth, heightOffset)
+        generateAndSaveImage(dataUrl, chartWidth, maxHeaderHeight)
       })['catch'](function (error) { // eslint-disable-line dot-notation
         if (error) { // TODO standard-js forces if(error) (see handle-callback-error)
           // TODO error handling: console.error('Failed to generate image', error)
@@ -579,19 +587,25 @@
   }
 
   const generateAndSaveImage =
-  function (dataUrl, minWidth, heightOffset) {
+  function (dataUrl, minWidth, someHeight) {
     const img = new Image()
     img.onload = function () {
-      const hMargin = 10
-      const chartWidth = Math.max(minWidth, img.width + 2 * hMargin)
-      const topMargin = 10
-      const bottomMargin = 20
-      const canvasHeight = img.height + heightOffset + topMargin + bottomMargin
+      const cropMargin = {
+        left: 20 * imageScaling,
+        right: 10 * imageScaling,
+        top: 10 * imageScaling,
+        bottom: 25 * imageScaling,
+      }
+
+      const chartWidth = img.width
+      const canvasHeight = img.height // + someHeight
 
       const canvasChartSelection = d3.select('body').append('canvas')
         .attr('width', chartWidth)
         .attr('height', canvasHeight)
         .style('visibility', 'visible')
+        .style('border', 'solid 1px black')
+
       const canvasChart = canvasChartSelection.node()
       const ctx = canvasChart.getContext('2d')
 
@@ -603,26 +617,77 @@
         ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
         ('0' + date.getDate()).slice(-2))
 
-      const sourceFontHeight = 11
+      const sourceFontHeight = 11 * imageScaling
       ctx.font = sourceFontHeight + 'px "Varta"'
       const sourceTextWidth = ctx.measureText(watermarkText).width
-
-      if (sourceTextWidth + 2 * hMargin > chartWidth) {
-        generateAndSaveImage(dataUrl, sourceTextWidth + 2 * hMargin, heightOffset)
-        canvasChartSelection.remove()
-        return
-      }
 
       ctx.fillStyle = 'white'
       ctx.fillRect(0, 0, chartWidth, canvasHeight)
       ctx.fillStyle = 'black'
 
-      ctx.drawImage(img, hMargin, topMargin + heightOffset)
+      ctx.drawImage(img, 0, 0)
 
-      ctx.fillStyle = '#555'
-      ctx.fillText(watermarkText, hMargin, canvasHeight - 5)
+      const data = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data
+      let firstRowWithColor = -1
+      for (let y = 0; y < ctx.canvas.height && firstRowWithColor === -1; y++) {
+        for (let x = 0; x < ctx.canvas.width && firstRowWithColor === -1; x++) {
+          const pixelIndex = (y * ctx.canvas.width + x) * 4
+          if (data[pixelIndex] !== 255 || data[pixelIndex + 1] !== 255 || data[pixelIndex + 2] !== 255 || data[pixelIndex + 3] !== 255) {
+            firstRowWithColor = y
+          }
+        }
+      }
 
-      canvasChart.toBlob(function (blob) {
+      let lastRowWithColor = -1
+      for (let y = ctx.canvas.height - 1; y >= 0 && lastRowWithColor === -1; y--) {
+        for (let x = 0; x < ctx.canvas.width && lastRowWithColor === -1; x++) {
+          const pixelIndex = (y * ctx.canvas.width + x) * 4
+          if (data[pixelIndex] !== 255 || data[pixelIndex + 1] !== 255 || data[pixelIndex + 2] !== 255 || data[pixelIndex + 3] !== 255) {
+            lastRowWithColor = y
+          }
+        }
+      }
+
+      let firstColumnWithColor = -1
+      for (let x = 0; x < ctx.canvas.width && firstColumnWithColor === -1; x++) {
+        for (let y = 0; y < ctx.canvas.height && firstColumnWithColor === -1; y++) {
+          const pixelIndex = (y * ctx.canvas.width + x) * 4
+          if (data[pixelIndex] !== 255 || data[pixelIndex + 1] !== 255 || data[pixelIndex + 2] !== 255 || data[pixelIndex + 3] !== 255) {
+            firstColumnWithColor = x
+          }
+        }
+      }
+
+      let lastColumnWithColor = -1
+      for (let x = ctx.canvas.width - 1; x >= 0 && lastColumnWithColor === -1; x--) {
+        for (let y = 0; y < ctx.canvas.height && lastColumnWithColor === -1; y++) {
+          const pixelIndex = (y * ctx.canvas.width + x) * 4
+          if (data[pixelIndex] !== 255 || data[pixelIndex + 1] !== 255 || data[pixelIndex + 2] !== 255 || data[pixelIndex + 3] !== 255) {
+            lastColumnWithColor = x
+          }
+        }
+      }
+
+      const cropWidth = lastColumnWithColor - firstColumnWithColor
+      const cropHeight = lastRowWithColor - firstRowWithColor
+      const cropCanvas = document.createElement('canvas')
+      const cropCanvasWidth = Math.max(cropWidth, sourceTextWidth) + cropMargin.left + cropMargin.right
+      const cropCanvasHeight = cropHeight + cropMargin.top + cropMargin.bottom
+      const cropContext = cropCanvas.getContext('2d')
+      cropCanvas.width = cropCanvasWidth
+      cropCanvas.height = cropCanvasHeight
+      cropContext.fillStyle = 'white'
+      cropContext.fillRect(0, 0, cropCanvasWidth, cropCanvasHeight)
+      cropContext.drawImage(
+        canvasChart,
+        firstColumnWithColor, firstRowWithColor, cropWidth, cropHeight,
+        cropMargin.left, cropMargin.top, cropWidth, cropHeight) // newCanvas, same size as source rect
+
+      cropContext.fillStyle = '#555'
+      cropContext.font = sourceFontHeight + 'px "Varta"'
+      cropContext.fillText(watermarkText, cropMargin.left / 2, cropCanvasHeight - 6 * imageScaling)
+
+      cropCanvas.toBlob(function (blob) {
         saveAs(blob, dax.text('user_profile.grid.image.filename') + '.png')
       })
 
