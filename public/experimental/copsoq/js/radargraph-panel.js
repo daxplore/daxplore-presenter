@@ -163,7 +163,6 @@
     selectedNode = nodeIndex
     d3.selectAll('.radar-chart-full')
       .classed('hidden', function (d, i) { return i === selectedNode ? '' : 'none' })
-      // .style('display', (d, i) => i === selectedNode ? '' : 'none')
     d3.selectAll('.radar-node')
       .classed('radar-node--highlighted', function (d, i) { return i === nodeIndex })
     d3.select('.radar-chart-full-header')

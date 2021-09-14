@@ -556,9 +556,19 @@
     textTest.remove()
 
     const headerNodes = gridclone.select('.grid-header').selectAll('.header-cell-input').nodes()
-    let maxHeaderHeight = Math.max(...headerNodes.map(n => n.getBoundingClientRect().height))
+
+    let maxHeaderHeight = 0
+    headerNodes.forEach(function (node, i) {
+      const nodeHeight = node.getBoundingClientRect().height
+      maxHeaderHeight = Math.max(maxHeaderHeight, nodeHeight)
+    })
     maxHeaderHeight += 5 * imageScaling
-    const maxHeaderWidth = Math.max(...headerNodes.map(n => n.getBoundingClientRect().width))
+
+    let maxHeaderWidth = 0
+    headerNodes.forEach(function (node, i) {
+      const nodeWidth = node.getBoundingClientRect().width
+      maxHeaderWidth = Math.max(maxHeaderWidth, nodeWidth)
+    })
 
     const trueHeaderWidth = maxHeaderWidth
 

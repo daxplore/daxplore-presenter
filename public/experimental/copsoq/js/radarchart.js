@@ -609,7 +609,9 @@
             const angleSlice = 2 * Math.PI / referenceData.length
             axisTextsSplit.forEach(function (textArray, i) {
               const angle = 0.75 * TAU + i * angleSlice
-              const maxTextWidth = textArray.reduce((acc, t) => Math.max(acc, ctx.measureText(t).width), 0)
+              const maxTextWidth = textArray.reduce(function (acc, t) {
+                Math.max(acc, ctx.measureText(t).width)
+              }, 0)
               const heightEstimation = textArray.length * textBoxHeightEstimation + (textArray.length - 1) * lineSpacing
               const coordinates = getTextCoordinates(radius * imageScaling, angle, maxTextWidth, heightEstimation)
               textArray.forEach(function (text, j) {
