@@ -22,14 +22,12 @@
   ]
 
   const linkLine = [
-    positions[0],
-    positions[1],
-    positions[2],
     positions[3],
     positions[1],
-    positions[4],
-    positions[2],
     positions[0],
+    positions[2],
+    positions[4],
+    positions[1],
   ]
 
   let selectedPerspectiveOption = 0
