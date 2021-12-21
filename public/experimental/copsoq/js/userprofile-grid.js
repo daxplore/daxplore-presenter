@@ -586,49 +586,14 @@
     domtoimage.toPng(gridclone.node(), { bgcolor: 'white', width: chartWidth, height: chartHeight })
       .then(function (dataUrl) {
         gridclone.remove()
-        generateAndSaveImage(dataUrl, chartWidth, maxHeaderHeight)
+        const watermarkID = 'user_profile.image.watermark'
+        const filenameID = 'user_profile.grid.image.filename'
+        dax.common.composeAndSaveImage(dataUrl, watermarkID, filenameID)
       })['catch'](function (error) { // eslint-disable-line dot-notation
         if (error) { // TODO standard-js forces if(error) (see handle-callback-error)
           // TODO error handling: console.error('Failed to generate image', error)
           console.log(error)
         }
       })
-  }
-
-  const generateAndSaveImage =
-  function (dataUrl, minWidth, someHeight) {
-    const img = new Image()
-    img.onload = function () {
-      // Create initial image canvas
-      const chartWidth = img.width
-      const canvasHeight = img.height
-      const canvasChartSelection = d3.select('body').append('canvas')
-        .attr('width', chartWidth)
-        .attr('height', canvasHeight)
-        .style('visibility', 'hidden')
-      const initialCanvas = canvasChartSelection.node()
-      const initialContext = initialCanvas.getContext('2d')
-
-      // Draw image to initial canvas
-      initialContext.drawImage(img, 0, 0)
-
-      // Define watermark
-      let watermarkText = dax.text('user_profile.image.watermark')
-      const date = new Date()
-      watermarkText = watermarkText.replace(
-        '{date}',
-        date.getFullYear() + '-' +
-        ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
-        ('0' + date.getDate()).slice(-2))
-
-      const compositeCanvas = dax.common.composeImageFromCanvas(initialCanvas, watermarkText)
-
-      compositeCanvas.toBlob(function (blob) {
-        saveAs(blob, dax.text('user_profile.grid.image.filename') + '.png')
-      })
-
-      canvasChartSelection.remove()
-    }
-    img.src = dataUrl
   }
 })(window.dax = window.dax || {})
