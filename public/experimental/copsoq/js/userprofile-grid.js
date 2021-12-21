@@ -488,7 +488,7 @@
     generateColumns(usernames, usermeans)
   }
 
-  const imageScaling = 2
+  const imageScaling = 2 // TODO externalize
   exports.saveGridImage =
   function () {
     let gridclone = d3.select(d3.select('.grid').node().cloneNode(true))
@@ -520,9 +520,8 @@
     const newWidth = oldWidth * imageScaling
     const newHeight = oldHeight * imageScaling
 
-    console.log('scale(' + imageScaling + ') translate(' + (gridclone.node().offsetWidth / 2) + 'px,' + (gridclone.node().offsetHeight / 2) + 'px)')
-    const translateX = (newWidth - oldWidth) / 2 // gridclone.node().offsetWidth
-    const translateY = (newHeight - oldHeight) / 2 // gridclone.node().offsetHeight
+    const translateX = (newWidth - oldWidth) / 2
+    const translateY = (newHeight - oldHeight) / 2
     gridclone
       .style('transform', 'translate(' + translateX + 'px,' + translateY + 'px) scale(' + imageScaling + ')')
 
@@ -600,25 +599,20 @@
   function (dataUrl, minWidth, someHeight) {
     const img = new Image()
     img.onload = function () {
-      const cropMargin = {
-        left: 20 * imageScaling,
-        right: 10 * imageScaling,
-        top: 10 * imageScaling,
-        bottom: 25 * imageScaling,
-      }
-
+      // Create initial image canvas
       const chartWidth = img.width
-      const canvasHeight = img.height // + someHeight
-
+      const canvasHeight = img.height
       const canvasChartSelection = d3.select('body').append('canvas')
         .attr('width', chartWidth)
         .attr('height', canvasHeight)
-        .style('visibility', 'visible')
-        .style('border', 'solid 1px black')
+        .style('visibility', 'hidden')
+      const initialCanvas = canvasChartSelection.node()
+      const initialContext = initialCanvas.getContext('2d')
 
-      const canvasChart = canvasChartSelection.node()
-      const ctx = canvasChart.getContext('2d')
+      // Draw image to initial canvas
+      initialContext.drawImage(img, 0, 0)
 
+      // Define watermark
       let watermarkText = dax.text('user_profile.image.watermark')
       const date = new Date()
       watermarkText = watermarkText.replace(
@@ -627,77 +621,9 @@
         ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
         ('0' + date.getDate()).slice(-2))
 
-      const sourceFontHeight = 11 * imageScaling
-      ctx.font = sourceFontHeight + 'px "Varta"'
-      const sourceTextWidth = ctx.measureText(watermarkText).width
+      const compositeCanvas = dax.common.composeImageFromCanvas(initialCanvas, watermarkText)
 
-      ctx.fillStyle = 'white'
-      ctx.fillRect(0, 0, chartWidth, canvasHeight)
-      ctx.fillStyle = 'black'
-
-      ctx.drawImage(img, 0, 0)
-
-      const data = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height).data
-      let firstRowWithColor = -1
-      for (let y = 0; y < ctx.canvas.height && firstRowWithColor === -1; y++) {
-        for (let x = 0; x < ctx.canvas.width && firstRowWithColor === -1; x++) {
-          const pixelIndex = (y * ctx.canvas.width + x) * 4
-          if (data[pixelIndex] !== 255 || data[pixelIndex + 1] !== 255 || data[pixelIndex + 2] !== 255 || data[pixelIndex + 3] !== 255) {
-            firstRowWithColor = y
-          }
-        }
-      }
-
-      let lastRowWithColor = -1
-      for (let y = ctx.canvas.height - 1; y >= 0 && lastRowWithColor === -1; y--) {
-        for (let x = 0; x < ctx.canvas.width && lastRowWithColor === -1; x++) {
-          const pixelIndex = (y * ctx.canvas.width + x) * 4
-          if (data[pixelIndex] !== 255 || data[pixelIndex + 1] !== 255 || data[pixelIndex + 2] !== 255 || data[pixelIndex + 3] !== 255) {
-            lastRowWithColor = y
-          }
-        }
-      }
-
-      let firstColumnWithColor = -1
-      for (let x = 0; x < ctx.canvas.width && firstColumnWithColor === -1; x++) {
-        for (let y = 0; y < ctx.canvas.height && firstColumnWithColor === -1; y++) {
-          const pixelIndex = (y * ctx.canvas.width + x) * 4
-          if (data[pixelIndex] !== 255 || data[pixelIndex + 1] !== 255 || data[pixelIndex + 2] !== 255 || data[pixelIndex + 3] !== 255) {
-            firstColumnWithColor = x
-          }
-        }
-      }
-
-      let lastColumnWithColor = -1
-      for (let x = ctx.canvas.width - 1; x >= 0 && lastColumnWithColor === -1; x--) {
-        for (let y = 0; y < ctx.canvas.height && lastColumnWithColor === -1; y++) {
-          const pixelIndex = (y * ctx.canvas.width + x) * 4
-          if (data[pixelIndex] !== 255 || data[pixelIndex + 1] !== 255 || data[pixelIndex + 2] !== 255 || data[pixelIndex + 3] !== 255) {
-            lastColumnWithColor = x
-          }
-        }
-      }
-
-      const cropWidth = lastColumnWithColor - firstColumnWithColor
-      const cropHeight = lastRowWithColor - firstRowWithColor
-      const cropCanvas = document.createElement('canvas')
-      const cropCanvasWidth = Math.max(cropWidth, sourceTextWidth) + cropMargin.left + cropMargin.right
-      const cropCanvasHeight = cropHeight + cropMargin.top + cropMargin.bottom
-      const cropContext = cropCanvas.getContext('2d')
-      cropCanvas.width = cropCanvasWidth
-      cropCanvas.height = cropCanvasHeight
-      cropContext.fillStyle = 'white'
-      cropContext.fillRect(0, 0, cropCanvasWidth, cropCanvasHeight)
-      cropContext.drawImage(
-        canvasChart,
-        firstColumnWithColor, firstRowWithColor, cropWidth, cropHeight,
-        cropMargin.left, cropMargin.top, cropWidth, cropHeight) // newCanvas, same size as source rect
-
-      cropContext.fillStyle = '#555'
-      cropContext.font = sourceFontHeight + 'px "Varta"'
-      cropContext.fillText(watermarkText, cropMargin.left / 2, cropCanvasHeight - 6 * imageScaling)
-
-      cropCanvas.toBlob(function (blob) {
+      compositeCanvas.toBlob(function (blob) {
         saveAs(blob, dax.text('user_profile.grid.image.filename') + '.png')
       })
 
