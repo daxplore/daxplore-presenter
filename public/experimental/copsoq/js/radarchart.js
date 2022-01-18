@@ -493,14 +493,16 @@
           .attr('transform', activeOverlayTransform + ' scale(' + scaling + ')')
       }
 
+      const imageScaling = 2 // TODO externalize
       radarChart.generateImage =
         function () {
-          const imageScaling = 2
           const doctype = '<?xml version="1.0" standalone="no"?>' +
             '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
 
+          // Copy existing chart
           const chartCopy = d3.select(chart.node().cloneNode(true))
           const radarGroupCopy = chartCopy.select('g')
+          const svg = chartCopy.node()
 
           // Extract text and then remove axis tspans
           const axisTextsSplit = []
@@ -518,10 +520,10 @@
             textSelection = radarGroupCopy.select('.line-axis-text')
           }
 
-          const svg = chartCopy.node()
-
+          // Adjust chart element css
           chartCopy.style('margin', 0)
 
+          // Scale the copied element baed on the imageScaling constant
           const widthBefore = chartCopy.attr('width')
           chartCopy.attr('width', imageScaling * (Number(widthBefore)))
           const heightBefore = chartCopy.attr('height')
@@ -529,6 +531,7 @@
           chartCopy.style('transform', 'scale(' + imageScaling + ')' +
             'translate(' + ((Number(widthBefore)) / 2) + 'px,' + (Number(heightBefore) / 2) + 'px)')
 
+          // Define SVG and generate blob
           const source = (new XMLSerializer()).serializeToString(svg)
           const blob = new Blob([doctype + source], { type: 'image/svg+xml;charset=utf-8' })
           const url = window.URL.createObjectURL(blob)
@@ -536,47 +539,65 @@
             .style('visibility', 'hidden')
           const img = imgSelection.node()
 
+          // On image load function
           img.onload = function () {
+            // Generate initial chart canvas
             const canvasChartSelection = d3.select('body').append('canvas')
               .attr('width', img.width)
               .attr('height', img.height)
               .style('visibility', 'hidden')
             const canvasChart = canvasChartSelection.node()
-
             const chartCtx = canvasChart.getContext('2d')
+
+            // Draw image to canvas
             chartCtx.drawImage(img, 0, 0)
 
+            // Define image header text
             const headerText = perspectiveOptionText + ': ' + d3.select('.radar-chart-full-header').text()
             const headerFontSize = 16 * imageScaling
             const headerPaddingBottom = 10 * imageScaling
             const headerFont = 'bold ' + headerFontSize + 'px "Varta"'
             const headerHeight = headerFontSize + headerPaddingBottom
 
-            const imgMargin = { top: 10 * imageScaling, right: 20 * imageScaling, bottom: 20 * imageScaling, left: 20 * imageScaling }
+            // Define image margins
+            const imgMargin = {
+              top: 10 * imageScaling,
+              right: 20 * imageScaling,
+              bottom: 20 * imageScaling,
+              left: 20 * imageScaling,
+            }
 
+            // Define composite canvas
             const canvasCompleteSelection = d3.select('body').append('canvas')
               .style('visibility', 'hidden')
-
             const canvasComplete = canvasCompleteSelection.node()
-
             const ctx = canvasCompleteSelection.node().getContext('2d')
 
+            // Set header font
             ctx.font = headerFont
+
+            // Calculate header width
             const headerWidth = ctx.measureText(headerText).width
+
+            // Calculate needed height and width for final image
             const imgAdditionalWidth = Math.max(0, headerWidth - img.width)
             const completeWidth = imgMargin.left + img.width + imgAdditionalWidth + imgMargin.right
             const completeHeight = imgMargin.top + headerHeight + img.height + imgMargin.bottom
             const headerHorizontalShift = completeWidth / 2 - headerWidth / 2
-
             canvasCompleteSelection
               .attr('width', completeWidth + 'px')
               .attr('height', completeHeight + 'px')
 
+            // Fill white background
             ctx.fillStyle = 'white'
             ctx.fillRect(0, 0, completeWidth, completeHeight)
+
+            // Draw header text
             ctx.fillStyle = 'black'
             ctx.font = headerFont
             ctx.fillText(headerText, headerHorizontalShift, headerFontSize + imgMargin.top)
+
+            // Define watermark text
             const customDataChart = false // TODO should not be hardcoded, userprofile should set to true
             let watermarkText = dax.text(customDataChart ? 'user_profile.image.watermark' : 'profile.chart.mean_bar_vertical.image.watermark')
 
@@ -588,19 +609,23 @@
               ('0' + date.getDate()).slice(-2))
               .replace('Profildiagram', 'Radardiagram') // TODO externalize Radar as separate text
 
+            // Define filename
             const fileName = dax.text(customDataChart ? 'user_profile.chart.mean_bar_vertical.image.filename' : 'profile.image.filename')
               .replace('{option}', headerText)
               .replace('Profildiagram', 'Radardiagram') // TODO externalize Radar as separate text
 
+            // Draw watermark text
             const sourceFontHeight = 11 * imageScaling
             ctx.font = sourceFontHeight + 'px "Varta"'
             ctx.fillStyle = '#555'
             ctx.fillText(watermarkText, 5, completeHeight - 8)
 
+            // Draw image canvas to composite canvas
             const imgDrawX = imgMargin.left + imgAdditionalWidth / 2
             const imgDrawY = imgMargin.top + headerHeight
             ctx.drawImage(canvasChart, imgDrawX, imgDrawY)
 
+            // Manually redraw text
             const axisTextFontHeight = 15 * imageScaling
             const textBoxHeightEstimation = axisTextFontHeight * 0.7
             ctx.font = axisTextFontHeight + 'px "Varta"'
@@ -621,15 +646,18 @@
               })
             })
 
+            // Generate image download for user
             canvasComplete.toBlob(function (blob) {
               saveAs(blob, fileName + '.png')
             })
 
+            // Clean up
             imgSelection.remove()
             canvasChartSelection.remove()
             canvasCompleteSelection.remove()
           }
 
+          // Set image content, triggering the onload function
           img.src = url
         }
 
