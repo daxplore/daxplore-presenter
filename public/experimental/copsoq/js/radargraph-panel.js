@@ -79,7 +79,7 @@
 
     d3.select('#radar-graph')
       .attr('width', 3 * miniRadarWidth + graphFirstSpacing + graphSecondSpacing + margin.left + margin.right)
-      .attr('height', 2 * miniRadarWidth + graphMidSpacing + margin.top + margin.bottom)
+      .attr('height', 2.1 * miniRadarWidth + graphMidSpacing + margin.top + margin.bottom)
 
     d3.select('#radar-graph-group')
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
@@ -96,15 +96,14 @@
     fullCharts = []
     const overlayTextScaling = []
     for (let i = 0; i < 5; i++) {
-      chartNodes[i] = dax.radarchart.createRadarChart('#radar-node-' + i, texts[i], referenceValues[i], goodDirections[i][0], nodes[i].overlayTextArray)
+      chartNodes[i] = dax.radarchart.createRadarChart('#radar-node-' + i, nodes[i].headerText, texts[i], referenceValues[i], goodDirections[i][0])
       chartNodes[i].setWidth(miniRadarWidth)
       overlayTextScaling.push(chartNodes[i].getCalculatedOverlayTextScaling())
       d3.select('#radar-node-' + i)
         .attr('transform', 'translate(' + positions[i].join(',') + ')')
-        .style('filter', 'drop-shadow(0 0 1px black) drop-shadow(0 0 1px black)')
 
       // cycle through all charts to find sizes
-      fullCharts[i] = dax.radarchart.createRadarChart('#radar-chart-full-' + i, texts[i], referenceValues[i], goodDirections[i][0], nodes[i].overlayTextArray)
+      fullCharts[i] = dax.radarchart.createRadarChart('#radar-chart-full-' + i, nodes[i].headerText, texts[i], referenceValues[i], goodDirections[i][0])
       fullCharts[i].setDisplayModeFull()
       fullCharts[i].setWidth(fullRadarWidth)
       fullCircleCenterOffsets[i] = fullCharts[i].getCircleCenterOffsets()

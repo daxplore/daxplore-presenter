@@ -42,15 +42,15 @@
   cursor: pointer;
 }
 
-.radar-node--highlighted {
+.radar-node--highlighted > .radar-node-background {
   filter: drop-shadow(0 0 1px black) drop-shadow(0 0 1px black) drop-shadow(0 0 1px black) !important;
 }
 
-.radar-node:hover {
+.radar-node:hover > .radar-node-background {
   filter: drop-shadow(0 0 1px black) drop-shadow(0 0 1px black) drop-shadow(0 0 1px black) !important;
 }
 
-.radar-node--highlighted:hover {
+.radar-node--highlighted:hover > .radar-node-background {
   filter: drop-shadow(0 0 1px black) drop-shadow(0 0 1px black) drop-shadow(0 0 1px black) drop-shadow(0 0 1px black) !important;
 }
 

@@ -24,8 +24,8 @@
 
   const dataPointColor = '#555'
 
-  const overlayTextWidth = 0.9 // Measured in radius units
-  const overlayTextLineHeight = 1.05 // Factor of font size
+  const headerTextWidth = 0.9 // Measured in radius units
+  // const overlayTextLineHeight = 1.05 // Factor of font size
 
   const margin = { top: 0, bottom: 0, left: 0, right: 0 }
 
@@ -48,10 +48,10 @@
   exports.createRadarChart =
     function (
       elementClassName,
+      headerText,
       axisTextArray,
       referenceValueArray,
       goodDirectionInput,
-      overlayTextArrayInput
     ) {
       if (axisTextArray.length !== referenceValueArray.length) {
         throw new Error('Invalid radar chart input data, different array lengths.')
@@ -59,7 +59,6 @@
       const referenceData = referenceValueArray
       const axisTexts = axisTextArray
       const goodDirection = goodDirectionInput
-      const overlayTextArray = overlayTextArrayInput
 
       const radarChart = {}
 
@@ -101,6 +100,8 @@
       // WHITE BACKGROUND BASE PLATE
       const baseBackgroundPlate = chart.append('circle')
         .style('fill', 'white')
+        .style('filter', displayModeMiniaturized ? 'drop-shadow(0 0 1px black) drop-shadow(0 0 1px black)' : '')
+        .classed('radar-node-background', true)
 
       // RADAR CHART GROUP
       const radarGroup = chart.append('g')
@@ -137,8 +138,11 @@
       // OVERLAY TEXT
       const overlayTextElement = chart.append('text')
         .style('fill', 'black')
-        .style('filter', 'drop-shadow(0 0 1px white) drop-shadow(0 0 1px white)')
+        // .style('filter', 'drop-shadow(0 0 1px white) drop-shadow(0 0 1px white)')
         .attr('font-family', '"Varta", sans-serif')
+        .style('text-anchor', 'middle')
+        .text(displayModeMiniaturized ? headerText : '')
+        // .style('font-size', 10 + 'px')
 
       // INTERNAL FUNCTIONS
 
@@ -261,15 +265,20 @@
 
         const radarGroupBBox = radarGroup.node().getBBox()
         if (displayModeMiniaturized) {
-          addSvgTspansFromArray(overlayTextElement.node(), overlayTextArray, 10, overlayTextLineHeight)
+          overlayTextElement // .append('tspan')
+            .text(headerText)
+            // .style('font-size', 20 + 'px')
+          // addSvgTspansFromArray(overlayTextElement.node(), overlayTextArray, 10, overlayTextLineHeight)
           const overlayTextBBox = overlayTextElement.node().getBBox()
-          const targetTextWidth = overlayTextWidth * radius
+          const targetTextWidth = 1.5 * headerTextWidth * radius
           calculatedOverlayTextScaling = targetTextWidth / overlayTextBBox.width
           const textScaling = forcedOverlayTextScaling !== null ? forcedOverlayTextScaling : calculatedOverlayTextScaling
           const scaledTextHeight = overlayTextBBox.height * textScaling
-          activeOverlayTransform = 'translate(' + (margin.left - radarGroupBBox.x) + ',' + (margin.right - radarGroupBBox.y) + ')' +
-                      'translate(0,' + (overlayTextArray.length === 1 ? 0.2 * scaledTextHeight : 0) + ')' +
-                      'scale(' + textScaling + ') '
+          activeOverlayTransform =
+                    'translate(' + (radarGroupBBox.width / 2) + ',' + (radarGroupBBox.height + scaledTextHeight) + ')' +
+                    // 'translate(' + (margin.left - radarGroupBBox.x) + ',' + (margin.right - radarGroupBBox.y) + ')' +
+                    // 'translate(0,' + scaledTextHeight + ')' +
+                    'scale(' + textScaling + ') '
           overlayTextElement
             .attr('transform', activeOverlayTransform)
         }
@@ -348,23 +357,23 @@
             .attr('dy', function (d, i) { return fontSize + i * lineHeight })
       }
 
-      function addSvgTspansFromArray (svgTextElement, textArray, fontSize, lineHeight) {
-        const textElement = d3.select(svgTextElement)
-        textElement.selectAll('*').remove()
-        textElement.selectAll('.wordwrap')
-          .data(textArray).enter()
-          .append('tspan')
-            .classed('wordwrap', true)
-            .attr('text-align', 'center')
-            .style('font-size', fontSize + 'px')
-            .text(function (d) { return d })
-            .attr('x', 0)
-            .attr('dy', function (d, i) { return i * fontSize * lineHeight })
-        textElement.selectAll('.wordwrap')
-          .attr('dx', function (d, i, nodes) {
-            return -(nodes[i].getBoundingClientRect().width / 2)
-          })
-      }
+      // function addSvgTspansFromArray (svgTextElement, textArray, fontSize, lineHeight) {
+      //   const textElement = d3.select(svgTextElement)
+      //   textElement.selectAll('*').remove()
+      //   textElement.selectAll('.wordwrap')
+      //     .data(textArray).enter()
+      //     .append('tspan')
+      //       .classed('wordwrap', true)
+      //       .attr('text-align', 'center')
+      //       .style('font-size', fontSize + 'px')
+      //       .text(function (d) { return d })
+      //       .attr('x', 0)
+      //       .attr('dy', function (d, i) { return i * fontSize * lineHeight })
+      //   textElement.selectAll('.wordwrap')
+      //     .attr('dx', function (d, i, nodes) {
+      //       return -(nodes[i].getBoundingClientRect().width / 2)
+      //     })
+      // }
 
       function getTextCoordinates (textRadius, angle, width, height) {
         angle = mod(angle, TAU)
@@ -553,11 +562,11 @@
             chartCtx.drawImage(img, 0, 0)
 
             // Define image header text
-            const headerText = perspectiveOptionText + ': ' + d3.select('.radar-chart-full-header').text()
-            const headerFontSize = 16 * imageScaling
-            const headerPaddingBottom = 10 * imageScaling
-            const headerFont = 'bold ' + headerFontSize + 'px "Varta"'
-            const headerHeight = headerFontSize + headerPaddingBottom
+            const imageHeaderText = perspectiveOptionText + ': ' + d3.select('.radar-chart-full-header').text()
+            const imageHeaderFontSize = 16 * imageScaling
+            const imageHeaderPaddingBottom = 10 * imageScaling
+            const imageHeaderFont = 'bold ' + imageHeaderFontSize + 'px "Varta"'
+            const imageHeaderHeight = imageHeaderFontSize + imageHeaderPaddingBottom
 
             // Define image margins
             const imgMargin = {
@@ -574,16 +583,16 @@
             const ctx = canvasCompleteSelection.node().getContext('2d')
 
             // Set header font
-            ctx.font = headerFont
+            ctx.font = imageHeaderFont
 
             // Calculate header width
-            const headerWidth = ctx.measureText(headerText).width
+            const headerWidth = ctx.measureText(imageHeaderText).width
 
             // Calculate needed height and width for final image
             const imgAdditionalWidth = Math.max(0, headerWidth - img.width)
             const completeWidth = imgMargin.left + img.width + imgAdditionalWidth + imgMargin.right
-            const completeHeight = imgMargin.top + headerHeight + img.height + imgMargin.bottom
-            const headerHorizontalShift = completeWidth / 2 - headerWidth / 2
+            const completeHeight = imgMargin.top + imageHeaderHeight + img.height + imgMargin.bottom
+            const imageHeaderHorizontalShift = completeWidth / 2 - headerWidth / 2
             canvasCompleteSelection
               .attr('width', completeWidth + 'px')
               .attr('height', completeHeight + 'px')
@@ -594,8 +603,8 @@
 
             // Draw header text
             ctx.fillStyle = 'black'
-            ctx.font = headerFont
-            ctx.fillText(headerText, headerHorizontalShift, headerFontSize + imgMargin.top)
+            ctx.font = imageHeaderFont
+            ctx.fillText(imageHeaderText, imageHeaderHorizontalShift, imageHeaderFontSize + imgMargin.top)
 
             // Define watermark text
             const customDataChart = false // TODO should not be hardcoded, userprofile should set to true
@@ -611,7 +620,7 @@
 
             // Define filename
             const fileName = dax.text(customDataChart ? 'user_profile.chart.mean_bar_vertical.image.filename' : 'profile.image.filename')
-              .replace('{option}', headerText)
+              .replace('{option}', imageHeaderText)
               .replace('Profildiagram', 'Radardiagram') // TODO externalize Radar as separate text
 
             // Draw watermark text
@@ -622,7 +631,7 @@
 
             // Draw image canvas to composite canvas
             const imgDrawX = imgMargin.left + imgAdditionalWidth / 2
-            const imgDrawY = imgMargin.top + headerHeight
+            const imgDrawY = imgMargin.top + imageHeaderHeight
             ctx.drawImage(canvasChart, imgDrawX, imgDrawY)
 
             // Manually redraw text
