@@ -27,7 +27,7 @@
   const headerTextWidth = 0.9 // Measured in radius units
   // const overlayTextLineHeight = 1.05 // Factor of font size
 
-  const margin = { top: 0, bottom: 0, left: 0, right: 0 }
+  const margin = { top: 0, bottom: 0, left: 10, right: 10 }
 
   // Helper
   function conditionalTransition (selection, applyTransition) {
@@ -51,7 +51,7 @@
       headerText,
       axisTextArray,
       referenceValueArray,
-      goodDirectionInput,
+      goodDirectionInput
     ) {
       if (axisTextArray.length !== referenceValueArray.length) {
         throw new Error('Invalid radar chart input data, different array lengths.')
@@ -256,7 +256,7 @@
         // DATA POINTS
         updateDataPointPositions(animate)
 
-        // OVERLAY TEXT
+        // HEADER TEXT
         overlayTextElement
           .style('font-size', radius + 'px')
           .style('display', displayModeMiniaturized ? '' : 'none')
@@ -275,7 +275,7 @@
           const textScaling = forcedOverlayTextScaling !== null ? forcedOverlayTextScaling : calculatedOverlayTextScaling
           const scaledTextHeight = overlayTextBBox.height * textScaling
           activeOverlayTransform =
-                    'translate(' + (radarGroupBBox.width / 2) + ',' + (radarGroupBBox.height + scaledTextHeight) + ')' +
+                    'translate(' + (radarGroupBBox.width / 2 + margin.left) + ',' + (radarGroupBBox.height + scaledTextHeight + margin.top) + ')' +
                     // 'translate(' + (margin.left - radarGroupBBox.x) + ',' + (margin.right - radarGroupBBox.y) + ')' +
                     // 'translate(0,' + scaledTextHeight + ')' +
                     'scale(' + textScaling + ') '
@@ -285,7 +285,7 @@
 
         // GROUP POSITIONING
         offsetLeft = margin.left - radarGroupBBox.x
-        offsetTop = margin.right - radarGroupBBox.y
+        offsetTop = margin.top - radarGroupBBox.y
         baseBackgroundPlate
           .attr('transform', 'translate(' + offsetLeft + ',' + offsetTop + ')')
         radarGroup
@@ -311,6 +311,9 @@
                 .classed('datapoint-symbol', true)
                 .attr('d', dataPointSymbol)
                 .attr('fill', dataPointColor)
+                // .attr('fill', function (d, i, n) {
+                //   return dax.colors.colorTextForValue(d, referenceData[i], goodDirection)
+                // })
                 .on('mouseover', function (d, i, n) { return hoverCallbackFunctions.forEach(function (callback) { return callback(d, i, n) }) })
                 .on('mouseout', mouseoutHighlight)
         radarGroup.selectAll('.datapoint-symbol')
@@ -418,7 +421,7 @@
         rectMidX += Math.cos(angle) * outerAxisTextMargin
         rectMidY += Math.sin(angle) * outerAxisTextMargin
 
-        const rectCornerPixelX = (rectMidX - width) * textRadius
+        const rectCornerPixelX = rectMidX * textRadius
         const rectCornerPixelY = (rectMidY - height) * textRadius
         return [rectCornerPixelX, rectCornerPixelY]
       }
@@ -458,7 +461,7 @@
       }
 
       radarChart.setWidth = function (width) {
-        radius = width / 2
+        radius = width / 2 - Math.max(margin.top + margin.bottom, margin.left + margin.bottom)
         updateChartElements(false)
       }
 
@@ -643,13 +646,13 @@
             const angleSlice = 2 * Math.PI / referenceData.length
             axisTextsSplit.forEach(function (textArray, i) {
               const angle = 0.75 * TAU + i * angleSlice
-              const maxTextWidth = textArray.reduce(function (acc, t) {
-                Math.max(acc, ctx.measureText(t).width)
+              var maxTextWidth = textArray.reduce(function (acc, t) {
+                return Math.max(acc, ctx.measureText(t).width)
               }, 0)
               const heightEstimation = textArray.length * textBoxHeightEstimation + (textArray.length - 1) * lineSpacing
               const coordinates = getTextCoordinates(radius * imageScaling, angle, maxTextWidth, heightEstimation)
               textArray.forEach(function (text, j) {
-                const x = coordinates[0] + imgDrawX + offsetLeft * imageScaling
+                const x = coordinates[0] + imgDrawX + offsetLeft * imageScaling - ctx.measureText(text).width / 2
                 const y = coordinates[1] + imgDrawY + offsetTop * imageScaling + textBoxHeightEstimation * (j + 1) + lineSpacing * j
                 ctx.fillText(text, x, y)
               })
