@@ -12,7 +12,10 @@
 
   const fullRadarWidth = 350
 
-  // Horizontal
+  // Graph structure
+  //    1    3
+  // 0
+  //    2    4
   const positions = [
     [0, (miniRadarWidth + graphMidSpacing) / 2],
     [miniRadarWidth + graphFirstSpacing, 0],
@@ -22,6 +25,7 @@
   ]
 
   const linkLine = [
+    positions[2],
     positions[3],
     positions[1],
     positions[0],
