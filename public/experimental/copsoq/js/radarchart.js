@@ -7,9 +7,6 @@
 
   const outerAxisTextMargin = 0.06 // Measured in radius units
   const outerAxisTextMaxWidth = 0.8 // Measured in radius units
-  const domainBottom = 0
-  const domainTop = 100
-  const axisXRingStepSize = 10
   const lowDataInterpolationStepCount = 50
 
   const referenceGreenFill = '#C5E1A5'
@@ -51,7 +48,8 @@
       headerText,
       axisTextArray,
       referenceValueArray,
-      goodDirectionInput
+      goodDirectionInput,
+      domainRangeInput
     ) {
       if (axisTextArray.length !== referenceValueArray.length) {
         throw new Error('Invalid radar chart input data, different array lengths.')
@@ -59,7 +57,9 @@
       const referenceData = referenceValueArray
       const axisTexts = axisTextArray
       const goodDirection = goodDirectionInput
-
+      // Round domain up to closest step size
+      let axisXRingStepSize = domainRangeInput > 50 ? 10 : 5
+      let domainRange = Math.ceil(domainRangeInput / axisXRingStepSize) * axisXRingStepSize
       const radarChart = {}
 
       const angleSlice = 2 * Math.PI / referenceData.length
@@ -108,18 +108,18 @@
 
       // RADIUS
       radiusScale
-        .domain([domainBottom, domainTop])
+        .domain([-domainRange, domainRange])
 
       // BACKGROUND COLORED REFERENCES AREAS
       const baseReferenceCircle = radarGroup.append('circle')
 
-      const midReferenceArea = radarGroup.append('path')
+      const midReferenceArea = radarGroup.append('circle')
         .style('fill', referenceYellowFill)
 
-      const centerReferenceArea = radarGroup.append('path')
+      const centerReferenceArea = radarGroup.append('circle')
 
       // AXIS RINGS
-      const axisRingData = d3.range(domainBottom + axisXRingStepSize, domainTop + 1, axisXRingStepSize)
+      const axisRingData = d3.range(-domainRange + axisXRingStepSize, domainRange + 1, axisXRingStepSize)
 
       radarGroup.selectAll('.circle-axis')
         .data(axisRingData).enter()
@@ -133,7 +133,10 @@
         .append('text')
           .classed('circle-axis-text', true)
           .style('fill', '#444')
-          .text(function (d) { return d }) // TODO externalize formatting
+          .text(function (d) {
+            const dd = goodDirection === 'HIGH' ? d : (d - axisXRingStepSize)
+            return (dd === 0 ? '± ' : (dd < 0 ? '- ' : '+ ')) + Math.abs(dd)
+          }) // TODO externalize formatting
 
       // OVERLAY TEXT
       const overlayTextElement = chart.append('text')
@@ -151,6 +154,9 @@
         // INTERPOLATION
         // Interpolate values for 2 or less datapoints
         let referenceDataInterpolated = referenceData
+
+        radiusScale
+          .domain([-domainRange, domainRange])
 
         // let pointDataInterpolated = pointDataForOption
         // TODO collapse empty datapoints or don't draw th
@@ -187,6 +193,28 @@
         dataPointSymbol
           .size(radius / 2) // TODO
 
+        // AXIS RINGS
+        const axisRingData = d3.range(-domainRange + axisXRingStepSize, domainRange + 1, axisXRingStepSize)
+
+        radarGroup.selectAll('.circle-axis').remove()
+        radarGroup.selectAll('.circle-axis')
+          .data(axisRingData).enter()
+            .append('circle')
+              .classed('circle-axis', true)
+              .style('fill-opacity', '0')
+              .style('stroke', axisColor)
+
+        radarGroup.selectAll('.circle-axis-text').remove()
+        radarGroup.selectAll('.circle-axis-text')
+          .data(axisRingData).enter()
+            .append('text')
+              .classed('circle-axis-text', true)
+              .style('fill', '#444')
+              .text(function (d) {
+                const dd = goodDirection === 'HIGH' ? d : (d - axisXRingStepSize)
+                return (dd === 0 ? '± ' : (dd < 0 ? '- ' : '+ ')) + Math.abs(dd)
+              }) // TODO externalize formatting
+
         // LINE/AREA GENERATORS
         referenceLineGenerator
           .angle(function (d, i) { return i * angleSliceInterpolated })
@@ -194,12 +222,12 @@
           .attr('r', radius)
         baseReferenceCircle
           .attr('r', radius)
-          .style('fill', goodDirection === 'HIGH' ? referenceGreenFill : referenceRedFill)
+          .style('fill', referenceGreenFill)
         midReferenceArea
-          .attr('d', referenceLineGenerator(referenceDataInterpolated.map(function (d) { return d + 5 })))
+          .attr('r', radiusScale(5))
         centerReferenceArea
-          .style('fill', goodDirection === 'HIGH' ? referenceRedFill : referenceGreenFill)
-          .attr('d', referenceLineGenerator(referenceDataInterpolated.map(function (d) { return d - 5 })))
+          .attr('r', radiusScale(-5))
+          .style('fill', referenceRedFill)
         dataPointLineGenerator
           .angle(function (d, i) { return i * angleSliceInterpolated })
 
@@ -214,7 +242,11 @@
           .style('position', displayModeMiniaturized ? 'absolute' : '')
           .attr('transform',
             function (d) {
-              return 'translate(' + (radius * axisCircleTextFontSize) / 8 + ',' + (-radiusScale(d - axisXRingStepSize / 2) + (radius * axisCircleTextFontSize) / 5) + ')'
+              const goodHigh = goodDirection === 'HIGH'
+              return 'translate(' +
+              (radius * (axisCircleTextFontSize + 0.03)) / 8 + ',' +
+              (-radiusScale((goodHigh ? 1 : -1) * (d - axisXRingStepSize / 2 - (goodDirection === 'HIGH'))) + (radius * axisCircleTextFontSize) / 5) +
+               ')'
             }
           )
 
@@ -226,7 +258,7 @@
             .style('stroke', axisColor)
 
         radarGroup.selectAll('.line-axis')
-          .attr('d', function (d, i) { return yAxisLineGenerator([[0, 0], d3.pointRadial(i * angleSlice, radiusScale(domainTop))]) })
+          .attr('d', function (d, i) { return yAxisLineGenerator([[0, 0], d3.pointRadial(i * angleSlice, radiusScale(domainRange))]) })
           .style('stroke-width', axisStrokeWidth * radius)
 
         // AXIS TEXT
@@ -302,7 +334,10 @@
       }
 
       function updateDataPointPositions (animate) {
-        const pointDataForOption = pointData.map(function (subarray) { return subarray[selectedPerspectiveOption] })
+        let pointDataForOption = pointData.map(function (subarray) { return subarray[selectedPerspectiveOption] })
+        pointDataForOption = pointDataForOption.map(function (n, i) {
+          return goodDirection === 'HIGH' ? n - referenceData[i] : referenceData[i] - n
+        })
         radarGroup.selectAll('.datapoint')
           .data(pointDataForOption).enter()
             .append('g')
@@ -452,12 +487,18 @@
       // --- EXPORTED FUNCTIONS FOR RADAR CHART OBJECT --- //
       // ------------------------------------------------- //
 
-      radarChart.setData = function (pointDataArray, animate) {
+      // Domain range argument is optional
+      radarChart.setData = function (pointDataArray, animate, domainRangeInput) {
+        if (!isNaN(domainRangeInput) && typeof domainRangeInput !== 'undefined') {
+          axisXRingStepSize = domainRangeInput > 50 ? 10 : 5
+          domainRange = Math.ceil(domainRangeInput / axisXRingStepSize) * axisXRingStepSize
+        }
         if (axisTextArray.length !== pointDataArray.length) {
           throw new Error('Invalid radar chart input data, different array lengths.')
         }
         pointData = pointDataArray
         updateDataPointPositions(animate)
+        // updateChartElements(a)
       }
 
       radarChart.setWidth = function (width) {

@@ -67,7 +67,7 @@
       // Get the downloaded metadata
       const questions = questionsResponse.data
       const perspectives = perspectivesResponse.data
-      // const settings = settingsResponse.data
+      const settings = settingsResponse.data
       const usertexts = usertextsResponse.data
       const listview = listviewResponse.data
       const manifest = manifestResponse.data
@@ -140,6 +140,8 @@
         }
       }
 
+      // Initialize elements that depend on the metadata
+      dax.settings.initializeResources(settings)
       dax.text.initializeResources(usertexts)
       dax.profile.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap)
 

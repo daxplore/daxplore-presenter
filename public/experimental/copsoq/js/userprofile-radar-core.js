@@ -49,9 +49,6 @@
     d3.select('.radarchart-save-image')
       .text(dax.text('common.button.save_chart_as_image'))
     dax.radargraph.initializeRadarGraph(radargraphData, questions, qIDs)
-    dax.userprofile.addGridUpdateCallback(function (names, means) {
-      dax.radargraph.setChartData(names, means)
-    })
   }
 
   function onTabClick () {
@@ -96,7 +93,7 @@
     .then(axios.spread(function (questionsResponse, settingsResponse, usertextsResponse, listviewResponse, manifestResponse, radargraphResponse) {
       // Get the downloaded metadata
       const questions = questionsResponse.data
-      // const settings = settingsResponse.data
+      const settings = settingsResponse.data
       const usertexts = usertextsResponse.data
       const listview = listviewResponse.data
       const manifest = manifestResponse.data
@@ -143,6 +140,8 @@
         }
       }
 
+      // Initialize elements that depend on the metadata
+      dax.settings.initializeResources(settings)
       dax.text.initializeResources(usertexts)
       dax.profile.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap)
 
@@ -155,6 +154,21 @@
         populateUserProfileDOM(listview, meanReferenceMap, shorttextMap, descriptionMap, directionMap, titleRegexpMap)
         populateRadarDOM(radargraphData, questions, listview)
       }
+
+      dax.userprofile.addGridUpdateCallback(function (names, means) {
+        let maxReferenceDiff = dax.settings('listview.max_reference_diff')
+        // Calculate max mean-to-value difference to get the radar +/- interval
+        for (let i = 0; i < means.length; i++) {
+          const reference = meanReferenceMap[listview[i]]
+          for (let j = 0; j < means[i].length; j++) {
+            if (Number.isNaN(means[i][j])) { continue }
+            const diff = Math.abs(means[i][j] - reference)
+            maxReferenceDiff = Math.max(diff, maxReferenceDiff)
+          }
+        }
+        // dax.radargraph.setDomainRange(maxReferenceDiff)
+        dax.radargraph.setChartData(names, means, maxReferenceDiff)
+      })
 
       // Send height changes to parent window, so it can update iframe size
       if (window.ResizeObserver) {

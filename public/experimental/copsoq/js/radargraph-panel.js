@@ -95,19 +95,33 @@
       .style('fill-opacity', 0)
       .attr('d', d3.line()(linkLine))
 
+    const domainRange = dax.settings('listview.max_reference_diff')
     chartNodes = []
     fullCircleCenterOffsets = []
     fullCharts = []
     const overlayTextScaling = []
     for (let i = 0; i < 5; i++) {
-      chartNodes[i] = dax.radarchart.createRadarChart('#radar-node-' + i, nodes[i].headerText, texts[i], referenceValues[i], goodDirections[i][0])
+      chartNodes[i] = dax.radarchart.createRadarChart(
+        '#radar-node-' + i,
+        nodes[i].headerText,
+        texts[i],
+        referenceValues[i],
+        goodDirections[i][0],
+        domainRange)
       chartNodes[i].setWidth(miniRadarWidth)
       overlayTextScaling.push(chartNodes[i].getCalculatedOverlayTextScaling())
       d3.select('#radar-node-' + i)
         .attr('transform', 'translate(' + positions[i].join(',') + ')')
 
       // cycle through all charts to find sizes
-      fullCharts[i] = dax.radarchart.createRadarChart('#radar-chart-full-' + i, nodes[i].headerText, texts[i], referenceValues[i], goodDirections[i][0])
+      fullCharts[i] = dax.radarchart.createRadarChart(
+        '#radar-chart-full-' + i,
+        nodes[i].headerText,
+        texts[i],
+        referenceValues[i],
+        goodDirections[i][0],
+        domainRange
+      )
       fullCharts[i].setDisplayModeFull()
       fullCharts[i].setWidth(fullRadarWidth)
       fullCircleCenterOffsets[i] = fullCharts[i].getCircleCenterOffsets()
@@ -142,18 +156,19 @@
     }
   }
 
+  // maxReferenceDiff is an optinal argument
   exports.setChartData =
-  function (perspectiveOptionsInput, means) {
+  function (perspectiveOptionsInput, means, maxReferenceDiff) {
     perspectiveOptions = perspectiveOptionsInput
     values = nodes.map(function (node) {
       return node.qIDs.map(function (qID) {
         return means[qIDs.indexOf(qID)]
       })
     })
-    for (let i = 0; i < 5; i++) {
-      chartNodes[i].setData(values[i], false)
+    for (let i = 0; i < chartNodes.length; i++) {
+      chartNodes[i].setData(values[i], false, maxReferenceDiff)
       chartNodes[i].setPerspectiveOption(perspectiveOptions[selectedPerspectiveOption], selectedPerspectiveOption, false)
-      fullCharts[i].setData(values[i], false)
+      fullCharts[i].setData(values[i], false, maxReferenceDiff)
       fullCharts[i].setPerspectiveOption(perspectiveOptions[selectedPerspectiveOption], selectedPerspectiveOption, false)
     }
 
@@ -168,8 +183,9 @@
       .classed('radar-node--highlighted', function (d, i) { return i === nodeIndex })
     d3.select('.radar-chart-full-header')
       .text(nodes[nodeIndex].headerText)
-      .style('margin-left', (Math.max(0, fullChartMaxOffset.left - fullChartMaxOffset.right) + 'px'))
-      .style('margin-right', (Math.max(0, fullChartMaxOffset.right - fullChartMaxOffset.left) + 'px'))
+      .style('margin-left', '10px') // TODO don't use 10px constant, figure out correct automatic positioning
+      // .style('margin-left', (Math.max(0, fullChartMaxOffset.left - fullChartMaxOffset.right) + 'px'))
+      // .style('margin-right', (Math.max(0, fullChartMaxOffset.right - fullChartMaxOffset.left) + 'px'))
 
     setDescription(selectedNode)
   }

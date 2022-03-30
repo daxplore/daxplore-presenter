@@ -37,6 +37,7 @@
     <script type="text/javascript" src="../../js/colors.js"></script>
     <script type="text/javascript" src="../../js/daxplore-common.js"></script>
     <script type="text/javascript" src="../../js/profile-helpers.js"></script>
+    <script type="text/javascript" src="../../js/settings.js"></script>
     <script type="text/javascript" src="../../js/text.js"></script>
 
     <!-- Import Daxplore chart -->
@@ -58,7 +59,7 @@
           inactive: dax.radargraph.initialize, // Generate chart after failing to load the font
         })
       } catch (e) {
-        dax.profileradargraph.initialize() // Generate chart if WebFont loading failed
+        dax.radargraph.initialize() // Generate chart if WebFont loading failed
       }
     </script>
 
