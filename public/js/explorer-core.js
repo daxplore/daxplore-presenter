@@ -136,7 +136,7 @@
   function () {
     // Download the manifest first, cache bust to always get newest version
     // The manifest can be used figure out if other files need to be cache busted
-    axios.get('../../data/manifest.json?ver=' + new Date().toISOString())
+    axios.get('data/manifest.json?ver=' + new Date().toISOString())
     .then(function (manifestResponse) {
       const manifest = manifestResponse.data
       const manifestDate = manifest.exportDate
