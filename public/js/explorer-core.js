@@ -134,114 +134,119 @@
 
   exports.initializeExplorer =
   function () {
-    // Use Axios to download all needed metadata files from the server
-    // Define functions for all metadata files to be downloaded
-    function getGroups () { return axios.get('data/groups.json') }
-    function getPerspectives () { return axios.get('data/perspectives.json') }
-    function getQuestions () { return axios.get('data/questions.json') }
-    function getSettings () { return axios.get('data/settings.json') }
-    function getUsertexts () { return axios.get('data/usertexts.json') }
-    function getManifest () { return axios.get('data/manifest.json') }
-
-    // Make a batch Axios request to download all metadata asynchronously
-    axios.all([getGroups(), getPerspectives(), getQuestions(), getSettings(), getUsertexts(), getManifest()])
-    .then(axios.spread(function (groupsResponse, perspectivesResponse, questionsResponse, settingsResponse, usertextsResponse, manifestResponse) {
-      // Get the downloaded metadata
-      groups = groupsResponse.data
-      perspectives = perspectivesResponse.data
-      questions = questionsResponse.data
-      settings = settingsResponse.data
-      const usertexts = usertextsResponse.data
+    // Download the manifest first, cache bust to always get newest version
+    // The manifest can be used figure out if other files need to be cache busted
+    axios.get('../../data/manifest.json?ver=' + new Date().toISOString())
+    .then(function (manifestResponse) {
       const manifest = manifestResponse.data
+      const manifestDate = manifest.exportDate
+      // Use Axios to download all needed metadata files from the server
+      // Define functions for all metadata files to be downloaded
+      function getGroups () { return axios.get('data/groups.json?ver=' + manifestDate) }
+      function getPerspectives () { return axios.get('data/perspectives.json?ver=' + manifestDate) }
+      function getQuestions () { return axios.get('data/questions.json?ver=' + manifestDate) }
+      function getSettings () { return axios.get('data/settings.json?ver=' + manifestDate) }
+      function getUsertexts () { return axios.get('data/usertexts.json?ver=' + manifestDate) }
 
-      // The function logs the error as a side effect,
-      // so if the versions don't match all we have to do here is exit
-      // TODO communicate the error directly in the DOM?
-      if (!dax.common.hasMatchingDataFileVersions(manifest.dataPackageVersion)) {
-        return
-      }
+      // Make a batch Axios request to download all metadata asynchronously
+      axios.all([getGroups(), getPerspectives(), getQuestions(), getSettings(), getUsertexts()])
+      .then(axios.spread(function (groupsResponse, perspectivesResponse, questionsResponse, settingsResponse, usertextsResponse) {
+        // Get the downloaded metadata
+        groups = groupsResponse.data
+        perspectives = perspectivesResponse.data
+        questions = questionsResponse.data
+        settings = settingsResponse.data
+        const usertexts = usertextsResponse.data
 
-      const shorttextMap = {}
-      const descriptionMap = {}
-      const directionMap = {}
-      const meanReferenceMap = {}
-
-      for (let i = 0; i < questions.length; i++) {
-        const q = questions[i]
-        questionMap[q.column] = q
-        dichselectedMap[q.column] = q.dichselected
-        optionsMap[q.column] = q.options
-        timepointsMap[q.column] = q.timepoints
-        shorttextMap[q.column] = q.short
-        descriptionMap[q.column] = unescape(q.description)
-        if ('gooddirection' in q) {
-          directionMap[q.column] = q.gooddirection
+        // The function logs the error as a side effect,
+        // so if the versions don't match all we have to do here is exit
+        // TODO communicate the error directly in the DOM?
+        if (!dax.common.hasMatchingDataFileVersions(manifest.dataPackageVersion)) {
+          return
         }
-        if (q.use_mean_reference) {
-          meanReferenceMap[q.column] = q.mean_reference
-        }
-      }
 
-      // Download all question data
-      // TODO download at the same time as other data (only get groups.json first) and/or on demand
-      function getQuestionData (questionID) { return axios.get('data/questions/' + questionID + '.json') }
-      const variableRequests = []
-      for (let i = 0; i < groups.length; i++) {
-        for (let j = 0; j < groups[i].questions.length; j++) {
-          variableRequests.push(getQuestionData(groups[i].questions[j]))
-        }
-      }
+        const shorttextMap = {}
+        const descriptionMap = {}
+        const directionMap = {}
+        const meanReferenceMap = {}
 
-      axios.all(variableRequests).then(function (responsesArray) {
-        responsesArray.forEach(function (response) {
-          for (let i = 0; i < response.data.length; i++) {
-            const question = response.data[i].q
-            const perspective = response.data[i].p
-            if (i === 0) {
-              questionData[question] = {}
-            }
-            questionData[question][perspective] = response.data[i]
+        for (let i = 0; i < questions.length; i++) {
+          const q = questions[i]
+          questionMap[q.column] = q
+          dichselectedMap[q.column] = q.dichselected
+          optionsMap[q.column] = q.options
+          timepointsMap[q.column] = q.timepoints
+          shorttextMap[q.column] = q.short
+          descriptionMap[q.column] = unescape(q.description)
+          if ('gooddirection' in q) {
+            directionMap[q.column] = q.gooddirection
           }
-        })
+          if (q.use_mean_reference) {
+            meanReferenceMap[q.column] = q.mean_reference
+          }
+        }
 
-        // Initialize elements that depend on the metadata
-        dax.text.initializeResources(usertexts)
-        dax.profile.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap)
-        dax.settings.initializeResources(settings)
-        dax.data.initializeResources(groups, perspectives, questionMap, questionData)
-        dax.explorer.generateQuestionPicker(questions, groups, settings)
-        dax.explorer.generatePerspectivePicker(settings)
-        dax.explorer.generateChartPanel(questions, groups, null, null, dichselectedMap, optionsMap, timepointsMap) // TODO fix constructor
+        // Download all question data
+        // TODO download at the same time as other data (only get groups.json first) and/or on demand
+        function getQuestionData (questionID) { return axios.get('data/questions/' + questionID + '.json?ver=' + manifestDate) }
+        const variableRequests = []
+        for (let i = 0; i < groups.length; i++) {
+          for (let j = 0; j < groups[i].questions.length; j++) {
+            variableRequests.push(getQuestionData(groups[i].questions[j]))
+          }
+        }
 
-        updateFromHash(window.location.hash.slice(1))
-
-        window.addEventListener('message', receiveMessage, false)
-        window.addEventListener('onpopstate', onHashUpdate, false)
-        window.addEventListener('hashchange', onHashUpdate, false)
-
-        // Send height changes to parent window, so it can update iframe size
-        if (window.ResizeObserver) {
-          const outerElement = document.querySelector('.daxplore-explorer')
-          const resizeObserver = new ResizeObserver(function (entries) {
-            for (let i = 0; i < entries.length; i++) {
-              if (entries[i].target === outerElement) {
-                if (entries[i].contentRect.height > maxHeight) {
-                  maxHeight = entries[i].contentRect.height
-                  if (window.self !== window.top) {
-                    parent.postMessage({ source: 'DAXPLORE_EXPLORER', height: maxHeight }, '*')
-                  }
-                }
-                break
+        axios.all(variableRequests).then(function (responsesArray) {
+          responsesArray.forEach(function (response) {
+            for (let i = 0; i < response.data.length; i++) {
+              const question = response.data[i].q
+              const perspective = response.data[i].p
+              if (i === 0) {
+                questionData[question] = {}
               }
+              questionData[question][perspective] = response.data[i]
             }
           })
-          resizeObserver.observe(outerElement)
-        }
-      }).catch(function (error) {
+
+          // Initialize elements that depend on the metadata
+          dax.text.initializeResources(usertexts)
+          dax.profile.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap)
+          dax.settings.initializeResources(settings)
+          dax.data.initializeResources(groups, perspectives, questionMap, questionData)
+          dax.explorer.generateQuestionPicker(questions, groups, settings)
+          dax.explorer.generatePerspectivePicker(settings)
+          dax.explorer.generateChartPanel(questions, groups, null, null, dichselectedMap, optionsMap, timepointsMap) // TODO fix constructor
+
+          updateFromHash(window.location.hash.slice(1))
+
+          window.addEventListener('message', receiveMessage, false)
+          window.addEventListener('onpopstate', onHashUpdate, false)
+          window.addEventListener('hashchange', onHashUpdate, false)
+
+          // Send height changes to parent window, so it can update iframe size
+          if (window.ResizeObserver) {
+            const outerElement = document.querySelector('.daxplore-explorer')
+            const resizeObserver = new ResizeObserver(function (entries) {
+              for (let i = 0; i < entries.length; i++) {
+                if (entries[i].target === outerElement) {
+                  if (entries[i].contentRect.height > maxHeight) {
+                    maxHeight = entries[i].contentRect.height
+                    if (window.self !== window.top) {
+                      parent.postMessage({ source: 'DAXPLORE_EXPLORER', height: maxHeight }, '*')
+                    }
+                  }
+                  break
+                }
+              }
+            })
+            resizeObserver.observe(outerElement)
+          }
+        }).catch(function (error) {
+          console.error(error)
+        })
+      })).catch(function (error) {
         console.error(error)
       })
-    })).catch(function (error) {
-      console.error(error)
     })
   }
 

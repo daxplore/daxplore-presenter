@@ -45,83 +45,88 @@
 
   exports.initializeUserProfile =
   function () {
-    // Use Axios to download all needed metadata files from the server
-    // Define functions for all metadata files to be downloaded
-    function getQuestions () { return axios.get('../../data/questions.json') }
-    function getSettings () { return axios.get('../../data/settings.json') }
-    function getUsertexts () { return axios.get('../../data/usertexts.json') }
-    function getListview () { return axios.get('../../data/listview.json') }
-    function getManifest () { return axios.get('../../data/manifest.json') }
-
-    // Make a batch Axios request to download all metadata and data asynchronously
-    axios.all([getQuestions(), getSettings(), getUsertexts(), getListview(), getManifest()])
-    .then(axios.spread(function (questionsResponse, settingsResponse, usertextsResponse, listviewResponse, manifestResponse) {
-      // Get the downloaded metadata
-      const questions = questionsResponse.data
-      // const settings = settingsResponse.data
-      const usertexts = usertextsResponse.data
-      const listview = listviewResponse.data
+    // Download the manifest first, cache bust to always get newest version
+    // The manifest can be used figure out if other files need to be cache busted
+    axios.get('../../data/manifest.json?ver=' + new Date().toISOString())
+    .then(function (manifestResponse) {
       const manifest = manifestResponse.data
+      const manifestDate = manifest.exportDate
+      // Use Axios to download all needed metadata files from the server
+      // Define functions for all metadata files to be downloaded
+      function getQuestions () { return axios.get('../../data/questions.json?ver=' + manifestDate) }
+      function getSettings () { return axios.get('../../data/settings.json?ver=' + manifestDate) }
+      function getUsertexts () { return axios.get('../../data/usertexts.json?ver=' + manifestDate) }
+      function getListview () { return axios.get('../../data/listview.json?ver=' + manifestDate) }
 
-      // The function logs the error as a side effect,
-      // so if the versions don't match all we have to do here is exit
-      // TODO communicate the error directly in the DOM?
-      if (!dax.common.hasMatchingDataFileVersions(manifest.dataPackageVersion)) {
-        return
-      }
-      const shorttextMap = {}
-      const descriptionMap = {}
-      const directionMap = {}
-      const meanReferenceMap = {}
-      const titleRegexpMap = {}
+      // Make a batch Axios request to download all metadata and data asynchronously
+      axios.all([getQuestions(), getSettings(), getUsertexts(), getListview()])
+      .then(axios.spread(function (questionsResponse, settingsResponse, usertextsResponse, listviewResponse) {
+        // Get the downloaded metadata
+        const questions = questionsResponse.data
+        // const settings = settingsResponse.data
+        const usertexts = usertextsResponse.data
+        const listview = listviewResponse.data
 
-      for (let i = 0; i < questions.length; i++) {
-        const q = questions[i]
-        shorttextMap[q.column] = q.short
-        descriptionMap[q.column] = unescape(q.description)
-
-        if ('gooddirection' in q) {
-          directionMap[q.column] = q.gooddirection
+        // The function logs the error as a side effect,
+        // so if the versions don't match all we have to do here is exit
+        // TODO communicate the error directly in the DOM?
+        if (!dax.common.hasMatchingDataFileVersions(manifest.dataPackageVersion)) {
+          return
         }
+        const shorttextMap = {}
+        const descriptionMap = {}
+        const directionMap = {}
+        const meanReferenceMap = {}
+        const titleRegexpMap = {}
 
-        if (q.use_mean_reference) {
-          meanReferenceMap[q.column] = q.mean_reference
-        }
+        for (let i = 0; i < questions.length; i++) {
+          const q = questions[i]
+          shorttextMap[q.column] = q.short
+          descriptionMap[q.column] = unescape(q.description)
 
-        if (q.titlematchregex) {
-          titleRegexpMap[q.column] = q.titlematchregex
-        }
-      }
-
-      dax.text.initializeResources(usertexts)
-      dax.profile.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap)
-
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function (e) {
-          populateUserProfileDOM(listview, meanReferenceMap, shorttextMap, descriptionMap, directionMap, titleRegexpMap)
-        })
-      } else {
-        populateUserProfileDOM(listview, meanReferenceMap, shorttextMap, descriptionMap, directionMap, titleRegexpMap)
-      }
-
-      // Send height changes to parent window, so it can update iframe size
-      if (window.ResizeObserver) {
-        const outerElement = document.querySelector('.userprofile-wrapper')
-        const resizeObserver = new ResizeObserver(function (entries) {
-          for (let i = 0; i < entries.length; i++) {
-            if (entries[i].target === outerElement) {
-              if (entries[i].contentRect.height > maxHeight) {
-                maxHeight = entries[i].contentRect.height
-                parent.postMessage({ source: 'DAXPLORE_USERPROFILE', height: maxHeight }, '*')
-              }
-              break
-            }
+          if ('gooddirection' in q) {
+            directionMap[q.column] = q.gooddirection
           }
-        })
-        resizeObserver.observe(outerElement)
-      }
-    })).catch(function (error) {
-      console.error(error)
+
+          if (q.use_mean_reference) {
+            meanReferenceMap[q.column] = q.mean_reference
+          }
+
+          if (q.titlematchregex) {
+            titleRegexpMap[q.column] = q.titlematchregex
+          }
+        }
+
+        dax.text.initializeResources(usertexts)
+        dax.profile.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap)
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', function (e) {
+            populateUserProfileDOM(listview, meanReferenceMap, shorttextMap, descriptionMap, directionMap, titleRegexpMap)
+          })
+        } else {
+          populateUserProfileDOM(listview, meanReferenceMap, shorttextMap, descriptionMap, directionMap, titleRegexpMap)
+        }
+
+        // Send height changes to parent window, so it can update iframe size
+        if (window.ResizeObserver) {
+          const outerElement = document.querySelector('.userprofile-wrapper')
+          const resizeObserver = new ResizeObserver(function (entries) {
+            for (let i = 0; i < entries.length; i++) {
+              if (entries[i].target === outerElement) {
+                if (entries[i].contentRect.height > maxHeight) {
+                  maxHeight = entries[i].contentRect.height
+                  parent.postMessage({ source: 'DAXPLORE_USERPROFILE', height: maxHeight }, '*')
+                }
+                break
+              }
+            }
+          })
+          resizeObserver.observe(outerElement)
+        }
+      })).catch(function (error) {
+        console.error(error)
+      })
     })
   }
 

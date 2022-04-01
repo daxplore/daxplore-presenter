@@ -79,115 +79,121 @@
 
   exports.initializeUserProfile =
   function () {
-    // Use Axios to download all needed metadata files from the server
-    // Define functions for all metadata files to be downloaded
-    function getQuestions () { return axios.get('../../data/questions.json') }
-    function getSettings () { return axios.get('../../data/settings.json') }
-    function getUsertexts () { return axios.get('../../data/usertexts.json') }
-    function getListview () { return axios.get('../../data/listview.json') }
-    function getManifest () { return axios.get('../../data/manifest.json') }
-    function getRadargraph () { return axios.get('../../data/radargraph.json') }
-
-    // Make a batch Axios request to download all metadata and data asynchronously
-    axios.all([getQuestions(), getSettings(), getUsertexts(), getListview(), getManifest(), getRadargraph()])
-    .then(axios.spread(function (questionsResponse, settingsResponse, usertextsResponse, listviewResponse, manifestResponse, radargraphResponse) {
-      // Get the downloaded metadata
-      const questions = questionsResponse.data
-      const settings = settingsResponse.data
-      const usertexts = usertextsResponse.data
-      const listview = listviewResponse.data
+    // Download the manifest first, cache bust to always get newest version
+    // The manifest can be used figure out if other files need to be cache busted
+    axios.get('../../data/manifest.json?ver=' + new Date().toISOString())
+    .then(function (manifestResponse) {
       const manifest = manifestResponse.data
-      const radargraphData = radargraphResponse.data
+      const manifestDate = manifest.exportDate
+      // Use Axios to download all needed metadata files from the server
+      // Define functions for all metadata files to be downloaded
+      function getQuestions () { return axios.get('../../data/questions.json?ver=' + manifestDate) }
+      function getSettings () { return axios.get('../../data/settings.json?ver=' + manifestDate) }
+      function getUsertexts () { return axios.get('../../data/usertexts.json?ver=' + manifestDate) }
+      function getListview () { return axios.get('../../data/listview.json?ver=' + manifestDate) }
+      function getRadargraph () { return axios.get('../../data/radargraph.json?ver=' + manifestDate) }
 
-      // The function logs the error as a side effect,
-      // so if the versions don't match all we have to do here is exit
-      // TODO communicate the error directly in the DOM?
-      if (!dax.common.hasMatchingDataFileVersions(manifest.dataPackageVersion)) {
-        return
-      }
+      // Make a batch Axios request to download all metadata and data asynchronously
+      axios.all([getQuestions(), getSettings(), getUsertexts(), getListview(), getRadargraph()])
+      .then(axios.spread(function (questionsResponse, settingsResponse, usertextsResponse, listviewResponse, radargraphResponse) {
+        // Get the downloaded metadata
+        const questions = questionsResponse.data
+        const settings = settingsResponse.data
+        const usertexts = usertextsResponse.data
+        const listview = listviewResponse.data
+        const manifest = manifestResponse.data
+        const radargraphData = radargraphResponse.data
 
-      // Add click events to the tabs
-      d3.selectAll('.chart-tab')
-        .on('click', onTabClick)
-
-      // Set chart tab names
-      d3.select('.chart-tab.profile')
-        .text('Profildiagram') // TODO externalize
-      d3.select('.chart-tab.radar')
-        .text('Radardiagram') // TODO externalize
-
-      const shorttextMap = {}
-      const descriptionMap = {}
-      const directionMap = {}
-      const meanReferenceMap = {}
-      const titleRegexpMap = {}
-
-      for (let i = 0; i < questions.length; i++) {
-        const q = questions[i]
-        shorttextMap[q.column] = q.short
-        descriptionMap[q.column] = unescape(q.description)
-
-        if ('gooddirection' in q) {
-          directionMap[q.column] = q.gooddirection
+        // The function logs the error as a side effect,
+        // so if the versions don't match all we have to do here is exit
+        // TODO communicate the error directly in the DOM?
+        if (!dax.common.hasMatchingDataFileVersions(manifest.dataPackageVersion)) {
+          return
         }
 
-        if (q.use_mean_reference) {
-          meanReferenceMap[q.column] = q.mean_reference
-        }
+        // Add click events to the tabs
+        d3.selectAll('.chart-tab')
+          .on('click', onTabClick)
 
-        if (q.titlematchregex) {
-          titleRegexpMap[q.column] = q.titlematchregex
-        }
-      }
+        // Set chart tab names
+        d3.select('.chart-tab.profile')
+          .text('Profildiagram') // TODO externalize
+        d3.select('.chart-tab.radar')
+          .text('Radardiagram') // TODO externalize
 
-      // Initialize elements that depend on the metadata
-      dax.settings.initializeResources(settings)
-      dax.text.initializeResources(usertexts)
-      dax.profile.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap)
+        const shorttextMap = {}
+        const descriptionMap = {}
+        const directionMap = {}
+        const meanReferenceMap = {}
+        const titleRegexpMap = {}
 
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function (e) {
-          populateUserProfileDOM(listview, meanReferenceMap, shorttextMap, descriptionMap, directionMap, titleRegexpMap)
-          populateRadarDOM(radargraphData, questions, [])
-        })
-      } else {
-        populateUserProfileDOM(listview, meanReferenceMap, shorttextMap, descriptionMap, directionMap, titleRegexpMap)
-        populateRadarDOM(radargraphData, questions, listview)
-      }
+        for (let i = 0; i < questions.length; i++) {
+          const q = questions[i]
+          shorttextMap[q.column] = q.short
+          descriptionMap[q.column] = unescape(q.description)
 
-      dax.userprofile.addGridUpdateCallback(function (names, means) {
-        let maxReferenceDiff = dax.settings('listview.max_reference_diff')
-        // Calculate max mean-to-value difference to get the radar +/- interval
-        for (let i = 0; i < means.length; i++) {
-          const reference = meanReferenceMap[listview[i]]
-          for (let j = 0; j < means[i].length; j++) {
-            if (Number.isNaN(means[i][j])) { continue }
-            const diff = Math.abs(means[i][j] - reference)
-            maxReferenceDiff = Math.max(diff, maxReferenceDiff)
+          if ('gooddirection' in q) {
+            directionMap[q.column] = q.gooddirection
+          }
+
+          if (q.use_mean_reference) {
+            meanReferenceMap[q.column] = q.mean_reference
+          }
+
+          if (q.titlematchregex) {
+            titleRegexpMap[q.column] = q.titlematchregex
           }
         }
-        // dax.radargraph.setDomainRange(maxReferenceDiff)
-        dax.radargraph.setChartData(names, means, maxReferenceDiff)
-      })
 
-      // Send height changes to parent window, so it can update iframe size
-      if (window.ResizeObserver) {
-        const outerElement = document.querySelector('.userprofile-wrapper')
-        const resizeObserver = new ResizeObserver(function (entries) {
-          for (let i = 0; i < entries.length; i++) {
-            if (entries[i].target === outerElement) {
-              if (entries[i].contentRect.height > maxHeight) {
-                maxHeight = entries[i].contentRect.height
-                parent.postMessage({ source: 'DAXPLORE_USERPROFILE', height: maxHeight }, '*')
-              }
-              break
+        // Initialize elements that depend on the metadata
+        dax.settings.initializeResources(settings)
+        dax.text.initializeResources(usertexts)
+        dax.profile.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap)
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', function (e) {
+            populateUserProfileDOM(listview, meanReferenceMap, shorttextMap, descriptionMap, directionMap, titleRegexpMap)
+            populateRadarDOM(radargraphData, questions, [])
+          })
+        } else {
+          populateUserProfileDOM(listview, meanReferenceMap, shorttextMap, descriptionMap, directionMap, titleRegexpMap)
+          populateRadarDOM(radargraphData, questions, listview)
+        }
+
+        dax.userprofile.addGridUpdateCallback(function (names, means) {
+          let maxReferenceDiff = dax.settings('listview.max_reference_diff')
+          // Calculate max mean-to-value difference to get the radar +/- interval
+          for (let i = 0; i < means.length; i++) {
+            const reference = meanReferenceMap[listview[i]]
+            for (let j = 0; j < means[i].length; j++) {
+              if (Number.isNaN(means[i][j])) { continue }
+              const diff = Math.abs(means[i][j] - reference)
+              maxReferenceDiff = Math.max(diff, maxReferenceDiff)
             }
           }
+          // dax.radargraph.setDomainRange(maxReferenceDiff)
+          dax.radargraph.setChartData(names, means, maxReferenceDiff)
         })
-        resizeObserver.observe(outerElement)
-      }
-    })).catch(function (error) {
-      console.error(error)
+
+        // Send height changes to parent window, so it can update iframe size
+        if (window.ResizeObserver) {
+          const outerElement = document.querySelector('.userprofile-wrapper')
+          const resizeObserver = new ResizeObserver(function (entries) {
+            for (let i = 0; i < entries.length; i++) {
+              if (entries[i].target === outerElement) {
+                if (entries[i].contentRect.height > maxHeight) {
+                  maxHeight = entries[i].contentRect.height
+                  parent.postMessage({ source: 'DAXPLORE_USERPROFILE', height: maxHeight }, '*')
+                }
+                break
+              }
+            }
+          })
+          resizeObserver.observe(outerElement)
+        }
+      })).catch(function (error) {
+        console.error(error)
+      })
     })
   }
 
