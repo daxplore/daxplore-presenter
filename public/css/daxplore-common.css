@@ -8,6 +8,41 @@ text {
 	font-size: 13px;
 }
 
+a, a:visited {
+	color: #3D748F !important;
+	/*hsl(200, 40%, 40%);*/
+	font-weight: bold;
+	text-decoration: none;
+ }
+ 
+ a:hover {
+	color: #2E576B !important;
+	/*hsl(200, 40%, 30%)*/
+ }
+
+.noscript {
+	font-family: sans-serif;
+	font-size: large;
+	padding: 20px;
+}
+
+.warning-sub {
+	background-position: left center;
+	background-repeat: no-repeat;
+	color: #333333;
+	font-size: small;
+	margin-left: 0;
+	padding-left: 23px;
+}
+
+.warning-sub-sv {
+	background-image: url("../img/globallinks-lang-sv.gif");
+}
+
+.warning-sub-en {
+	background-image: url("../img/globallinks-lang-en.gif");
+}
+
 .no-select {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -30,12 +65,12 @@ text {
 	text-decoration: none;
 	color: #555;
 
-  -webkit-touch-callout: none;
-    -webkit-user-select: none;
-     -khtml-user-select: none;
-       -moz-user-select: none;
-        -ms-user-select: none;
-            user-select: none;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 
 	margin: 3px;
 }
@@ -55,10 +90,10 @@ text {
 
 /* img-preload elements are hidden, while still forcing the browser to load the cointained image */
 .img-preload {
-  left: -9999px;
-  opacity: 0;
-  position: absolute;
-  top: -9999px;
+	left: -9999px;
+	opacity: 0;
+	position: absolute;
+	top: -9999px;
 }
 
 .hidden {
@@ -69,12 +104,14 @@ text {
 	top: -9999px !important;
 }
 
-@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-  /* IE11 CSS styles go here */
-  /* TODO use Modernizr instead of IE-check */
-  /* Hide save image button in IE11 because of a known svg bug */
-  /* https://connect.microsoft.com/IE/feedbackdetail/view/925655 */
-  .save-image {
-    display: none;
-  }
+@media all and (-ms-high-contrast: none),
+(-ms-high-contrast: active) {
+
+	/* IE11 CSS styles go here */
+	/* TODO use Modernizr instead of IE-check */
+	/* Hide save image button in IE11 because of a known svg bug */
+	/* https://connect.microsoft.com/IE/feedbackdetail/view/925655 */
+	.save-image {
+		display: none;
+	}
 }

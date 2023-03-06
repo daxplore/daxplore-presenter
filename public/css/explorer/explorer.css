@@ -6,12 +6,14 @@
 body {
   background: #FFF;
   line-height: 1.1;
-	margin: 0;
+  margin: 0;
   overflow-x: hidden;
-	padding: 0;
+  padding: 0;
 }
 
-@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+@media all and (-ms-high-contrast: none),
+(-ms-high-contrast: active) {
+
   /* IE11 CSS styles go here */
   body {
     overflow-y: visible !important;
@@ -40,47 +42,14 @@ h2 {
   white-space: nowrap;
 }
 
-a, a:visited, .gwt-Anchor, .gwt-Anchor:visited {
-	color: #3D748F !important; /*hsl(200, 40%, 40%);*/
-	font-weight: bold;
-	text-decoration: none;
-}
-
-a:hover, .gwt-Anchor:hover {
-	color: #2E576B !important;	/*hsl(200, 40%, 30%)*/
-}
-
-.noscript {
-  font-family: sans-serif;
-  font-size: large;
-	padding: 20px;
-}
-
-.warning-sub{
-  background-position: left center;
-  background-repeat: no-repeat;
-  color: #333333;
-  font-size: small;
-  margin-left: 0;
-  padding-left: 23px;
-}
-
-.warning-sub-sv{
-	background-image: url("../img/globallinks-lang-sv.gif");
-}
-
-.warning-sub-en{
-	background-image: url("../img/globallinks-lang-en.gif");
-}
-
-.general-warning-section{
-	width:100%;
+.general-warning-section {
+  width: 100%;
 }
 
 /* superscript */
 .super {
-	bottom: 0.5em;
-	color: black;
-	font-size: 0.8em;
+  bottom: 0.5em;
+  color: black;
+  font-size: 0.8em;
   /* position: relative; */
 }

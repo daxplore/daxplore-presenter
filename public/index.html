@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- This page was generated using the free and open source project Daxplore. -->
+  <!-- For usage information, license terms and contact information please visit: -->
+  <!-- https://github.com/daxplore -->
+
+  <!-- Set up basic page properties -->
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Daxplore Presenter: Overview</title>
+  <link rel="icon" href="favicon.ico">
+
+  <!-- Import style sheets -->
+  <!-- Normalize all browser default css values: https://necolas.github.io/normalize.css/ -->
+  <link rel="stylesheet" href="css/normalize/8.0.1/normalize.css">
+
+  <!-- Style -->
+  <link rel="stylesheet" href="css/daxplore-common.css">
+  <link rel="stylesheet" href="css/index.css">
+
+ <!-- Import library dependencies -->
+  <!-- Import shims and polyfills for older browsers-->
+  <script type="text/javascript" src="../../js/libraries/es5-shim/4.5.7/es5-shim.min.js"></script>
+  <script type="text/javascript" src="../../js/libraries/es6-promise/4.2.6/es6-promise.auto.min.js"></script>
+  <script type="text/javascript" src="../../js/libraries/url-search-params/0.1.2/url-search-params.min.js"></script>
+  <!-- Use d3 to design all charts, interactive elements and manipulate the DOM: https://d3js.org/ -->
+  <script type="text/javascript" src="../../js/libraries/d3/5.12.0/d3.v5.min.js"></script>
+  <!-- Use axios to download data from the server: https://github.com/axios/axios -->
+  <script type="text/javascript" src="../../js/libraries/axios/0.21.1/axios.min.js"></script>
+
+  <!-- Import Daxplore helpers -->
+  <script type="text/javascript" src="../../js/daxplore-common.js"></script>
+  <script type="text/javascript" src="../../js/settings.js"></script>
+  <script type="text/javascript" src="../../js/text.js"></script>
+
+  <!--index-core is used to set up and manage index.html  -->
+  <script type="text/javascript" src="js/index-core.js"></script>
+
+  <!-- Webfont loader -->
+  <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+  <script type="text/javascript">
+    try {
+      WebFont.load({
+        google: {
+          families: ['Varta']
+        },
+        active: dax.index.initializeIndex, // Generate chart after loading the font
+        inactive: dax.index.initializeIndex, // Generate chart after failing to load the font
+      })
+    } catch (e) {
+      dax.index.initializeIndex() // Generate chart if WebFont loading failed
+    }
+  </script>
+</head>
+
+<body>
+
+  <!-- Error message if JavaScript is disabled -->
+  <noscript>
+    <div class="noscript">
+      <p class="warning-sub">
+        To show this page you must allow it to run JavaScript.
+      </p>
+    </div>
+  </noscript>
+
+  <!-- Structural top level div -->
+  <div id="top-div">
+    <div class="warn-banner">
+      <span class="warn-banner__icon">⚠️</span>
+      <span class="warn-banner__text">
+        This should not be part of a live web page. Please embed one of the listed web
+        pages below instead.
+      </span>
+    </div>
+
+    <div class="info-block">
+      <div class="info-block__header">Daxplore Presenter overview</div>
+      <div>
+        This is an overview page of possible Daxplore visualizations. Not all
+        visualizations may work for the current data set.
+      </div>
+    </div>
+
+    <div class="info-block">
+      <div class="info-block__header">Daxplore Producer data file manifest</div>
+      <div class="manifest">
+        <div class="manifest__item">
+          <span class="manifest__item-header">Internal project name:</span>
+          <span class="manifest__item-text" id="manifest-project">-</span>
+        </div>
+        <div class="manifest__item">
+          <span class="manifest__item-header">Export date:</span>
+          <span class="manifest__item-text" id="manifest-export-date">-</span>
+        </div>
+        <div class="manifest__item">
+          <span class="manifest__item-header">Supported locales:</span>
+          <span class="manifest__item-text" id="manifest-locales">-</span>
+        </div>
+        <div class="manifest__item">
+          <span class="manifest__item-header">Data package version:</span>
+          <span class="manifest__item-text" id="manifest-package-version">-</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-block">
+      <div class="info-block__header">Main functionality</div>
+
+        <div class="chart-type">
+          <div class="chart-type__header">Explorer</div>
+          <div>
+            Explore all the data. Which charts are used to visualize the data depends on settings
+            made in Daxplore Producer. Full window width embed is recommended.</div>
+          <div class="chart-links"><a href="explorer.html">explorer.html</a></div>
+        </div>
+
+        <div class="chart-type">
+          <div class="chart-type__header">Profile charts</div>
+          <div>
+            Explore several variables from a specific perspective. Supports smaller embed
+            iframes and works well with several iframes in the same page.</div>
+          <div class="chart-links profile-links"></div>
+        </div>
+
+    </div>
+
+    <div class="info-block">
+      <div class="info-block__header">Experimental functionality</div>
+      <div>
+        Specialized visualizations that have been implemented for specific research
+        projects. These visualizations won't be useful for most data sets. They may also
+        not be supported by Daxplore Producer and can require manual generation of .json
+        data files to work.
+      </div>
+
+      <div class="chart-type">
+        <div class="chart-type__header">Radargraphs</div>
+        <div>
+          An alternative to profile charts with radar charts, with specific layouts
+          designed for the structure of data generated by the COPSOQ questionnaire.
+        </div>
+        <div class="live-example">
+          <span class="live-example__header">Online example:</span>
+          <a href="https://copsoq.se/diagram/radardiagram" target="_blank">COPSOQ Radargraph</a>
+        </div>
+        <div class="chart-type__link-header">Charts to embed:</div>
+        <div class="chart-links radargraph-links"></div>
+      </div>
+
+      <div class="chart-type">
+        <div class="chart-type__header">Profile chart with Radargraph tab</div>
+        <div>
+          A combination of standard profile charts, but with a tab containing a corresponding radargraph.
+          See the sections for Profilecharts and Radargraphs above for more details.
+        </div>
+        <div class="chart-type__link-header">Charts to embed:</div>
+        <div class="chart-links profile-radargraph-links"></div>
+      </div>
+
+      <div class="chart-type">
+        <div class="chart-type__header">Userprofile</div>
+        <div>
+          Allow users to input their own COPSOQ questionaire data. Generate table and profile charts
+          based on that data.
+        </div>
+        <div class="chart-links">
+          <a href="experimental/copsoq/userprofile.html">experimental/copsoq/userprofile.html</a>
+        </div>
+      </div>
+
+      <div class="chart-type">
+        <div class="chart-type__header">Userprofile with Radargraph</div>
+        <div>
+          Allow users to input their own COPSOQ questionnaire data. Generate table, profile and
+          radargraph charts based on that data.
+        </div>
+        <div class="live-example">
+          <span class="live-example__header">Online example:</span>
+          <a href="https://copsoq.se/diagram/skapa-egna-profildiagram" target="_blank">COPSOQ User Charts</a>
+        </div>
+        <div class="chart-links">
+          <a href="experimental/copsoq/userprofile-radar.html">
+            experimental/copsoq/userprofile-radar.html
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+
+</html>

@@ -1,8 +1,39 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	</head>
+<head>
+	<!-- This page was generated using the free and open source project Daxplore. -->
+	<!-- For usage information, license terms and contact information please visit: -->
+	<!-- https://github.com/daxplore -->
+
+	<!-- Set up basic page properties -->
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>Daxplore Presenter: embed</title>
+	<link rel="icon" href="favicon.ico">
+
+	<!-- Import style sheets -->
+	<!-- Normalize all browser default css values: https://necolas.github.io/normalize.css/ -->
+	<link rel="stylesheet" href="css/normalize/8.0.1/normalize.css">
+
+	<!-- Style for different Daxplore components -->
+	<link rel="stylesheet" href="css/daxplore-common.css">
+
+	<!-- Webfont loader -->
+	<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+	<script type="text/javascript">
+		try {
+			WebFont.load({
+				google: {
+					families: ['Varta']
+				},
+				active: dax.explorer.initializeExplorer, // Generate chart after loading the font
+				inactive: dax.explorer.initializeExplorer, // Generate chart after failing to load the font
+			})
+		} catch (e) {
+			dax.explorer.initializeExplorer()// Generate chart if WebFont loading failed
+		}
+	</script>
+</head>
 	<body>
+		Currently not implemented.
 	</body>
 </html>
