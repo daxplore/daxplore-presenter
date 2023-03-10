@@ -14,7 +14,11 @@
 
     const date = new Date(manifest.exportDate)
     d3.select('#manifest-export-date')
-      .text(manifest.exportDate.split('T')[0] + ' ' + date.getHours() + ':' + date.getMinutes())
+      .text(
+        manifest.exportDate.split('T')[0] +
+        ' ' + (String)(date.getHours()).padStart(2, 0) +
+        ':' + (String)(date.getMinutes()).padStart(2, 0)
+      )
 
     d3.select('#manifest-locales')
       .text(
