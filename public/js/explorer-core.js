@@ -7,7 +7,6 @@
   const questionData = {}
   const questionMap = {}
   const dichselectedMap = {}
-  const optionsMap = {}
   const timepointsMap = {}
 
   let maxHeight = -1
@@ -174,7 +173,6 @@
           const q = questions[i]
           questionMap[q.column] = q
           dichselectedMap[q.column] = q.dichselected
-          optionsMap[q.column] = q.options
           timepointsMap[q.column] = q.timepoints
           shorttextMap[q.column] = q.short
           descriptionMap[q.column] = unescape(q.description)
@@ -212,10 +210,10 @@
           dax.text.initializeResources(usertexts)
           dax.profile.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap)
           dax.settings.initializeResources(settings)
-          dax.data.initializeResources(groups, perspectives, questionMap, questionData)
+          dax.data.initializeResources(groups, perspectives, questionMap, questionData, dichselectedMap)
           dax.explorer.generateQuestionPicker(questions, groups, settings)
           dax.explorer.generatePerspectivePicker(settings)
-          dax.explorer.generateChartPanel(questions, groups, null, null, dichselectedMap, optionsMap, timepointsMap) // TODO fix constructor
+          dax.explorer.generateChartPanel(questions, groups)
 
           updateFromHash(window.location.hash.slice(1))
 

@@ -10,7 +10,7 @@
   const hoverColors = ['#93C072', '#72A6C0', '#7D7DC5', '#A17DC5', '#C07972', '#C69A5D', '#C6C65D']
   const tooltipColors = ['#D5F0C2', '#C2E0F0', '#C2C2F0', '#D9C2F0', '#F0C6C2', '#F0DDC2', '#F0F0C2']
 
-  let dichselectedMap, optionsMap, timepointsMap
+  // let dichselectedMap, optionsMap, timepointsMap
 
   // Initialize the chart panel
   // TODO fix constructor
@@ -18,16 +18,7 @@
   function (
     questions,
     groups,
-    primaryColorsInput,
-    hoverColorsInput,
-    dichselectedMapInput,
-    optionsMapInput,
-    timepointsMapInput
   ) {
-    dichselectedMap = dichselectedMapInput
-    optionsMap = optionsMapInput
-    timepointsMap = timepointsMapInput
-
     if (dax.settings('structure.perspectivePosition') === 'TOP') {
       d3.select('.perspective-description-row')
         .classed('perspective-row-top', true)
@@ -85,6 +76,7 @@
     dax.chart.meanbars.initializeResources(questionMap, primaryColors, hoverColors, tooltipColors)
     dax.chart.meanprofile.initializeResources()
     dax.chart.frequency.initializeResources(primaryColors, hoverColors)
+    dax.chart.dichtimeline.initializeResources(primaryColors)
 
     // TODO handle here or somewhere else?
     window.addEventListener('resize', dax.explorer.updateChartPanelSize)
@@ -116,7 +108,7 @@
     dax.chart.frequency.hide()
     dax.chart.meanbars.hide()
     dax.chart.meanprofile.hide()
-    // dax.chart.dichtimeline.hide() // TODO
+    dax.chart.dichtimeline.hide()
 
     // TODO allow for animated updates of same chart type
     // d3.select('.chart')
@@ -190,16 +182,7 @@
       case 'TIMEPOINTS_ONE':
       case 'TIMEPOINTS_TWO':
       case 'TIMEPOINTS_ALL':
-        dax.chart.dichtimeline.generateChart(
-          question,
-          perspectives,
-          selectedOptions,
-          dichselectedMap,
-          optionsMap,
-          timepointsMap,
-          primaryColors,
-          hoverColors
-        )
+        dax.chart.dichtimeline.populateChart(question, perspectives, selectedOptions)
         dax.chart.dichtimeline.generateLegend()
         break
       }

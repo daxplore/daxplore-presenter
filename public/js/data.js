@@ -252,13 +252,23 @@
     return questionMeta[questionID].gooddirection
   }
 
+  exports.getDichSelected =
+  function (questionID) {
+    return questionMeta[questionID].dichselected
+  }
+
   exports.initializeResources =
-  function (groupsInput, perspectivesInput, questionMetaInput, questionDataInput) {
+  function (
+    groupsInput,
+    perspectivesInput,
+    questionMetaInput,
+    questionDataInput,
+  ) {
     // groups = groupsInput
     perspectives = perspectivesInput
     questionMeta = questionMetaInput
     questionData = questionDataInput
-    //
+
     Object.keys(questionMeta).forEach(function (questionID) {
       const qm = questionMeta[questionID]
       if (qm.type !== 'COMBINED_PERSPECTIVE') {

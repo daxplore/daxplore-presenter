@@ -3,45 +3,249 @@
   namespace.chart.dichtimeline = namespace.chart.dichtimeline || {}
   const exports = namespace.chart.dichtimeline
 
+  /** ** CHART TYPE AND INSTANCE VARIABLES ** **/
+
   // CONSTANTS
-  // TODO move to setting in producer
+  const yAxisWidth = 35
+  const xAxisHeight = 24
+  const margin = { top: 25, right: 13, bottom: xAxisHeight, left: yAxisWidth + 10 }
+  const pointSize = 40
+  const pointFocusSize = 550
   // if chart width is smaller than this, embed it it a scrollpanel
-  const chartWidthScrollBreakpoint = 600
+  const chartWidthScrollBreakpoint = 600 // TODO hard coded, shouldn't be, move to setting in producer
+  const chartHeight = 300
 
   // CHART VARIABLES
-  let yAxisWidth, xAxisHeight, margin, width, height
-  let chart, chartG
+  let width, height
+  // CHART
+  let chart, chartContainer, chartG
+  // LEGEND
+  let legend
 
   // INITIALIZE STATIC RESOURCES
-  // TODO actually initialize
-  let dichselectedMap
-  let optionsMap
-  let timepointsMap
   const percentageFormat = d3.format('.0%')
 
   const pointSymbol = d3.symbol().type(d3.symbolCircle)
-  const pointSize = 40
-  const pointFocusSize = 550
 
   const fadeTransition = d3.transition()
-      .duration(300)
-      .ease(d3.easeLinear)
+    .duration(300)
+    .ease(d3.easeLinear)
 
   // INSTANCE SPECIFIC VARIABLES
-
   let lineColors // TODO unused: , hoverColors
-  let question, perspective
+  let questionID, perspectiveID
   let currentOptions
   let zScaleColor
 
-  // FUNCTIONS
+  /** ** EXPORTED FUNCTIONS ** **/
+
+  exports.initializeResources =
+  function (primaryColors) {
+    lineColors = primaryColors
+
+    // INITIALIZE CHART
+    // base div element
+    chartContainer = d3.select('.chart').append('div')
+      .attr('class', 'explorer-dichtimeline')
+
+    // CHART
+    chart = chartContainer.append('svg')
+    chart
+      .classed('dich-line-chart', true)
+      .attr('width', width + margin.left + margin.right)
+      .attr('height', height + margin.top + margin.bottom)
+
+    // WHITE BACKGROUND
+    chart.append('rect')
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .attr('fill', 'white')
+
+    // MARGIN ADJUSTED CHART ELEMENT
+    chartG = chart.append('g')
+      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+
+    // Y AXIS
+    chartG.append('g')
+      .attr('class', 'axis dichtime-y-axis')
+
+    // X AXIS
+    chartG.append('g')
+      .attr('class', 'axis dichtime-x-axis')
+
+    // Calculate initial dimensions
+    computeDimensions(chartWidthScrollBreakpoint, chartHeight)
+  }
+
+  exports.populateChart =
+  function (questionIDInput, perspectivesInput, selectedPerspectiveOptionsInput) {
+    displayChartElements(true)
+
+    // Arguments
+    questionID = questionIDInput
+    perspectiveID = perspectivesInput
+    const selectedPerspectiveOptions = selectedPerspectiveOptionsInput
+
+    // TODO check actually delivered time points in statJson data?
+    // TODO generate timepoint texts in daxplore export file to experiment with that as an array here
+    // DATA
+    const optionTexts = dax.data.getOptionTexts(perspectiveID)
+    const options = []
+    selectedPerspectiveOptions.forEach(function (option, i) {
+      const values = []
+      dax.data.getTimepoints(perspectiveID).forEach(function (timepoint) {
+        if (dax.data.hasTimepoint(questionID, timepoint)) {
+          const freq = dax.data.getFrequency(questionID, perspectiveID, option, timepoint)
+          const selected = dax.data.getDichSelected(questionID)
+          let selectedCount = 0
+          let totalCount = 0
+          for (let i = 0; i < freq.length; i++) {
+            if (freq[i] > 0) {
+              totalCount += freq[i]
+              for (let j = 0; j < selected.length; j++) {
+                if (i === selected[j]) {
+                  selectedCount += freq[i]
+                }
+              }
+            }
+          }
+          if (totalCount > 0) {
+            values.push({
+              timepoint: timepoint,
+              percentage: (selectedCount / totalCount),
+              count: totalCount,
+            })
+          }
+        }
+      })
+      options.push({
+        index: option,
+        id: optionTexts[option],
+        values: values,
+      })
+    })
+
+    currentOptions = options
+
+    updateChartElements()
+    updateStyles()
+  }
+
+  // Set the size available for the chart.
+  // Updates the chart so it fits in the new size.
+  exports.setSize =
+  function (availableWidthInput) {
+
+  }
+
+  // Hide all dichtimeline chart elements
+  // Called whenever the entire chart should be hidden, so that another chart type can be dislpayed
+  exports.hide =
+  function () {
+    displayChartElements(false)
+  }
+
+  exports.generateLegend =
+  function () {
+    // GENERATE LEGEND
+    legend = d3.select('.legend')
+      .style('margin-top', (d3.select('.header-section').node().offsetHeight + height / 2.5) + 'px')
+      .style('margin-left', '4px')
+
+    legend.html('')
+
+    // Add legend options
+    legend.selectAll('.legend__row')
+      .data(currentOptions)
+      .enter()
+        .append('div')
+        .attr('class', function (d) { return 'legend__row legend__row-' + d.index })
+        .html(function (option) {
+          return "<span class='legend__marker' style='background-color: " +
+                  zScaleColor(option.id) + ";'>&nbsp;</span>" +
+                  "<span class='legend__row-text'>" + option.id + '</span>'
+        })
+      .on('mouseover',
+        function (d) {
+          tooltipOver(d.index)
+          fadeOthers(d.index)
+        })
+      .on('mouseout',
+        function (d) {
+          tooltipOut()
+          unfadeAll()
+        })
+
+    updateStyles()
+  }
+
+  // TODO pretty hacky quick fixed solution
+  exports.updateSize =
+  function (heightTotal) {
+    // 2. width for chart to use is max of:
+    // a. room remaining of window width after QP, SA, margins, (scroll bar?)
+    // b. max of
+    // b.1 room required by header block
+    // b.2 room required by bottom block
+    // 3. calculate min width needed to draw chart
+    // 4. if allocated space in 2. < need in 3.
+    // then: set scroll area width to 2., chart to 3., wrap and scroll
+    // else: set chart to 2, no scroll
+
+    const availableWidth = document.documentElement.clientWidth - // window width
+              d3.select('.question-panel').node().offsetWidth - // tree sidebar
+              5 - // tree margin (if changed here, needs to be changed in css)
+              d3.select('.sidebar-column').node().offsetWidth - // right sidebar
+              2 - // border of 1px + 1px (if changed here, needs to be changed in css)
+              1 // 1px fudge
+    // TODO - scrollbar width?
+
+    const headerBlockWidth = d3.select('.header-section').node().offsetWidth
+    let bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
+    const description = d3.select('.description-panel').node()
+    if (description != null && description.offsetWidth > 0) {
+      bottomBlockWidth += 250 // TODO hard coded
+    }
+    const topBotNeededWidth = Math.max(headerBlockWidth, bottomBlockWidth)
+
+    const widthForChart = Math.max(availableWidth, topBotNeededWidth)
+
+    const chartNeededWidth = chartWidthScrollBreakpoint
+
+    const lockWidth = widthForChart < chartNeededWidth
+    let chartWidth = widthForChart
+    if (lockWidth) {
+      chartWidth = chartNeededWidth
+    }
+    d3.select('.chart')
+      .classed('chart-scroll', lockWidth)
+      .style('width', function () { return lockWidth ? widthForChart + 'px' : null })
+
+    computeDimensions(chartWidth, heightTotal)
+
+    chart
+      .attr('width', width + margin.left + margin.right)
+      .attr('height', height + margin.top + margin.bottom)
+
+    updateChartElements()
+  }
+
+  /** ** INTERNAL FUNCTIONS ** **/
+
+  // Hide or show all top level elements
+  function displayChartElements (show) {
+    // headerDiv.style('display', show ? null : 'none')
+    chartContainer.style('display', show ? null : 'none')
+    // legendDiv.style('display', show ? null : 'none')
+    // saveImageButton.style('display', show ? null : 'none')
+  }
 
   function fadeOthers (focusedIndex) {
     unfadeAll()
     for (let i = 0; i < currentOptions.length; i++) {
       const optionIndex = currentOptions[i].index
 
-      const row = d3.select('.legend-row-' + optionIndex)
+      const row = d3.select('.legend__row-' + optionIndex)
       row.interrupt().selectAll('*').interrupt()
 
       const lineMain = d3.selectAll('.line.dataset-' + optionIndex)
@@ -70,7 +274,7 @@
   function unfadeAll () {
     for (let i = 0; i < currentOptions.length; i++) {
       const optionIndex = currentOptions[i].index
-      const row = d3.select('.legend-row-' + optionIndex)
+      const row = d3.select('.legend__row-' + optionIndex)
       row.interrupt().selectAll('*').interrupt()
       row
         .transition(fadeTransition)
@@ -148,38 +352,8 @@
   }
 
   function computeDimensions (widthTotal, heightTotal) {
-    yAxisWidth = 35
-    xAxisHeight = 24
-    margin = { top: 25, right: 13, bottom: xAxisHeight, left: yAxisWidth + 10 }
     width = widthTotal - margin.left - margin.right
     height = heightTotal - margin.top - margin.bottom
-  }
-
-  function generateChartElements () {
-    // CHART
-    chart = d3.select('.chart').append('svg')
-    chart
-      .classed('dich-line-chart', true)
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom)
-
-    // WHITE BACKGROUND
-    chart.append('rect')
-      .attr('width', '100%')
-      .attr('height', '100%')
-      .attr('fill', 'white')
-
-    // MARGIN ADJUSTED CHART ELEMENT
-    chartG = chart.append('g')
-      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-
-    // Y AXIS
-    chartG.append('g')
-      .attr('class', 'axis dichtime-y-axis')
-
-    // X AXIS
-    chartG.append('g')
-      .attr('class', 'axis dichtime-x-axis')
   }
 
   function updateStyles () {
@@ -204,7 +378,7 @@
       .range([0, width])
       .paddingInner(0.3)
       .paddingOuter(0)
-      .domain(timepointsMap[perspective])
+      .domain(dax.data.getTimepoints(perspectiveID))
 
     const xBandwidth = xScale.bandwidth()
 
@@ -217,7 +391,7 @@
     // Z SCALE
     // mapping selected options to colors
     zScaleColor = d3.scaleOrdinal(lineColors)
-      .domain(optionsMap[perspective])
+      .domain(dax.data.getOptionTexts(perspectiveID))
 
     // TODO unused z scale hover color?
     // let zScaleHoverColor = d3.scaleOrdinal(hoverColors)
@@ -418,148 +592,5 @@
           })
           .style('display', 'none')
     })
-  }
-
-  exports.generateChart =
-  function (selectedOptions, stat, dichselectedMapInput, optionsMapInput, timepointsMapInput, lineColorsInput, hoverColorsInput) {
-    dichselectedMap = dichselectedMapInput
-    optionsMap = optionsMapInput
-    timepointsMap = timepointsMapInput
-
-    // TODO initialize once, not every time
-    lineColors = lineColorsInput
-    // TODO unused: hoverColors = hoverColorsInput
-    computeDimensions(chartWidthScrollBreakpoint, 300)
-    generateChartElements()
-
-    perspective = stat.p
-    question = stat.q
-
-    // TODO check actually delivered time points in statJson data?
-    // TODO generate timepoint texts in daxplore export file to experiment with that as an array here
-    const options = []
-    selectedOptions.forEach(function (option, i) {
-      const values = []
-      timepointsMap[perspective].forEach(function (timepoint) {
-        if (typeof stat.freq[timepoint] !== 'undefined') {
-          const freq = stat.freq[timepoint][option]
-          const selected = dichselectedMap[question]
-          let selectedCount = 0
-          let totalCount = 0
-          for (let i = 0; i < freq.length; i++) {
-            if (freq[i] > 0) {
-              totalCount += freq[i]
-              for (let j = 0; j < selected.length; j++) {
-                if (i === selected[j]) {
-                  selectedCount += freq[i]
-                }
-              }
-            }
-          }
-          if (totalCount > 0) {
-            values.push({
-              timepoint: timepoint,
-              percentage: (selectedCount / totalCount),
-              count: totalCount,
-            })
-          }
-        }
-      })
-      options.push({
-        index: option,
-        id: optionsMap[perspective][option],
-        values: values,
-      })
-    })
-
-    currentOptions = options
-
-    updateChartElements()
-    updateStyles()
-  }
-
-  exports.generateLegend =
-  function () {
-    // GENERATE LEGEND
-    const legend = d3.select('.legend')
-      .style('margin-top', (d3.select('.header-section').node().offsetHeight + height / 2.5) + 'px')
-      .style('margin-left', '4px')
-
-    legend.html('')
-
-    // Add legend options
-    legend.selectAll('.legend-row')
-      .data(currentOptions)
-      .enter()
-        .append('div')
-        .attr('class', function (d) { return 'legend-row legend-row-' + d.index })
-        .html(function (option) {
-          return "<span class='legend-marker' style='background-color: " +
-                  zScaleColor(option.id) + ";'>&nbsp;</span>" +
-                  "<span class='legend-text'>" + option.id + '</span>'
-        })
-      .on('mouseover',
-        function (d) {
-          tooltipOver(d.index)
-          fadeOthers(d.index)
-        })
-      .on('mouseout',
-        function (d) {
-          tooltipOut()
-          unfadeAll()
-        })
-
-    updateStyles()
-  }
-
-  // TODO pretty hacky quick fixed solution
-  exports.updateSize =
-  function (heightTotal) {
-    // 2. width for chart to use is max of:
-    // a. room remaining of window width after QP, SA, margins, (scroll bar?)
-    // b. max of
-    // b.1 room required by header block
-    // b.2 room required by bottom block
-    // 3. calculate min width needed to draw chart
-    // 4. if allocated space in 2. < need in 3.
-    // then: set scroll area width to 2., chart to 3., wrap and scroll
-    // else: set chart to 2, no scroll
-
-    const availableWidth = document.documentElement.clientWidth - // window width
-              d3.select('.question-panel').node().offsetWidth - // tree sidebar
-              5 - // tree margin (if changed here, needs to be changed in css)
-              d3.select('.sidebar-column').node().offsetWidth - // right sidebar
-              2 - // border of 1px + 1px (if changed here, needs to be changed in css)
-              1 // 1px fudge
-    // TODO - scrollbar width?
-
-    const headerBlockWidth = d3.select('.header-section').node().offsetWidth
-    let bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
-    const description = d3.select('.description-panel').node()
-    if (description != null && description.offsetWidth > 0) {
-      bottomBlockWidth += 250 // TODO hard coded
-    }
-    const topBotNeededWidth = Math.max(headerBlockWidth, bottomBlockWidth)
-
-    const widthForChart = Math.max(availableWidth, topBotNeededWidth)
-
-    const chartNeededWidth = 600 // TODO hard coded, shouldn't be
-
-    const lockWidth = widthForChart < chartNeededWidth
-    let chartWidth = widthForChart
-    if (lockWidth) {
-      chartWidth = chartNeededWidth
-    }
-    d3.select('.chart')
-      .classed('chart-scroll', lockWidth)
-      .style('width', function () { return lockWidth ? widthForChart + 'px' : null })
-
-    computeDimensions(chartWidth, heightTotal)
-
-    chart
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom)
-
-    updateChartElements()
   }
 })(window.dax = window.dax || {})

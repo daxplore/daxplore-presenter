@@ -21,7 +21,7 @@
     return text
   }
 
-  // Initlaize 'text' with the usertext data
+  // Initlaize 'text' with the usertext data and option texts
   namespace.text.initializeResources =
   function (usertextsInput) {
     usertexts = usertextsInput
