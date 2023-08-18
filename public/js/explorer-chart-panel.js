@@ -10,8 +10,6 @@
   const hoverColors = ['#93C072', '#72A6C0', '#7D7DC5', '#A17DC5', '#C07972', '#C69A5D', '#C6C65D']
   const tooltipColors = ['#D5F0C2', '#C2E0F0', '#C2C2F0', '#D9C2F0', '#F0C6C2', '#F0DDC2', '#F0F0C2']
 
-  // let dichselectedMap, optionsMap, timepointsMap
-
   // Initialize the chart panel
   // TODO fix constructor
   exports.generateChartPanel =
@@ -100,7 +98,6 @@
     question,
     perspectives,
     selectedOptions,
-    dichSubtitle
   ) {
     selectedTab = chartType
 
@@ -183,7 +180,6 @@
       case 'TIMEPOINTS_TWO':
       case 'TIMEPOINTS_ALL':
         dax.chart.dichtimeline.populateChart(question, perspectives, selectedOptions)
-        dax.chart.dichtimeline.generateLegend()
         break
       }
       break

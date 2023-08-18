@@ -121,15 +121,15 @@
       .call(yAxis)
 
     // style y and x axises
-    d3.selectAll('.axis .domain')
+    chart.selectAll('.axis .domain')
       .style('visibility', 'hidden')
 
-    d3.selectAll('.axis path, .axis line')
+    chart.selectAll('.axis path, .axis line')
       .style('fill', 'none')
       .style('stroke', '#bbb')
       .style('shape-rendering', 'geometricPrecision')
 
-    d3.selectAll('text')
+    chart.selectAll('text')
       .style('fill', '#555')
       .style('font-size', '13px')
       .style('font-family', '"Varta", sans-serif')
@@ -231,7 +231,7 @@
     xScale.domain(selectedPerspectiveOptions)
 
     // UPDATE Z
-    const allIndicesArray = dax.data.getPerspectiveOptionIndicesColumnOrder(perspectiveID) // questionMap[perspective].options.map(function (o, i) { return i })
+    const allIndicesArray = dax.data.getPerspectiveOptionIndicesColumnOrder(perspectiveID)
     zScaleColor.domain(allIndicesArray)
     zScaleColorHover.domain(allIndicesArray)
     zScaleColorTooltip.domain(allIndicesArray)
@@ -500,7 +500,7 @@
     // Set the vertical position and height of the legend area
     // The position of the legend div is then adjusted via flex parameters relative the defined area
     legendDiv
-      .style('margin-top', (chartBB.top + 0) + 'px')
+      .style('margin-top', chartBB.top + 'px')
       .style('height', chartBB.height + 'px')
 
     // COMPLETE UPDATE

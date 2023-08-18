@@ -12,15 +12,25 @@
   const pointSize = 40
   const pointFocusSize = 550
   // if chart width is smaller than this, embed it it a scrollpanel
-  const chartWidthScrollBreakpoint = 600 // TODO hard coded, shouldn't be, move to setting in producer
-  const chartHeight = 300
+  const chartWidthScrollBreakpoint = 600 // TODO shouldn't be hard coded, move to setting in producer
+  const chartHeight = 300 // TODO shouldn't be hard coded, move to setting in producer
 
-  // CHART VARIABLES
-  let width, height
+  // CHART SIZE VARIABLES
+  let availableWidth = 600 // initial placeholder value
+  let width = availableWidth
+  let height = chartHeight
+
+  // HEADER
+  let headerDiv, headerMain, headerSub, headerDich
+  // SCALES AND AXISES
+  let xScale, xAxis, xAxisElement
+  let yScale, yAxis, yAxisElement
+  let zScaleColor
   // CHART
   let chart, chartContainer, chartG
+  let mainLineGroup, mouseoverLineGroup
   // LEGEND
-  let legend
+  let legendDiv, legendPerspectiveHeader, legendPerspectiveOptionTable
 
   // INITIALIZE STATIC RESOURCES
   const percentageFormat = d3.format('.0%')
@@ -31,17 +41,29 @@
     .duration(300)
     .ease(d3.easeLinear)
 
+  // LINE TEMPLATE
+  const line = d3.line()
+    .curve(d3.curveLinear)
+    .x(function (d) { return xScale(d.timepoint) + xScale.bandwidth() / 2 })
+    .y(function (d) { return yScale(d.percentage) })
+
   // INSTANCE SPECIFIC VARIABLES
-  let lineColors // TODO unused: , hoverColors
   let questionID, perspectiveID
   let currentOptions
-  let zScaleColor
 
   /** ** EXPORTED FUNCTIONS ** **/
 
   exports.initializeResources =
   function (primaryColors) {
-    lineColors = primaryColors
+    // INITIALIZE HEADER
+    headerDiv = d3.select('.header-section').append('div')
+        .attr('class', 'header-section__meanbars')
+    headerMain = headerDiv.append('div')
+        .attr('class', 'header-section__main')
+    headerSub = headerDiv.append('div')
+        .attr('class', 'header-section__sub')
+    headerDich = headerDiv.append('div')
+      .attr('class', 'header-section__dich-selected')
 
     // INITIALIZE CHART
     // base div element
@@ -66,31 +88,71 @@
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
     // Y AXIS
-    chartG.append('g')
+    yScale = d3.scaleLinear()
+
+    yAxis = d3.axisLeft(yScale)
+      .tickFormat(d3.format('.0%'))
+      .tickSize(0)
+
+    yAxisElement = chartG.append('g')
       .attr('class', 'axis dichtime-y-axis')
 
     // X AXIS
-    chartG.append('g')
+    xScale = d3.scaleBand()
+      .paddingInner(0.3)
+      .paddingOuter(0)
+
+    xAxis = d3.axisBottom(xScale)
+
+    xAxisElement = chartG.append('g')
       .attr('class', 'axis dichtime-x-axis')
+
+    // Z AXIS (color coding)
+    zScaleColor = d3.scaleOrdinal(primaryColors)
+
+    // GROUPS FOR LINES/POINTS
+    // The mouseover highlight elements should always be drawn on top, so are placed in
+    // a later group in the SVG structure.
+    mainLineGroup = chartG.append('g')
+    mouseoverLineGroup = chartG.append('g')
+
+    // INITIALIZE LEGEND
+    // top level meanbars legend container
+    legendDiv = d3.select('.legend').append('div')
+      .attr('class', 'dichtimeline__legend')
+
+    // empty flex element, used to dynamically align the legend content vertically
+    legendDiv.append('div')
+      .style('flex', '1')
+
+    // legend for the perspective and selected options
+    const legendPerspective = legendDiv.append('div')
+    legendPerspectiveHeader = legendPerspective.append('h4')
+      .attr('class', 'legend__header')
+    legendPerspectiveOptionTable = legendPerspective.append('div')
+
+    // empty flex element, used to dynamically align the legend content vertically
+    legendDiv.append('div')
+      .style('flex', '3')
 
     // Calculate initial dimensions
     computeDimensions(chartWidthScrollBreakpoint, chartHeight)
   }
 
   exports.populateChart =
-  function (questionIDInput, perspectivesInput, selectedPerspectiveOptionsInput) {
+  function (questionIDInput, perspectiveIDInput, selectedPerspectiveOptions) {
     displayChartElements(true)
 
     // Arguments
     questionID = questionIDInput
-    perspectiveID = perspectivesInput
-    const selectedPerspectiveOptions = selectedPerspectiveOptionsInput
+    perspectiveID = perspectiveIDInput
 
     // TODO check actually delivered time points in statJson data?
     // TODO generate timepoint texts in daxplore export file to experiment with that as an array here
     // DATA
     const optionTexts = dax.data.getOptionTexts(perspectiveID)
-    const options = []
+    currentOptions = []
+    const pointData = []
     selectedPerspectiveOptions.forEach(function (option, i) {
       const values = []
       dax.data.getTimepoints(perspectiveID).forEach(function (timepoint) {
@@ -115,56 +177,89 @@
               percentage: (selectedCount / totalCount),
               count: totalCount,
             })
+            pointData.push({
+              index: option,
+              timepoint: timepoint,
+              percentage: (selectedCount / totalCount),
+            })
           }
         }
       })
-      options.push({
+      currentOptions.push({
         index: option,
         id: optionTexts[option],
         values: values,
       })
     })
 
-    currentOptions = options
+    // UPDATE HEADER
+    const shortText = dax.data.getQuestionShortText(questionID)
+    const longText = dax.data.getQuestionFullText(questionID)
+    headerMain.text(shortText)
+    headerSub
+      .text(longText)
+      .style('display', longText === '' || shortText === longText ? 'none' : null)
+    headerDich.text(getDichotomizedSubtitleText())
 
-    updateChartElements()
-    updateStyles()
-  }
+    // X SCALE
+    xScale
+      .range([0, width])
+      .domain(dax.data.getTimepoints(perspectiveID))
 
-  // Set the size available for the chart.
-  // Updates the chart so it fits in the new size.
-  exports.setSize =
-  function (availableWidthInput) {
+    const xBandwidth = xScale.bandwidth()
 
-  }
+    // Y SCALE
+    yScale
+      .range([height, 0])
+      .domain([0, 1])
 
-  // Hide all dichtimeline chart elements
-  // Called whenever the entire chart should be hidden, so that another chart type can be dislpayed
-  exports.hide =
-  function () {
-    displayChartElements(false)
-  }
+    // Z SCALE (color)
+    const allIndicesArray = dax.data.getPerspectiveOptionIndicesColumnOrder(perspectiveID)
+    zScaleColor.domain(allIndicesArray)
 
-  exports.generateLegend =
-  function () {
-    // GENERATE LEGEND
-    legend = d3.select('.legend')
-      .style('margin-top', (d3.select('.header-section').node().offsetHeight + height / 2.5) + 'px')
-      .style('margin-left', '4px')
+    // UPDATE X AXIS
+    xAxis
+      .tickFormat(function (d) {
+        return dax.text('timepoint' + d)
+      })
 
-    legend.html('')
+    xAxisElement
+      .attr('transform', 'translate(0,' + height + ')')
+      .call(xAxis)
 
-    // Add legend options
-    legend.selectAll('.legend__row')
-      .data(currentOptions)
-      .enter()
-        .append('div')
-        .attr('class', function (d) { return 'legend__row legend__row-' + d.index })
-        .html(function (option) {
-          return "<span class='legend__marker' style='background-color: " +
-                  zScaleColor(option.id) + ";'>&nbsp;</span>" +
-                  "<span class='legend__row-text'>" + option.id + '</span>'
-        })
+    // UPDATE Y AXIS
+    yAxis.tickSizeInner(width)
+
+    yAxisElement.interrupt().selectAll('*').interrupt()
+
+    yAxisElement
+      .attr('transform', 'translate(' + width + ',0)')
+      .call(yAxis)
+
+    // CHART LINES
+    const lines = mainLineGroup.selectAll('.dichtimeline__line')
+      .data(
+        currentOptions, // data
+        function (option) { return option.index } // key function
+      )
+
+    // Mouseover elements added to cover underlying elements when highlighted
+    const mouseoverLines = mouseoverLineGroup.selectAll('.dichtimeline__line')
+      .data(
+        currentOptions, // data
+        function (option) { return option.index } // key function
+      )
+
+    // remove old lines
+    lines.exit().remove()
+    mouseoverLines.exit().remove()
+
+    // add new lines
+    lines.enter().append('path')
+      .classed('dichtimeline__line', true)
+      .attr('fill', 'none')
+      .attr('stroke', function (d) { return zScaleColor(d.index) })
+      .attr('stroke-width', '3')
       .on('mouseover',
         function (d) {
           tooltipOver(d.index)
@@ -176,7 +271,198 @@
           unfadeAll()
         })
 
+    mouseoverLines.enter().append('path')
+      .attr('class', function (d) { return 'dichtimeline__line dich-line-cover dataset-' + d.index })
+      .attr('fill', 'none')
+      .attr('stroke', function (d) { return zScaleColor(d.index) })
+      .attr('stroke-width', '3')
+      .attr('opacity', '0')
+      .attr('pointer-events', 'none')
+
+    // update path data for all lines
+    chartG.selectAll('.dichtimeline__line')
+      .attr('d', function (d) { return line(d.values) })
+
+    // CHART POINTS
+    const points = mainLineGroup.selectAll('.dichtimeline__point')
+      .data(
+        pointData, // data
+        function (option) { return option.index + '@' + option.timepoint } // key function
+      )
+
+    // Mouseover elements added to cover underlying elements when highlighted
+    const mouseoverPoints = mouseoverLineGroup.selectAll('.dichtimeline__point')
+      .data(
+        pointData, // data
+        function (option) { return option.index + '@' + option.timepoint } // key function
+      )
+
+    const mouseoverPercentages = mouseoverLineGroup.selectAll('.dichtimeline__percentage')
+      .data(
+        pointData, // data
+        function (option) { return option.index + '@' + option.timepoint } // key function
+      )
+
+    // remove old points
+    points.exit().remove()
+    mouseoverPoints.exit().remove()
+    mouseoverPercentages.exit().remove()
+
+    // add new points
+    points.enter().append('path')
+      .classed('dichtimeline__point', true)
+      .attr('fill', function (d) { return zScaleColor(d.index) })
+      .attr('stroke', function (d) { return zScaleColor(d.index) })
+      .attr('d', pointSymbol.size(pointSize))
+      .on('mouseover',
+        function (d) {
+          tooltipOver(d.index)
+          fadeOthers(d.index)
+        })
+      .on('mouseout',
+        function (d) {
+          tooltipOut()
+          unfadeAll()
+        })
+
+    mouseoverPoints.enter().append('path')
+      .attr('class', function (d) { return 'dichtimeline__point dich-point-cover dataset-' + d.index })
+      .attr('fill', function (d) { return zScaleColor(d.index) })
+      .attr('stroke', function (d) { return zScaleColor(d.index) })
+      .attr('d', pointSymbol.size(pointFocusSize))
+      .attr('opacity', '0')
+      .on('mouseover',
+        function (d) {
+          tooltipOver(d.index)
+          fadeOthers(d.index)
+        })
+      .on('mouseout',
+        function (d) {
+          tooltipOut()
+          unfadeAll()
+        })
+
+    mouseoverPercentages.enter().append('text')
+      .attr('class', function (d) { return 'dichtimeline__percentage dichtimeline__percentage-' + d.index })
+      .text(function (d) { return percentageFormat(d.percentage) })
+      .style('font-size', '10px')
+      .style('text-anchor', 'middle')
+      .style('font-weight', 'bold')
+      .on('mouseover',
+        function (d) {
+          tooltipOver(d.index)
+          fadeOthers(d.index)
+        })
+      .on('mouseout',
+        function (d) {
+          tooltipOut()
+          unfadeAll()
+        })
+
+    // position all points
+    chartG.selectAll('.dichtimeline__point')
+      .attr('transform', function (d) {
+        return 'translate(' + (xScale(d.timepoint) + xBandwidth / 2) + ',' + yScale(d.percentage) + ')'
+      })
+
+    chartG.selectAll('.dichtimeline__percentage')
+      .attr('transform', function (d) {
+        return 'translate(' +
+        (xScale(d.timepoint) + xBandwidth / 2) + ',' +
+        (yScale(d.percentage) + 4) + ')'
+      })
+      .style('display', 'none')
+
+    // UPDATE LEGEND
+    // Update legend title
+    legendPerspectiveHeader
+      .text(dax.data.getQuestionShortText(perspectiveID))
+
+    // Set new data for the legend
+    const optionRows = legendPerspectiveOptionTable.selectAll('.legend__row')
+      .data(
+        currentOptions, // data
+        function (option) { return option.index } // key function, mapping a specific DOM element to a specific option index
+      )
+
+    // Remove old rows
+    optionRows.exit().remove()
+
+    // Add new rows
+    const optionEnter = optionRows.enter()
+    .append('div')
+      .classed('legend__row', true)
+      .on('mouseover',
+        function (d) {
+          tooltipOver(d.index)
+          fadeOthers(d.index)
+        })
+      .on('mouseout',
+        function (d) {
+          tooltipOut()
+          unfadeAll()
+        })
+    optionEnter.append('div')
+      .attr('class', 'legend__color-square')
+    optionEnter.append('div')
+      .attr('class', 'legend__row-text')
+
+    // reselect rows and use single-select to propagate data join to contained items
+    // update color and text for each row
+    const rows = legendPerspectiveOptionTable.selectAll('.legend__row')
+    .attr('class', function (d) {
+      const depth = dax.data.getPerspectiveOptionTreeDepth(perspectiveID, d.index)
+      let indentDepth = 0
+      if (depth >= 1) {
+        const parent = dax.data.getPerspectiveOptionParent(perspectiveID, d.index)
+        if (selectedPerspectiveOptions.indexOf(parent) !== -1) {
+          indentDepth += 1
+        }
+        if (depth >= 2) {
+          const parentParent = dax.data.getPerspectiveOptionParent(perspectiveID, parent)
+          if (selectedPerspectiveOptions.indexOf(parentParent) !== -1) {
+            indentDepth += 1
+          }
+        }
+      }
+      return 'legend__row legend__row--indent-' + indentDepth
+    })
+    .attr('title', function (option) {
+      let text = dax.data.getQuestionOptionText(perspectiveID, option.index)
+      if (option.nodata) {
+        text += ' ' + dax.text('explorer.chart.dichtimeline.legend.missing_data')
+      }
+      return text
+    })
+
+    rows.select('.legend__color-square')
+      .style('background-color', colorPrimary)
+    rows.select('.legend__row-text')
+      .text(function (option) {
+        let text = dax.data.getQuestionOptionText(perspectiveID, option.index)
+        if (option.nodata) {
+          text += ' ' + dax.text('explorer.chart.dichtimeline.legend.missing_data')
+        }
+        return text
+      })
+    .style('font-style', function (option) { return option.nodata ? 'italic' : null })
+
     updateStyles()
+  }
+
+  // Set the size available for the chart.
+  // Updates the chart so it fits in the new size.
+  exports.setSize =
+  function (availableWidthInput) {
+    availableWidth = availableWidthInput
+    resizeAndPositionElements()
+  }
+
+  // Hide all dichtimeline chart elements
+  // Called whenever the entire chart should be hidden, so that another chart type can be dislpayed
+  exports.hide =
+  function () {
+    displayChartElements(false)
   }
 
   // TODO pretty hacky quick fixed solution
@@ -226,18 +512,27 @@
     chart
       .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.top + margin.bottom)
-
-    updateChartElements()
   }
 
   /** ** INTERNAL FUNCTIONS ** **/
 
   // Hide or show all top level elements
   function displayChartElements (show) {
-    // headerDiv.style('display', show ? null : 'none')
+    headerDiv.style('display', show ? null : 'none')
     chartContainer.style('display', show ? null : 'none')
-    // legendDiv.style('display', show ? null : 'none')
+    legendDiv.style('display', show ? null : 'none')
     // saveImageButton.style('display', show ? null : 'none')
+  }
+
+  // Update the size and position of all chart elements.
+  // Called when the content or the size is updated.
+  function resizeAndPositionElements () {
+    // LEGEND
+    // Set the vertical position and height of the legend area
+    // The position of the legend div is then adjusted via flex parameters relative the defined area
+    legendDiv
+      .style('margin-top', chartBB.top + 'px')
+      .style('height', chartBB.height + 'px')
   }
 
   function fadeOthers (focusedIndex) {
@@ -248,10 +543,10 @@
       const row = d3.select('.legend__row-' + optionIndex)
       row.interrupt().selectAll('*').interrupt()
 
-      const lineMain = d3.selectAll('.line.dataset-' + optionIndex)
+      const lineMain = chartG.selectAll('.line.dataset-' + optionIndex)
       lineMain.interrupt().selectAll('*').interrupt()
 
-      const pointMain = d3.selectAll('.dich-point.dataset-' + optionIndex)
+      const pointMain = chartG.selectAll('.dich-point.dataset-' + optionIndex)
       pointMain.interrupt().selectAll('*').interrupt()
 
       if (optionIndex !== focusedIndex) {
@@ -280,13 +575,13 @@
         .transition(fadeTransition)
         .style('opacity', 1)
     }
-    const lineMain = d3.selectAll('.line')
+    const lineMain = chartG.selectAll('.line')
     lineMain.interrupt().selectAll('*').interrupt()
     lineMain
         .transition(fadeTransition)
         .attr('opacity', 1)
 
-    const pointMain = d3.selectAll('.dich-point')
+    const pointMain = chartG.selectAll('.dich-point')
     pointMain.interrupt().selectAll('*').interrupt()
     pointMain
         .transition(fadeTransition)
@@ -295,7 +590,7 @@
 
   function tooltipOver (focusedIndex) {
     tooltipOut()
-    const tooltips = d3.selectAll('.point-tooltip-' + focusedIndex)
+    const tooltips = chartG.selectAll('.dichtimeline__percentage-' + focusedIndex)
     tooltips.interrupt().selectAll('*').interrupt()
     tooltips.style('display', 'block')
     //     tooltips.transition(fadeTransition)
@@ -315,17 +610,17 @@
     // //     points.transition(fadeTransition)
     // //       .attr("d", symbol.size(400));
 
-    const lineCover = d3.selectAll('.line-cover.dataset-' + focusedIndex)
+    const lineCover = chartG.selectAll('.dich-line-cover.dataset-' + focusedIndex)
     lineCover
       .attr('opacity', '1')
 
-    const pointMain = d3.selectAll('.dich-point-cover.dataset-' + focusedIndex)
+    const pointMain = chartG.selectAll('.dich-point-cover.dataset-' + focusedIndex)
     pointMain
       .attr('opacity', '1')
   }
 
   function tooltipOut () {
-    const tooltips = d3.selectAll('.point-tooltip')
+    const tooltips = chartG.selectAll('.dichtimeline__percentage')
     tooltips.interrupt().selectAll('*').interrupt()
     tooltips.style('display', 'none')
     //     tooltips.transition(fadeTransition)
@@ -342,11 +637,11 @@
     // //     points.transition(fadeTransition)
     // //       .attr("d", symbol.size(pointSize));
 
-    const lineCover = d3.selectAll('.line-cover')
+    const lineCover = chartG.selectAll('.dich-line-cover')
     lineCover
       .attr('opacity', '0')
 
-    const pointMain = d3.selectAll('.dich-point-cover')
+    const pointMain = chartG.selectAll('.dich-point-cover')
     pointMain
       .attr('opacity', '0')
   }
@@ -357,240 +652,51 @@
   }
 
   function updateStyles () {
-    d3.selectAll('.axis .domain')
+    chartG.selectAll('.axis .domain')
       .style('visibility', 'hidden')
 
-    d3.selectAll('.axis path, .axis line')
+    chartG.selectAll('.axis path, .axis line')
       .style('fill', 'none')
       .style('stroke', '#bbb')
       .style('shape-rendering', 'geometricPrecision')
 
-    d3.selectAll('text')
+    chartG.selectAll('text')
       .style('fill', '#555')
       .style('font-size', '13px')
       .style('font-family', '"Varta", sans-serif')
       .style('cursor', 'default')
   }
 
-  function updateChartElements () {
-    // X SCALE
-    const xScale = d3.scaleBand()
-      .range([0, width])
-      .paddingInner(0.3)
-      .paddingOuter(0)
-      .domain(dax.data.getTimepoints(perspectiveID))
-
-    const xBandwidth = xScale.bandwidth()
-
-    // Y SCALE
-    // TODO use a dynamic scale or min/max points set in producer
-    const yScale = d3.scaleLinear()
-      .range([height, 0])
-      .domain([0, 1])
-
-    // Z SCALE
-    // mapping selected options to colors
-    zScaleColor = d3.scaleOrdinal(lineColors)
-      .domain(dax.data.getOptionTexts(perspectiveID))
-
-    // TODO unused z scale hover color?
-    // let zScaleHoverColor = d3.scaleOrdinal(hoverColors)
-    //   .domain(optionsMap[perspective])
-
-    // TODO unused z scale symbol?
-    // let zScaleSymbol = d3
-    //   .scaleOrdinal([d3.symbolCircle, d3.symbolDiamond, d3.symbolSquare, d3.symbolTriangle, d3.symbolStar, d3.symbolCross, d3.symbolWye])
-    //   .domain(optionsMap[perspective])
-
-    // LINE TEMPLATE
-    const line = d3.line()
-      .curve(d3.curveLinear)
-      .x(function (d) { return xScale(d.timepoint) + xScale.bandwidth() / 2 })
-      .y(function (d) {
-        return yScale(d.percentage)
-      })
-
-    // UPDATE X AXIS
-    const xAxis = d3.axisBottom(xScale)
-      .tickFormat(function (d) {
-        return dax.text('timepoint' + d)
-      })
-
-    const xAxisElement = d3.select('.dichtime-x-axis')
-
-    //     xAxisElement.interrupt().selectAll('*').interrupt();
-
-    xAxisElement
-      .attr('transform', 'translate(0,' + height + ')')
-      .call(xAxis)
-
-    // UPDATE Y AXIS
-    const yAxis = d3.axisLeft(yScale)
-      .tickFormat(d3.format('.0%'))
-      .tickSize(0)
-      .tickSizeInner(width)
-
-    const yAxisElement = d3.select('.dichtime-y-axis')
-
-    yAxisElement.interrupt().selectAll('*').interrupt()
-
-    yAxisElement
-      .attr('transform', 'translate(' + width + ',0)')
-      .call(yAxis)
-
-    // UPDATE LINES
-    // let option = chartG.selectAll(".option")
-    //       .data(options)
-    //       .enter().append("g")
-    //         .attr("class", "option");
-    //
-    //     option.append("path")
-    //       .attr("class", "line")
-    //       .attr("d", function(d) {
-    //         return line(d.values);
-    //       })
-    //       .style("stroke", function(d) { return zScaleColor(d.id); });
-
-    //     currentOptions.forEach(function(option) {
-    // let color = zScaleColor(option.id);
-    // let hover_color = zScaleHoverColor(option.id);
-    //
-
-    // Connect the points with lines
-    //       chartG.append("path")
-    //         .datum(option.values)
-    //         .attr("class", "line dataset-" + option.index)
-    //         .attr("fill", "none")
-    //         .attr("stroke", color)
-    //         .attr("stroke-width", "3")
-    //         .attr("d", line)
-    //         .on("mouseover",
-    //           function(d) {
-    //             tooltipOver(option.index);
-    //             fadeOthers(option.index)
-    //         })
-    //         .on("mouseout",
-    //           function(d) {
-    //             tooltipOut();
-    //             unfadeAll();
-    //         });
-
-    // Connect the points with lines
-    currentOptions.forEach(function (option) {
-      const color = zScaleColor(option.id)
-      d3.select('.line.dataset-' + option.index).remove()
-      chartG.append('path')
-        .datum(option.values)
-        .attr('class', 'line dataset-' + option.index)
-        .attr('fill', 'none')
-        .attr('stroke', color)
-        .attr('stroke-width', '3')
-        .attr('d', line)
-        .on('mouseover',
-          function (d) {
-            tooltipOver(option.index)
-            fadeOthers(option.index)
-          })
-        .on('mouseout',
-          function (d) {
-            tooltipOut()
-            unfadeAll()
-          })
+  // Generate specially formatted subtitle for selected options
+  function getDichotomizedSubtitleText () {
+    const optionTexts = dax.data.getOptionTexts(questionID)
+    const usedDichTexts = []
+    dax.data.getDichSelected(questionID).forEach(function (i) {
+      usedDichTexts.push(optionTexts[i])
     })
 
-    // Individual points
-    currentOptions.forEach(function (option) {
-      const color = zScaleColor(option.id)
-      chartG.selectAll('.dich-point.dataset-' + option.index)
-        .data(option.values)
-      .enter().append('path')
-        .attr('class', 'dich-point dataset-' + option.index)
-        .attr('fill', color)
-        .attr('stroke', color)
-        .attr('d', pointSymbol.size(pointSize))
-        .on('mouseover',
-          function (d) {
-            tooltipOver(option.index)
-            fadeOthers(option.index)
-          })
-        .on('mouseout',
-          function (d) {
-            tooltipOut()
-            unfadeAll()
-          })
+    const optCount = usedDichTexts.length
+    if (optCount === 0) { return '' }
 
-      chartG.selectAll('.dich-point.dataset-' + option.index)
-        .attr('transform', function (d) {
-          return 'translate(' + (xScale(d.timepoint) + xBandwidth / 2) + ',' + yScale(d.percentage) + ')'
-        })
-    })
+    const subStart = dax.text('explorer.chart.dichotomized_line.subtitle_start')
+    const subEnd = dax.text('explorer.chart.dichotomized_line.subtitle_end')
 
-    // Mouse over elements added later in order to cover underlying elements when highlighted
-    currentOptions.forEach(function (option) {
-      const color = zScaleColor(option.id)
+    if (usedDichTexts.length === 1) {
+      return subStart + usedDichTexts[0] + subEnd
+    }
 
-      // Connect the points with lines
-      d3.selectAll('.line-cover.dataset-' + option.index).remove()
-      chartG.append('path')
-        .datum(option.values)
-        .attr('class', 'line-cover dataset-' + option.index)
-        .attr('fill', 'none')
-        .attr('stroke', color)
-        .attr('stroke-width', '3')
-        .attr('opacity', '0')
-        .attr('pointer-events', 'none')
-        .attr('d', line)
-    })
+    const subSeparator = dax.text('explorer.chart.dichotomized_line.subtitle_separator')
+    const subOr = dax.text('explorer.chart.dichotomized_line.subtitle_or')
 
-    currentOptions.forEach(function (option) {
-      const color = zScaleColor(option.id)
-      // Individual points
-      d3.selectAll('.dich-point-cover.dataset-' + option.index).remove()
-      chartG.selectAll('.dich-point-cover.dataset-' + option.index)
-        .data(option.values)
-      .enter().append('path')
-        .attr('class', 'dich-point-cover dataset-' + option.index)
-        .attr('fill', color)
-        .attr('stroke', color)
-        .attr('d', pointSymbol.size(pointFocusSize))
-        .attr('opacity', '0')
-        .attr('pointer-events', 'none')
+    let sub = subStart
+    sub += usedDichTexts.slice(0, optCount - 1).join(subSeparator)
+    sub += subOr + usedDichTexts[optCount - 1] + subEnd
 
-      chartG.selectAll('.dich-point-cover.dataset-' + option.index)
-        .attr('transform', function (d) {
-          return 'translate(' + (xScale(d.timepoint) + xBandwidth / 2) + ',' + yScale(d.percentage) + ')'
-        })
-    })
-
-    currentOptions.forEach(function (option) {
-      // Add tooltip divs
-      // let dichWrapper = d3.select(".dich-line-chart").node().getBoundingClientRect();
-      // let xAxisStart = d3.select(".dichtime-x-axis").node().getBoundingClientRect().x;
-      d3.selectAll('.point-tooltip-' + option.index).remove()
-      chartG.selectAll('.point-tooltip-' + option.index)
-        .data(option.values)
-        .enter().append('text')
-          .attr('class', 'point-tooltip point-tooltip-' + option.index)
-          .text(function (d) { return percentageFormat(d.percentage) })
-          .style('font-size', '10px')
-          .on('mouseover',
-            function (d) {
-              tooltipOver(option.index)
-              fadeOthers(option.index)
-            })
-          .on('mouseout',
-            function (d) {
-              tooltipOut()
-              unfadeAll()
-            })
-
-      chartG.selectAll('.point-tooltip-' + option.index)
-          .attr('transform', function (d) {
-            return 'translate(' +
-            (xScale(d.timepoint) + xBandwidth / 2 - this.getComputedTextLength() / 2) + ',' +
-            (yScale(d.percentage) + 3.5) + ')'
-          })
-          .style('display', 'none')
-    })
+    return sub
   }
+
+  // Helper function for bar and legend colors.
+  // The option argument is an option data object used in the d3 data join for the bars and legend rows.
+  function colorPrimary (option) { return option.nodata ? '#999' : zScaleColor(option.index) } // TODO externalize no data color
+  // function colorHover (option) { return option.nodata ? '#888' : zScaleColorHover(option.index) } // TODO externalize no data color
 })(window.dax = window.dax || {})

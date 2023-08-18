@@ -54,27 +54,6 @@
     dax.explorer.selectionUpdateCallback(true)
   }
 
-  function dichotomizedSubtitle (optionTexts) {
-    const optCount = optionTexts.length
-    if (optCount === 0) { return '' }
-
-    const subStart = dax.text('explorer.chart.dichotomized_line.subtitle_start')
-    const subEnd = dax.text('explorer.chart.dichotomized_line.subtitle_end')
-
-    if (optionTexts.length === 1) {
-      return subStart + optionTexts[0] + subEnd
-    }
-
-    const subSeparator = dax.text('explorer.chart.dichotomized_line.subtitle_separator')
-    const subOr = dax.text('explorer.chart.dichotomized_line.subtitle_or')
-
-    let sub = subStart
-    sub += optionTexts.slice(0, optCount - 1).join(subSeparator)
-    sub += subOr + optionTexts[optCount - 1] + subEnd
-
-    return sub
-  }
-
   // TODO move to separate file?
   function setDescription (questionID, perspectives) {
     // TODO construct from elements instead of raw html
@@ -263,18 +242,8 @@
       tab = questionMap[question].displaytypes[0]
     }
 
-    // TODO dich subtitle should be handled by a dich subsystem
-    let dichSubtitle = ''
-    if (tab === 'DICH') {
-      const optionTexts = questionMap[question].options
-      const usedDichTexts = []
-      dichselectedMap[question].forEach(function (i) {
-        usedDichTexts.push(optionTexts[i])
-      })
-      dichSubtitle = dichotomizedSubtitle(usedDichTexts)
-    }
     setDescription(question, perspective)
-    dax.explorer.chartSetQueryDefinition(tab, 'TIMEPOINTS_ONE', question, perspective, perspectiveOptionsCombined, dichSubtitle)
+    dax.explorer.chartSetQueryDefinition(tab, 'TIMEPOINTS_ONE', question, perspective, perspectiveOptionsCombined)
 
     const queryHash = getCurrentStateHash()
 
