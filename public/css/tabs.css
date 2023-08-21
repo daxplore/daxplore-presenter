@@ -5,10 +5,11 @@
 
 .chart-tab {
   align-self: flex-end;
+  background: #F7F7F7;
   border: 1px solid #BBB;
   color: #666;
   cursor: pointer;
-  padding: 7px 14px 7px 14px;
+  padding: 8px 14px 6px 14px;
   user-select: none;
   white-space: nowrap;
 }
@@ -22,8 +23,10 @@
 }
 
 .chart-tab-selected {
+  background: white;
   border-bottom: none;
   color: black;
+  padding-bottom: 7px;
 }
 
 .chart-tab-spacing {
