@@ -244,7 +244,7 @@
       }
       break
     case 'DICH':
-      dax.chart.dichtimeline.updateSize(350)
+      dax.chart.dichtimeline.setSize(widthForChart, 350)
       break
     }
   }

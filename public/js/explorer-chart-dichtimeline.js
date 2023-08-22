@@ -11,14 +11,12 @@
   const margin = { top: 25, right: 13, bottom: xAxisHeight, left: yAxisWidth + 10 }
   const pointSize = 40
   const pointFocusSize = 550
-  // if chart width is smaller than this, embed it it a scrollpanel
-  const chartWidthScrollBreakpoint = 600 // TODO shouldn't be hard coded, move to setting in producer
-  const chartHeight = 300 // TODO shouldn't be hard coded, move to setting in producer
 
   // CHART SIZE VARIABLES
   let availableWidth = 600 // initial placeholder value
+  let availableHeight = 300 // initial placeholder value
   let width = availableWidth
-  let height = chartHeight
+  let height = availableHeight
 
   // HEADER
   let headerDiv, headerMain, headerSub, headerDich
@@ -27,7 +25,7 @@
   let yScale, yAxis, yAxisElement
   let zScaleColor
   // CHART
-  let chart, chartContainer, chartG
+  let chart, chartContainer, chartG, chartBB
   let mainLineGroup, mouseoverLineGroup
   // LEGEND
   let legendDiv, legendPerspectiveHeader, legendPerspectiveOptionTable
@@ -104,6 +102,11 @@
 
     xAxis = d3.axisBottom(xScale)
 
+    xAxis
+      .tickFormat(function (d) {
+        return dax.text('timepoint' + d)
+      })
+
     xAxisElement = chartG.append('g')
       .attr('class', 'axis dichtime-x-axis')
 
@@ -134,9 +137,6 @@
     // empty flex element, used to dynamically align the legend content vertically
     legendDiv.append('div')
       .style('flex', '3')
-
-    // Calculate initial dimensions
-    computeDimensions(chartWidthScrollBreakpoint, chartHeight)
   }
 
   exports.populateChart =
@@ -202,39 +202,14 @@
     headerDich.text(getDichotomizedSubtitleText())
 
     // X SCALE
-    xScale
-      .range([0, width])
-      .domain(dax.data.getTimepoints(perspectiveID))
-
-    const xBandwidth = xScale.bandwidth()
+    xScale.domain(dax.data.getTimepoints(perspectiveID))
 
     // Y SCALE
-    yScale
-      .range([height, 0])
-      .domain([0, 1])
+    yScale.domain([0, 1])
 
     // Z SCALE (color)
     const allIndicesArray = dax.data.getPerspectiveOptionIndicesColumnOrder(perspectiveID)
     zScaleColor.domain(allIndicesArray)
-
-    // UPDATE X AXIS
-    xAxis
-      .tickFormat(function (d) {
-        return dax.text('timepoint' + d)
-      })
-
-    xAxisElement
-      .attr('transform', 'translate(0,' + height + ')')
-      .call(xAxis)
-
-    // UPDATE Y AXIS
-    yAxis.tickSizeInner(width)
-
-    yAxisElement.interrupt().selectAll('*').interrupt()
-
-    yAxisElement
-      .attr('transform', 'translate(' + width + ',0)')
-      .call(yAxis)
 
     // CHART LINES
     const lines = mainLineGroup.selectAll('.dichtimeline__line')
@@ -278,10 +253,6 @@
       .attr('stroke-width', '3')
       .attr('opacity', '0')
       .attr('pointer-events', 'none')
-
-    // update path data for all lines
-    chartG.selectAll('.dichtimeline__line')
-      .attr('d', function (d) { return line(d.values) })
 
     // CHART POINTS
     const points = mainLineGroup.selectAll('.dichtimeline__point')
@@ -358,20 +329,6 @@
           tooltipOut()
           unfadeAll()
         })
-
-    // position all points
-    chartG.selectAll('.dichtimeline__point')
-      .attr('transform', function (d) {
-        return 'translate(' + (xScale(d.timepoint) + xBandwidth / 2) + ',' + yScale(d.percentage) + ')'
-      })
-
-    chartG.selectAll('.dichtimeline__percentage')
-      .attr('transform', function (d) {
-        return 'translate(' +
-        (xScale(d.timepoint) + xBandwidth / 2) + ',' +
-        (yScale(d.percentage) + 4) + ')'
-      })
-      .style('display', 'none')
 
     // UPDATE LEGEND
     // Update legend title
@@ -452,9 +409,11 @@
 
   // Set the size available for the chart.
   // Updates the chart so it fits in the new size.
+  // As a side effect, enable horizontal scrolling if needed for the chart to fit the given room.
   exports.setSize =
-  function (availableWidthInput) {
+  function (availableWidthInput, availableHeightInput) {
     availableWidth = availableWidthInput
+    availableHeight = availableHeightInput
     resizeAndPositionElements()
   }
 
@@ -463,55 +422,6 @@
   exports.hide =
   function () {
     displayChartElements(false)
-  }
-
-  // TODO pretty hacky quick fixed solution
-  exports.updateSize =
-  function (heightTotal) {
-    // 2. width for chart to use is max of:
-    // a. room remaining of window width after QP, SA, margins, (scroll bar?)
-    // b. max of
-    // b.1 room required by header block
-    // b.2 room required by bottom block
-    // 3. calculate min width needed to draw chart
-    // 4. if allocated space in 2. < need in 3.
-    // then: set scroll area width to 2., chart to 3., wrap and scroll
-    // else: set chart to 2, no scroll
-
-    const availableWidth = document.documentElement.clientWidth - // window width
-              d3.select('.question-panel').node().offsetWidth - // tree sidebar
-              5 - // tree margin (if changed here, needs to be changed in css)
-              d3.select('.sidebar-column').node().offsetWidth - // right sidebar
-              2 - // border of 1px + 1px (if changed here, needs to be changed in css)
-              1 // 1px fudge
-    // TODO - scrollbar width?
-
-    const headerBlockWidth = d3.select('.header-section').node().offsetWidth
-    let bottomBlockWidth = d3.select('.perspective-panel').node().offsetWidth
-    const description = d3.select('.description-panel').node()
-    if (description != null && description.offsetWidth > 0) {
-      bottomBlockWidth += 250 // TODO hard coded
-    }
-    const topBotNeededWidth = Math.max(headerBlockWidth, bottomBlockWidth)
-
-    const widthForChart = Math.max(availableWidth, topBotNeededWidth)
-
-    const chartNeededWidth = chartWidthScrollBreakpoint
-
-    const lockWidth = widthForChart < chartNeededWidth
-    let chartWidth = widthForChart
-    if (lockWidth) {
-      chartWidth = chartNeededWidth
-    }
-    d3.select('.chart')
-      .classed('chart-scroll', lockWidth)
-      .style('width', function () { return lockWidth ? widthForChart + 'px' : null })
-
-    computeDimensions(chartWidth, heightTotal)
-
-    chart
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom)
   }
 
   /** ** INTERNAL FUNCTIONS ** **/
@@ -527,12 +437,85 @@
   // Update the size and position of all chart elements.
   // Called when the content or the size is updated.
   function resizeAndPositionElements () {
+    // CHART SIZE
+    // Estimate the minimum width needed for the chart with the current content
+    const chartNeededWidth = margin.left + margin.right + // margins
+      30 + // y axis width // TODO calculate
+      10 * 2 + // space outside of line segments // TODO calculate
+      50 * dax.data.getTimepoints(perspectiveID).length // min width each time point
+
+    // Check if vertical scroll is needed
+    const scrollNeeded = availableWidth < chartNeededWidth
+
+    // Enable or disable scroll on the div containing the meanbars chart
+    // TODO function call or event to chartpanel?
+    d3.select('.chart')
+      .classed('chart-scroll', scrollNeeded)
+      .style('width', function () { return scrollNeeded ? availableWidth + 'px' : null })
+
+    // Update width of the chart, which may be bigger than the available space if scrolling is enabled
+    width = scrollNeeded ? chartNeededWidth : availableWidth
+    width = width - margin.left - margin.right
+    height = availableHeight - margin.top - margin.bottom
+    chart
+      .attr('width', width + margin.left + margin.right)
+      .attr('height', height + margin.top + margin.bottom)
+
+    // Update bounding box definition for the chart
+    const wrapperClientBB = d3.select('.chart').node().getBoundingClientRect()
+    chartBB = {
+      height: wrapperClientBB.height,
+      left: wrapperClientBB.left + window.scrollX,
+      top: wrapperClientBB.top + window.scrollY,
+      width: wrapperClientBB.width,
+    }
+
+    // X AXIS
+    // Update the space available for the x axis
+    xScale.range([0, width])
+    // Move and update the x axis
+    xAxisElement
+      .attr('transform', 'translate(0,' + height + ')')
+      .call(xAxis)
+
+    // Y AXIS
+    // Update the space available for the y axis
+    yScale.range([height, 0])
+    // Update the width of the y axis lines
+    yAxis.tickSizeInner(width)
+    // Update the y axis
+    // yAxisElement.interrupt().selectAll('*').interrupt()
+    yAxisElement
+      .attr('transform', 'translate(' + width + ',0)')
+      .call(yAxis)
+
+    // position all points
+    const xBandwidth = xScale.bandwidth()
+    chartG.selectAll('.dichtimeline__point')
+      .attr('transform', function (d) {
+        return 'translate(' + (xScale(d.timepoint) + xBandwidth / 2) + ',' + yScale(d.percentage) + ')'
+      })
+
+    chartG.selectAll('.dichtimeline__percentage')
+      .attr('transform', function (d) {
+        return 'translate(' +
+        (xScale(d.timepoint) + xBandwidth / 2) + ',' +
+        (yScale(d.percentage) + 4) + ')'
+      })
+      .style('display', 'none')
+
+    // update path data for all lines
+    chartG.selectAll('.dichtimeline__line')
+      .attr('d', function (d) { return line(d.values) })
+
     // LEGEND
     // Set the vertical position and height of the legend area
     // The position of the legend div is then adjusted via flex parameters relative the defined area
     legendDiv
       .style('margin-top', chartBB.top + 'px')
       .style('height', chartBB.height + 'px')
+
+    updateStyles()
   }
 
   function fadeOthers (focusedIndex) {
@@ -593,22 +576,6 @@
     const tooltips = chartG.selectAll('.dichtimeline__percentage-' + focusedIndex)
     tooltips.interrupt().selectAll('*').interrupt()
     tooltips.style('display', 'block')
-    //     tooltips.transition(fadeTransition)
-    //       .style("opacity", 1);
-
-    // let symbol = d3.symbol().type(d3.symbolCircle);
-    // let points = d3.selectAll(".dich-point.dataset-" + focusedIndex);
-    // //     points.interrupt().selectAll('*').interrupt();
-    // //     points.attr("d", symbol.size(64));
-    // //     console.log(points);
-    //     points
-    // //       .transition().duration(100)
-    //       .attr("d", symbol.size(500));
-    // //     path.attr("d", symbol.size(64));
-    //
-    // //     points.transition().duration(1000).attr("d", symbol.size(550));
-    // //     points.transition(fadeTransition)
-    // //       .attr("d", symbol.size(400));
 
     const lineCover = chartG.selectAll('.dich-line-cover.dataset-' + focusedIndex)
     lineCover
@@ -623,19 +590,6 @@
     const tooltips = chartG.selectAll('.dichtimeline__percentage')
     tooltips.interrupt().selectAll('*').interrupt()
     tooltips.style('display', 'none')
-    //     tooltips.transition(fadeTransition)
-    //       .style("opacity", 0);
-
-    // let symbol = d3.symbol().type(d3.symbolCircle);
-    // let points = d3.selectAll(".dich-point");
-    // //     points.interrupt().selectAll('*').interrupt();
-    //     points.attr("d", symbol.size(pointSize));
-    //
-    // //let symbol = d3.symbol().size(40).type(d3.symbolCircle);
-    // //let points = d3.selectAll(".dich-point");
-    // //     points.interrupt().selectAll('*').interrupt();
-    // //     points.transition(fadeTransition)
-    // //       .attr("d", symbol.size(pointSize));
 
     const lineCover = chartG.selectAll('.dich-line-cover')
     lineCover
@@ -644,11 +598,6 @@
     const pointMain = chartG.selectAll('.dich-point-cover')
     pointMain
       .attr('opacity', '0')
-  }
-
-  function computeDimensions (widthTotal, heightTotal) {
-    width = widthTotal - margin.left - margin.right
-    height = heightTotal - margin.top - margin.bottom
   }
 
   function updateStyles () {
