@@ -316,9 +316,10 @@
     mouseoverPercentages.enter().append('text')
       .attr('class', function (d) { return 'dichtimeline__percentage dichtimeline__percentage-' + d.index })
       .text(function (d) { return percentageFormat(d.percentage) })
-      .style('font-size', '10px')
+      .style('font-size', '11px')
       .style('text-anchor', 'middle')
       .style('font-weight', 'bold')
+      .style('cursor', 'default')
       .on('mouseover',
         function (d) {
           tooltipOver(d.index)
@@ -404,7 +405,7 @@
       })
     .style('font-style', function (option) { return option.nodata ? 'italic' : null })
 
-    updateStyles()
+    updateAxisStyles()
   }
 
   // Set the size available for the chart.
@@ -515,7 +516,7 @@
       .style('margin-top', chartBB.top + 'px')
       .style('height', chartBB.height + 'px')
 
-    updateStyles()
+    updateAxisStyles()
   }
 
   function fadeOthers (focusedIndex) {
@@ -600,7 +601,7 @@
       .attr('opacity', '0')
   }
 
-  function updateStyles () {
+  function updateAxisStyles () {
     chartG.selectAll('.axis .domain')
       .style('visibility', 'hidden')
 
@@ -608,12 +609,6 @@
       .style('fill', 'none')
       .style('stroke', '#bbb')
       .style('shape-rendering', 'geometricPrecision')
-
-    chartG.selectAll('text')
-      .style('fill', '#555')
-      .style('font-size', '13px')
-      .style('font-family', '"Varta", sans-serif')
-      .style('cursor', 'default')
   }
 
   // Generate specially formatted subtitle for selected options
