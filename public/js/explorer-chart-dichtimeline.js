@@ -219,7 +219,7 @@
       )
 
     // Mouseover elements added to cover underlying elements when highlighted
-    const mouseoverLines = mouseoverLineGroup.selectAll('.dichtimeline__line')
+    const mouseoverLines = mouseoverLineGroup.selectAll('.dichtimeline__line-hover')
       .data(
         currentOptions, // data
         function (option) { return option.index } // key function
@@ -231,7 +231,7 @@
 
     // add new lines
     lines.enter().append('path')
-      .classed('dichtimeline__line', true)
+    .attr('class', function (d) { return 'dichtimeline__line dataset-' + d.index })
       .attr('fill', 'none')
       .attr('stroke', function (d) { return zScaleColor(d.index) })
       .attr('stroke-width', '3')
@@ -247,7 +247,7 @@
         })
 
     mouseoverLines.enter().append('path')
-      .attr('class', function (d) { return 'dichtimeline__line dich-line-cover dataset-' + d.index })
+      .attr('class', function (d) { return 'dichtimeline__line-hover dataset-' + d.index })
       .attr('fill', 'none')
       .attr('stroke', function (d) { return zScaleColor(d.index) })
       .attr('stroke-width', '3')
@@ -262,7 +262,7 @@
       )
 
     // Mouseover elements added to cover underlying elements when highlighted
-    const mouseoverPoints = mouseoverLineGroup.selectAll('.dichtimeline__point')
+    const mouseoverPoints = mouseoverLineGroup.selectAll('.dichtimeline__point-hover')
       .data(
         pointData, // data
         function (option) { return option.index + '@' + option.timepoint } // key function
@@ -281,7 +281,7 @@
 
     // add new points
     points.enter().append('path')
-      .classed('dichtimeline__point', true)
+      .attr('class', function (d) { return 'dichtimeline__point dataset-' + d.index })
       .attr('fill', function (d) { return zScaleColor(d.index) })
       .attr('stroke', function (d) { return zScaleColor(d.index) })
       .attr('d', pointSymbol.size(pointSize))
@@ -297,7 +297,7 @@
         })
 
     mouseoverPoints.enter().append('path')
-      .attr('class', function (d) { return 'dichtimeline__point dich-point-cover dataset-' + d.index })
+      .attr('class', function (d) { return 'dichtimeline__point-hover dataset-' + d.index })
       .attr('fill', function (d) { return zScaleColor(d.index) })
       .attr('stroke', function (d) { return zScaleColor(d.index) })
       .attr('d', pointSymbol.size(pointFocusSize))
@@ -314,7 +314,7 @@
         })
 
     mouseoverPercentages.enter().append('text')
-      .attr('class', function (d) { return 'dichtimeline__percentage dichtimeline__percentage-' + d.index })
+      .attr('class', function (d) { return 'dichtimeline__percentage dataset-' + d.index })
       .text(function (d) { return percentageFormat(d.percentage) })
       .style('font-size', '11px')
       .style('text-anchor', 'middle')
@@ -490,9 +490,13 @@
       .attr('transform', 'translate(' + width + ',0)')
       .call(yAxis)
 
+    // update path data for all lines
+    chartG.selectAll('.dichtimeline__line, .dichtimeline__line-hover')
+      .attr('d', function (d) { return line(d.values) })
+
     // position all points
     const xBandwidth = xScale.bandwidth()
-    chartG.selectAll('.dichtimeline__point')
+    chartG.selectAll('.dichtimeline__point, .dichtimeline__point-hover')
       .attr('transform', function (d) {
         return 'translate(' + (xScale(d.timepoint) + xBandwidth / 2) + ',' + yScale(d.percentage) + ')'
       })
@@ -504,10 +508,6 @@
         (yScale(d.percentage) + 4) + ')'
       })
       .style('display', 'none')
-
-    // update path data for all lines
-    chartG.selectAll('.dichtimeline__line')
-      .attr('d', function (d) { return line(d.values) })
 
     // LEGEND
     // Set the vertical position and height of the legend area
@@ -527,10 +527,10 @@
       const row = d3.select('.legend__row-' + optionIndex)
       row.interrupt().selectAll('*').interrupt()
 
-      const lineMain = chartG.selectAll('.line.dataset-' + optionIndex)
+      const lineMain = chartG.selectAll('.dichtimeline__line.dataset-' + optionIndex)
       lineMain.interrupt().selectAll('*').interrupt()
 
-      const pointMain = chartG.selectAll('.dich-point.dataset-' + optionIndex)
+      const pointMain = chartG.selectAll('.dichtimeline__point.dataset-' + optionIndex)
       pointMain.interrupt().selectAll('*').interrupt()
 
       if (optionIndex !== focusedIndex) {
@@ -559,45 +559,39 @@
         .transition(fadeTransition)
         .style('opacity', 1)
     }
-    const lineMain = chartG.selectAll('.line')
+    const lineMain = chartG.selectAll('.dichtimeline__line')
     lineMain.interrupt().selectAll('*').interrupt()
     lineMain
-        .transition(fadeTransition)
-        .attr('opacity', 1)
+      .transition(fadeTransition)
+      .attr('opacity', 1)
 
-    const pointMain = chartG.selectAll('.dich-point')
+    const pointMain = chartG.selectAll('.dichtimeline__point')
     pointMain.interrupt().selectAll('*').interrupt()
     pointMain
-        .transition(fadeTransition)
-        .attr('opacity', 1)
+      .transition(fadeTransition)
+      .attr('opacity', 1)
   }
 
   function tooltipOver (focusedIndex) {
     tooltipOut()
-    const tooltips = chartG.selectAll('.dichtimeline__percentage-' + focusedIndex)
-    tooltips.interrupt().selectAll('*').interrupt()
-    tooltips.style('display', 'block')
+    chartG.selectAll('.dichtimeline__percentage.dataset-' + focusedIndex)
+      .style('display', 'block')
 
-    const lineCover = chartG.selectAll('.dich-line-cover.dataset-' + focusedIndex)
-    lineCover
+    chartG.selectAll('.dichtimeline__line-hover.dataset-' + focusedIndex)
       .attr('opacity', '1')
 
-    const pointMain = chartG.selectAll('.dich-point-cover.dataset-' + focusedIndex)
-    pointMain
+    chartG.selectAll('.dichtimeline__point-hover.dataset-' + focusedIndex)
       .attr('opacity', '1')
   }
 
   function tooltipOut () {
-    const tooltips = chartG.selectAll('.dichtimeline__percentage')
-    tooltips.interrupt().selectAll('*').interrupt()
-    tooltips.style('display', 'none')
+    chartG.selectAll('.dichtimeline__percentage')
+      .style('display', 'none')
 
-    const lineCover = chartG.selectAll('.dich-line-cover')
-    lineCover
+    chartG.selectAll('.dichtimeline__line-hover')
       .attr('opacity', '0')
 
-    const pointMain = chartG.selectAll('.dich-point-cover')
-    pointMain
+    chartG.selectAll('.dichtimeline__point-hover')
       .attr('opacity', '0')
   }
 
