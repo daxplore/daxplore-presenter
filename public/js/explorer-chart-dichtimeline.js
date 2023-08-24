@@ -485,7 +485,6 @@
     // Update the width of the y axis lines
     yAxis.tickSizeInner(width)
     // Update the y axis
-    // yAxisElement.interrupt().selectAll('*').interrupt()
     yAxisElement
       .attr('transform', 'translate(' + width + ',0)')
       .call(yAxis)
