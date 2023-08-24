@@ -547,6 +547,14 @@
         pointMain.attr('opacity', 1)
       }
     }
+
+    // Fade other legend options
+    const rows = d3.selectAll('.dichtimeline__legend .legend__row')
+    // Stop all current legend row animations
+    rows.interrupt().selectAll('*').interrupt()
+    // Fade non-selected options
+    rows
+      .style('opacity', function (d) { return d.index === focusedIndex ? 1 : 0.4 })
   }
 
   function unfadeAll () {
@@ -569,6 +577,14 @@
     pointMain
       .transition(fadeTransition)
       .attr('opacity', 1)
+
+    // Unfade legend
+    const rows = d3.selectAll('.dichtimeline__legend .legend__row')
+    // Stop all current legend row animations
+    rows.interrupt().selectAll('*').interrupt()
+    // Set all legend rows to visible again
+    rows.transition(fadeTransition)
+      .style('opacity', 1)
   }
 
   function tooltipOver (focusedIndex) {
