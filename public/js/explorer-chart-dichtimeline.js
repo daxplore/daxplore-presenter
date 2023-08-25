@@ -28,7 +28,9 @@
   let chart, chartContainer, chartG, chartBB
   let mainLineGroup, mouseoverLineGroup
   // LEGEND
-  let legendDiv, legendPerspectiveHeader, legendPerspectiveOptionTable
+  let legendDiv
+  let legendPerspectiveHeader, legendPerspectiveOptionTable
+  let legendQuestionHeader, legendQuestionOptionTable
 
   // INITIALIZE STATIC RESOURCES
   const percentageFormat = d3.format('.0%')
@@ -134,6 +136,12 @@
       .attr('class', 'legend__header')
     legendPerspectiveOptionTable = legendPerspective.append('div')
 
+    // legend for the question and dichotomized options
+    const legendQuestion = legendDiv.append('div')
+    legendQuestionHeader = legendQuestion.append('h4')
+      .attr('class', 'legend__header')
+    legendQuestionOptionTable = legendQuestion.append('div')
+
     // empty flex element, used to dynamically align the legend content vertically
     legendDiv.append('div')
       .style('flex', '3')
@@ -235,16 +243,8 @@
       .attr('fill', 'none')
       .attr('stroke', function (d) { return zScaleColor(d.index) })
       .attr('stroke-width', '3')
-      .on('mouseover',
-        function (d) {
-          tooltipOver(d.index)
-          fadeOthers(d.index)
-        })
-      .on('mouseout',
-        function (d) {
-          tooltipOut()
-          unfadeAll()
-        })
+      .on('mouseover', function (d) { addMouseoverHighlights(d.index) })
+      .on('mouseout', removeMouseoverHighlights)
 
     mouseoverLines.enter().append('path')
       .attr('class', function (d) { return 'dichtimeline__line-hover dataset-' + d.index })
@@ -285,16 +285,8 @@
       .attr('fill', function (d) { return zScaleColor(d.index) })
       .attr('stroke', function (d) { return zScaleColor(d.index) })
       .attr('d', pointSymbol.size(pointSize))
-      .on('mouseover',
-        function (d) {
-          tooltipOver(d.index)
-          fadeOthers(d.index)
-        })
-      .on('mouseout',
-        function (d) {
-          tooltipOut()
-          unfadeAll()
-        })
+      .on('mouseover', function (d) { addMouseoverHighlights(d.index) })
+      .on('mouseout', removeMouseoverHighlights)
 
     mouseoverPoints.enter().append('path')
       .attr('class', function (d) { return 'dichtimeline__point-hover dataset-' + d.index })
@@ -302,16 +294,8 @@
       .attr('stroke', function (d) { return zScaleColor(d.index) })
       .attr('d', pointSymbol.size(pointFocusSize))
       .attr('opacity', '0')
-      .on('mouseover',
-        function (d) {
-          tooltipOver(d.index)
-          fadeOthers(d.index)
-        })
-      .on('mouseout',
-        function (d) {
-          tooltipOut()
-          unfadeAll()
-        })
+      .on('mouseover', function (d) { addMouseoverHighlights(d.index) })
+      .on('mouseout', removeMouseoverHighlights)
 
     mouseoverPercentages.enter().append('text')
       .attr('class', function (d) { return 'dichtimeline__percentage dataset-' + d.index })
@@ -320,82 +304,95 @@
       .style('text-anchor', 'middle')
       .style('font-weight', 'bold')
       .style('cursor', 'default')
-      .on('mouseover',
-        function (d) {
-          tooltipOver(d.index)
-          fadeOthers(d.index)
-        })
-      .on('mouseout',
-        function (d) {
-          tooltipOut()
-          unfadeAll()
-        })
+      .style('display', 'none')
+      .on('mouseover', function (d) { addMouseoverHighlights(d.index) })
+      .on('mouseout', removeMouseoverHighlights)
 
     // UPDATE LEGEND
-    // Update legend title
+    // Update legend titles
     legendPerspectiveHeader
       .text(dax.data.getQuestionShortText(perspectiveID))
+    legendQuestionHeader
+      .text(dax.data.getQuestionShortText(questionID))
 
-    // Set new data for the legend
-    const optionRows = legendPerspectiveOptionTable.selectAll('.legend__row')
+    // Set new data for the legends
+    const perspectiveOptionRows = legendPerspectiveOptionTable.selectAll('.legend__row')
       .data(
         currentOptions, // data
         function (option) { return option.index } // key function, mapping a specific DOM element to a specific option index
       )
 
+    const questionOptionData = dax.data.getOptionTexts(questionID).map(function (t, i) {
+      return { index: i, text: t }
+    })
+    const questionOptionRows = legendQuestionOptionTable.selectAll('.legend__row')
+      .data(
+        questionOptionData, // data
+        function (option) { return option.index } // key function, mapping a specific DOM element to a specific option index
+      )
+
     // Remove old rows
-    optionRows.exit().remove()
+    perspectiveOptionRows.exit().remove()
+    questionOptionRows.exit().remove()
 
     // Add new rows
-    const optionEnter = optionRows.enter()
+    const perspectiveOptionEnter = perspectiveOptionRows.enter()
     .append('div')
       .classed('legend__row', true)
-      .on('mouseover',
-        function (d) {
-          tooltipOver(d.index)
-          fadeOthers(d.index)
-        })
-      .on('mouseout',
-        function (d) {
-          tooltipOut()
-          unfadeAll()
-        })
-    optionEnter.append('div')
+      .on('mouseover', function (d) { addMouseoverHighlights(d.index) })
+      .on('mouseout', removeMouseoverHighlights)
+
+    perspectiveOptionEnter.append('div')
       .attr('class', 'legend__color-square')
-    optionEnter.append('div')
+    perspectiveOptionEnter.append('div')
+      .attr('class', 'legend__row-text')
+
+    const questionOptionEnter = questionOptionRows.enter()
+      .append('div')
+        .classed('legend__row', true)
+
+    questionOptionEnter.append('div')
+      .attr('class', 'legend__color-square')
+    questionOptionEnter.append('div')
       .attr('class', 'legend__row-text')
 
     // reselect rows and use single-select to propagate data join to contained items
-    // update color and text for each row
-    const rows = legendPerspectiveOptionTable.selectAll('.legend__row')
-    .attr('class', function (d) {
-      const depth = dax.data.getPerspectiveOptionTreeDepth(perspectiveID, d.index)
-      let indentDepth = 0
-      if (depth >= 1) {
-        const parent = dax.data.getPerspectiveOptionParent(perspectiveID, d.index)
-        if (selectedPerspectiveOptions.indexOf(parent) !== -1) {
-          indentDepth += 1
-        }
-        if (depth >= 2) {
-          const parentParent = dax.data.getPerspectiveOptionParent(perspectiveID, parent)
-          if (selectedPerspectiveOptions.indexOf(parentParent) !== -1) {
+    const perspectiveRows = legendPerspectiveOptionTable.selectAll('.legend__row')
+      .attr('class', function (d) {
+        const depth = dax.data.getPerspectiveOptionTreeDepth(perspectiveID, d.index)
+        let indentDepth = 0
+        if (depth >= 1) {
+          const parent = dax.data.getPerspectiveOptionParent(perspectiveID, d.index)
+          if (selectedPerspectiveOptions.indexOf(parent) !== -1) {
             indentDepth += 1
           }
+          if (depth >= 2) {
+            const parentParent = dax.data.getPerspectiveOptionParent(perspectiveID, parent)
+            if (selectedPerspectiveOptions.indexOf(parentParent) !== -1) {
+              indentDepth += 1
+            }
+          }
         }
-      }
-      return 'legend__row legend__row--indent-' + indentDepth
-    })
-    .attr('title', function (option) {
-      let text = dax.data.getQuestionOptionText(perspectiveID, option.index)
-      if (option.nodata) {
-        text += ' ' + dax.text('explorer.chart.dichtimeline.legend.missing_data')
-      }
-      return text
-    })
+        return 'legend__row legend__row--indent-' + indentDepth
+      })
+      .attr('title', function (option) {
+        let text = dax.data.getQuestionOptionText(perspectiveID, option.index)
+        if (option.nodata) {
+          text += ' ' + dax.text('explorer.chart.dichtimeline.legend.missing_data')
+        }
+        return text
+      })
 
-    rows.select('.legend__color-square')
+    const dichSelected = dax.data.getDichSelected(questionID)
+    const questionRows = legendQuestionOptionTable.selectAll('.legend__row')
+      .attr('class', 'legend__row')
+      .attr('title', function (option) { return option.text })
+      .style('opacity', function (option) { return dichSelected.indexOf(option.index) !== -1 ? 1 : 0.6 })
+
+    // update color and text for each row
+    perspectiveRows.select('.legend__color-square')
       .style('background-color', colorPrimary)
-    rows.select('.legend__row-text')
+    perspectiveRows.select('.legend__row-text')
       .text(function (option) {
         let text = dax.data.getQuestionOptionText(perspectiveID, option.index)
         if (option.nodata) {
@@ -403,7 +400,14 @@
         }
         return text
       })
-    .style('font-style', function (option) { return option.nodata ? 'italic' : null })
+      .style('font-style', function (option) { return option.nodata ? 'italic' : null })
+
+    questionRows.select('.legend__color-square')
+      .style('background-color', function (option) {
+        return dichSelected.indexOf(option.index) !== -1 ? '#9DC680' : '#C68680' // TODO should be a producer setting
+      })
+    questionRows.select('.legend__row-text')
+      .text(function (option) { return option.text })
 
     updateAxisStyles()
   }
@@ -506,7 +510,6 @@
         (xScale(d.timepoint) + xBandwidth / 2) + ',' +
         (yScale(d.percentage) + 4) + ')'
       })
-      .style('display', 'none')
 
     // LEGEND
     // Set the vertical position and height of the legend area
@@ -518,8 +521,8 @@
     updateAxisStyles()
   }
 
-  function fadeOthers (focusedIndex) {
-    unfadeAll()
+  function addMouseoverHighlights (focusedIndex) {
+    removeMouseoverHighlights()
     for (let i = 0; i < currentOptions.length; i++) {
       const optionIndex = currentOptions[i].index
 
@@ -548,8 +551,18 @@
       }
     }
 
+    // Highlight chart line elements
+    chartG.selectAll('.dichtimeline__percentage.dataset-' + focusedIndex)
+      .style('display', 'block')
+
+    chartG.selectAll('.dichtimeline__line-hover.dataset-' + focusedIndex)
+      .attr('opacity', '1')
+
+    chartG.selectAll('.dichtimeline__point-hover.dataset-' + focusedIndex)
+      .attr('opacity', '1')
+
     // Fade other legend options
-    const rows = d3.selectAll('.dichtimeline__legend .legend__row')
+    const rows = legendPerspectiveOptionTable.selectAll('.dichtimeline__legend .legend__row')
     // Stop all current legend row animations
     rows.interrupt().selectAll('*').interrupt()
     // Fade non-selected options
@@ -557,7 +570,7 @@
       .style('opacity', function (d) { return d.index === focusedIndex ? 1 : 0.4 })
   }
 
-  function unfadeAll () {
+  function removeMouseoverHighlights () {
     for (let i = 0; i < currentOptions.length; i++) {
       const optionIndex = currentOptions[i].index
       const row = d3.select('.legend__row-' + optionIndex)
@@ -578,28 +591,7 @@
       .transition(fadeTransition)
       .attr('opacity', 1)
 
-    // Unfade legend
-    const rows = d3.selectAll('.dichtimeline__legend .legend__row')
-    // Stop all current legend row animations
-    rows.interrupt().selectAll('*').interrupt()
-    // Set all legend rows to visible again
-    rows.transition(fadeTransition)
-      .style('opacity', 1)
-  }
-
-  function tooltipOver (focusedIndex) {
-    tooltipOut()
-    chartG.selectAll('.dichtimeline__percentage.dataset-' + focusedIndex)
-      .style('display', 'block')
-
-    chartG.selectAll('.dichtimeline__line-hover.dataset-' + focusedIndex)
-      .attr('opacity', '1')
-
-    chartG.selectAll('.dichtimeline__point-hover.dataset-' + focusedIndex)
-      .attr('opacity', '1')
-  }
-
-  function tooltipOut () {
+    // Hide highlight chart elements
     chartG.selectAll('.dichtimeline__percentage')
       .style('display', 'none')
 
@@ -608,6 +600,14 @@
 
     chartG.selectAll('.dichtimeline__point-hover')
       .attr('opacity', '0')
+
+    // Unfade legend
+    const rows = legendPerspectiveOptionTable.selectAll('.dichtimeline__legend .legend__row')
+    // Stop all current legend row animations
+    rows.interrupt().selectAll('*').interrupt()
+    // Set all legend rows to visible again
+    rows.transition(fadeTransition)
+      .style('opacity', 1)
   }
 
   function updateAxisStyles () {
