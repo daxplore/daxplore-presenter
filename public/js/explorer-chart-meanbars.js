@@ -395,6 +395,7 @@
     const scrollNeeded = availableWidth < chartNeededWidth
 
     // Enable or disable scroll on the div containing the meanbars chart
+    // TODO function call or event to chartpanel?
     d3.select('.chart')
       .classed('chart-scroll', scrollNeeded)
       .style('width', function () { return scrollNeeded ? availableWidth + 'px' : null })
@@ -411,8 +412,8 @@
     const wrapperClientBB = d3.select('.chart').node().getBoundingClientRect()
     chartBB = {
       height: wrapperClientBB.height,
-      left: wrapperClientBB.left + pageXOffset,
-      top: wrapperClientBB.top + pageYOffset,
+      left: wrapperClientBB.left + window.scrollX,
+      top: wrapperClientBB.top + window.scrollY,
       width: wrapperClientBB.width,
     }
 
@@ -429,7 +430,7 @@
       .style('shape-rendering', 'geometricPrecision')
 
     // Y AXIS
-    // Update the space available for the x axis
+    // Update the space available for the y axis
     yScale.rangeRound([height, 0])
     // Update the width of the y axis lines
     yAxis.tickSizeInner(-width)
