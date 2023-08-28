@@ -138,6 +138,7 @@
 
     // legend for the question and dichotomized options
     const legendQuestion = legendDiv.append('div')
+      .style('margin-top', '25px')
     legendQuestionHeader = legendQuestion.append('h4')
       .attr('class', 'legend__header')
     legendQuestionOptionTable = legendQuestion.append('div')
