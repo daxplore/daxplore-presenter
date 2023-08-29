@@ -353,8 +353,6 @@
         .classed('legend__row', true)
 
     questionOptionEnter.append('div')
-      .attr('class', 'legend__color-square')
-    questionOptionEnter.append('div')
       .attr('class', 'legend__row-text')
 
     // reselect rows and use single-select to propagate data join to contained items
@@ -403,12 +401,9 @@
       })
       .style('font-style', function (option) { return option.nodata ? 'italic' : null })
 
-    questionRows.select('.legend__color-square')
-      .style('background-color', function (option) {
-        return dichSelected.indexOf(option.index) !== -1 ? '#9DC680' : '#C68680' // TODO should be a producer setting
-      })
     questionRows.select('.legend__row-text')
-      .text(function (option) { return option.text })
+      .text(function (option) { return (dichSelected.indexOf(option.index) === -1 ? '✖ ' : '✔ ') + option.text })
+      .style('margin-left', '0')
 
     updateAxisStyles()
   }

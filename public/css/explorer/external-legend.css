@@ -11,7 +11,7 @@
 .legend__row {
   cursor: default;
   display: flex;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   overflow-y: hidden;
 	white-space: nowrap;
 	width: auto !important;
@@ -46,8 +46,8 @@
 .legend__row-text {
 	margin-left: 5px;
   max-width: 235px;
-  overflow: hidden;
   text-overflow: ellipsis;
+  padding-top: 2px;
   white-space: nowrap;
 }
 
