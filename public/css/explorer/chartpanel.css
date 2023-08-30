@@ -1,6 +1,7 @@
 .chart {
   border: 1px solid #BBB;
   border-top: none;
+  position: relative;
 }
 
 .chart-perspective-column {

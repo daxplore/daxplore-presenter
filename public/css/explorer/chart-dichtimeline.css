@@ -1,5 +1,5 @@
 /*** Style for the dichotomized line chart in Daxplore Explorer ***/
-.point-tooltip {
+/* .point-tooltip {
   border: 0;
   border-radius: 4px;
   font-size: 11px;
@@ -12,9 +12,33 @@
   white-space: nowrap;
   width: auto;
   z-index: 100;
-}
+} */
 
 .dichtimeline__legend {
   display: flex;
   flex-direction: column;
+}
+
+.explorer-dichtimeline__zoom-y {
+  background: no-repeat center/100% url(../../img/magnifying-glass-plus-solid.svg);
+  width: 15px;
+  opacity: 0.6;
+  height: 15px;
+  bottom: 5px;
+  cursor: pointer;
+  left: 5px;
+  position: absolute;
+}
+
+.explorer-dichtimeline__zoom-y:hover {
+  opacity: 0.7;
+}
+
+.explorer-dichtimeline__zoom-y:active {
+  bottom: 6px;
+  opacity: 0.8;
+}
+
+.explorer-dichtimeline__zoom-y--unzoom {
+  background: no-repeat center/100% url(../../img/magnifying-glass-minus-solid.svg);
 }

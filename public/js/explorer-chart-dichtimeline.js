@@ -3,7 +3,7 @@
   namespace.chart.dichtimeline = namespace.chart.dichtimeline || {}
   const exports = namespace.chart.dichtimeline
 
-  /** ** CHART TYPE AND INSTANCE VARIABLES ** **/
+  /** CHART TYPE AND INSTANCE VARIABLES**/
 
   // CONSTANTS
   const yAxisWidth = 35
@@ -11,6 +11,7 @@
   const margin = { top: 25, right: 13, bottom: xAxisHeight, left: yAxisWidth + 10 }
   const pointSize = 40
   const pointFocusSize = 550
+  const pointTextSize = 11
 
   // CHART SIZE VARIABLES
   let availableWidth = 600 // initial placeholder value
@@ -31,6 +32,8 @@
   let legendDiv
   let legendPerspectiveHeader, legendPerspectiveOptionTable
   let legendQuestionHeader, legendQuestionOptionTable
+  // BUTTONS
+  let zoomYButton
 
   // INITIALIZE STATIC RESOURCES
   const percentageFormat = d3.format('.0%')
@@ -41,17 +44,24 @@
     .duration(300)
     .ease(d3.easeLinear)
 
+  const elementTransition = d3.transition().duration(300).ease(d3.easeLinear)
+
   // LINE TEMPLATE
   const line = d3.line()
     .curve(d3.curveLinear)
     .x(function (d) { return xScale(d.timepoint) + xScale.bandwidth() / 2 })
     .y(function (d) { return yScale(d.percentage) })
 
+  // STATE TRACKING
+  let animateNextUpdate = false
+  let zoomY = false
+  let zoomYDomain = 1.0
+
   // INSTANCE SPECIFIC VARIABLES
   let questionID, perspectiveID
   let currentOptions
 
-  /** ** EXPORTED FUNCTIONS ** **/
+  /** EXPORTED FUNCTIONS **/
 
   exports.initializeResources =
   function (primaryColors) {
@@ -146,11 +156,22 @@
     // empty flex element, used to dynamically align the legend content vertically
     legendDiv.append('div')
       .style('flex', '3')
+
+    // Zoom Y axis button
+    zoomYButton = chartContainer.append('div')
+      .attr('class', 'explorer-dichtimeline__zoom-y')
+      .attr('title', 'Zoom') // TODO externalize
+      .on('click', () => {
+        zoomY = !zoomY
+        animateNextUpdate = true
+        resizeAndPositionElements()
+      })
   }
 
   exports.populateChart =
   function (questionIDInput, perspectiveIDInput, selectedPerspectiveOptions) {
     displayChartElements(true)
+    animateNextUpdate = false
 
     // Arguments
     questionID = questionIDInput
@@ -162,7 +183,11 @@
     const optionTexts = dax.data.getOptionTexts(perspectiveID)
     currentOptions = []
     const pointData = []
-    selectedPerspectiveOptions.forEach(function (option, i) {
+    zoomYDomain = -1
+    // dax.data.perspectiveOp
+    const optionCount = dax.data.getQuestionOptionCount(perspectiveID)
+    for (let option = 0; option < optionCount; option++) {
+      const isSelected = selectedPerspectiveOptions.indexOf(option) !== -1
       const values = []
       dax.data.getTimepoints(perspectiveID).forEach(function (timepoint) {
         if (dax.data.hasTimepoint(questionID, timepoint)) {
@@ -181,25 +206,32 @@
             }
           }
           if (totalCount > 0) {
-            values.push({
-              timepoint: timepoint,
-              percentage: (selectedCount / totalCount),
-              count: totalCount,
-            })
-            pointData.push({
-              index: option,
-              timepoint: timepoint,
-              percentage: (selectedCount / totalCount),
-            })
+            const percentage = selectedCount / totalCount
+            zoomYDomain = Math.max(zoomYDomain, percentage)
+            if (isSelected) {
+              values.push({
+                timepoint: timepoint,
+                percentage: percentage,
+                count: totalCount,
+              })
+              pointData.push({
+                index: option,
+                timepoint: timepoint,
+                percentage: percentage,
+              })
+            }
           }
         }
       })
-      currentOptions.push({
-        index: option,
-        id: optionTexts[option],
-        values: values,
-      })
-    })
+      if (isSelected) {
+        currentOptions.push({
+          index: option,
+          id: optionTexts[option],
+          values: values,
+        })
+      }
+    }
+    zoomYDomain = Math.min(1.0, Math.ceil((zoomYDomain) * 10) / 10)
 
     // UPDATE HEADER
     const shortText = dax.data.getQuestionShortText(questionID)
@@ -212,9 +244,6 @@
 
     // X SCALE
     xScale.domain(dax.data.getTimepoints(perspectiveID))
-
-    // Y SCALE
-    yScale.domain([0, 1])
 
     // Z SCALE (color)
     const allIndicesArray = dax.data.getPerspectiveOptionIndicesColumnOrder(perspectiveID)
@@ -301,7 +330,7 @@
     mouseoverPercentages.enter().append('text')
       .attr('class', function (d) { return 'dichtimeline__percentage dataset-' + d.index })
       .text(function (d) { return percentageFormat(d.percentage) })
-      .style('font-size', '11px')
+      .style('font-size', pointTextSize + 'px')
       .style('text-anchor', 'middle')
       .style('font-weight', 'bold')
       .style('cursor', 'default')
@@ -425,7 +454,7 @@
     displayChartElements(false)
   }
 
-  /** ** INTERNAL FUNCTIONS ** **/
+  /** INTERNAL FUNCTIONS **/
 
   // Hide or show all top level elements
   function displayChartElements (show) {
@@ -480,22 +509,36 @@
       .call(xAxis)
 
     // Y AXIS
-    // Update the space available for the y axis
-    yScale.range([height, 0])
+    // Update the space available for the y axis, its domain and ticks
+    yScale
+      .range([height, 0])
+      .domain([0, zoomY ? zoomYDomain : 1])
+
     // Update the width of the y axis lines
-    yAxis.tickSizeInner(width)
+    let tickCount = zoomY ? (zoomYDomain * 10) : 10
+    tickCount *= tickCount <= 3 ? 2 : 1
+
+    yAxis
+      .tickSizeInner(width)
+      .ticks(tickCount)
+
     // Update the y axis
-    yAxisElement
+    yAxisElement.interrupt().selectAll('*').interrupt()
+    conditionalApplyTransition(yAxisElement, elementTransition, animateNextUpdate)
       .attr('transform', 'translate(' + width + ',0)')
       .call(yAxis)
 
     // update path data for all lines
-    chartG.selectAll('.dichtimeline__line, .dichtimeline__line-hover')
+    const lines = chartG.selectAll('.dichtimeline__line, .dichtimeline__line-hover')
+    lines.interrupt().selectAll('*').interrupt()
+    conditionalApplyTransition(lines, elementTransition, animateNextUpdate)
       .attr('d', function (d) { return line(d.values) })
 
     // position all points
     const xBandwidth = xScale.bandwidth()
-    chartG.selectAll('.dichtimeline__point, .dichtimeline__point-hover')
+    const points = chartG.selectAll('.dichtimeline__point, .dichtimeline__point-hover')
+    points.interrupt().selectAll('*').interrupt()
+    conditionalApplyTransition(points, elementTransition, animateNextUpdate)
       .attr('transform', function (d) {
         return 'translate(' + (xScale(d.timepoint) + xBandwidth / 2) + ',' + yScale(d.percentage) + ')'
       })
@@ -513,6 +556,9 @@
     legendDiv
       .style('margin-top', chartBB.top + 'px')
       .style('height', chartBB.height + 'px')
+
+    // Update Y axis zoom button
+    zoomYButton.classed('explorer-dichtimeline__zoom-y--unzoom', zoomY)
 
     updateAxisStyles()
   }
@@ -648,4 +694,9 @@
   // The option argument is an option data object used in the d3 data join for the bars and legend rows.
   function colorPrimary (option) { return option.nodata ? '#999' : zScaleColor(option.index) } // TODO externalize no data color
   // function colorHover (option) { return option.nodata ? '#888' : zScaleColorHover(option.index) } // TODO externalize no data color
+
+  // Helper
+  function conditionalApplyTransition (selection, transition, useTransition) {
+    return useTransition ? selection.transition(transition) : selection
+  }
 })(window.dax = window.dax || {})
