@@ -329,7 +329,6 @@
 
     mouseoverPercentages.enter().append('text')
       .attr('class', function (d) { return 'dichtimeline__percentage dataset-' + d.index })
-      .text(function (d) { return percentageFormat(d.percentage) })
       .style('font-size', pointTextSize + 'px')
       .style('text-anchor', 'middle')
       .style('font-weight', 'bold')
@@ -337,6 +336,10 @@
       .style('display', 'none')
       .on('mouseover', function (d) { addMouseoverHighlights(d.index) })
       .on('mouseout', removeMouseoverHighlights)
+
+    // Update points
+    mouseoverLineGroup.selectAll('.dichtimeline__percentage')
+      .text(function (d) { return percentageFormat(d.percentage) })
 
     // UPDATE LEGEND
     // Update legend titles
