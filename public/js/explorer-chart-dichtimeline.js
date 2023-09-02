@@ -31,9 +31,9 @@
   // LEGEND
   let legendDiv
   let legendPerspectiveHeader, legendPerspectiveOptionTable
-  let legendQuestionHeader, legendQuestionOptionTable
+  let legendQuestionHeader, legendQuestionSubHeader, legendQuestionOptionTable
   // BUTTONS
-  let zoomYButton
+  let zoomYButton, saveImageButton
 
   // INITIALIZE STATIC RESOURCES
   const percentageFormat = d3.format('.0%')
@@ -151,13 +151,15 @@
       .style('margin-top', '25px')
     legendQuestionHeader = legendQuestion.append('h4')
       .attr('class', 'legend__header')
+    legendQuestionSubHeader = legendQuestion.append('div')
+      .attr('class', 'legend__sub-header')
     legendQuestionOptionTable = legendQuestion.append('div')
 
     // empty flex element, used to dynamically align the legend content vertically
     legendDiv.append('div')
       .style('flex', '3')
 
-    // Zoom Y axis button
+    // ZOOM Y AXIS BUTTON
     zoomYButton = chartContainer.append('div')
       .attr('class', 'explorer-dichtimeline__zoom-y')
       .attr('title', 'Zoom') // TODO externalize
@@ -166,6 +168,13 @@
         animateNextUpdate = true
         resizeAndPositionElements()
       })
+
+    // SAVE IMAGE BUTTON
+    saveImageButton = d3.select('.chart-panel').append('div')
+      .classed('dashed-button', true)
+      .classed('dichtimeline__save-image', true)
+      // .on('click', generateImage)
+      .text(dax.text('common.button.save_chart_as_image'))
   }
 
   exports.populateChart =
@@ -343,10 +352,9 @@
 
     // UPDATE LEGEND
     // Update legend titles
-    legendPerspectiveHeader
-      .text(dax.data.getQuestionShortText(perspectiveID))
-    legendQuestionHeader
-      .text(dax.data.getQuestionShortText(questionID))
+    legendPerspectiveHeader.text(dax.data.getQuestionShortText(perspectiveID))
+    legendQuestionHeader.text(dax.data.getQuestionShortText(questionID))
+    legendQuestionSubHeader.text('Procent som svarade:') // TODO externalize
 
     // Set new data for the legends
     const perspectiveOptionRows = legendPerspectiveOptionTable.selectAll('.legend__row')

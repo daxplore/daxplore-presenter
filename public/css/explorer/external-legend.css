@@ -8,6 +8,10 @@
   margin-bottom: 5px;
 }
 
+.legend__sub-header {
+  margin-top: -5px;
+}
+
 .legend__row {
   cursor: default;
   display: flex;
