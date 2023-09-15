@@ -50,7 +50,8 @@
   top: 5px;
 }
 
-@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+@media all and (-ms-high-contrast: none),
+(-ms-high-contrast: active) {
   /* IE11 CSS styles go here */
   /* TODO use Modernizr instead of IE-check */
   /* Hide save image button in IE11 because of a known svg bug */

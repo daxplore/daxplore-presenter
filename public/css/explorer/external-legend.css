@@ -1,6 +1,6 @@
 .legend {
   padding-left: 7px;
-	white-space: nowrap;
+  white-space: nowrap;
 }
 
 .legend__header {
@@ -15,12 +15,12 @@
 .legend__row {
   cursor: default;
   display: flex;
-	white-space: nowrap;
-	width: auto !important;
+  white-space: nowrap;
+  width: auto !important;
 }
 
 .legend__row--missing-data {
-	margin-top: 30px;
+  margin-top: 30px;
 }
 
 .legend__row--indent-1 {
@@ -34,7 +34,7 @@
 .legend__color-square {
   border-radius: 2px;
   height: 1.1em;
-	width: 1.1em;
+  width: 1.1em;
 }
 
 .legend__marker {
@@ -46,7 +46,7 @@
 }
 
 .legend__row-text {
-	margin-left: 5px;
+  margin-left: 5px;
   max-width: 235px;
   overflow-x: hidden;
   text-overflow: ellipsis;

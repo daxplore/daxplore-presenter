@@ -11,11 +11,11 @@
 
 .perspective-button {
   color: #888;
-	z-index: 1;
+  z-index: 1;
 }
 
 .perspective-header {
-	padding-bottom: 5px;
+  padding-bottom: 5px;
   padding-top: 10px;
 }
 
@@ -28,20 +28,20 @@
 }
 
 .perspective-picker {
-	display: flex;
+  display: flex;
   flex: 1;
-	flex-direction: row;
+  flex-direction: row;
   min-width: 0;
 }
 
 .perspective-varpicker {
-	display: flex;
-	flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .peropt-buttons {
   display: flex;
-	flex-direction: row;
+  flex-direction: row;
   padding-left: 3px;
   padding-top: 3px;
   white-space: nowrap;
@@ -52,27 +52,27 @@
   border-right: 1px solid #ABABAB;
   border-top: 1px dashed #DDD;
   min-height: 10px;
-	position: relative;
+  position: relative;
 }
 
 .pervarpicker-bottom-padding {
   border-bottom: 1px dashed #DDD;
   border-left: 1px dashed #DDD;
   border-right: 1px solid #ABABAB;
-	min-height: 10px;
+  min-height: 10px;
   position: relative;
 }
 
 .pervarpicker-right-border-extender {
   border-right: 1px solid #ABABAB;
-	flex: 1;
+  flex: 1;
 }
 
 .pervarpicker-varoption::before {
-	content: url('../../img/perspective-radio-empty.png');
-	padding-left: 3px;
-	padding-right: 5px;
-	padding-top: 2px;
+  content: url('../../img/perspective-radio-empty.png');
+  padding-left: 3px;
+  padding-right: 5px;
+  padding-top: 2px;
 }
 
 .pervarpicker-varoption {
@@ -80,29 +80,29 @@
   border-left: 1px dashed #DDD;
   border-right: 1px solid #ABABAB;
   cursor: pointer;
-	display: flex;
-	padding-top: 6px;
+  display: flex;
+  padding-top: 6px;
   padding-bottom: 3px;
-	padding-right: 10px;
-	white-space: nowrap;
+  padding-right: 10px;
+  white-space: nowrap;
 }
 
 .pervarpicker-varoption-selected::before {
-	content: url('../../img/perspective-radio-filled.png');
+  content: url('../../img/perspective-radio-filled.png');
 }
 
 .pervarpicker-varoption-selected {
   border-bottom: 1px solid #ABABAB;
   border-left: 1px solid #ABABAB;
   border-right: none;
-	border-top: 1px solid #ABABAB;
+  border-top: 1px solid #ABABAB;
   padding-bottom: 2px;
-	padding-right: 11px;
-	padding-top: 5px;
+  padding-right: 11px;
+  padding-top: 5px;
 }
 
 .pervarpicker-varoption:hover {
-	color: #444;
+  color: #444;
 }
 
 .perspective-options {
@@ -112,18 +112,18 @@
   border-top: solid 1px #ABABAB;
   display: flex;
   flex: 1;
-	flex-direction: column;
+  flex-direction: column;
   max-width: max-content;
   min-width: 0;
 }
 
 .peropt-columns {
   display: flex;
-	flex: 1;
-	flex-direction: row;
+  flex: 1;
+  flex-direction: row;
 }
 
-.peropt-columns > div {
+.peropt-columns>div {
   flex: 1;
 }
 
@@ -145,11 +145,11 @@
 .peropt-checkbox {
   align-items: center;
   cursor: pointer;
-	display: flex;
+  display: flex;
   overflow: hidden;
-	padding: 2px;
+  padding: 2px;
   padding-left: 4px;
-	white-space: nowrap;
+  white-space: nowrap;
 }
 
 .peropt-checkbox-combined {
@@ -166,17 +166,17 @@
 }
 
 .peropt-checkbox::before {
-	content: url('../../img/perspective-checkbox-empty.png');
-	padding-right: 5px;
-	padding-top: 3px;
+  content: url('../../img/perspective-checkbox-empty.png');
+  padding-right: 5px;
+  padding-top: 3px;
 }
 
 .peropt-checkbox-selected::before {
-	content: url('../../img/perspective-checkbox-filled.png');
+  content: url('../../img/perspective-checkbox-filled.png');
 }
 
 .peropt-checkbox:hover {
-	color: #444;
+  color: #444;
 }
 
 /* .peropt-col-two-combined .peropt-checkbox:first-child {
@@ -206,11 +206,11 @@
   text-overflow: ellipsis;
 
   -webkit-touch-callout: none;
-    -webkit-user-select: none;
-     -khtml-user-select: none;
-       -moz-user-select: none;
-        -ms-user-select: none;
-            user-select: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .peropt-checkbox-combined .peropt-checkbox-text {
@@ -223,7 +223,9 @@
   padding-bottom: 2px;
 }
 
-.peropt-col-one, .peropt-col-two, .peropt-col-three {
+.peropt-col-one,
+.peropt-col-two,
+.peropt-col-three {
   flex: 1;
   max-width: max-content;
   min-width: 0;
@@ -231,7 +233,8 @@
   transition: flex 0.3s;
 }
 
-.peropt-col-two-combined, .peropt-col-three-combined {
+.peropt-col-two-combined,
+.peropt-col-three-combined {
   border-bottom: 1px solid #ABABAB;
   border-top: 1px solid #ABABAB;
   display: flex;
@@ -256,7 +259,9 @@
   flex: 1;
 }
 
-.peropt-col-one:hover, .peropt-col-two:hover, .peropt-col-three:hover {
+.peropt-col-one:hover,
+.peropt-col-two:hover,
+.peropt-col-three:hover {
   flex: 2;
   transition: flex 0.3s;
 }

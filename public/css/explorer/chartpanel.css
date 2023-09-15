@@ -7,7 +7,8 @@
   overflow-y: hidden;
 }
 
-@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+@media all and (-ms-high-contrast: none),
+(-ms-high-contrast: active) {
   /* IE11 CSS styles go here */
   .chart-perspective-column {
     overflow-y: visible !important;

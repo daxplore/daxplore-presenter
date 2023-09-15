@@ -1,10 +1,12 @@
-.meanbars__legend, .freqs__legend {
+.meanbars__legend,
+.freqs__legend {
   display: flex;
   flex-direction: column;
   overflow-y: visible;
 }
 
-.meanbars__tooltip, .meanbars__reference-tooltip {
+.meanbars__tooltip,
+.meanbars__reference-tooltip {
   border: 0;
   border-radius: 8px;
   height: auto;

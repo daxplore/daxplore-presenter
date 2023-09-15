@@ -51,7 +51,8 @@
   visibility: hidden;
 }
 
-.explorer-meanprofile .axis path, .explorer-meanprofile .axis line {
+.explorer-meanprofile .axis path,
+.explorer-meanprofile .axis line {
   fill: none;
   shape-rendering: geometricPrecision;
   stroke: #bbb;
@@ -71,11 +72,13 @@
   transform: translate(0, 5px);
 }
 
-.explorer-meanprofile .y path, .explorer-meanprofile .y line {
+.explorer-meanprofile .y path,
+.explorer-meanprofile .y line {
   visibility: hidden;
 }
 
-.explorer-meanprofile .reference rect, .explorer-meanprofile .reference path {
+.explorer-meanprofile .reference rect,
+.explorer-meanprofile .reference path {
   fill: #444;
 }
 
@@ -105,7 +108,8 @@
   top: 5px;
 }
 
-@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+@media all and (-ms-high-contrast: none),
+(-ms-high-contrast: active) {
   /* IE11 CSS styles go here */
   /* TODO use Modernizr instead of IE-check */
   /* Hide save image button in IE11 because of a known svg bug */
