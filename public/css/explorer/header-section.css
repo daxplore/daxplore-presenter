@@ -1,12 +1,11 @@
 /*** External header ***/
 
-.header-section {
-	display: table;
-	margin: 0 auto;
-	padding-bottom: 6px;
-  padding-left: 3px;
-  padding-right: 3px;
+.header-section-wrapper {
+	display: flex;
+	justify-content: center;
+	padding-top: 20px;
 	text-align: center;
+	white-space: nowrap;
 }
 
 .header-section__main {

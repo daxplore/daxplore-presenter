@@ -107,11 +107,7 @@
 
         <!-- Contains chart titles, tabs and chart. -->
         <!-- Populated by explorer-chart-panel.js and different chart-*.js classes -->
-        <div class="chart-panel">
-
-          <!-- The header section of the chart, which is populated by different chart-*.js -->
-          <div class="header-section"></div>
-
+        <div class="chart-panel">         
           <!-- Tabs used to select the chart to display when there are multiple -->
           <!-- supported charts for a given question/perspective combination -->
           <!-- Managed/populated by explorer-chart-panel.js -->
@@ -124,9 +120,15 @@
             <div class="chart-tab dich"></div>
             <div class="chart-tab-filler"></div>
           </div>
+          <div class="tab-container">
+            <!-- The header section of the chart, which is populated by different chart-*.js -->
+            <div class="header-section-wrapper">
+              <div class="header-section"></div>
+            </div>
 
-          <!-- Wrapper for the actual chart, populated by different chart-*.js -->
-          <div class="chart"></div>
+            <!-- Wrapper for the actual chart, populated by different chart-*.js -->
+            <div class="chart"></div>
+          </div>
         </div>
 
         <!-- Structural row that contains the perspective and description panels -->

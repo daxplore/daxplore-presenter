@@ -202,7 +202,7 @@
     const windowWidth = document.documentElement.clientWidth
     const leftSidebarWidth = d3.select('.question-panel').node().offsetWidth
     const rightSidebarWidth = d3.select('.sidebar-column').node().offsetWidth
-    const headerBlockWidth = d3.select('.header-section').node().offsetWidth
+    const headerBlockWidth = d3.select('.header-section-wrapper').node().offsetWidth
 
     let bottomBlockWidth = 0
     if (dax.settings('perspectiveDescriptionPosition') === 'BOTTOM') {
