@@ -510,6 +510,7 @@
 
     d3.select('body')
       .append('div')
+        .classed('userprofile-grid__temp-img', true)
         .style('position', 'absolute')
         .style('left', '-9999px')
         .style('top', '-9999px')
@@ -589,10 +590,12 @@
         const watermarkID = 'user_profile.image.watermark'
         const filenameID = 'user_profile.grid.image.filename'
         dax.common.composeAndSaveImage(dataUrl, watermarkID, filenameID)
+        d3.select('.userprofile-grid__temp-img').remove()
       })['catch'](function (error) { // eslint-disable-line dot-notation
         if (error) { // TODO standard-js forces if(error) (see handle-callback-error)
           // TODO error handling: console.error('Failed to generate image', error)
           console.log(error)
+          d3.select('.userprofile-grid__temp-img').remove()
         }
       })
   }
