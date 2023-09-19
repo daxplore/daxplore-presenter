@@ -491,8 +491,10 @@
   const imageScaling = 2 // TODO externalize
   exports.saveGridImage =
   function () {
+    // Make a copy of the grid DOM element
     let gridclone = d3.select(d3.select('.grid').node().cloneNode(true))
 
+    // Remove empty rows from the final image
     let removed = 0
     systemdata.forEach(function (d) {
       for (let col = 0; col < usernames.length; col++) {
@@ -504,18 +506,19 @@
       removed++
     })
 
+    // If no rows remain, keep all rows and show them as empty
     if (removed === systemdata.length) {
       gridclone = d3.select(d3.select('.grid').node().cloneNode(true))
     }
 
+    // Add the temporary copy of the grid to the DOM
     d3.select('body')
       .append('div')
         .classed('userprofile-grid__temp-img', true)
-        .style('position', 'absolute')
-        .style('left', '-9999px')
-        .style('top', '-9999px')
+        .classed('hidden', true)
         .append(function () { return gridclone.node() })
 
+    // Rescale clone to get better resolution for the final image
     const oldWidth = gridclone.node().offsetWidth
     const oldHeight = gridclone.node().offsetHeight
     const newWidth = oldWidth * imageScaling
@@ -526,10 +529,11 @@
     gridclone
       .style('transform', 'translate(' + translateX + 'px,' + translateY + 'px) scale(' + imageScaling + ')')
 
-    gridclone
-      .selectAll('.header-cell')
+    // Remove the header cells
+    gridclone.selectAll('.header-cell')
       .remove()
 
+    // Create new headers that work for the image
     gridclone
       .select('.grid-header')
       .selectAll('.header-cell')
@@ -542,19 +546,21 @@
               .style('width', 'auto')
               .text(function (name) { return name })
 
+    // Create temporary text element to find the max width of the titles
     const textTest = d3.select('body')
       .append('span')
-      .classed('text-width-test', true)
+        .classed('text-width-test', true)
+        .classed('hidden', true)
 
     let maxTitleWidth = 0
     for (let i = 0; i < usernames.length; i++) {
-      textTest
-        .text(usernames[i])
+      textTest.text(usernames[i])
       maxTitleWidth = Math.max(maxTitleWidth, textTest.node().offsetWidth * imageScaling)
     }
 
     textTest.remove()
 
+    // Calculate the max height of the headers
     const headerNodes = gridclone.select('.grid-header').selectAll('.header-cell-input').nodes()
 
     let maxHeaderHeight = 0
@@ -564,39 +570,45 @@
     })
     maxHeaderHeight += 5 * imageScaling
 
+    // Calculate the max width of the headers
     let maxHeaderWidth = 0
     headerNodes.forEach(function (node, i) {
       const nodeWidth = node.getBoundingClientRect().width
       maxHeaderWidth = Math.max(maxHeaderWidth, nodeWidth)
     })
-
     const trueHeaderWidth = maxHeaderWidth
 
+    // Adjust margins to compensate for the true sizes of headers
     const topMargin = maxHeaderHeight
     const bottomMargin = 10 * imageScaling
     gridclone
       .style('margin-top', topMargin + 'px')
       .style('padding-bottom', bottomMargin + 'px')
 
+    // Remove border styling on headers
     gridclone.selectAll('.header-cell-input')
       .style('border', 'none')
 
+    // Calulate the final size of the image
     const chartWidth = (gridclone.node().offsetWidth + trueHeaderWidth) * imageScaling
     const chartHeight = gridclone.node().offsetHeight * imageScaling + topMargin + bottomMargin
 
+    // Convert DOM element to PNG
     domtoimage.toPng(gridclone.node(), { bgcolor: 'white', width: chartWidth, height: chartHeight })
       .then(function (dataUrl) {
-        gridclone.remove()
+        // Generate image and prompt the user to save it
         const watermarkID = 'user_profile.image.watermark'
         const filenameID = 'user_profile.grid.image.filename'
         dax.common.composeAndSaveImage(dataUrl, watermarkID, filenameID)
-        d3.select('.userprofile-grid__temp-img').remove()
       })['catch'](function (error) { // eslint-disable-line dot-notation
         if (error) { // TODO standard-js forces if(error) (see handle-callback-error)
           // TODO error handling: console.error('Failed to generate image', error)
           console.log(error)
-          d3.select('.userprofile-grid__temp-img').remove()
         }
+      })['finally'](function () { // eslint-disable-line dot-notation
+        // Remove generated temporary elements
+        gridclone.remove()
+        d3.select('.userprofile-grid__temp-img').remove()
       })
   }
 })(window.dax = window.dax || {})
