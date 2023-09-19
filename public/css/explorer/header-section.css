@@ -14,7 +14,7 @@
 }
 
 .header-section__sub {
-  color: #333;
+
 }
 
 .header-section__dichsub {
@@ -55,11 +55,9 @@
 }
 
 .header-section__freq-tooltip {
-  height: 13px;
   margin-top: 1px;
 }
 
 .header-section__dich-selected {
-  height: 13px;
   margin-top: 1px;
 }
