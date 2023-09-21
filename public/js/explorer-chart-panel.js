@@ -74,7 +74,7 @@
     dax.chart.meanbars.initializeResources(questionMap, primaryColors, hoverColors, tooltipColors)
     dax.chart.meanprofile.initializeResources()
     dax.chart.frequency.initializeResources(primaryColors, hoverColors)
-    dax.chart.dichtimeline.initializeResources(primaryColors)
+    dax.chart.dichtimeline.initializeResources(primaryColors, tooltipColors)
 
     // TODO handle here or somewhere else?
     window.addEventListener('resize', dax.explorer.updateChartPanelSize)

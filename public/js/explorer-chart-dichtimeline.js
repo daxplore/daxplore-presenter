@@ -25,7 +25,8 @@
   // SCALES AND AXISES
   let xScale, xAxis, xAxisElement
   let yScale, yAxis, yAxisElement
-  let zScaleColor
+  let zScaleColor, secondaryScaleColor, colorCount
+
   // CHART
   let chart, chartContainer, chartG, chartBB
   let mainLineGroup, mouseoverLineGroup
@@ -64,7 +65,10 @@
   /** EXPORTED FUNCTIONS **/
 
   exports.initializeResources =
-  function (primaryColors) {
+  function (primaryColors, secondaryColors) {
+    // VARIABLES
+    colorCount = primaryColors.length
+
     // INITIALIZE HEADER
     headerDiv = d3.select('.header-section').append('div')
       .attr('class', 'header-dichtimeline')
@@ -122,8 +126,9 @@
     xAxisElement = chartG.append('g')
       .attr('class', 'axis dichtime-x-axis')
 
-    // Z AXIS (color coding)
+    // COLOR CODING
     zScaleColor = d3.scaleOrdinal(primaryColors)
+    secondaryScaleColor = d3.scaleOrdinal(secondaryColors)
 
     // GROUPS FOR LINES/POINTS
     // The mouseover highlight elements should always be drawn on top, so are placed in
@@ -280,6 +285,7 @@
       .attr('fill', 'none')
       .attr('stroke', function (d) { return zScaleColor(d.index) })
       .attr('stroke-width', '3')
+      .attr('stroke-dasharray', function (d) { return d.index < colorCount ? null : '10 5' }) // TODO handle option 2x color count?
       .on('mouseover', function (d) { addMouseoverHighlights(d.index) })
       .on('mouseout', removeMouseoverHighlights)
 
@@ -376,10 +382,10 @@
 
     // Add new rows
     const perspectiveOptionEnter = perspectiveOptionRows.enter()
-    .append('div')
-      .classed('legend__row', true)
-      .on('mouseover', function (d) { addMouseoverHighlights(d.index) })
-      .on('mouseout', removeMouseoverHighlights)
+      .append('div')
+        .classed('legend__row', true)
+        .on('mouseover', function (d) { addMouseoverHighlights(d.index) })
+        .on('mouseout', removeMouseoverHighlights)
 
     perspectiveOptionEnter.append('div')
       .attr('class', 'legend__color-square')
@@ -428,7 +434,17 @@
 
     // update color and text for each row
     perspectiveRows.select('.legend__color-square')
-      .style('background-color', colorPrimary)
+      .style('background', function (d) {
+        if (d.index < colorCount) { // TODO handle option 2x color count?
+          return colorPrimary(d)
+        } else {
+          return 'linear-gradient(45deg, {A} 30%, {B} 30%, {B} 50%, {A} 50%, {A} 80%, {B} 80%, {B} 100%)'
+            .replaceAll('{A}', colorPrimary(d))
+            .replaceAll('{B}', colorSecondary(d))
+        }
+      })
+      .style('background-size', '7.07px 7.07px')
+
     perspectiveRows.select('.legend__row-text')
       .text(function (option) {
         let text = dax.data.getQuestionOptionText(perspectiveID, option.index)
@@ -703,7 +719,7 @@
   // Helper function for bar and legend colors.
   // The option argument is an option data object used in the d3 data join for the bars and legend rows.
   function colorPrimary (option) { return option.nodata ? '#999' : zScaleColor(option.index) } // TODO externalize no data color
-  // function colorHover (option) { return option.nodata ? '#888' : zScaleColorHover(option.index) } // TODO externalize no data color
+  function colorSecondary (option) { return option.nodata ? '#888' : secondaryScaleColor(option.index) } // TODO externalize no data color
 
   // Helper
   function conditionalApplyTransition (selection, transition, useTransition) {
