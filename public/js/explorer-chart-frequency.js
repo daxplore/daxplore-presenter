@@ -3,7 +3,7 @@
   namespace.chart.frequency = namespace.chart.frequency || {}
   const exports = namespace.chart.frequency
 
-  /** ** CHART TYPE AND INSTANCE VARIABLES ** **/
+  /** CHART TYPE AND INSTANCE VARIABLES **/
 
   // CONSTANTS
   const yAxisWidth = 35
@@ -11,12 +11,11 @@
   const margin = { top: 20, right: 13, bottom: xAxisHeight, left: yAxisWidth + 10 }
   const missingDataColor = d3.hsl('#BBB') // TODO externalize to producer?
   let leftTimetickTransform, selectedTimetickTransform, rightTimetickTransform
-  const timepointTransition = d3.transition()
-    .duration(300)
-    .ease(d3.easeLinear)
   const fadeTransition = d3.transition()
     .duration(100)
     .ease(d3.easeLinear)
+
+  const fullMultipointAnimations = false // TODO MUST BE EXTERNALIZED
 
   // SIZE VARIABLES
   let availableWidth = 600 // initial placeholder value
@@ -30,6 +29,8 @@
   // If no question has more than 1 timepoint display all frequency charts in single timepoint mode.
   // If at least one question has more than 1 timepoint show all charts with timepoints.
   let singleTimepointMode
+  // TRANSITIONS
+  let timepointTransition
   // HEADER
   let headerDiv, headerMain, headerSub, headerTooltip
   // SCALES AND AXISES
@@ -50,7 +51,7 @@
   let hasMissingData
   let tpWidths, tpWidthsAdditive
 
-  /** ** EXPORTED FUNCTIONS ** **/
+  /** EXPORTED FUNCTIONS **/
 
   // Constructor, used to initialize the chart type.
   // Run once when the page is loaded. Call populateChart in order to update the chart content.
@@ -58,6 +59,11 @@
   function (primaryColors) {
     // CALCULATE RELEVANT DATA
     singleTimepointMode = dax.data.isAllSingleTimepoint()
+
+    // TRANSITIONS
+    timepointTransition = d3.transition()
+      .duration(singleTimepointMode ? 0 : 300)
+      .ease(d3.easeLinear)
 
     if (!singleTimepointMode) {
       margin.bottom += 40
@@ -161,14 +167,26 @@
     // See: https://stackoverflow.com/a/28726517
     const styleHelperDiv = chartContainer.append('div')
 
-    styleHelperDiv.style('transform', 'translate(-14px, 19px) rotate(-45deg)')
+    styleHelperDiv.style('transform',
+      fullMultipointAnimations
+        ? 'translate(-14px, 19px) rotate(-45deg)'
+        : 'translate(-8px, 19px) rotate(-45deg)'
+    )
     leftTimetickTransform = getComputedStyle(styleHelperDiv.node()).getPropertyValue('transform')
 
-    styleHelperDiv.style('transform', 'translate(-8px, 0px) rotate(45deg)')
-    rightTimetickTransform = getComputedStyle(styleHelperDiv.node()).getPropertyValue('transform')
-
-    styleHelperDiv.style('transform', 'translate(-13px, 4px) rotate(0deg)')
+    styleHelperDiv.style('transform',
+      fullMultipointAnimations
+        ? 'translate(-13px, 4px) rotate(0deg)'
+        : 'translate(-8px, 16px) rotate(-45deg)'
+    )
     selectedTimetickTransform = getComputedStyle(styleHelperDiv.node()).getPropertyValue('transform')
+
+    styleHelperDiv.style('transform',
+      fullMultipointAnimations
+        ? 'translate(-8px, 0px) rotate(45deg)'
+        : 'translate(-8px, 19px) rotate(-45deg)'
+    )
+    rightTimetickTransform = getComputedStyle(styleHelperDiv.node()).getPropertyValue('transform')
 
     styleHelperDiv.remove()
   }
@@ -413,7 +431,7 @@
     displayChartElements(false)
   }
 
-  /** ** INTERNAL FUNCTIONS ** **/
+  /** INTERNAL FUNCTIONS **/
 
   // Hide or show all top level elements: header, chart and legend
   function displayChartElements (show) {
@@ -605,15 +623,22 @@
     return barFillColor(key, tpIndex).darker(0.8)
   }
 
+  // Recaulculate timepoint widths and populate tpWidths as a side effect
   function calculateTPWidths () {
     tpWidths = []
     const selectedTPIndex = timepoints.indexOf(selectedTimepoint)
     // if (selectedTPIndex === -1) {
     //   console.log('Invalid selected tp.', 'question:', question, '/ perspective:', perspective, '/ selectedTimepoint:', selectedTimepoint)
     // }
-    const unselectedSize = 0.4
-    for (let tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
-      tpWidths.push(selectedTPIndex - tpIndex === 0 ? 1 : unselectedSize)
+    if (fullMultipointAnimations) {
+      const unselectedSize = 0.4
+      for (let tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
+        tpWidths.push(selectedTPIndex - tpIndex === 0 ? 1 : unselectedSize)
+      }
+    } else {
+      for (let tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
+        tpWidths.push(1)
+      }
     }
     // Adjust the widths so they sum up to 1
     const totalWidth = tpWidths.reduce(function (a, b) { return a + b })
