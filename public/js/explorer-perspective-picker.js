@@ -185,7 +185,7 @@
       })
 
     // Secondary perspective panel
-    secondaryPanel.style('display', secondaryPerspectives.length === 0 ? 'none' : null)
+    secondaryPanel.style('display', secondaryPerspectives.length === 1 ? 'none' : null)
     const secondaryButtons = secondaryPanel.selectAll('.peropt-second-button').data(secondaryPerspectives)
 
     secondaryButtons.enter()
