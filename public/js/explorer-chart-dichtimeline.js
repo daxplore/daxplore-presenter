@@ -54,7 +54,6 @@
     .y(function (d) { return yScale(d.percentage) })
 
   // STATE TRACKING
-  let animateNextUpdate = false
   let zoomY = false
   let zoomYDomain = 1.0
 
@@ -166,7 +165,7 @@
       .attr('title', 'Zoom') // TODO externalize
       .on('click', () => {
         zoomY = !zoomY
-        resizeAndPositionElements()
+        resizeAndPositionElements(true)
       })
 
     // SAVE IMAGE BUTTON
@@ -180,7 +179,6 @@
   exports.populateChart =
   function (questionIDInput, perspectiveIDInput, selectedPerspectiveOptions) {
     displayChartElements(true)
-    animateNextUpdate = false
 
     // Arguments
     questionID = questionIDInput
@@ -477,7 +475,9 @@
 
   // Update the size and position of all chart elements.
   // Called when the content or the size is updated.
-  function resizeAndPositionElements () {
+  function resizeAndPositionElements (animateUpdate) {
+    // Default "animateUpdate" to false in unset
+    animateUpdate = typeof animateUpdate === 'undefined' ? false : animateUpdate
     // CHART SIZE
     // Estimate the minimum width needed for the chart with the current content
     const chartNeededWidth = margin.left + margin.right + // margins
@@ -535,21 +535,21 @@
 
     // Update the y axis
     yAxisElement.interrupt().selectAll('*').interrupt()
-    conditionalApplyTransition(yAxisElement, elementTransition, animateNextUpdate)
+    conditionalApplyTransition(yAxisElement, elementTransition, animateUpdate)
       .attr('transform', 'translate(' + width + ',0)')
       .call(yAxis)
 
     // update path data for all lines
     const lines = chartG.selectAll('.dichtimeline__line, .dichtimeline__line-hover')
     lines.interrupt().selectAll('*').interrupt()
-    conditionalApplyTransition(lines, elementTransition, animateNextUpdate)
+    conditionalApplyTransition(lines, elementTransition, animateUpdate)
       .attr('d', function (d) { return line(d.values) })
 
     // position all points
     const xBandwidth = xScale.bandwidth()
     const points = chartG.selectAll('.dichtimeline__point, .dichtimeline__point-hover')
     points.interrupt().selectAll('*').interrupt()
-    conditionalApplyTransition(points, elementTransition, animateNextUpdate)
+    conditionalApplyTransition(points, elementTransition, animateUpdate)
       .attr('transform', function (d) {
         return 'translate(' + (xScale(d.timepoint) + xBandwidth / 2) + ',' + yScale(d.percentage) + ')'
       })
@@ -837,7 +837,6 @@
     const widthAdjust = 10
     const initiaAvailablelWidth = availableWidth
     // Set width of actual chart before making a copy
-    animateNextUpdate = false
     exports.setSize(saveImageCanvasWidth, availableHeight)
     // Make copy of chart element
     const chartCopy = d3.select(chart.node().cloneNode(true))
