@@ -271,21 +271,24 @@
       const tp = timepoints[tpIndex]
       const tpData = data[tp]
 
-      const questionOptionRows = chartG
-       .selectAll('.freq-optionrow-tp' + tp)
+      // removing everything instead of updating is a hack
+      // TODO: figure out how to make enter/exit code work with this chart structure
+      chartG.selectAll('.freq-optionrow-tp' + tp).remove()
+
+      const rowData = d3.stack().keys(optionKeys)(tpData)
+      const questionOptionRows = chartG.selectAll('.freq-optionrow-tp' + tp)
        .data(
-         d3.stack().keys(optionKeys)(tpData), // data
-         function (option) { return option.key + ';' + option.index } // key function, mapping a specific DOM element to a specific option index
+         rowData, // data
+         //  function (option) { return option.key + ';' + option.index } // key function, mapping a specific DOM element to a specific option index
        )
 
+      // add new rows
       questionOptionRows.enter().append('g')
         .classed('freq-optionrow-tp' + tp, true)
-        .attr('transform', function (d, i) {
-          return 'translate(0,' + 1.5 + ')'
-        })
+        .attr('transform', 'translate(0, 1.5)')
 
       // remove old bars
-      questionOptionRows.exit().remove()
+      // questionOptionRows.exit().remove()
 
       const sections = chartG.selectAll('.freq-optionrow-tp' + tp).selectAll('.freq-optionrow-section-tp' + tp)
         .data(
@@ -536,7 +539,7 @@
   function setSelectedTimepoint (selectedTimepointInput, instantAnimation) {
     instantAnimation = typeof instantAnimation === 'undefined' ? false : instantAnimation
     selectedTimepoint = selectedTimepointInput
-    calculateTPWidths(selectedTimepoint)
+    calculateTPWidths()
 
     // Iterate over all timepoints, with special treatment for the selected timepoint
     for (let tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
