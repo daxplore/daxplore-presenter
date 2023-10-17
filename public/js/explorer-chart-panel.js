@@ -196,7 +196,7 @@
     const headerBlockWidth = d3.select('.header-section-wrapper').node().offsetWidth
 
     let bottomBlockWidth = 0
-    if (dax.settings('structure.descriptionPosition') === 'BOTTOM') {
+    if (dax.settings('explorer.structure.description_position') === 'BOTTOM') {
       const descriptionPanel = d3.select('.description-panel.description-bottom').node()
       if (descriptionPanel !== null && descriptionPanel.offsetWidth > 0) {
         bottomBlockWidth = 350 // TODO hard coded

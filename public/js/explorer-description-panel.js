@@ -13,7 +13,7 @@
       .style('display', 'none')
 
     // Select the description panel chosen in the settings
-    const descriptionPosition = dax.settings('structure.descriptionPosition')
+    const descriptionPosition = dax.settings('explorer.structure.description_position')
     switch (descriptionPosition) {
     case 'BOTTOM': descriptionPanel = d3.select('.description-panel.description-bottom'); break
     case 'LEFT': descriptionPanel = d3.select('.description-panel.description-left'); break
