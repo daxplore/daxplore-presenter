@@ -15,6 +15,9 @@
   <!-- Normalize all browser default css values: https://necolas.github.io/normalize.css/ -->
   <link rel="stylesheet" href="css/normalize/8.0.1/normalize.css">
 
+  <!-- Locally hosted web fonts-->
+  <link rel="stylesheet" href="css/fonts.css">
+
   <!-- Style -->
   <link rel="stylesheet" href="css/daxplore-common.css">
   <link rel="stylesheet" href="css/index.css">
@@ -38,19 +41,8 @@
   <script type="text/javascript" src="js/index-core.js"></script>
 
   <!-- Webfont loader -->
-  <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
   <script type="text/javascript">
-    try {
-      WebFont.load({
-        google: {
-          families: ['Varta']
-        },
-        active: dax.index.initializeIndex, // Generate chart after loading the font
-        inactive: dax.index.initializeIndex, // Generate chart after failing to load the font
-      })
-    } catch (e) {
-      dax.index.initializeIndex() // Generate chart if WebFont loading failed
-    }
+    document.fonts.ready.then(dax.index.initializeIndex)
   </script>
 </head>
 

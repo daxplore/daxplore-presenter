@@ -1,0 +1,3 @@
+Varta	SIL Open Font License, 1.1
+Varta[wght].ttf: Copyright 2019 The Varta Project Authors (https://github.com/SorkinType/Varta)
+http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL

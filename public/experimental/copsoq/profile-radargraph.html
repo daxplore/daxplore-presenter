@@ -13,6 +13,10 @@
     <!-- Import style sheets -->
     <!--Normalize all browser default css values: https://necolas.github.io/normalize.css/ -->
     <link rel="stylesheet" href="../../css/normalize/8.0.1/normalize.css">
+
+    <!-- Locally hosted web fonts-->
+    <link rel="stylesheet" href="../../css/fonts.css">
+
     <!-- Style for different Daxplore components -->
     <link rel="stylesheet" href="../../css/daxplore-common.css">
     <link rel="stylesheet" href="../../css/header-select.css">
@@ -52,21 +56,9 @@
     <script type="text/javascript" src="js/profile-radargraph-core.js"></script>
 
     <!-- Webfont loader -->
-    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
     <script type="text/javascript">
-      try {
-        WebFont.load({
-          google: {
-            families: ['Varta']
-          },
-          active: dax.profileradargraph.initializeProfile, // Generate chart after loading the font
-          inactive: dax.profileradargraph.initializeProfile, // Generate chart after failing to load the font
-        })
-      } catch (e) {
-        dax.profileradargraph.initializeProfile() // Generate chart if WebFont loading failed
-      }
+      document.fonts.ready.then(dax.profileradargraph.initializeProfile)
     </script>
-
   </head>
 
   <body>
