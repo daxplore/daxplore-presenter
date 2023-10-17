@@ -685,8 +685,10 @@
     chartG.selectAll('text')
       .style('fill', '#555')
       .style('font-size', '13px')
-
       .style('cursor', 'default')
+
+    xAxisElement.selectAll('.tick text')
+      .style('fill', 'black')
   }
 
   function legendOptionMouseOver (hoveredOption) {
