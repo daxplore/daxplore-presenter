@@ -17,15 +17,6 @@
     questions,
     groups,
   ) {
-    if (dax.settings('structure.perspectivePosition') === 'TOP') {
-      d3.select('.perspective-description-row')
-        .classed('perspective-row-top', true)
-        .lower()
-
-      d3.select('.question-panel')
-        .classed('perspective-is-top', true)
-    }
-
     // Unpack the data
     for (let i = 0; i < questions.length; i++) {
       const q = questions[i]
@@ -93,13 +84,13 @@
 
   exports.chartSetQueryDefinition =
   function (
-    chartType,
+    chartTab,
     timepoints,
     question,
     perspectives,
     selectedOptions,
   ) {
-    selectedTab = chartType
+    selectedTab = chartTab
 
     // Hide all charts elements
     dax.chart.frequency.hide()
@@ -205,10 +196,10 @@
     const headerBlockWidth = d3.select('.header-section-wrapper').node().offsetWidth
 
     let bottomBlockWidth = 0
-    if (dax.settings('perspectiveDescriptionPosition') === 'BOTTOM') {
-      const descriptionPanel = d3.select('.description-panel').node()
+    if (dax.settings('structure.descriptionPosition') === 'BOTTOM') {
+      const descriptionPanel = d3.select('.description-panel.description-bottom').node()
       if (descriptionPanel !== null && descriptionPanel.offsetWidth > 0) {
-        bottomBlockWidth = 250 // TODO hard coded
+        bottomBlockWidth = 350 // TODO hard coded
       }
     }
 

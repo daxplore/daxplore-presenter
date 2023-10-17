@@ -542,7 +542,7 @@
           .style('height', hasRemainder ? null : '4px')
       }
 
-      d3.select('.description-panel')
+      d3.selectAll('.description-panel')
         .interrupt().transition()
           .style('color', collapsed ? 'black' : 'hsl(0, 0%, 70%)')
 

@@ -237,8 +237,8 @@
     yAxis.scale(yScale)
 
     // DESCRIPTION
-    if (firstOptionData !== null) {
-      setDescriptionContent(firstOptionData)
+    if (firstOptionData !== null && firstOptionData.type === 'DATA') {
+      dax.explorer.setReferenceDescription(questionID, firstOptionData.mean)
     }
   }
 
@@ -498,59 +498,9 @@
       .style('top', (yScale(option.type + '|' + option.index) - tooltipBodyBB.height - tooltipBarArrowDistance + tooltipArrowBB.height / 2 - 2) + 'px')
 
     tooltipBarMove()
-    setDescriptionContent(option)
-  }
-
-  function setDescriptionContent (option) {
-    if (option.type !== 'DATA') {
-      return
+    if (option.type === 'DATA') {
+      dax.explorer.setReferenceDescription(questionID, option.mean)
     }
-    // // Add a zero-width space after slashes to encourage linebreaks after slashes
-    const shorttext = dax.data.getQuestionShortText(questionID).replace(/\//g, '/&#8203;')
-    // const optiontext = dax.data.getPerspectivesOptionTexts(perspectives, option.index).join(', ').replace(/\//g, '/&#8203;')
-    // const description = dax.data.getQuestionDescription(questionID)
-    // const reference = questionReferenceValue // TODO not assaign
-    // const direction = questionReferenceDirection
-    //
-    // // TODO externalize all text?
-    // let header = '<div class="meanprofile__description-header">' + shorttext + '</div>'
-    // header += '<div class="meanprofile__description-option">' + optiontext + ':&nbsp;' + d3.format('d')(option.mean) + '</div>'
-    //
-    // // TODO externalize all text?
-    // const subheader = '<div class="meanprofile__description-reference">' + dax.text('explorer.chart.mean_bar_vertical.reference.value') + ': ' + d3.format('d')(reference) + '</div>'
-    //
-    // const trueDiff = option.mean - reference
-    // const diff = direction === 'LOW' ? reference - option.mean : trueDiff
-    //
-    // let referenceComparison
-    // if (diff < -5) {
-    //   referenceComparison = dax.text('explorer.chart.mean_bar_vertical.reference.worse')
-    // } else if (diff > 5) {
-    //   referenceComparison = dax.text('explorer.chart.mean_bar_vertical.reference.better')
-    // } else {
-    //   referenceComparison = dax.text('explorer.chart.mean_bar_vertical.reference.comparable')
-    // }
-    // // TODO externalize all text?
-    // const color = dax.colors.colorTextForValue(option.mean, reference, direction)
-    // referenceComparison = '<div class="meanprofile__description-comparison" style="color: ' + color + ';"">' + referenceComparison + ': ' + d3.format('+d')(trueDiff) + '</div>'
-    //
-    // let html = header + subheader + referenceComparison + description
-    //
-    // perspectives.forEach(function (perspectiveID) {
-    //   const perspectiveDescription = dax.data.getQuestionDescription(perspectiveID)
-    //   if (perspectiveDescription !== null && perspectiveDescription !== undefined && perspectiveDescription.trim().length > 0) {
-    //     if (html.length > 0) {
-    //       html += '<hr>'
-    //     }
-    //     const title = dax.data.getQuestionShortText(perspectiveID)
-    //     html += '<b>' + title + '</b><p>' + perspectiveDescription + '</p>'
-    //   }
-    // })
-    //
-    // d3.selectAll('.description-panel')
-    //   .html(html)
-    // (element, groupName, qID, mean)
-    dax.profile.setDescriptionFull(d3.select('.description-panel'), shorttext, questionID, option.mean)
   }
 
   // Update tooltip X position on bar

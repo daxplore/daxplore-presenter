@@ -26,7 +26,7 @@
   // DATA
   let questionMap
   // HEADER
-  let headerDiv, headerMain, headerSub, headerDescriptionButton, headerDecriptionPanel
+  let headerDiv, headerMain, headerSub
   // SCALES AND AXISES
   let xScale, xAxis, xAxisElement
   let yScale, yAxis, yAxisElement
@@ -61,14 +61,6 @@
       .attr('class', 'header-section__main')
     headerSub = headerDiv.append('div')
       .attr('class', 'header-section__sub')
-
-    // TODO move to centralized description handling, or remove completely
-    if (dax.settings('perspectiveDescriptionPosition') === 'TOP') {
-      headerDescriptionButton = d3.select('.chart-panel').append('div')
-        .attr('class', 'header-section__description-button')
-      headerDecriptionPanel = headerDescriptionButton.append('div')
-        .attr('class', 'header-section__description-panel')
-    }
 
     // INITIALIZE CHART
     // base div element
@@ -340,18 +332,6 @@
       .text(dax.text('explorer.chart.mean_bar_horizontal.tooltip.reference_value'))
     referenceTooltipDiv.append('span')
       .text(dax.common.integerFormat(questionReferenceValue))
-  }
-
-  // TODO move to core or description handler, or remove completely
-  exports.setHeaderDescriptionHTML =
-  function (html) {
-    if (headerDescriptionButton && headerDecriptionPanel) {
-      headerDescriptionButton
-        .classed('hidden', html.length === 0)
-      headerDecriptionPanel
-        .classed('hidden', html.length === 0)
-        .html(html)
-    }
   }
 
   // Set the size available for the chart.

@@ -54,35 +54,6 @@
     dax.explorer.selectionUpdateCallback(true)
   }
 
-  // TODO move to separate file?
-  function setDescription (questionID, perspectives) {
-    // TODO construct from elements instead of raw html
-    let html = ''
-
-    const questionDescription = questionMap[questionID].description
-    if (questionDescription !== null && questionDescription !== undefined && questionDescription.trim().length > 0) {
-      const title = questionMap[questionID].short
-      html += '<b>' + title + '</b><p>' + questionDescription + '</p>'
-    }
-
-    perspectives.forEach(function (perspectiveID) {
-      const perspectiveDescription = questionMap[perspectiveID].description
-      if (perspectiveDescription !== null && perspectiveDescription !== undefined && perspectiveDescription.trim().length > 0) {
-        if (html.length > 0) {
-          html += '<hr>'
-        }
-        const title = questionMap[perspectiveID].short
-        html += '<b>' + title + '</b><p>' + perspectiveDescription + '</p>'
-      }
-    })
-
-    d3.select('.description-panel')
-      .html(html)
-      .style('display', html.length > 0 ? 'inherit' : 'none')
-
-    dax.chart.meanbars.setHeaderDescriptionHTML(html)
-  }
-
   // Helper function for URL search params. Replace with URLSearchParams when IE11 support is dropped.
   function getURLParameter (name) {
     return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null
@@ -187,9 +158,10 @@
 
           // Initialize elements that depend on the metadata
           dax.text.initializeResources(usertexts)
-          dax.profile.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap)
           dax.settings.initializeResources(settings)
           dax.data.initializeResources(groups, perspectives, questionMap, questionData, dichselectedMap)
+          dax.description.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap, questionMap)
+          dax.explorer.initializeDescriptionPanel()
           dax.explorer.generateQuestionPicker(questions, groups, settings)
           dax.explorer.generatePerspectivePicker(settings)
           dax.explorer.generateChartPanel(questions, groups)
@@ -242,7 +214,9 @@
       tab = questionMap[question].displaytypes[0]
     }
 
-    setDescription(question, perspective)
+    dax.explorer.setStandardDescription(question, perspective)
+    // The TIMEPOINTS system is currently broken, this is just a hack.
+    // TODO replace TIMEPOINT flags with other solution
     dax.explorer.chartSetQueryDefinition(tab, 'TIMEPOINTS_ONE', question, perspective, perspectiveOptionsCombined)
 
     const queryHash = getCurrentStateHash()

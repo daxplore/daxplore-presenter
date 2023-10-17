@@ -46,7 +46,7 @@
 
     <!-- Import Daxplore helpers -->
     <script type="text/javascript" src="js/colors.js"></script>
-    <script type="text/javascript" src="js/profile-helpers.js"></script>
+    <script type="text/javascript" src="js/description-helpers.js"></script>
     <script type="text/javascript" src="js/data.js"></script>
     <script type="text/javascript" src="js/daxplore-common.js"></script>
     <script type="text/javascript" src="js/querydefinition.js"></script>
@@ -54,10 +54,11 @@
     <script type="text/javascript" src="js/settings.js"></script>
 
     <!-- Import Daxplore Explorer elements -->
+    <script type="text/javascript" src="js/explorer-core.js"></script>
     <script type="text/javascript" src="js/explorer-chart-panel.js"></script>
     <script type="text/javascript" src="js/explorer-question-picker.js"></script>
     <script type="text/javascript" src="js/explorer-perspective-picker.js"></script>
-    <script type="text/javascript" src="js/explorer-core.js"></script>
+    <script type="text/javascript" src="js/explorer-description-panel.js"></script>
 
     <!-- Import Daxplore Charts  -->
     <script type="text/javascript" src="js/explorer-chart-frequency.js"></script>
@@ -100,42 +101,15 @@
       <div class="question-panel">
         <div class="section-header question-header"></div>
         <div class="question-picker no-select"></div>
-        <!-- Contains description panel, populated by TODO -->
+        <!-- Contains description panel, populated by explorer-description-panel.js -->
         <div class="description-panel description-left"></div>
       </div>
 
       <!-- Structural column that contains the chart and bottom panels -->
       <div class="chart-perspective-column">
 
-        <!-- Contains chart titles, tabs and chart. -->
-        <!-- Populated by explorer-chart-panel.js and different chart-*.js classes -->
-        <div class="chart-panel">         
-          <!-- Tabs used to select the chart to display when there are multiple -->
-          <!-- supported charts for a given question/perspective combination -->
-          <!-- Managed/populated by explorer-chart-panel.js -->
-          <div class="chart-tabs">
-            <div class="chart-tab-spacing freq"></div>
-            <div class="chart-tab freq chart-tab-selected"></div>
-            <div class="chart-tab-spacing mean"></div>
-            <div class="chart-tab mean"></div>
-            <div class="chart-tab-spacing dich"></div>
-            <div class="chart-tab dich"></div>
-            <div class="chart-tab-filler"></div>
-          </div>
-          <div class="tab-container">
-            <!-- The header section of the chart, which is populated by different chart-*.js -->
-            <div class="header-section-wrapper">
-              <div class="header-section"></div>
-            </div>
-
-            <!-- Wrapper for the actual chart, populated by different chart-*.js -->
-            <div class="chart"></div>
-          </div>
-        </div>
-
-        <!-- Structural row that contains the perspective and description panels -->
-        <div class="perspective-description-row">
-
+        <!-- Structural row that contains the perspective panel -->
+        <div class="perspective-row">
           <!-- Contains perspective picker, populated by explorer-perspective-picker.js -->
           <div class="perspective-panel">
             <div class="section-header perspective-header"></div>
@@ -173,11 +147,44 @@
               </div>
             </div>
           </div>
-
-          <!-- Contains description panel, populated by TODO -->
-          <div class="description-panel description-bottom"></div>
         </div>
+
+        <!-- Contains chart titles, tabs and chart. -->
+        <!-- Populated by explorer-chart-panel.js and different chart-*.js classes -->
+        <div class="chart-panel">         
+          <!-- Tabs used to select the chart to display when there are multiple -->
+          <!-- supported charts for a given question/perspective combination -->
+          <!-- Managed/populated by explorer-chart-panel.js -->
+          <div class="chart-tabs">
+            <div class="chart-tab-spacing freq"></div>
+            <div class="chart-tab freq chart-tab-selected"></div>
+            <div class="chart-tab-spacing mean"></div>
+            <div class="chart-tab mean"></div>
+            <div class="chart-tab-spacing dich"></div>
+            <div class="chart-tab dich"></div>
+            <div class="chart-tab-filler"></div>
+          </div>
+          <div class="tab-container">
+            <!-- The header section of the chart, which is populated by different chart-*.js -->
+            <div class="header-section-wrapper">
+              <div class="header-section"></div>
+            </div>
+
+            <!-- Wrapper for the actual chart, populated by different chart-*.js -->
+            <div class="chart"></div>
+
+            <!-- Contains description panel, populated by explorer-description-panel.js -->
+            <div class="description-panel__button description-header">
+              <div class="description-panel description-header"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contains description panel, populated by explorer-description-panel.js -->
+        <div class="description-panel description-bottom"></div>
       </div>
+
+
 
       <!-- Structural column that contains the legend -->
       <div class="sidebar-column">

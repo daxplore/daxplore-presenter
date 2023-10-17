@@ -98,7 +98,7 @@
         }
 
         dax.text.initializeResources(usertexts)
-        dax.profile.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap)
+        dax.description.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap, null)
 
         if (document.readyState === 'loading') {
           document.addEventListener('DOMContentLoaded', function (e) {

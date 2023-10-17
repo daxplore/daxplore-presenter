@@ -1,12 +1,7 @@
 /*** Style for the perspective picker in Daxplore Explorer ***/
 
-.perspective-panel {
-  flex: 1;
-  left: 0;
-  min-width: 0;
-  padding-right: 1px;
-  top: 0;
-  width: 100%;
+.perspective-row {
+  padding-bottom: 10px;
 }
 
 .perspective-button {
@@ -16,15 +11,6 @@
 
 .perspective-header {
   padding-bottom: 5px;
-  padding-top: 10px;
-}
-
-.perspective-row-top {
-  margin-bottom: 10px;
-}
-
-.perspective-row-top .perspective-header {
-  padding-top: 0;
 }
 
 .perspective-picker {

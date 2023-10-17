@@ -147,7 +147,7 @@
         // Initialize elements that depend on the metadata
         dax.settings.initializeResources(settings)
         dax.text.initializeResources(usertexts)
-        dax.profile.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap)
+        dax.description.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap, null)
 
         // Get the data used in the listview
         function getQuestionData (questionID) { return axios.get('../../data/questions/' + questionID + '.json?ver=' + manifestDate) }

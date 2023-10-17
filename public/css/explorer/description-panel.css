@@ -1,8 +1,6 @@
+/* GENERAL */
 .description-panel {
-  border: 1px solid #BBB;
   display: none;
-  margin: 22px 0 0 10px;
-  max-width: 500px;
   padding: 15px 5px 15px 8px;
 }
 
@@ -16,18 +14,76 @@
   padding-left: 20px;
 }
 
-.perspective-description-row {
-  display: flex;
-  justify-content: space-between;
-  min-width: 0;
-  width: 100%;
+/* BUTTON STYLING */
+.description-panel__button {
+  background: no-repeat center/100% url(../../img/question-circle.svg);
+  cursor: help;
+  height: 16px;
+  opacity: 0.75;
+  width: 16px;
 }
 
+.description-panel__button:hover {
+  opacity: 1;
+}
+
+.description-panel__button > .description-panel {
+  background: white;
+  border: 1px solid #ABABAB;
+  cursor: default;
+  display: none;
+  height: fit-content;
+  padding: 20px 25px 10px;
+  text-align: start;
+  transform: translate(-100%, 30px) translate(16px, 0);
+  width: 300px;
+}
+
+.description-panel__button:hover > .description-panel {
+  display: block;
+}
+
+/* LEFT POSITION */
 .description-panel.description-left {
-  margin-left: 0;
   display: inherit;
+  border: 1px solid #BBB;
+  margin-top: 10px;
+  max-width: 500px;
 }
 
+.description-panel.description-left > .description-panel__question {
+  padding-bottom: 10px;
+}
+
+/* BOTTOM POSITION */
+.description-panel.description-bottom {
+  display: flex;
+  flex-direction: row;
+}
+
+.description-panel.description-bottom > .description-panel__question {
+  padding-right: 5px;
+  width: 50%;
+}
+
+.description-panel.description-bottom > .description-panel__perspectives {
+  padding-left: 5px;
+  width: 50%;
+}
+
+/* HEADER POSITION */
+
+.description-panel__button.description-header {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+
+.description-panel.description-header > .description-panel__question {
+  padding-bottom: 10px;
+}
+
+/* IE11 COMPATABILITY */
 @media all and (-ms-high-contrast: none),
 (-ms-high-contrast: active) {
   /* IE11 CSS styles go here */

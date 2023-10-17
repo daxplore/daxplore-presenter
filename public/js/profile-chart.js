@@ -70,7 +70,9 @@
     arrowleft
       .style('left', (chartwrapperBB.left + xScale(Math.max(getMean(qID, selectedOption), meanReferences[qID])) + yAxisWidth + 10) + 'px')
       .style('top', (yScale(qID) + yScale.bandwidth() / 2 - arrowleft.node().getBoundingClientRect().height / 2 + 2) + 'px')
-    dax.profile.setDescriptionFull(d3.select('#profile-description'), perspectiveOptions[selectedOption], qID, getMean(qID, selectedOption))
+
+    d3.select('#profile-description')
+      .html(dax.description.getProfileDescriptionFull(perspectiveOptions[selectedOption], qID, getMean(qID, selectedOption)))
   }
 
   function tooltipOut () {

@@ -91,7 +91,8 @@
           .attr('pattern', '[0-9]+([\\.,][0-9]+)?')
           .attr('step', 0.1)
           .on('focus', function (d) {
-            dax.profile.setDescriptionShort(d3.select('#grid-description'), d.qID)
+            d3.select('#grid-description')
+              .html(dax.description.getProfileDescriptionShort(d.qID))
           })
           .on('focusout', function (d, i, t) {
             const el = t[i]
@@ -438,7 +439,8 @@
     d3.select('.grid-legend-text.bad').text(dax.text('profile.chart.mean_bar_vertical.reference.worse'))
 
     if (qIDs.length > 0) {
-      dax.profile.setDescriptionShort(d3.select('#grid-description'), qIDs[0])
+      d3.select('#grid-description')
+        .html(dax.description.getProfileDescriptionShort(qIDs[0]))
     }
 
     usernames.push('Grupp 1') // TODO externalize text
@@ -478,7 +480,7 @@
         .append('tr')
           .attr('class', function (d) { return 'gridrow-' + d.qID })
           .on('mouseover', function (d, i) {
-            dax.profile.setDescriptionShort(d3.select('#grid-description'), d.qID)
+            dax.explorer.setStandardDescriptionShort(d3.select('#grid-description'), d.qID)
           })
 
     gridRows.append('td')

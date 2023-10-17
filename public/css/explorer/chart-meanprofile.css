@@ -82,14 +82,6 @@
   fill: #444;
 }
 
-/* TODO collect all desciption text */
-.description-header {
-  font-size: 14px;
-  font-weight: bold;
-  margin-bottom: 8px;
-  overflow-wrap: break-word;
-}
-
 .meanprofile__description-option,
 .meanprofile__description-reference,
 .meanprofile__description-comparison {

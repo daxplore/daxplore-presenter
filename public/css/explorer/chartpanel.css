@@ -29,4 +29,5 @@
 .tab-container {
   border: 1px solid #BBB;
   border-top: none;
+  position: relative;
 }
