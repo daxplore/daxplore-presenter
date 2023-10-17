@@ -42,7 +42,7 @@
   function (questionID, mean) {
     // Add a zero-width space after slashes to encourage linebreaks after slashes
     const header = dax.data.getQuestionShortText(questionID).replace(/\//g, '/&#8203;')
-    const html = exports.getProfileDescriptionFull(header, questionID, mean)
+    const html = dax.description.getProfileDescriptionFull(header, questionID, mean)
     descriptionPanel
       .html(html)
       .style('display', html.length > 0 ? null : 'none')
