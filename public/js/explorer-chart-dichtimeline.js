@@ -174,6 +174,7 @@
       })
 
     // SAVE IMAGE BUTTON
+    // TODO create general save button manager
     saveImageButton = d3.select('.chart-panel').append('div')
       .classed('dashed-button', true)
       .classed('dichtimeline__save-image', true)
@@ -769,6 +770,7 @@
       .append(function () { return headerDiv.node().cloneNode(true) })
       .style('padding-left', '1000px')
       .style('padding-right', '1000px')
+      .style('width', '1000px')
 
     const oldWidth = headerClone.node().offsetWidth
     const oldHeight = headerClone.node().offsetHeight
