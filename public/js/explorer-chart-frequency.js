@@ -80,6 +80,7 @@
       .attr('class', 'header-section__sub')
     headerTooltip = headerDiv.append('div')
       .attr('class', 'header-section__freq-tooltip')
+      .text('\xa0')
 
     // INITIALIZE CHART
     // base div element
