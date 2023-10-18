@@ -190,6 +190,13 @@
             })
             resizeObserver.observe(outerElement)
           }
+
+          // Stop hiding body after everything has loaded
+          // TODO timeout hack, find a different solution
+          setTimeout(function () {
+            d3.select('body')
+              .style('opacity', '1')
+          }, 100)
         }).catch(function (error) {
           console.error(error)
         })

@@ -53,7 +53,7 @@
         } else {
           openGroup = i
         }
-        updateTree()
+        updateTree(true)
       })
 
     headers.append('div')
@@ -80,23 +80,18 @@
         .classed('question-question', true)
         .text(function (d) { return shorttextMap[d] })
         .on('click', function (d) {
-          // let changed = selectedQuestion !== d
-          // if (changed) {
           selectedQuestion = d
-          updateTree()
-          // TODO replace with callback to js page handler
-          // gwtQuestionCallback()
-          // }
+          updateTree(true)
           dax.explorer.selectionUpdateCallback(true)
         })
 
     openGroup = groupMap[selectedQuestion]
-    updateTree()
+    updateTree(false)
 
     // hack to force initial sizing to work
-    // TODO handle in different way
+    // TODO timeout hack, handle in different way
     for (let i = 2; i <= 12; i++) {
-      setTimeout(updateTree, Math.pow(2, i))
+      setTimeout(function () { updateTree(false) }, Math.pow(2, i))
     }
   }
 
@@ -116,15 +111,14 @@
     }
     selectedQuestion = questionID
     openGroup = groupMap[selectedQuestion]
-    updateTree()
+    updateTree(true)
   }
 
-  function updateTree () {
+  function updateTree (animate) {
     // EXPAND/CONTRACT SECTIONS
     const sections = d3.selectAll('.question-section-questions')
     sections.interrupt().selectAll('*').interrupt()
-    sections
-      .transition(elementTransition)
+    conditionalApplyTransition(sections, elementTransition, animate)
       .style('height', function (d, i) {
         if (i === openGroup) {
           return d3.select(this).select('.question-section-questions-inner').node().offsetHeight + 'px'
@@ -143,8 +137,7 @@
     // TURN ARROWS
     const arrows = d3.selectAll('.question-group-arrow')
     arrows.interrupt().selectAll('*').interrupt()
-    arrows
-      .transition(elementTransition)
+    conditionalApplyTransition(arrows, elementTransition, animate)
       .style('transform', function (d, i) {
         if (i === openGroup) {
           return 'rotate(0.25turn)'
@@ -157,5 +150,10 @@
       .classed('selected', function (d) {
         return d === selectedQuestion
       })
+  }
+
+  // Helper
+  function conditionalApplyTransition (selection, transition, useTransition) {
+    return useTransition ? selection.transition(transition) : selection
   }
 })(window.dax = window.dax || {})

@@ -8,6 +8,7 @@ body {
   line-height: 1.1;
   margin: 0;
   overflow-x: hidden;
+  opacity: 0; /* hide entire page before JS has loaded */
   padding: 0;
 }
 
