@@ -8,7 +8,7 @@
   // CONSTANTS
   const yAxisWidth = 35
   const xAxisHeight = 24
-  const margin = { top: 25, right: 13, bottom: xAxisHeight, left: yAxisWidth + 10 }
+  const margin = { top: 10, right: 13, bottom: xAxisHeight, left: yAxisWidth + 10 }
   const pointSize = 40
   const pointFocusSize = 550
   const pointTextSize = 11

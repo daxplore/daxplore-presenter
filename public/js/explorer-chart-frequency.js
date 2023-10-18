@@ -8,7 +8,7 @@
   // CONSTANTS
   const yAxisWidth = 35
   const xAxisHeight = 24
-  const margin = { top: 20, right: 13, bottom: xAxisHeight, left: yAxisWidth + 10 }
+  const margin = { top: 10, right: 13, bottom: xAxisHeight, left: yAxisWidth + 10 }
   const missingDataColor = d3.hsl('#BBB') // TODO externalize to producer?
   let leftTimetickTransform, selectedTimetickTransform, rightTimetickTransform
   const fadeTransition = d3.transition()
