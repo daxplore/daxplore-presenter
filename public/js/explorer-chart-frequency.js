@@ -212,7 +212,10 @@
     selectedPerspectiveOptionIndices = selectedPerspectiveOptionIndicesInput
     const removedTimepoints = timepoints.filter(function (tp) { return !dax.data.hasTimepoint(question, tp) })
     timepoints = dax.data.getTimepoints(question)
-    selectedTimepoint = timepoints[Math.floor((2 / 3) * timepoints.length)]
+
+    // Reset mouseover effects when loading new chart
+    selectedTimepoint = null
+    headerTooltip.text('\xa0')
 
     hasMissingData = false
 
@@ -832,7 +835,7 @@
 
   // Takes an empty image element and loads an image of the chart into it
   function generateChartImage (img) {
-    const originalSelectedTimepoint = selectedTimepoint
+    const savedActiveTimepoint = selectedTimepoint
     setSelectedTimepoint(null, true)
 
     const leftAdjust = 10
@@ -860,7 +863,7 @@
     const source = (new XMLSerializer()).serializeToString(chartCopy.node())
     const blob = new Blob([doctype + source], { type: 'image/svg+xml;charset=utf-8' })
     img.src = window.URL.createObjectURL(blob)
-    setSelectedTimepoint(originalSelectedTimepoint, true)
+    setSelectedTimepoint(savedActiveTimepoint, true)
   }
 
   function composeAndSaveImage (headerImg, legendImg, chartImg) {
