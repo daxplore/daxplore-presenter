@@ -692,6 +692,7 @@
     chartG.selectAll('text')
       .style('fill', '#555')
       .style('font-size', '13px')
+      .style('font-family', '"Varta", sans-serif')
       .style('cursor', 'default')
 
     xAxisElement.selectAll('.tick text')

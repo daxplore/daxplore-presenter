@@ -683,6 +683,10 @@
     chartG.selectAll('.axis .domain')
       .style('visibility', 'hidden')
 
+    chartG.selectAll('text')
+      .style('font-size', '13px')
+      .style('font-family', '"Varta", sans-serif')
+
     chartG.selectAll('.axis path, .axis line')
       .style('fill', 'none')
       .style('stroke', '#bbb')
