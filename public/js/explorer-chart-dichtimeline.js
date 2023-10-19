@@ -865,6 +865,16 @@
     // Restore size of actual chart
     exports.setSize(initiaAvailablelWidth, availableHeight)
 
+    // Apply local font version
+    chartCopy
+      .append('defs')
+      .append('style')
+      .text(dax.fonts.getVartaBase64Definition())
+
+    chartCopy.selectAll('text')
+      .style('font-family', '"VartaBase64", "Varta", sans-serif')
+
+    // Apply margins
     chartCopy.select('g').attr('transform', 'translate(' + (margin.left + leftAdjust) + ',' + margin.top + ')')
 
     const widthBefore = chartCopy.attr('width')

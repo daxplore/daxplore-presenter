@@ -852,6 +852,16 @@
     exports.setSize(saveImageCanvasWidth, availableHeight)
     // Make copy of chart element
     const chartCopy = d3.select(chart.node().cloneNode(true))
+
+    // Apply local font version
+    chartCopy
+      .append('defs')
+      .append('style')
+      .text(dax.fonts.getVartaBase64Definition())
+
+    chartCopy.selectAll('text')
+      .style('font-family', '"VartaBase64", "Varta", sans-serif')
+
     // Restore size of actual chart
     exports.setSize(initiaAvailablelWidth, availableHeight)
 

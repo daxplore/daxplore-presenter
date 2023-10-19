@@ -13,7 +13,7 @@
   const referenceLineHoverWidth = 10 // width of the reference line mouseover area
 
   const xAxisTopHeight = 30
-  const margin = { top: 0, right: 23, bottom: xAxisTopHeight, left: 10 }
+  const margin = { top: 0, right: 23, bottom: xAxisTopHeight + 2, left: 10 }
   const elementTransition = d3.transition().duration(300).ease(d3.easeLinear)
 
   // SIZE VARIABLES
@@ -608,6 +608,17 @@
     exports.setSize(saveImageWidth)
 
     const chartCopy = d3.select(chart.node().cloneNode(true))
+
+    // Apply local font version
+    chartCopy
+      .append('defs')
+      .append('style')
+      .text(dax.fonts.getVartaBase64Definition())
+
+    chartCopy.selectAll('text')
+      .style('font-family', '"VartaBase64", "Varta", sans-serif')
+
+    // Apply margins
     chartCopy.select('g').attr('transform', 'translate(' + (margin.left + leftAdjust) + ',' + margin.top + ')')
 
     const widthBefore = chartCopy.attr('width')
