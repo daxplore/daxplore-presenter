@@ -160,6 +160,9 @@
     legendMissingData.append('div')
       .attr('class', 'legend__row-text')
       .text(dax.text('explorer.chart.frequency_bar.legend.missing_data'))
+      .attr('title', dax.text('explorer.chart.frequency_bar.legend.missing_data'))
+      .on('mouseover', function () { legendOptionMouseOver('MISSING_DATA') })
+      .on('mouseout', legendOptionMouseOut)
 
     // empty flex element, used to dynamically align the legend content vertically
     legendDiv.append('div')
@@ -701,7 +704,10 @@
     rows.interrupt().selectAll('*').interrupt()
     // Fade non-selected options
     rows
-      .style('opacity', function (option) { return option === hoveredOption ? 1 : 0.4 })
+      .style('opacity', function (option) { return hoveredOption === option ? 1 : 0.4 })
+
+    legendMissingData
+      .style('opacity', function (option) { return hoveredOption === 'MISSING_DATA' ? 1 : 0.4 })
   }
 
   function legendOptionMouseOut () {
