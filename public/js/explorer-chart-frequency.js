@@ -161,8 +161,14 @@
       .attr('class', 'legend__row-text')
       .text(dax.text('explorer.chart.frequency_bar.legend.missing_data'))
       .attr('title', dax.text('explorer.chart.frequency_bar.legend.missing_data'))
-      .on('mouseover', function () { legendOptionMouseOver('MISSING_DATA') })
-      .on('mouseout', legendOptionMouseOut)
+      .on('mouseover', function () {
+        setHorizontalHighlight('MISSING_DATA')
+        legendOptionMouseOver('MISSING_DATA')
+      })
+      .on('mouseout', function () {
+        legendOptionMouseOut()
+        unsetHorizontalHighlight()
+      })
 
     // empty flex element, used to dynamically align the legend content vertically
     legendDiv.append('div')
@@ -408,8 +414,14 @@
     const optionEnter = optionRows.enter()
       .append('div')
         .attr('class', 'legend__row')
-        .on('mouseover', function (option) { legendOptionMouseOver(option) })
-        .on('mouseout', legendOptionMouseOut)
+        .on('mouseover', function (option) {
+          setHorizontalHighlight(option)
+          legendOptionMouseOver(option)
+        })
+        .on('mouseout', function () {
+          unsetHorizontalHighlight()
+          legendOptionMouseOut()
+        })
     optionEnter.append('div')
       .attr('class', 'legend__color-square')
     optionEnter.append('div')
@@ -621,29 +633,52 @@
     }
   }
 
-  function barFillColor (key, tpIndex) {
-    if (singleTimepointMode || selectedTimepoint === null) {
-      if (key === 'MISSING_DATA') {
-        return missingDataColor
-      }
-      return d3.hsl(zScaleColor(key))
+  function setHorizontalHighlight (option) {
+    for (let tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
+      const tp = timepoints[tpIndex]
+      const rows = d3.selectAll('.freq-optionrow-section-tp' + tp)
+      rows
+        .style('filter', function (d) {
+          if (option === 'MISSING_DATA') {
+            return d.key === option ? 'brightness(0.93)' : null
+          }
+          return d.key === option ? null : 'grayscale(1) brightness(1.2)'
+        })
     }
+  }
+
+  function unsetHorizontalHighlight () {
+    for (let tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
+      const tp = timepoints[tpIndex]
+      const rows = d3.selectAll('.freq-optionrow-section-tp' + tp)
+      rows.style('filter', null)
+    }
+  }
+
+  function barFillColor (key, tpIndex) {
+    if (singleTimepointMode || selectedTimepoint === null || tpIndex === null) {
+      return key === 'MISSING_DATA' ? missingDataColor : d3.hsl(zScaleColor(key))
+    }
+
+    const selectedTPIndex = timepoints.indexOf(selectedTimepoint)
+    const indexDistance = Math.abs(selectedTPIndex - tpIndex)
+
     const asymptoticLightnessTarget = 0.8
     const lightnessDropoffRate = 1.3
-    const selectedTPIndex = timepoints.indexOf(selectedTimepoint)
+
     let color = missingDataColor
     if (key !== 'MISSING_DATA') {
       color = d3.hsl(zScaleColor(key)).darker(0.3)
     }
     const lightness = color.l
     let targetDiff = asymptoticLightnessTarget - lightness
-    color.l = lightness + targetDiff - (targetDiff) / Math.pow(lightnessDropoffRate, Math.abs(selectedTPIndex - tpIndex))
+    color.l = lightness + targetDiff - targetDiff / Math.pow(lightnessDropoffRate, indexDistance)
 
     const asymptoticSaturationTarget = 0.25
     const saturationDropoffRate = 1.5
     const saturation = color.s
     targetDiff = saturation - asymptoticSaturationTarget
-    color.s = saturation - targetDiff + (targetDiff) / Math.pow(saturationDropoffRate, Math.abs(selectedTPIndex - tpIndex))
+    color.s = saturation - targetDiff + targetDiff / Math.pow(saturationDropoffRate, indexDistance)
 
     return color
   }
@@ -656,9 +691,6 @@
   function calculateTPWidths () {
     tpWidths = []
     const selectedTPIndex = timepoints.indexOf(selectedTimepoint)
-    // if (selectedTPIndex === -1) {
-    //   console.log('Invalid selected tp.', 'question:', question, '/ perspective:', perspective, '/ selectedTimepoint:', selectedTimepoint)
-    // }
     if (fullMultipointAnimations) {
       const unselectedSize = 0.4
       for (let tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
@@ -712,12 +744,9 @@
   }
 
   function legendOptionMouseOut () {
-    const rows = d3.selectAll('.freqs__legend .legend__row')
-    // Stop all current legend row animations
-    rows.interrupt().selectAll('*').interrupt()
     // Set all legend rows to visible again
-    rows.transition(fadeTransition)
-      .style('opacity', 1)
+    const rows = d3.selectAll('.freqs__legend .legend__row')
+    rows.style('opacity', 1)
   }
 
   const imageScaling = 2 // TODO externalize
@@ -795,7 +824,7 @@
 
   // Takes an empty image element and loads an image of the legend into it
   function generateLegendImage (img) {
-    // removeMouseoverHighlights(false)
+    legendOptionMouseOut()
 
     // Add the temporary copy of the legend to the DOM
     const hiddenDiv = d3.select('body').append('div')
@@ -844,6 +873,7 @@
   function generateChartImage (img) {
     const savedActiveTimepoint = selectedTimepoint
     setSelectedTimepoint(null, true)
+    unsetHorizontalHighlight()
 
     const leftAdjust = 10
     const widthAdjust = 10
