@@ -11,9 +11,6 @@
   const margin = { top: 10, right: 13, bottom: xAxisHeight, left: yAxisWidth + 10 }
   const missingDataColor = d3.hsl('#BBB') // TODO externalize to producer?
   let leftTimetickTransform, selectedTimetickTransform, rightTimetickTransform
-  const fadeTransition = d3.transition()
-    .duration(100)
-    .ease(d3.easeLinear)
   const saveImageCanvasWidth = 600
 
   const fullMultipointAnimations = false // TODO MUST BE EXTERNALIZED
@@ -377,6 +374,8 @@
         .on('mouseout', function (d) {
           // Deselect any legend options
           legendOptionMouseOut()
+          setSelectedTimepoint(null)
+          headerTooltip.text('\xa0')
         })
 
       // remove old sections
