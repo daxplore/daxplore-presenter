@@ -295,6 +295,7 @@
       .attr('fill', 'none')
       .attr('stroke', function (d) { return zScaleColor(d.index) })
       .attr('stroke-width', '3')
+      .attr('stroke-dasharray', function (d) { return d.index < colorCount ? null : '10 5' }) // TODO handle option 2x color count?
       .attr('opacity', '0')
       .attr('pointer-events', 'none')
 
