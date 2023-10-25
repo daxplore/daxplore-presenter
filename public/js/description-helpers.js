@@ -80,18 +80,18 @@
     const color = dax.colors.colorTextForValue(mean, reference, direction)
     // TODO externalize all text?
     const subheader = '<b>' + shorttext + ': ' + d3.format('d')(mean) + '</b><br>' +
-    '<b>' + dax.text('profile.chart.mean_bar_vertical.reference.value') + ': ' + d3.format('d')(reference) + '</b><br>'
+    '<b>' + dax.text('profile.reference.value') + ': ' + d3.format('d')(reference) + '</b><br>'
 
     const trueDiff = mean - reference
     const diff = direction === 'LOW' ? reference - mean : trueDiff
 
     let referenceComparison
     if (diff < -5) {
-      referenceComparison = dax.text('profile.chart.mean_bar_vertical.reference.worse')
+      referenceComparison = dax.text('profile.reference.worse')
     } else if (diff > 5) {
-      referenceComparison = dax.text('profile.chart.mean_bar_vertical.reference.better')
+      referenceComparison = dax.text('profile.reference.better')
     } else {
-      referenceComparison = dax.text('profile.chart.mean_bar_vertical.reference.comparable')
+      referenceComparison = dax.text('profile.reference.comparable')
     }
     // TODO externalize all text?
     referenceComparison = '<span style="color: ' + color + '; font-weight: bold">' + referenceComparison + ': ' + d3.format('+d')(trueDiff) + '</span></b><br><br>'

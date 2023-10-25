@@ -152,7 +152,7 @@
       }
       break
     case 'MEAN':
-      switch (dax.settings('chart.mean.orientation')) {
+      switch (dax.settings('explorer.chart.mean.orientation')) {
       case 'HORIZONTAL':
         switch (timepoints) {
         case 'TIMEPOINTS_ONE':
@@ -196,7 +196,7 @@
     const headerBlockWidth = d3.select('.header-section-wrapper').node().offsetWidth
 
     let bottomBlockWidth = 0
-    if (dax.settings('explorer.structure.description_position') === 'BOTTOM') {
+    if (dax.settings('explorer.description.position') === 'BOTTOM') {
       const descriptionPanel = d3.select('.description-panel.description-bottom').node()
       if (descriptionPanel !== null && descriptionPanel.offsetWidth > 0) {
         bottomBlockWidth = 350 // TODO hard coded
@@ -223,7 +223,7 @@
       dax.chart.frequency.setSize(widthForChart, 350)
       break
     case 'MEAN':
-      switch (dax.settings('chart.mean.orientation')) {
+      switch (dax.settings('explorer.chart.mean.orientation')) {
       case 'HORIZONTAL':
         // TODO allow more height instead of vertical scroll
         // TODO hard coded based on specific chart, should be generalized

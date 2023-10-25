@@ -43,12 +43,14 @@
   let nodes
   let texts, goodDirections, referenceValues
   let qIDs, perspectiveOptions, values
+  let customDataChart
 
   exports.initializeRadarGraph =
-  function (radargraphData, questionsInput, qIDsInput) {
+  function (radargraphData, questionsInput, qIDsInput, customDataChartInput) {
     const questions = questionsInput
     qIDs = qIDsInput
     nodes = radargraphData.nodes
+    customDataChart = customDataChartInput
 
     texts = nodes.map(function (node) {
       return node.qIDs.map(function (qid) {
@@ -107,7 +109,9 @@
         texts[i],
         referenceValues[i],
         goodDirections[i][0],
-        domainRange)
+        domainRange,
+        customDataChart
+      )
       chartNodes[i].setWidth(miniRadarWidth)
       overlayTextScaling.push(chartNodes[i].getCalculatedOverlayTextScaling())
       d3.select('#radar-node-' + i)
@@ -120,7 +124,8 @@
         texts[i],
         referenceValues[i],
         goodDirections[i][0],
-        domainRange
+        domainRange,
+        customDataChart
       )
       fullCharts[i].setDisplayModeFull()
       fullCharts[i].setWidth(fullRadarWidth)
@@ -362,8 +367,7 @@
       const headerHorizontalShift = 30 + img.width / 2 - headerWidth / 2
 
       ctx.fillText(headerText, headerHorizontalShift, headerPaddingTop + headerFontSize + imgMargin.top)
-      const CUSTOM_DATA_CHART = false // TODO custom chart should not be hardcoded
-      let watermarkText = dax.text(CUSTOM_DATA_CHART ? 'user_profile.image.watermark' : 'profile.chart.mean_bar_vertical.image.watermark')
+      let watermarkText = dax.text(customDataChart ? 'user_profile.radar_model.image.watermark' : 'radar_model.image.watermark')
 
       const date = new Date()
       watermarkText = watermarkText.replace(
@@ -371,10 +375,8 @@
         date.getFullYear() + '-' +
         ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
         ('0' + date.getDate()).slice(-2))
-        .replace('Profildiagram', 'Radarmodell') // TODO externalize Radar as separate text
 
-      const fileName = dax.text(CUSTOM_DATA_CHART ? 'user_profile.chart.mean_bar_vertical.image.filename' : 'profile.image.filename')
-        .replace('Profildiagram', 'Radarmodell')// TODO externalize Radar as separate text
+      const fileName = dax.text(customDataChart ? 'user_profile.radar_model.image.filename' : 'radar_model.image.filename')
         .replace('{option}', headerText)
 
       const sourceFontHeight = 11 * imageScaling

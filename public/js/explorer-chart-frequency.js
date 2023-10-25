@@ -957,9 +957,13 @@
       ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
       ('0' + date.getDate()).slice(-2))
 
-    const fileName = dax.text('explorer.chart.image.generic_filename')
+    const fileName = dax.text('explorer.chart.frequency_bar.image.filename')
       .replaceAll('{question}', dax.data.getQuestionShortText(question))
       .replaceAll('{perspective}', dax.data.getQuestionShortText(perspective))
+      .replaceAll('{date}',
+        date.getFullYear() + '-' +
+        ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
+        ('0' + date.getDate()).slice(-2))
 
     const sourceFontHeight = 11 * imageScaling
     ctx.font = sourceFontHeight + 'px "Varta"'

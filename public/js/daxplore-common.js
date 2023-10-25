@@ -6,7 +6,7 @@
   // Data package version used by this version of the explorer.
   // Compare with dataPackageVersion in data/manifest.json.
   // Used to make sure the code and data package are compatible.
-  const systemDataVersion = 7
+  const systemDataVersion = 8
   common.getSystemDataVersion =
   function () {
     return systemDataVersion

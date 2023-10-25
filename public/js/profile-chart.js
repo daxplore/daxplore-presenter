@@ -58,7 +58,7 @@
 
     tooltipdiv.html( // TODO externalize entire string
       shorttexts[qID] + ': <b>' + d3.format('d')(getMean(qID, selectedOption)) + '</b><br>' +
-        dax.text('profile.chart.mean_bar_vertical.reference.value') + ': <b>' + d3.format('d')(meanReferences[qID]) + '</b>')
+        dax.text('profile.reference.value') + ': <b>' + d3.format('d')(meanReferences[qID]) + '</b>')
       .style('left', (chartwrapperBB.left + xScale(Math.max(getMean(qID, selectedOption), meanReferences[qID])) + yAxisWidth + 15.5) + 'px')
       .style('top', (yScale(qID) + yScale.bandwidth() / 2 - tooltipdiv.node().getBoundingClientRect().height / 2 + 0.5) + 'px')
     const arrowleft = d3.select('.profile-arrow-left')
@@ -133,7 +133,7 @@
       .attr('class', 'x axis top')
       .append('text')
         .classed('x-top-description', true)
-        .text(dax.text('profile.chart.mean_bar_vertical.x_axis_description'))
+        .text(dax.text('profile.x_axis_description'))
 
     // X AXIS BOTTOM
     chart.append('g')
@@ -142,7 +142,7 @@
         .attr('class', 'x-bottom-description')
         .attr('text-anchor', 'middle')
         .style('text-anchor', 'middle')
-        .text(dax.text('profile.chart.mean_bar_vertical.x_axis_description'))
+        .text(dax.text('profile.x_axis_description'))
 
     // TODO use Modernizr instead of IE-check
     // Hide save image button in IE11 because of a known svg bug
@@ -550,7 +550,7 @@
 
       ctx.fillText(headerText, headerHorizontalShift, headerPaddingTop + headerFontSize + imgMargin.top)
 
-      let watermarkText = dax.text(customDataChart ? 'user_profile.image.watermark' : 'profile.chart.mean_bar_vertical.image.watermark')
+      let watermarkText = dax.text(customDataChart ? 'user_profile.profile.image.watermark' : 'profile.image.watermark')
 
       const date = new Date()
       watermarkText = watermarkText.replace(
@@ -559,7 +559,7 @@
         ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
         ('0' + date.getDate()).slice(-2))
 
-      const fileName = dax.text(customDataChart ? 'user_profile.chart.mean_bar_vertical.image.filename' : 'profile.image.filename')
+      const fileName = dax.text(customDataChart ? 'user_profile.profile.image.filename' : 'profile.image.filename')
         .replace('{option}', headerText)
 
       const sourceFontHeight = 11 * imageScaling

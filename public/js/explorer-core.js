@@ -162,8 +162,8 @@
           dax.data.initializeResources(groups, perspectives, questionMap, questionData, dichselectedMap)
           dax.description.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap, questionMap)
           dax.explorer.initializeDescriptionPanel()
-          dax.explorer.generateQuestionPicker(questions, groups, settings)
-          dax.explorer.generatePerspectivePicker(settings)
+          dax.explorer.generateQuestionPicker(questions, groups)
+          dax.explorer.generatePerspectivePicker()
           dax.explorer.generateChartPanel(questions, groups)
 
           updateFromHash(window.location.hash.slice(1))

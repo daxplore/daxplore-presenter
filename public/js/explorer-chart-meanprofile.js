@@ -702,6 +702,10 @@
       const fileName = dax.text('explorer.chart.mean_bar_vertical.image.filename')
         .replaceAll('{question}', headerText)
         .replaceAll('{perspective}', dax.data.getQuestionShortText(perspectives))
+        .replaceAll('{date}',
+          date.getFullYear() + '-' +
+          ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
+          ('0' + date.getDate()).slice(-2))
 
       const sourceFontHeight = 11 * imageScaling
       ctx.font = sourceFontHeight + 'px "Varta"'

@@ -938,9 +938,13 @@
       ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
       ('0' + date.getDate()).slice(-2))
 
-    const fileName = dax.text('explorer.chart.image.generic_filename')
+    const fileName = dax.text('explorer.chart.dichotomized_line.image.filename')
       .replaceAll('{question}', dax.data.getQuestionShortText(questionID))
       .replaceAll('{perspective}', dax.data.getQuestionShortText(perspectiveID))
+      .replaceAll('{date}',
+        date.getFullYear() + '-' +
+        ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
+        ('0' + date.getDate()).slice(-2))
 
     const sourceFontHeight = 11 * imageScaling
     ctx.font = sourceFontHeight + 'px "Varta"'

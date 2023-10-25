@@ -48,7 +48,7 @@
       .text(dax.text('common.button.save_chart_as_image'))
     d3.select('.radarchart-save-image')
       .text(dax.text('common.button.save_chart_as_image'))
-    dax.radargraph.initializeRadarGraph(radargraphData, questions, qIDs)
+    dax.radargraph.initializeRadarGraph(radargraphData, questions, qIDs, true)
   }
 
   function onTabClick () {

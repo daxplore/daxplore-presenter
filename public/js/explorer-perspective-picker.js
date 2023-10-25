@@ -15,8 +15,6 @@
   let hasRemainder = false
   let collapsed = true
 
-  let settings
-
   let moreButton, columnOne, columnTwo, columnThree, secondaryPanel
 
   let combinedColumnOneHighlight = -1
@@ -61,9 +59,7 @@
   }
 
   exports.generatePerspectivePicker =
-  function (settingsInput) {
-    settings = settingsInput
-
+  function () {
     moreButton = d3.selectAll('.peropt-more-button')
     columnOne = d3.select('.peropt-col-one')
     columnTwo = d3.select('.peropt-col-two')
@@ -86,7 +82,7 @@
       const thirdColumnData = []
       if (!dax.data.isCombinedPerspective(perspectiveID)) {
         // BASIC PERSPECTIVE
-        const perColumnSetting = settings.perspectiveCheckboxesPerColumn
+        const perColumnSetting = dax.settings('explorer.perspective.checkboxes_per_column')
         const maxColumns = 3
         const columns = Math.min(maxColumns, Math.ceil(optionCount / perColumnSetting))
         const perColumn = Math.ceil(optionCount / columns)
@@ -297,7 +293,7 @@
         .classed('pervarpicker-varoption-selected', function (d) { return d === selectedPerspectiveID })
 
       const topLevelOptionCount = dax.data.getTopLevelQuestionOptionCount(selectedPerspectiveID)
-      const selectedCount = Math.min(topLevelOptionCount, settings.defaultSelectedPerspectiveOptions)
+      const selectedCount = Math.min(topLevelOptionCount, dax.settings('explorer.perspective.default_selected_option_count'))
       selectedOptions.clear()
       for (let i = 0; i < selectedCount; i++) {
         selectedOptions.add(i)
@@ -306,7 +302,7 @@
 
       if (!dax.data.isCombinedPerspective(selectedPerspectiveID)) {
         // BASIC PERSPECTIVE
-        const perColumnSetting = settings.perspectiveCheckboxesPerColumn
+        const perColumnSetting = dax.settings('explorer.perspective.checkboxes_per_column')
         const maxColumns = 3
         const optionCount = dax.data.getQuestionOptionCount(selectedPerspectiveID)
         const columns = Math.min(maxColumns, Math.ceil(optionCount / perColumnSetting))
@@ -585,7 +581,7 @@
   }
 
   function updateElements () {
-    // const showSelectTotal = settings.showSelectTotal
+    // const showSelectTotal = dax.settings('explorer.perspective.compare_to_all.show')
     // const totalCount = (showSelectTotal ? 1 : 0)
     // d3.select('.peropt-extra-columns')
     //   .style('width', '0px')

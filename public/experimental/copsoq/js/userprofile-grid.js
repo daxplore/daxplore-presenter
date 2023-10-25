@@ -434,9 +434,9 @@
         .remove()
     }
 
-    d3.select('.grid-legend-text.good').text(dax.text('profile.chart.mean_bar_vertical.reference.better'))
-    d3.select('.grid-legend-text.avg').text(dax.text('profile.chart.mean_bar_vertical.reference.comparable'))
-    d3.select('.grid-legend-text.bad').text(dax.text('profile.chart.mean_bar_vertical.reference.worse'))
+    d3.select('.grid-legend-text.good').text(dax.text('profile.reference.better'))
+    d3.select('.grid-legend-text.avg').text(dax.text('profile.reference.comparable'))
+    d3.select('.grid-legend-text.bad').text(dax.text('profile.reference.worse'))
 
     if (qIDs.length > 0) {
       d3.select('#grid-description')
@@ -480,7 +480,8 @@
         .append('tr')
           .attr('class', function (d) { return 'gridrow-' + d.qID })
           .on('mouseover', function (d, i) {
-            dax.explorer.setStandardDescriptionShort(d3.select('#grid-description'), d.qID)
+            d3.select('#grid-description')
+              .html(dax.description.getProfileDescriptionShort(d.qID))
           })
 
     gridRows.append('td')
@@ -599,7 +600,7 @@
     domtoimage.toPng(gridclone.node(), { bgcolor: 'white', width: chartWidth, height: chartHeight })
       .then(function (dataUrl) {
         // Generate image and prompt the user to save it
-        const watermarkID = 'user_profile.image.watermark'
+        const watermarkID = 'user_profile.grid.image.watermark'
         const filenameID = 'user_profile.grid.image.filename'
         dax.common.composeAndSaveImage(dataUrl, watermarkID, filenameID)
       })['catch'](function (error) { // eslint-disable-line dot-notation

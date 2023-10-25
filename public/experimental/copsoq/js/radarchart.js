@@ -22,7 +22,6 @@
   const dataPointColor = '#555'
 
   const headerTextWidth = 0.9 // Measured in radius units
-  // const overlayTextLineHeight = 1.05 // Factor of font size
 
   const margin = { top: 0, bottom: 0, left: 10, right: 10 }
 
@@ -49,7 +48,8 @@
       axisTextArray,
       referenceValueArray,
       goodDirectionInput,
-      domainRangeInput
+      domainRangeInput,
+      customDataChartInput
     ) {
       if (axisTextArray.length !== referenceValueArray.length) {
         throw new Error('Invalid radar chart input data, different array lengths.')
@@ -60,6 +60,7 @@
       // Round domain up to closest step size
       let axisXRingStepSize = domainRangeInput > 50 ? 10 : 5
       let domainRange = Math.ceil(domainRangeInput / axisXRingStepSize) * axisXRingStepSize
+      const customDataChart = customDataChartInput
       const radarChart = {}
 
       const angleSlice = 2 * Math.PI / referenceData.length
@@ -651,8 +652,7 @@
             ctx.fillText(imageHeaderText, imageHeaderHorizontalShift, imageHeaderFontSize + imgMargin.top)
 
             // Define watermark text
-            const customDataChart = false // TODO should not be hardcoded, userprofile should set to true
-            let watermarkText = dax.text(customDataChart ? 'user_profile.image.watermark' : 'profile.chart.mean_bar_vertical.image.watermark')
+            let watermarkText = dax.text(customDataChart ? 'user_profile.radar.image.watermark' : 'radar.image.watermark')
 
             const date = new Date()
             watermarkText = watermarkText.replace(
@@ -660,12 +660,14 @@
               date.getFullYear() + '-' +
               ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
               ('0' + date.getDate()).slice(-2))
-              .replace('Profildiagram', 'Radardiagram') // TODO externalize Radar as separate text
 
             // Define filename
-            const fileName = dax.text(customDataChart ? 'user_profile.chart.mean_bar_vertical.image.filename' : 'profile.image.filename')
-              .replace('{option}', imageHeaderText)
-              .replace('Profildiagram', 'Radardiagram') // TODO externalize Radar as separate text
+            const fileName = dax.text(customDataChart ? 'user_profile.radar.image.filename' : 'radar.image.filename')
+              .replaceAll('{option}', imageHeaderText)
+              .replaceAll('{date}',
+                date.getFullYear() + '-' +
+                ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
+                ('0' + date.getDate()).slice(-2))
 
             // Draw watermark text
             const sourceFontHeight = 11 * imageScaling
