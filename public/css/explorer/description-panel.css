@@ -14,6 +14,13 @@
   padding-left: 20px;
 }
 
+.description-header {
+  font-size: 15px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  overflow-wrap: break-word;
+}
+
 /* BUTTON STYLING */
 .description-panel__button {
   background: no-repeat center/100% url(../../img/question-circle.svg);
