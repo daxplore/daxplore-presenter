@@ -3,9 +3,17 @@
 .header-section-wrapper {
   display: flex;
   justify-content: center;
-  padding-top: 20px;
   text-align: center;
   white-space: nowrap;
+}
+
+.header-outer {
+  padding: 3px;
+  padding-bottom: 5px;
+}
+
+.header-inner {
+  padding-top: 15px;
 }
 
 .header-section__main {

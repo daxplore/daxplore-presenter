@@ -156,11 +156,19 @@
             }
           })
 
-          // Initialize elements that depend on the metadata
+          // Initialize data managers that depend on the metadata
           dax.text.initializeResources(usertexts)
           dax.settings.initializeResources(settings)
           dax.data.initializeResources(groups, perspectives, questionMap, questionData, dichselectedMap)
           dax.description.initializeHelpers(meanReferenceMap, shorttextMap, descriptionMap, directionMap, questionMap)
+
+          // Remove unused header element
+          switch (dax.settings('explorer.header.position')) {
+          case 'INNER': d3.select('.header-outer').remove(); break
+          case 'OUTER': d3.select('.header-inner').remove(); break
+          }
+
+          // Initialize explorer sections that depend on metadata
           dax.explorer.initializeDescriptionPanel()
           dax.explorer.generateQuestionPicker(questions, groups)
           dax.explorer.generatePerspectivePicker()
