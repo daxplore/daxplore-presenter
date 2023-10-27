@@ -41,7 +41,7 @@
         //   html += '<hr>'
         // }
         const title = questions[perspectiveID].short
-        html += '<div class="description-panel__perspectives"><b>' + title + '</b><p>' + perspectiveDescription + '</p></div>'
+        html += '<div class="description-panel__perspective"><b>' + title + '</b><p>' + perspectiveDescription + '</p></div>'
       }
     })
 

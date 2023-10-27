@@ -78,6 +78,14 @@
   width: 50%;
 }
 
+.description-panel.description-bottom .description-panel__perspective {
+  padding-bottom: 10px;
+}
+
+.description-panel.description-bottom .description-panel__perspective:last-of-type {
+  padding-bottom: 0;
+}
+
 /* HEADER POSITION */
 
 .description-panel__button.description-header {
