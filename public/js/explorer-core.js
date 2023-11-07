@@ -16,13 +16,16 @@
   const historyEnabled = getURLParameter('history') === 'on'
 
   // Handle messages from outside the iframe
-  function receiveMessage () {
+  function receiveMessage (event) {
     // Do manual origin check. Not secure, but prevents accidentally picking up other events.
     if (!(event.data && event.data.source === 'DAXPLORE_EXPLORER')) {
       return
     }
     if (typeof event.data.hash === 'string') {
-      updateFromHash(event.data.hash)
+      // Ignore empty hash
+      if (event.data.hash.length > 0) {
+        updateFromHash(event.data.hash)
+      }
     }
   }
 
