@@ -6,7 +6,7 @@
   namespace.settings =
   function (settingID) {
     if (typeof settings[settingID] === 'undefined') {
-      console.warn('Missing setting: ' + settingID) // TODO custom logging system?
+      console.error('Missing setting: ' + settingID) // TODO custom logging system?
     }
     return settings[settingID]
   }
