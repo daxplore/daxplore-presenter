@@ -61,6 +61,7 @@
   // INSTANCE SPECIFIC VARIABLES
   let questionID, perspectiveID
   let currentOptions
+  let timepoints
 
   /** EXPORTED FUNCTIONS **/
 
@@ -190,9 +191,9 @@
     questionID = questionIDInput
     perspectiveID = perspectiveIDInput
 
-    // TODO check actually delivered time points in statJson data?
-    // TODO generate timepoint texts in daxplore export file to experiment with that as an array here
     // DATA
+    timepoints = dax.settings('all_timepoints')
+
     const optionTexts = dax.data.getOptionTexts(perspectiveID)
     currentOptions = []
     const pointData = []
@@ -202,7 +203,7 @@
     for (let option = 0; option < optionCount; option++) {
       const isSelected = selectedPerspectiveOptions.indexOf(option) !== -1
       const values = []
-      dax.data.getTimepoints(perspectiveID).forEach(function (timepoint) {
+      timepoints.forEach(function (timepoint) {
         if (dax.data.hasTimepoint(questionID, timepoint)) {
           const freq = dax.data.getFrequency(questionID, perspectiveID, option, timepoint)
           const selected = dax.data.getDichSelected(questionID)
@@ -256,7 +257,7 @@
     headerDich.text(getDichotomizedSubtitleText())
 
     // X SCALE
-    xScale.domain(dax.data.getTimepoints(perspectiveID))
+    xScale.domain(timepoints)
 
     // Z SCALE (color)
     const allIndicesArray = dax.data.getPerspectiveOptionIndicesColumnOrder(perspectiveID)
@@ -501,7 +502,7 @@
     const chartNeededWidth = margin.left + margin.right + // margins
       30 + // y axis width // TODO calculate
       10 * 2 + // space outside of line segments // TODO calculate
-      50 * dax.data.getTimepoints(perspectiveID).length // min width each time point
+      50 * timepoints.length // min width each time point
 
     // Check if vertical scroll is needed
     const scrollNeeded = availableWidth < chartNeededWidth

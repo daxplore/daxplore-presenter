@@ -216,8 +216,14 @@
     perspective = perspectiveID
     question = questionID
     selectedPerspectiveOptionIndices = selectedPerspectiveOptionIndicesInput
-    const removedTimepoints = timepoints.filter(function (tp) { return !dax.data.hasTimepoint(question, tp) })
-    timepoints = dax.data.getTimepoints(question)
+    const questionTimepoints = dax.data.getTimepoints(question)
+    let removedTimepoints = []
+    if (dax.settings('explorer.chart.frequency.show_empty_timepoints')) {
+      timepoints = dax.settings('all_timepoints')
+    } else {
+      removedTimepoints = timepoints.filter(function (tp) { return !dax.data.hasTimepoint(question, tp) })
+      timepoints = questionTimepoints
+    }
 
     // Reset mouseover effects when loading new chart
     selectedTimepoint = null
@@ -241,12 +247,18 @@
       const tpData = []
 
       selectedPerspectiveOptionIndices.forEach(function (i) {
-        const stat = dax.data.getFrequency(questionID, perspectiveID, i, tp)
-        const total = stat.length > 0 ? stat.reduce(function (a, b) { return a + b }) : 0
+        let stat
+        let total = 0
         const stackData = {
           __option: perspectiveOptions[i],
           __total: total,
           __timepoint: timepoints[tpIndex],
+        }
+        // If question has data for timepoint
+        if (questionTimepoints.indexOf(tp) !== -1) {
+          stat = dax.data.getFrequency(questionID, perspectiveID, i, tp)
+          total = stat.length > 0 ? stat.reduce(function (a, b) { return a + b }) : 0
+          stackData.__total = total
         }
         if (total === 0) {
           hasMissingData = true
