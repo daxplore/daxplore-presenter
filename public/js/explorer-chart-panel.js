@@ -65,6 +65,7 @@
     dax.chart.meanbars.initializeResources(questionMap, primaryColors, hoverColors, tooltipColors)
     dax.chart.meanprofile.initializeResources()
     dax.chart.frequency.initializeResources(primaryColors, hoverColors)
+    dax.chart.frequencyVertical.initializeResources(primaryColors, hoverColors)
     dax.chart.dichtimeline.initializeResources(primaryColors, tooltipColors)
 
     // TODO handle here or somewhere else?
@@ -94,6 +95,7 @@
 
     // Hide all charts elements
     dax.chart.frequency.hide()
+    dax.chart.frequencyVertical.hide()
     dax.chart.meanbars.hide()
     dax.chart.meanprofile.hide()
     dax.chart.dichtimeline.hide()
@@ -147,7 +149,14 @@
       case 'TIMEPOINTS_TWO':
       case 'TIMEPOINTS_ALL':
         // TODO temporary hard coded timepoint
-        dax.chart.frequency.populateChart(question, perspectives, selectedOptions)
+        switch (dax.settings('explorer.chart.mean.orientation')) {
+        case 'HORIZONTAL':
+          dax.chart.frequency.populateChart(question, perspectives, selectedOptions)
+          break
+        case 'VERTICAL':
+          dax.chart.frequencyVertical.populateChart(question, perspectives, selectedOptions)
+          break
+        }
         break
       }
       break
@@ -220,7 +229,14 @@
     const widthForChart = Math.max(availableWidth, topBotNeededWidth)
     switch (selectedTab) {
     case 'FREQ':
-      dax.chart.frequency.setSize(widthForChart, 350)
+      switch (dax.settings('explorer.chart.frequency.orientation')) {
+      case 'HORIZONTAL':
+        dax.chart.frequency.setSize(widthForChart, 350)
+        break
+      case 'VERTICAL':
+        dax.chart.frequencyVertical.setSize(widthForChart, 350)
+        break
+      }
       break
     case 'MEAN':
       switch (dax.settings('explorer.chart.mean.orientation')) {
