@@ -296,7 +296,8 @@
         const perspectiveOptionText = d.option
         let html
         if (d.key === 'MISSING_DATA') {
-          html = dax.text('explorer.chart.frequency_bar.tooltip.single_timepoint_missing', 10, perspectiveOptionText) // TODO externalize cutoff
+          const cutoff = dax.settings('export.statistics.group_cutoff')
+          html = dax.text('explorer.chart.frequency_bar.tooltip.single_timepoint_missing', cutoff, perspectiveOptionText) // TODO externalize cutoff
         } else {
           const percentageText = dax.common.percentageFormat(d.end - d.start)
           const questionOptionText = d.key

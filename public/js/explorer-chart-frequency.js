@@ -365,10 +365,11 @@
           const perspectiveOptionText = d.option
           let html
           if (d.key === 'MISSING_DATA') {
+            const cutoff = dax.settings('export.statistics.group_cutoff')
             if (singleTimepointMode) {
-              html = dax.text('explorer.chart.frequency_bar.tooltip.multiple_timepoints_missing', 10, perspectiveOptionText) // TODO externalize cutoff
+              html = dax.text('explorer.chart.frequency_bar.tooltip.multiple_timepoints_missing', cutoff, perspectiveOptionText)
             } else {
-              html = dax.text('explorer.chart.frequency_bar.tooltip.multiple_timepoints_missing', 10, perspectiveOptionText, timepointText) // TODO externalize cutoff
+              html = dax.text('explorer.chart.frequency_bar.tooltip.multiple_timepoints_missing', cutoff, perspectiveOptionText, timepointText)
             }
           } else {
             const percentageText = dax.common.percentageFormat(d.end - d.start)
