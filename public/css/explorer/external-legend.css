@@ -48,7 +48,7 @@
 .legend__row-text {
   margin-left: 5px;
   max-width: 235px;
-  overflow-x: hidden;
+  overflow: hidden;
   text-overflow: ellipsis;
   padding-bottom: 2px;
   padding-top: 2px;
