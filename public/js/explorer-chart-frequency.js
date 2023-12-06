@@ -9,7 +9,7 @@
   const yAxisWidth = 35
   const xAxisHeight = 24
   const margin = { top: 10, right: 13, bottom: xAxisHeight, left: yAxisWidth + 10 }
-  const missingDataColor = d3.hsl('#BBB') // TODO externalize to producer?
+  const missingDataColor = d3.hsl(0, 0, 0.77) // TODO externalize to producer?
   let leftTimetickTransform, selectedTimetickTransform, rightTimetickTransform
   const saveImageCanvasWidth = 600
 
@@ -38,16 +38,19 @@
   // CHART
   let chartContainer, chartBB, chart, chartG
   // LEGEND
-  let legendDiv, legendQuestionHeader, legendQuestionOptionTable, legendMissingData
+  let legendDiv, legendQuestionHeader, legendQuestionOptionTable, legendMissingData, legendMissingTimepoint
   // BUTTONS
   let saveImageButton
+  // PATTERNS
+  let defs
+  const patternURLs = new Set()
 
   // CURRENT FREQUENCY CHART
   let question, perspective, data
   let timepoints = []
   let selectedPerspectiveOptionIndices, selectedPerspectiveOptions, optionKeys
   let selectedTimepoint, highlightedQuestionOption, highlightedPerspectiveOption
-  let hasMissingData
+  let hasMissingData, hasMissingTimepoint
   let tpWidths, tpWidthsAdditive
 
   /** EXPORTED FUNCTIONS **/
@@ -87,6 +90,9 @@
     // base svg element
     chart = chartContainer.append('svg')
       .attr('class', 'explorer-freq')
+
+    // patterns
+    defs = chart.append('defs')
 
     // white background
     chart.append('rect')
@@ -166,6 +172,28 @@
         legendOptionMouseOut()
         unsetHorizontalHighlight()
       })
+    legendMissingTimepoint = legendDiv.append('div')
+      .attr('class', 'legend__row')
+    legendMissingTimepoint.append('div')
+        .attr('class', 'legend__color-square')
+        .style('background',
+          'linear-gradient(-45deg, {A} 30%, {B} 30%, {B} 50%, {A} 50%, {A} 80%, {B} 80%, {B} 100%)'
+              .replaceAll('{A}', missingDataColor)
+              .replaceAll('{B}', missingDataColor.darker(0.6))
+        )
+        .style('background-size', '7.07px 7.07px')
+    legendMissingTimepoint.append('div')
+        .attr('class', 'legend__row-text')
+        .text(dax.text('explorer.chart.frequency_bar.legend.missing_timepoint'))
+        .attr('title', dax.text('explorer.chart.frequency_bar.legend.missing_timepoint'))
+        .on('mouseover', function () {
+          setHorizontalHighlight('MISSING_TIMEPOINT')
+          legendOptionMouseOver('MISSING_TIMEPOINT')
+        })
+        .on('mouseout', function () {
+          legendOptionMouseOut()
+          unsetHorizontalHighlight()
+        })
 
     // empty flex element, used to dynamically align the legend content vertically
     legendDiv.append('div')
@@ -233,6 +261,7 @@
 
     optionKeys = dax.data.getOptionTexts(question)
     optionKeys.push('MISSING_DATA')
+    optionKeys.push('MISSING_TIMEPOINT')
 
     selectedPerspectiveOptions = []
     selectedPerspectiveOptionIndices.forEach(function (i) {
@@ -248,26 +277,32 @@
 
       selectedPerspectiveOptionIndices.forEach(function (i) {
         let stat
-        let total = 0
         const stackData = {
           __option: perspectiveOptions[i],
-          __total: total,
+          __total: 0,
           __timepoint: timepoints[tpIndex],
         }
-        // If question has data for timepoint
         if (questionTimepoints.indexOf(tp) !== -1) {
+          // If question has data for timepoint
           stat = dax.data.getFrequency(questionID, perspectiveID, i, tp)
-          total = stat.length > 0 ? stat.reduce(function (a, b) { return a + b }) : 0
+          const total = stat.length > 0 ? stat.reduce(function (a, b) { return a + b }) : 0
           stackData.__total = total
-        }
-        if (total === 0) {
-          hasMissingData = true
-          stackData.MISSING_DATA = 1
-        } else {
-          for (let j = 0; j < optionKeys.length; j++) {
-            stackData[optionKeys[j]] = total !== 0 ? stat[j] / total : 0
+          if (total === 0) {
+            // If data is empty, due to export cutoff
+            hasMissingData = true
+            stackData.MISSING_DATA = 1
+          } else {
+            // Extract frequency data
+            for (let j = 0; j < optionKeys.length; j++) {
+              stackData[optionKeys[j]] = total !== 0 ? stat[j] / total : 0
+            }
           }
+        } else {
+          // If timepoint is missing for this question
+          hasMissingTimepoint = true
+          stackData.MISSING_TIMEPOINT = 1
         }
+
         tpData.push(stackData)
       })
       data[tp] = tpData
@@ -346,8 +381,6 @@
         .attr('y', function (d) { return yScale(d.end) })
         .attr('height', function (d) { return yScale(d.start) - yScale(d.end) })
         .attr('width', tpWidthsAdditive[tpIndex] * xScale.bandwidth())
-        .attr('fill', function (d) { return barFillColor(d.key, tpIndex) })
-        .attr('stroke', function (d) { return barStrokeColor(d.key, tpIndex) })
         .attr('stroke-width', 1)
         .on('mouseover', function (d) {
           // Set selected options
@@ -371,6 +404,8 @@
             } else {
               html = dax.text('explorer.chart.frequency_bar.tooltip.multiple_timepoints_missing', cutoff, perspectiveOptionText, timepointText)
             }
+          } else if (d.key === 'MISSING_TIMEPOINT') {
+            html = dax.text('explorer.chart.frequency_bar.tooltip.timepoint_missing', dax.text('timepoint' + d.timepoint))
           } else {
             const percentageText = dax.common.percentageFormat(d.end - d.start)
             const questionOptionText = d.key
@@ -580,6 +615,35 @@
     setSelectedTimepoint(selectedTimepoint, true)
   }
 
+  function getPatternUrl (backgroundColor, stripeColor) {
+    const key = 'pattern-stripes-' + backgroundColor.hex().replace('#', '') + '-' + stripeColor.hex().replace('#', '')
+    // generate pattern
+    if (!patternURLs.has(key)) {
+      // generate stripes: https://svg-stripe-generator.web.app/
+      const pattern = defs.append('pattern')
+        .attr('id', key)
+        .attr('patternUnits', 'userSpaceOnUse')
+        .attr('width', '7.5')
+        .attr('height', '7.5')
+        .attr('patternTransform', 'rotate(45)')
+      // background
+      pattern.append('rect')
+        .attr('width', '100%')
+        .attr('height', '100%')
+        .attr('fill', backgroundColor)
+      // stripe lines
+      pattern.append('line')
+        .attr('x1', '0')
+        .attr('y1', '0')
+        .attr('x2', '0')
+        .attr('y2', '7.5')
+        .attr('stroke', stripeColor)
+        .attr('stroke-width', 5)
+    }
+    patternURLs.add(key)
+    return 'url(#' + key + ')'
+  }
+
   function setSelectedTimepoint (selectedTimepointInput, instantAnimation) {
     instantAnimation = typeof instantAnimation === 'undefined' ? false : instantAnimation
     selectedTimepoint = selectedTimepointInput
@@ -601,7 +665,11 @@
               highlightedPerspectiveOption === d.option) {
             darken = 0.3
           }
-          return barFillColor(d.key, tpIndex).darker(darken)
+          const barColor = barFillColor(d.key, tpIndex).darker(darken)
+          if (d.key === 'MISSING_TIMEPOINT') {
+            return getPatternUrl(barColor, barColor.darker(0.3))
+          }
+          return barColor
         })
         .attr('stroke', function (d) { return barStrokeColor(d.key, tpIndex) })
       // Select rows with or without transition
@@ -651,8 +719,8 @@
       const rows = d3.selectAll('.freq-optionrow-section-tp' + tp)
       rows
         .style('filter', function (d) {
-          if (option === 'MISSING_DATA') {
-            return d.key === option ? 'brightness(0.93)' : null
+          if (option === 'MISSING_DATA' || option === 'MISSING_TIMEPOINT') {
+            return d.key === option ? null : 'brightness(0.93)'
           }
           return d.key === option ? null : 'grayscale(1) brightness(1.2)'
         })
@@ -669,30 +737,38 @@
 
   function barFillColor (key, tpIndex) {
     if (singleTimepointMode || selectedTimepoint === null || tpIndex === null) {
-      return key === 'MISSING_DATA' ? missingDataColor : d3.hsl(zScaleColor(key))
+      return key === 'MISSING_DATA' || key === 'MISSING_TIMEPOINT' ? missingDataColor : d3.hsl(zScaleColor(key))
     }
 
     const selectedTPIndex = timepoints.indexOf(selectedTimepoint)
     const indexDistance = Math.abs(selectedTPIndex - tpIndex)
 
-    const asymptoticLightnessTarget = 0.8
-    const lightnessDropoffRate = 1.3
+    if (key === 'MISSING_DATA' || key === 'MISSING_TIMEPOINT') {
+      const color = d3.hsl(0, 0, 0.63)
+      const asymptoticLightnessTarget = 0.85
+      const lightnessDropoffRate = 1.3
 
-    let color = missingDataColor
-    if (key !== 'MISSING_DATA') {
-      color = d3.hsl(zScaleColor(key)).darker(0.3)
+      const lightness = color.l
+      const targetDiff = asymptoticLightnessTarget - lightness
+      color.l = lightness + targetDiff - targetDiff / Math.pow(lightnessDropoffRate, indexDistance)
+      return color
+    } else {
+      const asymptoticLightnessTarget = 0.8
+      const lightnessDropoffRate = 1.3
+      const color = d3.hsl(zScaleColor(key)).darker(0.3)
+
+      const lightness = color.l
+      let targetDiff = asymptoticLightnessTarget - lightness
+      color.l = lightness + targetDiff - targetDiff / Math.pow(lightnessDropoffRate, indexDistance)
+
+      const asymptoticSaturationTarget = 0.25
+      const saturationDropoffRate = 1.5
+      const saturation = color.s
+      targetDiff = saturation - asymptoticSaturationTarget
+      color.s = saturation - targetDiff + targetDiff / Math.pow(saturationDropoffRate, indexDistance)
+
+      return color
     }
-    const lightness = color.l
-    let targetDiff = asymptoticLightnessTarget - lightness
-    color.l = lightness + targetDiff - targetDiff / Math.pow(lightnessDropoffRate, indexDistance)
-
-    const asymptoticSaturationTarget = 0.25
-    const saturationDropoffRate = 1.5
-    const saturation = color.s
-    targetDiff = saturation - asymptoticSaturationTarget
-    color.s = saturation - targetDiff + targetDiff / Math.pow(saturationDropoffRate, indexDistance)
-
-    return color
   }
 
   function barStrokeColor (key, tpIndex) {
@@ -752,7 +828,13 @@
       .style('opacity', function (option) { return hoveredOption === option ? 1 : 0.4 })
 
     legendMissingData
-      .style('opacity', function (option) { return hoveredOption === 'MISSING_DATA' ? 1 : 0.4 })
+      .style('opacity', function (option) {
+        return (hoveredOption === 'MISSING_DATA') ? 1 : 0.4
+      })
+    legendMissingTimepoint
+      .style('opacity', function (option) {
+        return (hoveredOption === 'MISSING_TIMEPOINT') ? 1 : 0.4
+      })
   }
 
   function legendOptionMouseOut () {
