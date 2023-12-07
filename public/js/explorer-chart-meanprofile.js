@@ -151,10 +151,11 @@
       })
 
     // TOOLTIPS
-    tooltipBody = chartContainer.append('div')
+    const mouseoverWrapper = d3.select('.chart-mouseover-wrapper')
+    tooltipBody = mouseoverWrapper.append('div')
       .classed('meanprofile__tooltip-body', true)
       .style('opacity', 0)
-    tooltipArrow = chartContainer.append('div')
+    tooltipArrow = mouseoverWrapper.append('div')
       .classed('meanprofile__tooltip-arrow', true)
       .style('opacity', 0)
 
