@@ -258,6 +258,7 @@
     headerTooltip.text('\xa0')
 
     hasMissingData = false
+    hasMissingTimepoint = false
 
     optionKeys = dax.data.getOptionTexts(question)
     optionKeys.push('MISSING_DATA')
@@ -486,6 +487,7 @@
 
     // Missing data option, show or hide
     legendMissingData.style('display', hasMissingData ? null : 'none')
+    legendMissingTimepoint.style('display', hasMissingTimepoint ? null : 'none')
 
     // UPDATE TIMEPOINT SPECIFIC POSITIONS
     // Set timepoint to current timepoint to update timepoint related positions
