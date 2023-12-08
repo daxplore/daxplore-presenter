@@ -215,9 +215,7 @@
     // Calculate available width, assuming to horizontal scroll for the page as a whole
     const availableWidth = windowWidth -
               leftSidebarWidth -
-              rightSidebarWidth - // right sidebar
-              2 - // border of 1px + 1px (if changed here, needs to be changed in css)
-              1 // 1 px fudge to account for rounding
+              rightSidebarWidth // right sidebar
 
     // Minimum width needed for the header and bottom blocks
     const topBotNeededWidth = Math.max(headerBlockWidth, bottomBlockWidth)
@@ -226,7 +224,9 @@
     // block require more width. In that case also allow the chart to be so big that the page as a
     // whole gets a vertical scroll bar. If the chart's minimum width is larger than the available
     // width then it's up to the chart to put itself in a horizontal scroll panel.
-    const widthForChart = Math.max(availableWidth, topBotNeededWidth)
+    const widthForChart = Math.max(availableWidth, topBotNeededWidth) -
+      2 - // border of 1px + 1px (if changed here, needs to be changed in css)
+      1 // 1 px fudge to account for rounding
     switch (selectedTab) {
     case 'FREQ':
       switch (dax.settings('explorer.chart.frequency.orientation')) {

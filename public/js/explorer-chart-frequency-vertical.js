@@ -9,26 +9,26 @@
   const paddingInner = 0.3
   const paddingOuter = 0.3
   let yAxisWidth = 0
-  const xAxisTopHeight = 30
-  const margin = { top: 10, right: 25, bottom: xAxisTopHeight, left: 10 }
+  const xAxisTopHeight = 10
+  const margin = { top: 10, right: 25, bottom: 20, left: 10 }
   const missingDataColor = d3.hsl('#BBB') // TODO externalize to producer?
   // const saveImageCanvasWidth = 600
-
-  const fullMultipointAnimations = false // TODO MUST BE EXTERNALIZED
+  const elementTransition = d3.transition().duration(300).ease(d3.easeLinear)
 
   // SIZE VARIABLES
   let availableWidth = 600 // initial placeholder value
   let width = availableWidth
-  let availableHeight = 300 // initial placeholder value
-  let height = availableHeight
+  // let availableHeight = 300
+  // let height = 300 // initial placeholder value
 
   // CHART RESOURCES
   // HEADER
   let headerDiv, headerMain, headerSub, headerTooltip
   // SCALES AND AXISES
   // let xScale, xAxis, xAxisElement
-  let xScale, xAxisScale, xAxis, xAxisElement
-  let yScale, yAxisScale, yAxis, yAxisElement
+  let xScale, xAxisScale
+  let xAxisBottom, xAxisBottomElement, xAxisTop, xAxisTopElement
+  let yScale, yAxis, yAxisElement
   let zScaleColor
   // CHART
   let chartContainer, chartBB, chart, chartG
@@ -36,6 +36,9 @@
   let legendDiv, legendQuestionHeader, legendQuestionOptionTable, legendMissingData
   // BUTTONS
   let saveImageButton
+
+  // STATE TRACKING
+  let animateNextUpdate = false
 
   // CURRENT FREQUENCY CHART
   let question, perspective, data
@@ -88,18 +91,27 @@
       .rangeRound([0, width])
       .domain([0, 1])
 
-    xAxis = d3.axisBottom(xAxisScale)
+    xAxisBottom = d3.axisBottom(xAxisScale)
       .tickFormat(d3.format('.0%'))
       .tickSize(0)
-      .tickSizeInner(height)
+      // .tickSizeInner(height)
 
-    xAxisElement = chartG.append('g')
+    xAxisBottomElement = chartG.append('g')
       .attr('class', 'axis frequency-x-axis')
-      .call(xAxis)
+      .call(xAxisBottom)
+
+    xAxisTop = d3.axisTop(xAxisScale)
+      .tickFormat(d3.format('.0%'))
+      .tickSize(0)
+      .tickSizeInner(0)
+
+    xAxisTopElement = chartG.append('g')
+      .attr('class', 'axis frequency-x-axis')
+      .call(xAxisTop)
 
     // y axis
     yScale = d3.scaleBand()
-      .rangeRound([0, height])
+      // .rangeRound([0, height])
       .paddingInner(paddingInner)
       .paddingOuter(paddingOuter)
 
@@ -149,31 +161,6 @@
     legendDiv.append('div')
       .style('flex', '3')
 
-    // INITIALIZE SVG TRANSFORMATIONS
-    // Generate matrix transformations for svg elements, to make them work in IE11
-    // See: https://stackoverflow.com/a/28726517
-    const styleHelperDiv = chartContainer.append('div')
-
-    styleHelperDiv.style('transform',
-      fullMultipointAnimations
-        ? 'translate(-14px, 19px) rotate(-45deg)'
-        : 'translate(-8px, 19px) rotate(-45deg)'
-    )
-
-    styleHelperDiv.style('transform',
-      fullMultipointAnimations
-        ? 'translate(-13px, 4px) rotate(0deg)'
-        : 'translate(-8px, 16px) rotate(-45deg)'
-    )
-
-    styleHelperDiv.style('transform',
-      fullMultipointAnimations
-        ? 'translate(-8px, 0px) rotate(45deg)'
-        : 'translate(-8px, 19px) rotate(-45deg)'
-    )
-
-    styleHelperDiv.remove()
-
     // SAVE IMAGE BUTTON
     // TODO create general save button manager
     saveImageButton = d3.select('.chart-panel').append('div')
@@ -188,6 +175,7 @@
   exports.populateChart =
   function (questionID, perspectiveID, selectedPerspectiveOptionIndicesInput) {
     displayChartElements(true)
+    animateNextUpdate = true
     perspective = perspectiveID
     question = questionID
     selectedPerspectiveOptionIndices = selectedPerspectiveOptionIndicesInput
@@ -366,9 +354,9 @@
   // Updates the chart so it fits in the new size.
   // As a side effect, enable horizontal scrolling if needed for the chart to fit the given room.
   exports.setSize =
-  function (availableWidthInput, availableHeightInput) {
+  function (availableWidthInput) {
+    animateNextUpdate = availableWidth === availableWidthInput
     availableWidth = availableWidthInput
-    availableHeight = availableHeightInput
     resizeAndPositionElements()
   }
 
@@ -414,25 +402,47 @@
         }
       })
 
-    // const chartNeededWidth = xAxisWidth + outsideMargin * 2 + innerMarginBars * (selectedPerspectiveOptionCount - 1) +
-    //                         minWidthBar * selectedPerspectiveOptionCount
+    // UPDATE Y-AXIS
+    yScale.range([xAxisTopHeight, yStop]) // TODO switch
 
-    const chartNeededWidth = longestPerspectiveOptionTextLength + 600 // TODO placeholder
+    // Update the space available for the y axis
+    yAxisElement
+      .call(yAxis)
+
+    const oldYAxisWidth = yAxisWidth
+    yAxisWidth = Math.max(50, yAxisElement.node().getBBox().width)
+
+    yAxisElement.interrupt().selectAll('*').interrupt()
+    conditionalApplyTransition(yAxisElement, elementTransition, animateNextUpdate)
+      .style('transform', 'translate(' + yAxisWidth + 'px,0)')
+
+    const chartNeededWidth = margin.left + margin.right + yAxisWidth + 300
     // Check if vertical scroll is needed
     const scrollNeeded = availableWidth < chartNeededWidth
 
     // Enable or disable scroll on the div containing the frequency cchart
     d3.select('.chart')
       .classed('chart-scroll', scrollNeeded)
-      .style('width', function () { return scrollNeeded ? availableWidth + 'px' : null })
+      .style('width', scrollNeeded ? availableWidth + 'px' : null)
 
+    // SET MAIN ELEMENT WIDTH AND HEIGHT
     // Update width of the chart, which may be bigger than the available space if scrolling is enabled
     width = scrollNeeded ? chartNeededWidth : availableWidth
     width = width - margin.left - margin.right
-    height = availableHeight - margin.top - margin.bottom
+    // height = availableHeight - margin.top - margin.bottom
     chart
       .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom)
+
+    // chart
+    //   .attr('width', width)
+
+    // Skip animation if it would result in an iframe resize
+    const newHeight = yStop + margin.top + margin.bottom
+    // const isSmaller = newHeight <= tallestChartSoFar
+    // tallestChartSoFar = Math.max(newHeight, tallestChartSoFar)
+    // conditionalApplyTransition(chart, elementTransition, animateNextUpdate && isSmaller)
+    chart.attr('height', newHeight)
+    // .attr('height', height + margin.top + margin.bottom)
 
     // Update bounding box definition for the chart
     const wrapperClientBB = d3.select('.chart').node().getBoundingClientRect()
@@ -443,31 +453,19 @@
       width: wrapperClientBB.width,
     }
 
-    // UPDATE Y-AXIS
-    yScale.range([0, height]) // TODO switch
-
-    // Update the space available for the y axis
-    // yScale.rangeRound([0, height])
-    // Move and update the y axis with the new range
-    yAxisElement
-    // .attr('transform', 'translate(' + width + ',0)')
-      .call(yAxis)
-
-    yAxisWidth = Math.max(50, yAxisElement.node().getBBox().width)
-
-    // yAxisElement
-    //   .style('transform', 'translate(' + yAxisWidth + ',0)')
-
-    yAxisElement
-      .style('transform', 'translate(' + yAxisWidth + 'px,0)')
-
     // UPDATE X AXIS
     xScale.rangeRound([yAxisWidth, width - 2])
     xAxisScale.rangeRound([yAxisWidth, width])
-    xAxis.tickSizeInner(height)
-    xAxisElement
-      // .attr('transform', 'translate(' + 0 + ',0)')
-      .call(xAxis)
+    xAxisBottom.tickSizeInner(-(yStop - xAxisTopHeight))
+    xAxisBottomElement
+    // conditionalApplyTransition(xAxisBottomElement, elementTransition, animateNextUpdate)
+      .attr('transform', 'translate(' + 0 + ',' + yStop + ')')
+      .call(xAxisBottom)
+
+    xAxisTopElement
+    // conditionalApplyTransition(xAxisBottomElement, elementTransition, animateNextUpdate)
+      .attr('transform', 'translate(' + 0 + ',' + xAxisTopHeight + ')')
+      .call(xAxisTop)
 
     // UPDATE BARS
     // Update size and position for each bar element
@@ -545,5 +543,10 @@
     // Set all legend rows to visible again
     const rows = d3.selectAll('.freqs__legend .legend__row')
     rows.style('opacity', 1)
+  }
+
+  // Helper
+  function conditionalApplyTransition (selection, transition, useTransition) {
+    return useTransition ? selection.transition(transition) : selection
   }
 })(window.dax = window.dax || {})
