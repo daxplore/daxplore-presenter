@@ -54,13 +54,13 @@
   function (primaryColors) {
     // INITIALIZE HEADER
     headerDiv = d3.select('.header-section').append('div')
-      .attr('class', 'header-section__freqs')
+      .attr('class', 'header-section__freqs-vertical')
     headerMain = headerDiv.append('div')
       .attr('class', 'header-section__main')
     headerSub = headerDiv.append('div')
       .attr('class', 'header-section__sub')
     headerTooltip = headerDiv.append('div')
-      .attr('class', 'header-section__freq-tooltip')
+      .attr('class', 'header-section__freq-vertical-tooltip')
       .text('\xa0')
 
     // INITIALIZE CHART
@@ -409,7 +409,6 @@
     yAxisElement
       .call(yAxis)
 
-    const oldYAxisWidth = yAxisWidth
     yAxisWidth = Math.max(50, yAxisElement.node().getBBox().width)
 
     yAxisElement.interrupt().selectAll('*').interrupt()
