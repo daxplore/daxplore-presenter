@@ -87,7 +87,7 @@
       .tickFormat(function (opt) {
         const optSplit = opt.split('|')
         switch (optSplit[0]) {
-        case 'HEADER': return dax.data.getPerspectivesOptionTexts(perspectives.slice(0, 1), optSplit[1])
+        case 'HEADER': return dax.data.getPerspectivesOptionTexts(perspectives.slice(0, 1), Number(optSplit[1]))
         case 'DATA': return dax.data.getPerspectivesOptionTexts(perspectives, optSplit[1]).slice(-1)
         }
       })
@@ -191,7 +191,7 @@
     selectedOptionsDataMap = {}
     let secondarySection = -1
     let firstOptionData = null
-    selectedPerspectiveOptions.forEach(function (option, i) {
+    selectedPerspectiveOptions.forEach(function (option) {
       if (perspectives.length === 2) {
         const newSecondarySection = Math.floor(option / dax.data.getQuestionOptionCount(perspectives[1]))
         if (secondarySection !== newSecondarySection) {
@@ -279,7 +279,7 @@
     const bandWidth = 20
     // rearranged equation from d3's source file band.js, ignoring the floor call
     // https://github.com/d3/d3-scale/blob/fd07dd8ceeaeaec612f675050ac134243b406f64/src/band.js#L26
-    const barSectionHeight = Math.max(1, selectedPerspectiveOptions.length - paddingInner + paddingOuter * 2) * bandWidth / (1 - paddingInner)
+    const barSectionHeight = Math.max(1, selectedOptionsData.length - paddingInner + paddingOuter * 2) * bandWidth / (1 - paddingInner)
     const yStop = barSectionHeight + xAxisTopHeight
 
     // UPDATE Y
@@ -388,6 +388,7 @@
     xAxisBottomDescription.attr('transform', 'translate(' + (width - yAxisWidth) / 2 + ', 28)')
 
     // BARS
+    // Set bar data
     bars = chartG.selectAll('.bar')
       .data(
         selectedOptionsData, // data

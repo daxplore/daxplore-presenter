@@ -1,0 +1,5 @@
+.freq__legend {
+    display: flex;
+    flex-direction: column;
+    overflow-y: visible;
+}

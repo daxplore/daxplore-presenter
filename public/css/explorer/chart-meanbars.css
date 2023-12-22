@@ -1,5 +1,4 @@
-.meanbars__legend,
-.freqs__legend {
+.meanbars__legend {
   display: flex;
   flex-direction: column;
   overflow-y: visible;

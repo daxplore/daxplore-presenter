@@ -144,7 +144,7 @@
     // INITIALIZE LEGEND
     // top level freqs legend container
     legendDiv = d3.select('.legend').append('div')
-      .attr('class', 'freqs__legend')
+      .attr('class', 'freq__legend')
 
     // empty flex element, used to dynamically align the legend content vertically
     legendDiv.append('div')
@@ -432,7 +432,7 @@
 
       if (!singleTimepointMode) {
         // add/remove/update bar timepoint tick texts
-        const timeticks = chartG.selectAll('.freq-bar-timetick-wrapper-' + tp)
+        const timeticks = chartG.selectAll('.frequency-bar-timetick-wrapper-' + tp)
           .data(selectedPerspectiveOptions)
 
         timeticks.exit().remove()

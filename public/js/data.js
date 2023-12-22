@@ -42,14 +42,37 @@
 
   // Returns an array with the number of respondents for each question option
   exports.getFrequency =
-  function (questionID, perspectiveID, perspectiveOptionIndex, timepoint) {
-    const perspectiveOption = getQuestionOptionDefinition(perspectiveID, perspectiveOptionIndex)
+  function (questionID, perspectives, combinedPerspectiveOptionIndex, timepoint) {
     timepoint = typeof timepoint !== 'undefined' ? timepoint : questionMeta[questionID].timepoints[0] // default to first defined timepoint
-    const stat = questionData[questionID][perspectiveOption.dataQuestion].freq[timepoint]
-    if (perspectiveOptionIndex === 'ALL_RESPONDENTS') {
+    // Only primary perspective
+    if (perspectives.length === 1) {
+      const perspectiveOption = getQuestionOptionDefinition(perspectives[0], combinedPerspectiveOptionIndex)
+      const stat = questionData[questionID][perspectiveOption.dataQuestion].freq[timepoint]
+      if (combinedPerspectiveOptionIndex === 'ALL_RESPONDENTS') {
+        return stat.all
+      }
+      return stat[perspectiveOption.dataOption]
+    }
+    // Primary and secondary perspective
+    const p2OptionCount = exports.getQuestionOptionCount(perspectives[1])
+    const p1Index = Math.floor(combinedPerspectiveOptionIndex / p2OptionCount)
+    const p2Index = combinedPerspectiveOptionIndex % p2OptionCount
+    const perspective1Option = getQuestionOptionDefinition(perspectives[0], p1Index)
+    const perspective2Option = getQuestionOptionDefinition(perspectives[1], p2Index)
+    const dataPerspectives = [perspective1Option.dataQuestion, perspective2Option.dataQuestion]
+    let dataItem = questionData[questionID][dataPerspectives]
+    let dataIndex = perspective1Option.dataOption + ',' + perspective2Option.dataOption
+    if (typeof dataItem === 'undefined') {
+      // Perspective combination missing, assume the reverse perspective order exists in the data file
+      dataPerspectives.reverse()
+      dataItem = questionData[questionID][dataPerspectives]
+      dataIndex = perspective2Option.dataOption + ',' + perspective1Option.dataOption
+    }
+    const stat = dataItem.freq[timepoint]
+    if (combinedPerspectiveOptionIndex === 'ALL_RESPONDENTS') {
       return stat.all
     }
-    return stat[perspectiveOption.dataOption]
+    return stat[dataIndex]
   }
 
   // META
