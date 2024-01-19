@@ -2,11 +2,6 @@
   position: relative;
 }
 
-.chart-perspective-column {
-  overflow-x: hidden;
-  overflow-y: hidden;
-}
-
 @media all and (-ms-high-contrast: none),
 (-ms-high-contrast: active) {
   /* IE11 CSS styles go here */
@@ -30,4 +25,9 @@
   border: 1px solid #BBB;
   border-top: none;
   position: relative;
+}
+
+.chart-sidebar-row {
+  display: flex;
+  flex-direction: row;
 }

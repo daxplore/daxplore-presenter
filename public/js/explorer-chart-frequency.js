@@ -148,15 +148,17 @@
 
     // empty flex element, used to dynamically align the legend content vertically
     legendDiv.append('div')
-      .style('flex', '1')
+      .style('flex', '2.5')
 
     // legend for the question and selected options
     legendQuestionHeader = legendDiv.append('h4')
       .attr('class', 'legend__header')
     legendQuestionOptionTable = legendDiv.append('div')
-    legendMissingData = legendDiv.append('div')
-      .attr('class', 'legend__row')
+
+    const legendMissingWrapper = legendDiv.append('div')
       .style('margin-top', '15px')
+    legendMissingData = legendMissingWrapper.append('div')
+      .attr('class', 'legend__row')
     legendMissingData.append('div')
       .attr('class', 'legend__color-square')
       .style('background-color', missingDataColor)
@@ -172,7 +174,7 @@
         legendOptionMouseOut()
         unsetHorizontalHighlight()
       })
-    legendMissingTimepoint = legendDiv.append('div')
+    legendMissingTimepoint = legendMissingWrapper.append('div')
       .attr('class', 'legend__row')
     legendMissingTimepoint.append('div')
         .attr('class', 'legend__color-square')
@@ -247,7 +249,11 @@
     const questionTimepoints = dax.data.getTimepoints(question)
     let removedTimepoints = []
     if (dax.settings('explorer.chart.frequency.show_empty_timepoints')) {
-      timepoints = dax.settings('all_timepoints')
+      const newTimepoints = dax.settings('all_timepoints')
+      removedTimepoints = timepoints.filter(function (tp) {
+        return newTimepoints.indexOf(tp) === -1
+      })
+      timepoints = newTimepoints
     } else {
       removedTimepoints = timepoints.filter(function (tp) { return !dax.data.hasTimepoint(question, tp) })
       timepoints = questionTimepoints
@@ -344,6 +350,7 @@
       // removing everything instead of updating is a hack
       // TODO: figure out how to make enter/exit code work with this chart structure
       chartG.selectAll('.freq-optionrow-tp' + tp).remove()
+      chartG.selectAll('.freq-bar-timetick-wrapper-' + tp).remove()
 
       const rowData = d3.stack().keys(optionKeys)(tpData)
       const questionOptionRows = chartG.selectAll('.freq-optionrow-tp' + tp)
@@ -570,8 +577,8 @@
     const wrapperClientBB = d3.select('.chart').node().getBoundingClientRect()
     chartBB = {
       height: wrapperClientBB.height,
-      left: wrapperClientBB.left + pageXOffset,
-      top: wrapperClientBB.top + pageYOffset,
+      left: wrapperClientBB.left + scrollX,
+      top: wrapperClientBB.top + scrollY,
       width: wrapperClientBB.width,
     }
 
@@ -609,7 +616,6 @@
     // Set the vertical position and height of the legend area
     // The position of the legend div is then adjusted via flex parameters relative the defined area
     legendDiv
-      .style('margin-top', (chartBB.top + 0) + 'px')
       .style('height', chartBB.height + 'px')
 
     // UPDATE TIMEPOINT SPECIFIC POSITIONS
@@ -722,7 +728,7 @@
       rows
         .style('filter', function (d) {
           if (option === 'MISSING_DATA' || option === 'MISSING_TIMEPOINT') {
-            return d.key === option ? null : 'brightness(0.93)'
+            return d.key === option ? 'brightness(0.93)' : null
           }
           return d.key === option ? null : 'grayscale(1) brightness(1.2)'
         })
@@ -822,7 +828,7 @@
   }
 
   function legendOptionMouseOver (hoveredOption) {
-    const rows = d3.selectAll('.freqs__legend .legend__row')
+    const rows = d3.selectAll('.freq__legend .legend__row')
     // Stop all current legend row animations
     rows.interrupt().selectAll('*').interrupt()
     // Fade non-selected options
@@ -841,7 +847,7 @@
 
   function legendOptionMouseOut () {
     // Set all legend rows to visible again
-    const rows = d3.selectAll('.freqs__legend .legend__row')
+    const rows = d3.selectAll('.freq__legend .legend__row')
     rows.style('opacity', 1)
   }
 

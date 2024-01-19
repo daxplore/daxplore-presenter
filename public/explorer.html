@@ -148,50 +148,51 @@
         <div class="header-section-wrapper header-outer">
           <div class="header-section"></div>
         </div>
-
-        <!-- Contains chart titles, tabs and chart. -->
-        <!-- Populated by explorer-chart-panel.js and different chart-*.js classes -->
-        <div class="chart-panel">         
-          <!-- Tabs used to select the chart to display when there are multiple -->
-          <!-- supported charts for a given question/perspective combination -->
-          <!-- Managed/populated by explorer-chart-panel.js -->
-          <div class="chart-tabs">
-            <div class="chart-tab-spacing freq"></div>
-            <div class="chart-tab freq chart-tab-selected"></div>
-            <div class="chart-tab-spacing mean"></div>
-            <div class="chart-tab mean"></div>
-            <div class="chart-tab-spacing dich"></div>
-            <div class="chart-tab dich"></div>
-            <div class="chart-tab-filler"></div>
-          </div>
-          <div class="tab-container">
-            <div class="chart-mouseover-wrapper"></div>
-
-            <!-- The INNER header section of the chart, which is populated by different chart-*.js -->
-            <div class="header-section-wrapper header-inner">
-              <div class="header-section"></div>
+        
+        <!-- Structural row that contains the chart and legend -->
+        <div class="chart-sidebar-row">
+          <!-- Contains chart titles, tabs and chart. -->
+          <!-- Populated by explorer-chart-panel.js and different chart-*.js classes -->
+          <div class="chart-panel">         
+            <!-- Tabs used to select the chart to display when there are multiple -->
+            <!-- supported charts for a given question/perspective combination -->
+            <!-- Managed/populated by explorer-chart-panel.js -->
+            <div class="chart-tabs">
+              <div class="chart-tab-spacing freq"></div>
+              <div class="chart-tab freq chart-tab-selected"></div>
+              <div class="chart-tab-spacing mean"></div>
+              <div class="chart-tab mean"></div>
+              <div class="chart-tab-spacing dich"></div>
+              <div class="chart-tab dich"></div>
+              <div class="chart-tab-filler"></div>
             </div>
+            <div class="tab-container">
+              <div class="chart-mouseover-wrapper"></div>
 
-            <!-- Wrapper for the actual chart, populated by different chart-*.js -->
-            <div class="chart"></div>
+              <!-- The INNER header section of the chart, which is populated by different chart-*.js -->
+              <div class="header-section-wrapper header-inner">
+                <div class="header-section"></div>
+              </div>
+
+              <!-- Wrapper for the actual chart, populated by different chart-*.js -->
+              <div class="chart"></div>
+
+              <!-- Contains description panel, populated by explorer-description-panel.js -->
+              <div class="description-panel__button description-header">
+                <div class="description-panel description-header"></div>
+              </div>
+            </div>
 
             <!-- Contains description panel, populated by explorer-description-panel.js -->
-            <div class="description-panel__button description-header">
-              <div class="description-panel description-header"></div>
-            </div>
+            <div class="description-panel description-bottom"></div>
+          </div>
+
+          <!-- Structural column that contains the legend -->
+          <div class="sidebar-column">
+            <!-- Contains the chart legend, populated by different chart-*.js -->
+            <div class="legend"></div>
           </div>
         </div>
-
-        <!-- Contains description panel, populated by explorer-description-panel.js -->
-        <div class="description-panel description-bottom"></div>
-      </div>
-
-
-
-      <!-- Structural column that contains the legend -->
-      <div class="sidebar-column">
-        <!-- Contains the chart legend, populated by different chart-*.js -->
-        <div class="legend"></div>
       </div>
   </body>
 </html>

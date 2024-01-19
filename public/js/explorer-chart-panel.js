@@ -100,25 +100,6 @@
     dax.chart.meanprofile.hide()
     dax.chart.dichtimeline.hide()
 
-    // TODO allow for animated updates of same chart type
-    // d3.select('.chart')
-    //     .selectAll(function () { return this.childNodes })
-    //     .remove()
-    //
-    // d3.select('.legend').html('')
-    //
-    // d3.select('.header-section-sub, .header-section-dichsub, .header-section-freq-tooltip')
-    //   .text('')
-
-    // Add new content
-    // let questionMeta = questionMap[questionID]
-    // d3.select('.header-section-header').text(questionMeta.short)
-    // if (questionMeta.short !== questionMeta.text) {
-    //   d3.select('.header-section-sub').text(questionMeta.text)
-    // }
-    // d3.select('.header-section-dichsub').text(dichSubtitle)
-    // d3.select('.header-section-freq-tooltip').text('')
-
     // reset any side scroll set by previous charts
     d3.select('.chart-panel')
       .classed('chart-scroll', false)
@@ -140,6 +121,9 @@
         }
         return 'none'
       })
+
+    d3.select('.legend')
+      .style('margin-top', d3.select('.chart-tabs').node().getBoundingClientRect().height + 'px')
 
     // Select chart to displaytypes
     switch (selectedTab) {
@@ -202,29 +186,18 @@
     const windowWidth = document.documentElement.clientWidth
     const leftSidebarWidth = d3.select('.question-panel').node().offsetWidth
     const rightSidebarWidth = d3.select('.sidebar-column').node().offsetWidth
-    const headerBlockWidth = d3.select('.header-section-wrapper').node().offsetWidth
-
-    let bottomBlockWidth = 0
-    if (dax.settings('explorer.description.position') === 'BOTTOM') {
-      const descriptionPanel = d3.select('.description-panel.description-bottom').node()
-      if (descriptionPanel !== null && descriptionPanel.offsetWidth > 0) {
-        bottomBlockWidth = 350 // TODO hard coded
-      }
-    }
 
     // Calculate available width, assuming to horizontal scroll for the page as a whole
-    const availableWidth = windowWidth -
-              leftSidebarWidth -
-              rightSidebarWidth // right sidebar
+    const availableWidth = windowWidth - leftSidebarWidth - rightSidebarWidth
 
     // Minimum width needed for the header and bottom blocks
-    const topBotNeededWidth = Math.max(headerBlockWidth, bottomBlockWidth)
+    // const topBotNeededWidth = Math.max(headerBlockWidth, bottomBlockWidth)
 
     // Use all the width available with no scrolling for the chart  unless the header or bottom
     // block require more width. In that case also allow the chart to be so big that the page as a
     // whole gets a vertical scroll bar. If the chart's minimum width is larger than the available
     // width then it's up to the chart to put itself in a horizontal scroll panel.
-    const widthForChart = Math.max(availableWidth, topBotNeededWidth) -
+    const widthForChart = availableWidth -
       2 - // border of 1px + 1px (if changed here, needs to be changed in css)
       1 // 1 px fudge to account for rounding
     switch (selectedTab) {

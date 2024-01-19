@@ -24,9 +24,10 @@
 .freq-vertical__legend {
     display: flex;
     flex-direction: column;
+    margin-top: 40px;
     overflow-y: visible;
-    top: 40px;
     position: sticky;
+    top: 40px;
 }
 
 @media (max-width: 900px) {

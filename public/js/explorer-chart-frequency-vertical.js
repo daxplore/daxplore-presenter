@@ -30,7 +30,7 @@
   let yScale, yAxis, yAxisElement, yAxisReferenceElement
   let zScaleColor
   // CHART
-  let chartContainer, chartBB, chart, chartG
+  let chartContainer, chart, chartG
   // LEGEND
   let legendDiv, legendQuestionHeader, legendQuestionOptionTable, legendMissingData
   // BUTTONS
@@ -114,7 +114,7 @@
       .paddingOuter(paddingOuter)
 
     yAxis = d3.axisLeft(yScale)
-      .tickSize(3)
+      .tickSize(0)
       .tickFormat(function (opt) {
         const optSplit = opt.split('|')
         switch (optSplit[0]) {
@@ -138,10 +138,6 @@
     legendDiv = d3.select('.legend').append('div')
       .attr('class', 'freq-vertical__legend')
 
-    // empty flex element, used to dynamically align the legend content vertically
-    legendDiv.append('div')
-      .style('flex', '1')
-
     // legend for the question and selected options
     legendQuestionHeader = legendDiv.append('h4')
       .attr('class', 'legend__header')
@@ -149,13 +145,6 @@
     legendMissingData = legendDiv.append('div')
       .attr('class', 'legend__row')
       .style('margin-top', '15px')
-    legendMissingData.append('div')
-      .attr('class', 'legend__color-square')
-      .style('background-color', missingDataColor)
-    legendMissingData.append('div')
-      .attr('class', 'legend__row-text')
-      .text(dax.text('explorer.chart.frequency_bar.legend.missing_data'))
-      .attr('title', dax.text('explorer.chart.frequency_bar.legend.missing_data'))
       .on('mouseover', function () {
         setHorizontalHighlight('MISSING_DATA')
         legendOptionMouseOver('MISSING_DATA')
@@ -164,10 +153,13 @@
         legendOptionMouseOut()
         unsetHorizontalHighlight()
       })
-
-    // empty flex element, used to dynamically align the legend content vertically
-    legendDiv.append('div')
-      .style('flex', '3')
+    legendMissingData.append('div')
+      .attr('class', 'legend__color-square')
+      .style('background-color', missingDataColor)
+    legendMissingData.append('div')
+      .attr('class', 'legend__row-text')
+      .text(dax.text('explorer.chart.frequency_bar.legend.missing_data'))
+      .attr('title', dax.text('explorer.chart.frequency_bar.legend.missing_data'))
 
     // SAVE IMAGE BUTTON
     // TODO create general save button manager
@@ -318,7 +310,7 @@
           })
 
         // Create html for contextual header tooltip
-        const perspectiveOptionText = d.index
+        const perspectiveOptionText = dax.data.getPerspectivesOptionTexts(perspectives, d.index).join(', ')
         let html
         if (d.key === 'MISSING_DATA') {
           const cutoff = dax.settings('export.statistics.group_cutoff')
@@ -479,13 +471,14 @@
     chart.attr('height', yStop + margin.top + margin.bottom)
 
     // Update bounding box definition for the chart
-    const wrapperClientBB = d3.select('.chart').node().getBoundingClientRect()
-    chartBB = {
-      height: wrapperClientBB.height,
-      left: wrapperClientBB.left + window.scrollX,
-      top: wrapperClientBB.top + window.scrollY,
-      width: wrapperClientBB.width,
-    }
+    // TODO clean up
+    // const wrapperClientBB = d3.select('.chart').node().getBoundingClientRect()
+    // chartBB = {
+    //   height: wrapperClientBB.height,
+    //   left: wrapperClientBB.left + window.scrollX,
+    //   top: wrapperClientBB.top + window.scrollY,
+    //   width: wrapperClientBB.width,
+    // }
 
     // UPDATE X AXIS
     xScale.rangeRound([yAxisWidth, width - 2])
@@ -513,12 +506,6 @@
       .attr('x', function (d) { return xScale(d.start) })
       .attr('y', function (d) { return yScale(d.rowKey) })
       .attr('width', function (d) { return xScale(d.end) - xScale(d.start) })
-
-    // LEGEND
-    // Set the vertical position and height of the legend area
-    // The position of the legend div is then adjusted via flex parameters relative the defined area
-    legendDiv
-      .style('margin-top', (chartBB.top + 20) + 'px')
 
     // UPDATE STYLES
     updateStyles()
