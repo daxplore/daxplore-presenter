@@ -9,7 +9,7 @@
   const bandWidth = 27
   const paddingInner = 0.2
   const paddingOuter = 0.3
-  let yAxisWidth = 0
+  const tooltipBarArrowDistance = 7
   const xAxisTopHeight = 10
   const margin = { top: 10, right: 25, bottom: 20, left: 10 }
   const missingDataColor = d3.hsl('#BBB') // TODO externalize to producer?
@@ -22,12 +22,13 @@
 
   // CHART RESOURCES
   // HEADER
-  let headerDiv, headerMain, headerSub, headerTooltip
+  let headerDiv, headerMain, headerSub
   // SCALES AND AXISES
   // let xScale, xAxis, xAxisElement
   let xScale, xAxisScale
   let xAxisBottom, xAxisBottomElement, xAxisTop, xAxisTopElement
   let yScale, yAxis, yAxisElement, yAxisReferenceElement
+  let yAxisWidth = 0
   let zScaleColor
   // CHART
   let chartContainer, chart, chartG
@@ -35,6 +36,8 @@
   let legendDiv, legendQuestionHeader, legendQuestionOptionTable, legendMissingData
   // BUTTONS
   let saveImageButton
+  // TOOLTIP
+  let tooltipArrow, tooltipBody
 
   // STATE TRACKING
   let animateNextUpdate = false
@@ -59,9 +62,6 @@
       .attr('class', 'header-section__main')
     headerSub = headerDiv.append('div')
       .attr('class', 'header-section__sub')
-    headerTooltip = headerDiv.append('div')
-      .attr('class', 'header-section__freq-vertical-tooltip')
-      .text('\xa0')
 
     // INITIALIZE CHART
     // base div element
@@ -133,6 +133,15 @@
     // z axis, color coding
     zScaleColor = d3.scaleOrdinal().range(primaryColors)
 
+    // INITIALIZE TOOLTIPS
+    const mouseoverWrapper = d3.select('.chart-mouseover-wrapper')
+    tooltipBody = mouseoverWrapper.append('div')
+      .classed('freq-vertical__tooltip-body', true)
+      .style('opacity', 0)
+    tooltipArrow = mouseoverWrapper.append('div')
+      .classed('freq-vertical__tooltip-arrow', true)
+      .style('opacity', 0)
+
     // INITIALIZE LEGEND
     // top level freqs legend container
     legendDiv = d3.select('.legend').append('div')
@@ -158,8 +167,8 @@
       .style('background-color', missingDataColor)
     legendMissingData.append('div')
       .attr('class', 'legend__row-text')
-      .text(dax.text('explorer.chart.frequency_bar.legend.missing_data'))
-      .attr('title', dax.text('explorer.chart.frequency_bar.legend.missing_data'))
+      .text(dax.text('explorer.chart.frequency_bar_vertical.legend.missing_data'))
+      .attr('title', dax.text('explorer.chart.frequency_bar_vertical.legend.missing_data'))
 
     // SAVE IMAGE BUTTON
     // TODO create general save button manager
@@ -184,10 +193,6 @@
     // ANIMATIONS
     populateCount++
     animateNextUpdate = populateCount > 1
-
-    // TOOLTIP
-    // Reset mouseover effects when loading new chart
-    headerTooltip.text('\xa0')
 
     // DATA
     hasMissingData = false
@@ -292,6 +297,7 @@
       .attr('stroke', function (d) { return barStrokeColor(d.key, 0) })
       .attr('stroke-width', 1)
       .on('mouseover', function (d) {
+        tooltipOverBar(d)
         // Set selected options
         highlightedQuestionOption = d.key
         // highlightedPerspectiveOption = d.index
@@ -308,32 +314,18 @@
             const optSplit = opt.split('|')
             return optSplit[0] === 'DATA' && parseInt(optSplit[1]) === d.index
           })
-
-        // Create html for contextual header tooltip
-        const perspectiveOptionText = dax.data.getPerspectivesOptionTexts(perspectives, d.index).join(', ')
-        let html
-        if (d.key === 'MISSING_DATA') {
-          const cutoff = dax.settings('export.statistics.group_cutoff')
-          html = dax.text('explorer.chart.frequency_bar.tooltip.single_timepoint_missing', cutoff, perspectiveOptionText) // TODO externalize cutoff
-        } else {
-          const percentageText = dax.common.percentageFormat(d.end - d.start)
-          const questionOptionText = d.key
-          const color = barStrokeColor(d.key, 0).darker(0.7)
-          html = dax.text('explorer.chart.frequency_bar.tooltip.single_timepoint', percentageText, perspectiveOptionText, questionOptionText, color)
-        }
-        // Set new header tooltip
-        headerTooltip.html(html)
       })
       .on('mouseout', function (d) {
+        tooltipOut()
         // Reset color filter
         d3.select(this)
           .style('filter', null)
         // Deselect any legend options
         legendOptionMouseOut()
-        headerTooltip.text('\xa0')
         yAxisElement.selectAll('.tick')
           .classed('freq-vertical__y-tick--hover', false)
       })
+      .on('mousemove', tooltipBarMove)
 
     // remove old sections
     sections.exit().remove()
@@ -509,6 +501,49 @@
 
     // UPDATE STYLES
     updateStyles()
+  }
+
+  function tooltipOverBar (option) {
+    tooltipBody.style('opacity', 1)
+    tooltipArrow.style('opacity', 1)
+
+    const perspectiveOptionText = dax.data.getPerspectivesOptionTexts(perspectives, option.index).join(', ')
+    let tooltipHtml
+    if (option.key === 'MISSING_DATA') {
+      const cutoff = dax.settings('export.statistics.group_cutoff')
+      tooltipHtml = dax.text('explorer.chart.frequency_bar_vertical.tooltip.missing_data', cutoff, perspectiveOptionText)
+    } else {
+      const percentageText = dax.common.percentageFormat(option.end - option.start)
+      const questionOptionText = option.key
+      const color = barStrokeColor(option.key, 0).darker(0.7)
+      tooltipHtml = dax.text('explorer.chart.frequency_bar_vertical.tooltip.response_percentage', percentageText, perspectiveOptionText, questionOptionText, color)
+    }
+
+    tooltipBody.html(tooltipHtml)
+
+    tooltipArrow
+      .style('border-left-color', null)
+      .style('top', (yScale(option.rowKey) - tooltipBarArrowDistance) + 'px')
+
+    const tooltipArrowBB = tooltipArrow.node().getBoundingClientRect()
+    const tooltipBodyBB = tooltipBody.node().getBoundingClientRect()
+    tooltipBody
+      .style('top', (yScale(option.rowKey) - tooltipBodyBB.height - tooltipBarArrowDistance + tooltipArrowBB.height / 2 - 2) + 'px')
+  }
+
+  // Update tooltip X position on bar
+  function tooltipBarMove () {
+    const tooltipBodyBB = tooltipBody.node().getBoundingClientRect()
+    const tooltipArrowBB = tooltipArrow.node().getBoundingClientRect()
+    const chartLeft = chart.node().getBoundingClientRect().left + window.scrollX
+    const mouseX = d3.event.pageX - chartLeft
+    tooltipBody.style('left', (mouseX - tooltipBodyBB.width / 2) + 'px')
+    tooltipArrow.style('left', (mouseX - tooltipArrowBB.width / 2) + 'px')
+  }
+
+  function tooltipOut () {
+    tooltipBody.style('opacity', 0)
+    tooltipArrow.style('opacity', 0)
   }
 
   function setHorizontalHighlight (option) {

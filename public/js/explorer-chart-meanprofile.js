@@ -510,7 +510,7 @@
   function tooltipBarMove () {
     const tooltipBodyBB = tooltipBody.node().getBoundingClientRect()
     const tooltipArrowBB = tooltipArrow.node().getBoundingClientRect()
-    const chartLeft = chart.node().getBoundingClientRect().left + window.pageXOffset
+    const chartLeft = chart.node().getBoundingClientRect().left + window.scrollX
     let mouseX = d3.event.pageX - chartLeft
     if (mouseX - tooltipBodyBB.width / 2 < 0) {
       mouseX = tooltipBodyBB.width / 2

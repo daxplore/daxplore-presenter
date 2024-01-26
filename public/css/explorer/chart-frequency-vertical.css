@@ -35,3 +35,30 @@
     display: none;
   }
 }
+
+.freq-vertical__tooltip-body {
+  background-color: white;
+  border: #ABABAB solid 2px;
+  height: auto;
+  line-height: 1.4;
+  padding: 10px 15px;
+  pointer-events: none;
+  position: absolute;
+  text-align: center;
+  white-space: nowrap;
+  width: auto;
+  z-index: 100;
+}
+
+.freq-vertical__tooltip-arrow {
+  background-color: white;
+  border-left: #ABABAB solid 2px;
+  border-radius: 0 0 10px 0;
+  border-top: #ABABAB solid 2px;
+  height: 10px;
+  pointer-events: none;
+  position: absolute;
+  transform: rotate(225deg);
+  width: 10px;
+  z-index: 100;
+}
