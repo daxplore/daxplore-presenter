@@ -176,7 +176,7 @@
 
     // SAVE IMAGE BUTTON
     // TODO create general save button manager
-    saveImageButton = d3.select('.chart-panel').append('div')
+    saveImageButton = d3.select('.save-button-wrapper').append('div')
       .classed('dashed-button', true)
       .classed('dichtimeline__save-image', true)
       .on('click', generateImage)

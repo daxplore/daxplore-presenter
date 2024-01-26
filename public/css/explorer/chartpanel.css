@@ -31,3 +31,13 @@
   display: flex;
   flex-direction: row;
 }
+
+.description-bottom-save-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.save-button-wrapper {
+  padding-top: 10px;
+  margin-left: auto;
+}

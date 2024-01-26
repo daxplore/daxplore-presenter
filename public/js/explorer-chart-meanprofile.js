@@ -160,7 +160,7 @@
       .style('opacity', 0)
 
     // SAVE IMAGE BUTTON
-    saveImageButton = d3.select('.chart-panel').append('div')
+    saveImageButton = d3.select('.save-button-wrapper').append('div')
       .classed('dashed-button', true)
       .classed('meanprofile__save-image', true)
       .on('click', generateImage)
