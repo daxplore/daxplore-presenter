@@ -227,5 +227,7 @@
       dax.chart.dichtimeline.setSize(widthForChart, 350)
       break
     }
+    d3.select('.header-outer')
+      .style('width', widthForChart + 'px')
   }
 })(window.dax = window.dax || {})
