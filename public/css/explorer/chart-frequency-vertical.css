@@ -7,16 +7,6 @@
   font-weight: bold;
 }
 
-.freq-vertical__y-tick-header text {
-  fill: black;
-  transform: translate(0, 5px);
-}
-
-.freq-vertical__y-tick-header text {
-  font-size: 13.5px !important;
-    fill: #111 !important;
-}
-
 .freq-vertical__y-tick text:hover {
     fill: #111 !important;
 }
@@ -24,10 +14,10 @@
 .freq-vertical__legend {
     display: flex;
     flex-direction: column;
-    margin-top: 40px;
+    margin-top: 75px;
     overflow-y: visible;
     position: sticky;
-    top: 40px;
+    top: 75px;
 }
 
 @media (max-width: 900px) {

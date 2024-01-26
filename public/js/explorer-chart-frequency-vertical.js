@@ -13,7 +13,7 @@
   const xAxisTopHeight = 10
   const margin = { top: 10, right: 25, bottom: 20, left: 10 }
   const missingDataColor = d3.hsl('#BBB') // TODO externalize to producer?
-  // const saveImageCanvasWidth = 600
+  const saveImageCanvasWidth = 900
   const elementTransition = d3.transition().duration(300).ease(d3.easeLinear)
 
   // SIZE VARIABLES
@@ -114,7 +114,7 @@
       .paddingOuter(paddingOuter)
 
     yAxis = d3.axisLeft(yScale)
-      .tickSize(0)
+      .tickSize(5)
       .tickFormat(function (opt) {
         const optSplit = opt.split('|')
         switch (optSplit[0]) {
@@ -175,7 +175,7 @@
     saveImageButton = d3.select('.save-button-wrapper').append('div')
       .classed('dashed-button', true)
       .classed('freq-vertical__save-image', true)
-      // .on('click', generateImage)
+      .on('click', generateImage)
       .text(dax.text('common.button.save_chart_as_image'))
   }
 
@@ -585,8 +585,13 @@
       .style('font-family', '"Varta", sans-serif')
       .style('cursor', 'default')
 
-    chart.selectAll('.y path, .y line')
+    chartG.selectAll('.freq-vertical__y-tick path, .freq-vertical__y-tick line')
       .style('visibility', 'hidden')
+
+    chartG.selectAll('.freq-vertical__y-tick-header text')
+      .style('fill', 'black')
+      .style('font-size', '14px')
+      .style('transform', 'translate(0, 6px)')
   }
 
   function legendOptionMouseOver (hoveredOption) {
@@ -610,5 +615,234 @@
   // Helper
   function conditionalApplyTransition (selection, transition, useTransition) {
     return useTransition ? selection.transition(transition) : selection
+  }
+
+  // SAVE CHART AS IMAGE
+  const imageScaling = 2 // TODO externalize
+  function generateImage () {
+    // The structure of these nested functions follow the same pattern
+    // 1. Define image element
+    // 2. Define the onload function
+    // 3. Call other function to populate the image element with the actual image
+    // 4. The onload function is called, doing the next image in sequence
+
+    // Load header image
+    const headerImg = new Image()
+    headerImg.onload = function () {
+      // Header image is loaded!
+      // Load legend image:
+      const legendImg = new Image()
+      legendImg.onload = function () {
+        // Legend image is loaded!
+        // Load chart image
+        const chartImg = new Image()
+        chartImg.onload = function () {
+          d3.select('body').node().append(chartImg)
+          // Chart image is loaded!
+          // Build and save the complete image
+          composeAndSaveImage(headerImg, legendImg, chartImg)
+        }
+        generateChartImage(chartImg)
+      }
+      generateLegendImage(legendImg)
+    }
+    generateHeaderImage(headerImg)
+  }
+
+  // Takes an empty image element and loads an image of the header into it
+  function generateHeaderImage (img) {
+    // Add the temporary copy of the legend to the DOM
+    const hiddenDiv = d3.select('body').append('div')
+      .classed('hidden', true)
+      .style('justify-content', 'center')
+      .style('text-align', 'center')
+      .style('white-space', 'nowrap')
+
+    const headerClone = hiddenDiv
+      .append(function () { return headerDiv.node().cloneNode(true) })
+      .style('padding-left', '1000px')
+      .style('padding-right', '1000px')
+      .style('width', '1000px')
+
+    headerClone.select('.header-section__freq-tooltip')
+      .remove()
+
+    const oldWidth = headerClone.node().offsetWidth
+    const oldHeight = headerClone.node().offsetHeight
+    const newWidth = oldWidth * imageScaling
+    const newHeight = oldHeight * imageScaling
+
+    // Adjust legend appearance
+    const translateX = (newWidth - oldWidth) / 2
+    const translateY = (newHeight - oldHeight) / 2
+    headerClone
+      .style('transform', 'translate(' + translateX + 'px,' + translateY + 'px) scale(' + imageScaling + ')')
+
+    domtoimage.toPng(headerClone.node(), { bgcolor: 'white', width: newWidth, height: newHeight })
+      .then(function (dataUrl) {
+        img.src = dataUrl
+      })['catch'](function (error) { // eslint-disable-line dot-notation
+        if (error) { // TODO standard-js forces if(error) (see handle-callback-error)
+          // TODO error handling: console.error('Failed to generate image', error)
+          console.log(error)
+        }
+      })['finally'](function () { // eslint-disable-line dot-notation
+        // Remove generated temporary elements
+        hiddenDiv.remove()
+      })
+  }
+
+  // Takes an empty image element and loads an image of the legend into it
+  function generateLegendImage (img) {
+    legendOptionMouseOut()
+
+    // Add the temporary copy of the legend to the DOM
+    const hiddenDiv = d3.select('body').append('div')
+      .classed('hidden', true)
+
+    const legendClone = hiddenDiv.append('div')
+      .style('padding-top', (15 * imageScaling) + 'px')
+      .style('padding-left', (0 * imageScaling) + 'px')
+
+    // Reconstruct copy of legend from the DOM element, only keeping the relevant parts
+    const questionHeaderCopy = legendQuestionHeader.node().cloneNode(true)
+    d3.select(questionHeaderCopy).style('margin-top', '10px')
+    legendClone.append(function () { return questionHeaderCopy })
+    legendClone.append(function () { return legendQuestionOptionTable.node().cloneNode(true) })
+    legendClone.selectAll('.legend__row-text')
+      .style('max-width', 'inherit')
+      .style('text-overflow', 'inherit')
+      .style('padding-right', (15 * imageScaling) + 'px')
+
+    const oldWidth = legendClone.node().offsetWidth
+    const oldHeight = legendClone.node().offsetHeight
+    const newWidth = oldWidth * imageScaling
+    const newHeight = oldHeight * imageScaling
+
+    // Adjust legend appearance
+    const translateX = (newWidth - oldWidth) / 2
+    const translateY = (newHeight - oldHeight) / 2
+    legendClone
+      .style('transform', 'translate(' + translateX + 'px,' + translateY + 'px) scale(' + imageScaling + ')')
+
+    domtoimage.toPng(legendClone.node(), { bgcolor: 'white', width: newWidth, height: newHeight })
+      .then(function (dataUrl) {
+        img.src = dataUrl
+      })['catch'](function (error) { // eslint-disable-line dot-notation
+        if (error) { // TODO standard-js forces if(error) (see handle-callback-error)
+          // TODO error handling: console.error('Failed to generate image', error)
+          console.log(error)
+        }
+      })['finally'](function () { // eslint-disable-line dot-notation
+        // Remove generated temporary elements
+        hiddenDiv.remove()
+      })
+  }
+
+  // Takes an empty image element and loads an image of the chart into it
+  function generateChartImage (img) {
+    unsetHorizontalHighlight()
+
+    const leftAdjust = 10
+    const widthAdjust = 10
+    const initialAvailablelWidth = availableWidth
+    // Set width of actual chart before making a copy
+    exports.setSize(saveImageCanvasWidth)
+    // Make copy of chart element
+    const chartCopy = d3.select(chart.node().cloneNode(true))
+
+    // Apply local font version
+    chartCopy
+      .append('defs')
+      .append('style')
+      .text(dax.fonts.getVartaBase64Definition())
+
+    chartCopy.selectAll('text')
+      .style('font-family', '"VartaBase64", "Varta", sans-serif')
+
+    // Restore size of actual chart
+    exports.setSize(initialAvailablelWidth)
+
+    chartCopy.select('g').attr('transform', 'translate(' + (margin.left + leftAdjust) + ',' + margin.top + ')')
+
+    const widthBefore = chartCopy.attr('width')
+    chartCopy.attr('width', imageScaling * (Number(widthBefore) + widthAdjust))
+    const heightBefore = chartCopy.attr('height')
+    chartCopy.attr('height', imageScaling * Number(heightBefore))
+    chartCopy.style('transform', 'scale(' + imageScaling + ')' +
+      'translate(' + ((Number(widthBefore) + widthAdjust) / 2) + 'px,' + (Number(heightBefore) / 2) + 'px)')
+
+    const doctype = '<?xml version="1.0" standalone="no"?>' +
+      '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
+
+    const source = (new XMLSerializer()).serializeToString(chartCopy.node())
+    const blob = new Blob([doctype + source], { type: 'image/svg+xml;charset=utf-8' })
+    img.src = window.URL.createObjectURL(blob)
+  }
+
+  function composeAndSaveImage (headerImg, legendImg, chartImg) {
+    const canvasChartSelection = d3.select('body').append('canvas')
+      .classed('hidden', true)
+      .attr('width', chartImg.width)
+      .attr('height', chartImg.height)
+
+    const imgMargin = { top: 20 * imageScaling, right: 20 * imageScaling, bottom: 20 * imageScaling, left: 0 * imageScaling }
+
+    const completeWidth = imgMargin.left + chartImg.width + imgMargin.right + legendImg.width
+    const completeHeight = imgMargin.top + headerImg.height + Math.max(chartImg.height, legendImg.height) + imgMargin.bottom
+    const canvasCompleteSelection = d3.select('body').append('canvas')
+      .attr('width', completeWidth + 'px')
+      .attr('height', completeHeight + 'px')
+      .style('visibility', 'hidden')
+
+    const canvasComplete = canvasCompleteSelection.node()
+
+    const ctx = canvasCompleteSelection.node().getContext('2d')
+
+    ctx.fillStyle = 'white'
+    ctx.fillRect(0, 0, completeWidth, completeHeight)
+    ctx.fillStyle = 'black'
+
+    const lineSectionStart = margin.left + imgMargin.left + yAxisWidth * imageScaling
+    const lineSectionEnd = chartImg.width - margin.right - imgMargin.right
+    const lineSectionWidth = lineSectionEnd - lineSectionStart
+    const headerHorizontalShift = lineSectionStart + lineSectionWidth / 2 - headerImg.width / 2
+
+    // Draw header img to canvas
+    ctx.drawImage(headerImg, headerHorizontalShift, imgMargin.top)
+
+    // Draw chart img to canvas
+    ctx.drawImage(chartImg, imgMargin.left, imgMargin.top + headerImg.height)
+
+    // Draw legend img to canvas
+    ctx.drawImage(legendImg, chartImg.width, imgMargin.top + headerImg.height + 100)
+
+    let watermarkText = dax.text('explorer.image.watermark')
+    const date = new Date()
+    watermarkText = watermarkText.replace(
+      '{date}',
+      date.getFullYear() + '-' +
+      ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
+      ('0' + date.getDate()).slice(-2))
+
+    const fileName = dax.text('explorer.chart.frequency_bar.image.filename')
+      .replaceAll('{question}', dax.data.getQuestionShortText(question))
+      .replaceAll('{perspective}', dax.data.getQuestionShortText(perspectives))
+      .replaceAll('{date}',
+        date.getFullYear() + '-' +
+        ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
+        ('0' + date.getDate()).slice(-2))
+
+    const sourceFontHeight = 11 * imageScaling
+    ctx.font = sourceFontHeight + 'px "Varta"'
+    ctx.fillStyle = '#555'
+    ctx.fillText(watermarkText, 5 * imageScaling, completeHeight - 5 * imageScaling)
+
+    canvasComplete.toBlob(function (blob) {
+      saveAs(blob, fileName + '.png')
+    })
+
+    canvasChartSelection.remove()
+    canvasCompleteSelection.remove()
   }
 })(window.dax = window.dax || {})

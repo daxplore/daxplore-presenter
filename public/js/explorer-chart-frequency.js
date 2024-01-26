@@ -851,6 +851,7 @@
     rows.style('opacity', 1)
   }
 
+  // SAVE CHART AS IMAGE
   const imageScaling = 2 // TODO externalize
   function generateImage () {
     // The structure of these nested functions follow the same pattern
@@ -920,7 +921,7 @@
         }
       })['finally'](function () { // eslint-disable-line dot-notation
         // Remove generated temporary elements
-        // hiddenDiv.remove()
+        hiddenDiv.remove()
       })
   }
 
@@ -979,7 +980,7 @@
 
     const leftAdjust = 10
     const widthAdjust = 10
-    const initiaAvailablelWidth = availableWidth
+    const initialAvailablelWidth = availableWidth
     // Set width of actual chart before making a copy
     exports.setSize(saveImageCanvasWidth, availableHeight)
     // Make copy of chart element
@@ -995,7 +996,7 @@
       .style('font-family', '"VartaBase64", "Varta", sans-serif')
 
     // Restore size of actual chart
-    exports.setSize(initiaAvailablelWidth, availableHeight)
+    exports.setSize(initialAvailablelWidth, availableHeight)
 
     chartCopy.select('g').attr('transform', 'translate(' + (margin.left + leftAdjust) + ',' + margin.top + ')')
 
