@@ -58,8 +58,8 @@
   max-width: 500px;
 }
 
-.description-panel.description-left > .description-panel__question {
-  padding-bottom: 10px;
+.description-panel.description-left .description-panel__perspective {
+  padding-top: 10px;
 }
 
 /* BOTTOM POSITION */
