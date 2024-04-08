@@ -413,7 +413,7 @@
               html = dax.text('explorer.chart.frequency_bar.tooltip.multiple_timepoints_missing', cutoff, perspectiveOptionText, timepointText)
             }
           } else if (d.key === 'MISSING_TIMEPOINT') {
-            html = dax.text('explorer.chart.frequency_bar.tooltip.timepoint_missing', dax.text('timepoint' + d.timepoint))
+            html = dax.text('explorer.chart.frequency_bar.tooltip.missing_timepoint', dax.text('timepoint' + d.timepoint))
           } else {
             const percentageText = dax.common.percentageFormat(d.end - d.start)
             const questionOptionText = d.key
