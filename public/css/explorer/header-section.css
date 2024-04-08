@@ -4,7 +4,6 @@
   display: flex;
   justify-content: center;
   text-align: center;
-  white-space: nowrap;
 }
 
 .header-outer {
@@ -21,9 +20,7 @@
   font-weight: bold;
 }
 
-.header-section__sub {
-
-}
+.header-section__sub {}
 
 .header-section__dichsub {
   color: #333;
