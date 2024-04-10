@@ -144,7 +144,7 @@
 
     // empty flex element, used to dynamically align the legend content vertically
     legendDiv.append('div')
-      .style('flex', '1')
+      .style('flex', '2')
 
     // legend for the perspective and selected options
     const legendPerspective = legendDiv.append('div')
@@ -584,8 +584,7 @@
     // Set the vertical position and height of the legend area
     // The position of the legend div is then adjusted via flex parameters relative the defined area
     legendDiv
-      .style('margin-top', chartBB.top + 'px')
-      .style('height', chartBB.height + 'px')
+      .style('height', (chartBB.height + headerDiv.node().getBoundingClientRect().height) + 'px')
 
     // Update Y axis zoom button
     zoomYButton.classed('explorer-dichtimeline__zoom-y--unzoom', zoomY)
