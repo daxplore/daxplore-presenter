@@ -226,11 +226,7 @@
     const perspectiveOptionsCombined = dax.explorer.getSelectedPerspectiveOptionsCombined()
     // const totalSelected = dax.explorer.isPerspectiveTotalSelected()
 
-    // TODO should be handled by tab component
-    let tab = dax.explorer.getSelectedTab()
-    if (questionMap[question].displaytypes.indexOf(tab) === -1) {
-      tab = questionMap[question].displaytypes[0]
-    }
+    const tab = dax.explorer.getSelectedTab()
 
     dax.explorer.setStandardDescription(question, perspective)
     // The TIMEPOINTS system is currently broken, this is just a hack.

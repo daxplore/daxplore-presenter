@@ -73,7 +73,7 @@
 
     // INITIALIZE HEADER
     headerDiv = d3.select('.header-section').append('div')
-      .attr('class', 'header-section__freqs')
+      .attr('class', 'header-section__freq')
     headerMain = headerDiv.append('div')
       .attr('class', 'header-section__main')
     headerSub = headerDiv.append('div')

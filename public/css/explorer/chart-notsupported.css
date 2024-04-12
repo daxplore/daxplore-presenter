@@ -1,0 +1,29 @@
+.explorer-notsupported {
+    align-items: center;
+    background: repeating-linear-gradient(
+        45deg,
+        #EEE,
+        #EEE 30px,
+        #FFF 5px,
+        #FFF 35px
+    );
+    display: flex;
+    justify-content: center;
+}
+.explorer-notsupported__textbox {
+    align-items: center;
+    background: white;
+    border: 1px solid #DDD;
+    display: flex;
+    flex-direction: column;
+    font-size: 15px;
+    height: fit-content;
+    justify-content: center;
+    padding: 20px;
+    width: fit-content;
+}
+
+.explorer-notsupported__textbox > div {
+    padding-top: 2px;
+    padding-bottom: 2px;
+}

@@ -72,7 +72,7 @@
 
     // INITIALIZE HEADER
     headerDiv = d3.select('.header-section').append('div')
-      .attr('class', 'header-dichtimeline')
+      .attr('class', 'header-section__dichtimeline')
     headerMain = headerDiv.append('div')
       .attr('class', 'header-section__main')
     headerSub = headerDiv.append('div')

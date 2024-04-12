@@ -3,7 +3,7 @@
   const exports = namespace.explorer
 
   const questionMap = {}
-  let initialQuestion, selectedTab
+  let initialQuestion, selectedTab, chartSupported
   // let primaryColors, hoverColors
   // TODO hard coded here as temporary hack, also input in constructor might be temporary
   const primaryColors = ['#9DC680', '#80AFC6', '#8B8BCB', '#AB8BCB', '#C68680', '#CBA46C', '#CBCB6C']
@@ -24,7 +24,6 @@
     }
     initialQuestion = groups[0].questions[0]
     selectedTab = questionMap[initialQuestion].displaytypes[0]
-    const displaytypes = questionMap[initialQuestion].displaytypes
 
     // Add click events to the tabs
     d3.selectAll('.chart-tab')
@@ -47,7 +46,7 @@
       .text(dax.text('explorer.chart_tab.dichotomized_line'))
 
     // Apply special classes to style the tabs
-    // TODO duplicate code, used again in chartSetQueryDefinition function, should probably be unified
+    const displaytypes = dax.settings('used_display_types')
     d3.selectAll('.chart-tab, .chart-tab-spacing')
       .style('display', function (d, i, tabs) {
         if (displaytypes.length <= 1) {
@@ -67,6 +66,7 @@
     dax.chart.frequency.initializeResources(primaryColors, hoverColors)
     dax.chart.frequencyVertical.initializeResources(primaryColors, hoverColors)
     dax.chart.dichtimeline.initializeResources(primaryColors, tooltipColors)
+    dax.chart.notsupported.initializeResources()
 
     // TODO handle here or somewhere else?
     window.addEventListener('resize', dax.explorer.updateChartPanelSize)
@@ -92,35 +92,24 @@
     selectedOptions,
   ) {
     selectedTab = chartTab
+    chartSupported = questionMap[question].displaytypes.indexOf(selectedTab) !== -1
 
     // Hide all charts elements
+    dax.chart.dichtimeline.hide()
     dax.chart.frequency.hide()
     dax.chart.frequencyVertical.hide()
     dax.chart.meanbars.hide()
     dax.chart.meanprofile.hide()
-    dax.chart.dichtimeline.hide()
+    dax.chart.notsupported.hide()
 
     // reset any side scroll set by previous charts
     d3.select('.chart-panel')
       .classed('chart-scroll', false)
       .style('width', null)
 
-    const displaytypes = questionMap[question].displaytypes
+    // const displaytypes = questionMap[question].displaytypes
     d3.selectAll('.chart-tab')
       .classed('chart-tab-selected', function (d, i, tabs) { return tabs[i].classList.contains(selectedTab.toLowerCase()) })
-
-    d3.selectAll('.chart-tab, .chart-tab-spacing')
-      .style('display', function (d, i, tabs) {
-        if (displaytypes.length <= 1) {
-          return 'none'
-        }
-        for (let j = 0; j < displaytypes.length; j++) {
-          if (tabs[i].classList.contains(displaytypes[j].toLowerCase())) {
-            return 'block'
-          }
-        }
-        return 'none'
-      })
 
     d3.select('.legend')
       .style('margin-top', d3.select('.chart-tabs').node().getBoundingClientRect().height + 'px')
@@ -135,10 +124,18 @@
         // TODO temporary hard coded timepoint
         switch (dax.settings('explorer.chart.mean.orientation')) {
         case 'HORIZONTAL':
-          dax.chart.frequency.populateChart(question, perspectives, selectedOptions)
+          if (chartSupported) {
+            dax.chart.frequency.populateChart(question, perspectives, selectedOptions)
+          } else {
+            dax.chart.notsupported.populateChart('frequency_bar', question)
+          }
           break
         case 'VERTICAL':
-          dax.chart.frequencyVertical.populateChart(question, perspectives, selectedOptions)
+          if (chartSupported) {
+            dax.chart.frequencyVertical.populateChart(question, perspectives, selectedOptions)
+          } else {
+            dax.chart.notsupported.populateChart('frequency_bar_vertical', question)
+          }
           break
         }
         break
@@ -149,12 +146,20 @@
       case 'HORIZONTAL':
         switch (timepoints) {
         case 'TIMEPOINTS_ONE':
-          dax.chart.meanbars.populateChart(question, perspectives, selectedOptions)
+          if (chartSupported) {
+            dax.chart.meanbars.populateChart(question, perspectives, selectedOptions)
+          } else {
+            dax.chart.notsupported.populateChart('mean_bar', question)
+          }
           break
         }
         break
       case 'VERTICAL':
-        dax.chart.meanprofile.populateChart(question, perspectives, selectedOptions)
+        if (chartSupported) {
+          dax.chart.meanprofile.populateChart(question, perspectives, selectedOptions)
+        } else {
+          dax.chart.notsupported.populateChart('mean_bar', question)
+        }
         break
       }
       break
@@ -163,7 +168,11 @@
       case 'TIMEPOINTS_ONE':
       case 'TIMEPOINTS_TWO':
       case 'TIMEPOINTS_ALL':
-        dax.chart.dichtimeline.populateChart(question, perspectives, selectedOptions)
+        if (chartSupported) {
+          dax.chart.dichtimeline.populateChart(question, perspectives, selectedOptions)
+        } else {
+          dax.chart.notsupported.populateChart('dichotomized_line', question)
+        }
         break
       }
       break
@@ -182,6 +191,9 @@
 
   exports.updateChartPanelSize =
   function () {
+    // Remove explicitly set width (could have been set by charts to enable scroll)
+    d3.select('.chart').style('width', null)
+
     // TODO ask all elements for their needed width
     const windowWidth = document.documentElement.clientWidth
     const leftSidebarWidth = d3.select('.question-panel').node().offsetWidth
@@ -200,33 +212,39 @@
     const widthForChart = availableWidth -
       2 - // border of 1px + 1px (if changed here, needs to be changed in css)
       1 // 1 px fudge to account for rounding
-    switch (selectedTab) {
-    case 'FREQ':
-      switch (dax.settings('explorer.chart.frequency.orientation')) {
-      case 'HORIZONTAL':
-        dax.chart.frequency.setSize(widthForChart, 350)
+
+    if (!chartSupported) {
+      dax.chart.notsupported.setSize(widthForChart, 350)
+    } else {
+      switch (selectedTab) {
+      case 'FREQ':
+        switch (dax.settings('explorer.chart.frequency.orientation')) {
+        case 'HORIZONTAL':
+          dax.chart.frequency.setSize(widthForChart, 350)
+          break
+        case 'VERTICAL':
+          dax.chart.frequencyVertical.setSize(widthForChart, 350)
+          break
+        }
         break
-      case 'VERTICAL':
-        dax.chart.frequencyVertical.setSize(widthForChart, 350)
-        break
-      }
-      break
-    case 'MEAN':
-      switch (dax.settings('explorer.chart.mean.orientation')) {
-      case 'HORIZONTAL':
+      case 'MEAN':
+        switch (dax.settings('explorer.chart.mean.orientation')) {
+        case 'HORIZONTAL':
         // TODO allow more height instead of vertical scroll
         // TODO hard coded based on specific chart, should be generalized
-        dax.chart.meanbars.setSize(widthForChart, 350)
+          dax.chart.meanbars.setSize(widthForChart, 350)
+          break
+        case 'VERTICAL':
+          dax.chart.meanprofile.setSize(widthForChart)
+          break
+        }
         break
-      case 'VERTICAL':
-        dax.chart.meanprofile.setSize(widthForChart)
+      case 'DICH':
+        dax.chart.dichtimeline.setSize(widthForChart, 350)
         break
       }
-      break
-    case 'DICH':
-      dax.chart.dichtimeline.setSize(widthForChart, 350)
-      break
     }
+
     d3.select('.header-outer')
       .style('width', widthForChart + 'px')
   }

@@ -12,7 +12,6 @@
 }
 
 .header-inner {
-  padding-top: 15px;
 }
 
 .header-section__main {
@@ -33,4 +32,12 @@
 
 .header-section__dich-selected {
   margin-top: 1px;
+}
+
+.header-section__freq,
+.header-section__freq-vertical,
+.header-section__meanbars,
+.header-section__meanprofile,
+.header-section__dichtimeline {
+  padding-top: 15px;
 }
