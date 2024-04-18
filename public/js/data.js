@@ -48,6 +48,14 @@
     if (perspectives.length === 1) {
       const perspectiveOption = getQuestionOptionDefinition(perspectives[0], combinedPerspectiveOptionIndex)
       const stat = questionData[questionID][perspectiveOption.dataQuestion].freq[timepoint]
+      if (typeof stat === 'undefined') {
+        // TODO decide how to handle this
+        // Currently: treats it as an empty intersection
+        // Possible options:
+        //   - have a different client message for this case
+        //   - handle it in producer, treat it as an error here
+        return []
+      }
       if (combinedPerspectiveOptionIndex === 'ALL_RESPONDENTS') {
         return stat.all
       }
@@ -69,6 +77,9 @@
       dataIndex = perspective2Option.dataOption + ',' + perspective1Option.dataOption
     }
     const stat = dataItem.freq[timepoint]
+    if (typeof stat === 'undefined') {
+      return []
+    }
     if (combinedPerspectiveOptionIndex === 'ALL_RESPONDENTS') {
       return stat.all
     }
