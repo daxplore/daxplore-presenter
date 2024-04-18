@@ -266,7 +266,7 @@
     hasMissingData = false
     hasMissingTimepoint = false
 
-    optionKeys = dax.data.getOptionTexts(question)
+    optionKeys = dax.data.getOptionTexts(question).toReversed()
     optionKeys.push('MISSING_DATA')
     optionKeys.push('MISSING_TIMEPOINT')
 
@@ -300,6 +300,7 @@
             stackData.MISSING_DATA = 1
           } else {
             // Extract frequency data
+            stat = stat.toReversed()
             for (let j = 0; j < optionKeys.length; j++) {
               stackData[optionKeys[j]] = total !== 0 ? stat[j] / total : 0
             }
@@ -460,7 +461,7 @@
 
     // Set new data for the legend
     const optionRows = legendQuestionOptionTable.selectAll('.legend__row')
-      .data([].concat(dax.data.getOptionTexts(question)).reverse())
+      .data([].concat(dax.data.getOptionTexts(question)))
 
     // Remove old rows
     optionRows.exit().remove()
