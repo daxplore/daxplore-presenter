@@ -521,14 +521,16 @@
 
     tooltipBody.html(tooltipHtml)
 
+    const headerHeight = headerDiv.node().getBoundingClientRect().height
+
     tooltipArrow
       .style('border-left-color', null)
-      .style('top', (yScale(option.rowKey) - tooltipBarArrowDistance) + 'px')
+      .style('top', (yScale(option.rowKey) - tooltipBarArrowDistance + headerHeight) + 'px')
 
     const tooltipArrowBB = tooltipArrow.node().getBoundingClientRect()
     const tooltipBodyBB = tooltipBody.node().getBoundingClientRect()
     tooltipBody
-      .style('top', (yScale(option.rowKey) - tooltipBodyBB.height - tooltipBarArrowDistance + tooltipArrowBB.height / 2 - 2) + 'px')
+      .style('top', (yScale(option.rowKey) - tooltipBodyBB.height - tooltipBarArrowDistance + tooltipArrowBB.height / 2 + headerHeight - 2) + 'px')
   }
 
   // Update tooltip X position on bar
