@@ -639,7 +639,6 @@
         // Load chart image
         const chartImg = new Image()
         chartImg.onload = function () {
-          d3.select('body').node().append(chartImg)
           // Chart image is loaded!
           // Build and save the complete image
           composeAndSaveImage(headerImg, legendImg, chartImg)
