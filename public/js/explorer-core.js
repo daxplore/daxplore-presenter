@@ -264,7 +264,7 @@
     if (height > maxHeight) {
       maxHeight = height
       if (window.self !== window.top) {
-        parent.postMessage({ source: 'DAXPLORE_EXPLORER', height: maxHeight }, '*')
+        parent.postMessage({ source: 'DAXPLORE_EXPLORER', height: (maxHeight + 100) }, '*')
       }
     }
   }
