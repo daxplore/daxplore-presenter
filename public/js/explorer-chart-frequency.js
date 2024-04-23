@@ -41,9 +41,6 @@
   let legendDiv, legendQuestionHeader, legendQuestionOptionTable, legendMissingData, legendMissingTimepoint
   // BUTTONS
   let saveImageButton
-  // PATTERNS
-  let defs
-  const patternURLs = new Set()
 
   // CURRENT FREQUENCY CHART
   let question, perspective, data
@@ -90,9 +87,6 @@
     // base svg element
     chart = chartContainer.append('svg')
       .attr('class', 'explorer-freq')
-
-    // patterns
-    defs = chart.append('defs')
 
     // white background
     chart.append('rect')
@@ -624,35 +618,6 @@
     setSelectedTimepoint(selectedTimepoint, true)
   }
 
-  function getPatternUrl (backgroundColor, stripeColor) {
-    const key = 'pattern-stripes-' + backgroundColor.hex().replace('#', '') + '-' + stripeColor.hex().replace('#', '')
-    // generate pattern
-    if (!patternURLs.has(key)) {
-      // generate stripes: https://svg-stripe-generator.web.app/
-      const pattern = defs.append('pattern')
-        .attr('id', key)
-        .attr('patternUnits', 'userSpaceOnUse')
-        .attr('width', '7.5')
-        .attr('height', '7.5')
-        .attr('patternTransform', 'rotate(45)')
-      // background
-      pattern.append('rect')
-        .attr('width', '100%')
-        .attr('height', '100%')
-        .attr('fill', backgroundColor)
-      // stripe lines
-      pattern.append('line')
-        .attr('x1', '0')
-        .attr('y1', '0')
-        .attr('x2', '0')
-        .attr('y2', '7.5')
-        .attr('stroke', stripeColor)
-        .attr('stroke-width', 5)
-    }
-    patternURLs.add(key)
-    return 'url(#' + key + ')'
-  }
-
   function setSelectedTimepoint (selectedTimepointInput, instantAnimation) {
     instantAnimation = typeof instantAnimation === 'undefined' ? false : instantAnimation
     selectedTimepoint = selectedTimepointInput
@@ -676,7 +641,7 @@
           }
           const barColor = barFillColor(d.key, tpIndex).darker(darken)
           if (d.key === 'MISSING_TIMEPOINT') {
-            return getPatternUrl(barColor, barColor.darker(0.3))
+            return dax.colors.createSvgStripePatternURL(chart, barColor, barColor.darker(0.3))
           }
           return barColor
         })

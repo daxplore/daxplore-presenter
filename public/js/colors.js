@@ -88,4 +88,49 @@
       return colors.averageTooltipBackground
     }
   }
+
+  // PATTERNS
+  /**
+   * Add a stripe defs pattern to a d3 svg selection (a chart) and
+   * return a string url reference to the pattern.
+   * @param {*} chartSelection A d3 selection containing the chart.
+   * @param {*} backgroundColor A d3 color for the background (thick stripes).
+   * @param {*} stripeColor A d3 color for the stripes (thin stripes).
+   * @returns A string with an url to the pattern: "url(#stripes-000000-FFFFFF)"
+   */
+  exports.createSvgStripePatternURL =
+  function (chartSelection, backgroundColor, stripeColor) {
+    const key = 'stripes-' + backgroundColor.hex().slice(1) + '-' + stripeColor.hex().slice(1)
+
+    // generate pattern
+    if (!chartSelection.node().getElementById(key)) {
+      let defs = chartSelection.select('defs')
+      if (defs.empty()) {
+        defs = chartSelection.append('defs')
+      }
+      // generate stripes: https://svg-stripe-generator.web.app/
+      const pattern = defs.append('pattern')
+        .attr('id', key)
+        .attr('patternUnits', 'userSpaceOnUse')
+        .attr('width', '7.5')
+        .attr('height', '7.5')
+        .attr('patternTransform', 'rotate(45)')
+      // background
+      pattern.append('rect')
+        .attr('width', '100%')
+        .attr('height', '100%')
+        .attr('fill', backgroundColor)
+      // stripe lines
+      pattern.append('line')
+        .attr('x1', '0')
+        .attr('y1', '0')
+        .attr('x2', '0')
+        .attr('y2', '7.5')
+        .attr('stroke', stripeColor)
+        .attr('stroke-width', 5)
+    }
+
+    // Return an url to the pattern
+    return 'url(#' + key + ')'
+  }
 })(window.dax = window.dax || {})
