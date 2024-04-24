@@ -21,6 +21,8 @@
   let width = availableWidth
 
   // CHART RESOURCES
+  // COLORS
+  let colorCount
   // HEADER
   let headerDiv, headerMain, headerSub
   // SCALES AND AXISES
@@ -55,6 +57,9 @@
   // Run once when the page is loaded. Call populateChart in order to update the chart content.
   exports.initializeResources =
   function (primaryColors) {
+    // Store color count
+    colorCount = primaryColors.length
+
     // INITIALIZE HEADER
     headerDiv = d3.select('.header-section').append('div')
       .attr('class', 'header-section__freq-vertical')
@@ -293,7 +298,13 @@
       .attr('y', function (d) { return yScale(d.rowKey) })
       .attr('height', yScale.bandwidth())
       .attr('width', function (d) { return xScale(d.end) - xScale(d.start) })
-      .attr('fill', function (d) { return barFillColor(d.key, 0) })
+      .attr('fill', function (d) {
+        const barColor = barFillColor(d.key, 0)
+        if (optionKeys.indexOf(d.key) >= colorCount) {
+          return dax.colors.createSvgStripePatternURL(chart, barColor, barColor.darker(0.3))
+        }
+        return barColor
+      })
       .attr('stroke', function (d) { return barStrokeColor(d.key, 0) })
       .attr('stroke-width', 1)
       .on('mouseover', function (d) {
@@ -337,7 +348,7 @@
 
     // Set new data for the legend
     const optioncols = legendQuestionOptionTable.selectAll('.legend__row')
-      .data([].concat(dax.data.getOptionTexts(question)).reverse())
+      .data(dax.data.getOptionTexts(question))
 
     // Remove old rows
     optioncols.exit().remove()
@@ -362,8 +373,19 @@
     // Reselect rows and use single-select to propagate data join to contained items
     // update color and text for each row
     const rows = legendQuestionOptionTable.selectAll('.legend__row')
+
     rows.select('.legend__color-square')
-      .style('background-color', zScaleColor)
+    .style('background', function (d) {
+      if (optionKeys.indexOf(d) < colorCount) { // TODO handle option 2x color count?
+        return barFillColor(d)
+      } else {
+        return 'linear-gradient(135deg, {A} 30%, {B} 30%, {B} 50%, {A} 50%, {A} 80%, {B} 80%, {B} 100%)'
+          .replaceAll('{A}', barFillColor(d))
+          .replaceAll('{B}', barStrokeColor(d))
+      }
+    })
+    .style('background-size', '7.07px 7.07px')
+
     rows.select('.legend__row-text')
       .text(function (option) { return option })
       .style('font-style', function (option) { return option.nodata ? 'italic' : null })
@@ -462,16 +484,6 @@
 
     chart.attr('height', yStop + margin.top + margin.bottom)
 
-    // Update bounding box definition for the chart
-    // TODO clean up
-    // const wrapperClientBB = d3.select('.chart').node().getBoundingClientRect()
-    // chartBB = {
-    //   height: wrapperClientBB.height,
-    //   left: wrapperClientBB.left + window.scrollX,
-    //   top: wrapperClientBB.top + window.scrollY,
-    //   width: wrapperClientBB.width,
-    // }
-
     // UPDATE X AXIS
     xScale.rangeRound([yAxisWidth, width - 2])
     xAxisScale.rangeRound([yAxisWidth, width])
@@ -498,6 +510,24 @@
       .attr('x', function (d) { return xScale(d.start) })
       .attr('y', function (d) { return yScale(d.rowKey) })
       .attr('width', function (d) { return xScale(d.end) - xScale(d.start) })
+
+    // UPDATE LEGEND
+    // Reset top margin for calculations
+    legendDiv.style('margin-top', null)
+    const chartHeight = chart.node().getBoundingClientRect().height
+    const legendHeight = legendDiv.node().getBoundingClientRect().height
+    const headerHeight = headerDiv.node().getBoundingClientRect().height
+    let legendTopMargin = 0
+    if (legendHeight * 1.1 > headerHeight + chartHeight) {
+      // If the legend is larger than the other components, leave it at the top
+      legendTopMargin = Math.max(10, headerHeight - 30)
+    } else {
+      // Otherwise, adjust the height dynamically
+      legendTopMargin = headerHeight
+      legendTopMargin += Math.min(100, (chartHeight - legendHeight) / 3)
+    }
+
+    legendDiv.style('margin-top', legendTopMargin + 'px')
 
     // UPDATE STYLES
     updateStyles()
