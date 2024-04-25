@@ -1,3 +1,7 @@
+.chart-mouseover-wrapper {
+  padding-top: 5px;
+}
+
 .chart {
   position: relative;
 }

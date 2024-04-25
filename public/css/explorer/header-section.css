@@ -37,10 +37,6 @@
   margin-top: 1px;
 }
 
-.header-section__freq,
-.header-section__freq-vertical,
-.header-section__meanbars,
-.header-section__meanprofile,
-.header-section__dichtimeline {
-  padding-top: 11px;
+.header-inner > .header-section {
+  padding-top: 6px;
 }
