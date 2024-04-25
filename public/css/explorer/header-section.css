@@ -20,7 +20,9 @@
   font-weight: bold;
 }
 
-.header-section__sub {}
+.header-section__sub {
+  text-wrap: balance;
+}
 
 .header-section__dichsub {
   color: #333;
