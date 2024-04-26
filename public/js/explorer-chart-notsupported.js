@@ -3,6 +3,9 @@
   namespace.chart.notsupported = namespace.chart.notsupported || {}
   const exports = namespace.chart.notsupported
 
+  /** HEADER **/
+  let innerHeaderDiv, chartMouseoverWrapper
+
   /** CHART TYPE AND INSTANCE VARIABLES**/
   let chartContainer, lineOne, lineTwo, lineThree
 
@@ -22,6 +25,8 @@
     lineOne = textbox.append('div')
     lineTwo = textbox.append('div')
     lineThree = textbox.append('div')
+    innerHeaderDiv = d3.select('.header-inner')
+    chartMouseoverWrapper = d3.select('.chart-mouseover-wrapper')
   }
 
   exports.populateChart =
@@ -58,6 +63,8 @@
   // Hide or show all top level elements
   function displayChartElements (show) {
     chartContainer.style('display', show ? null : 'none')
+    innerHeaderDiv.style('display', show ? 'none' : null)
+    chartMouseoverWrapper.style('paddin-top', '0', null)
   }
 
   // Update the size and position of all chart elements.

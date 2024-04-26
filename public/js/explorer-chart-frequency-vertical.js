@@ -514,7 +514,6 @@
 
     // UPDATE LEGEND
     // Reset top margin for calculations
-    legendDiv.style('margin-top', null)
     const chartHeight = chart.node().getBoundingClientRect().height
     const legendHeight = legendDiv.node().getBoundingClientRect().height
     const headerHeight = headerDiv.node().getBoundingClientRect().height
@@ -522,17 +521,18 @@
     if (dax.settings('explorer.header.position') === 'INNER') {
       if (legendHeight * 1.1 > headerHeight + chartHeight) {
         // If the legend is larger than the other components, leave it at the top
-        legendTopMargin = Math.max(10, headerHeight - 30)
+        legendTopMargin = 0
       } else {
         // Otherwise, adjust the height dynamically
         legendTopMargin = headerHeight + Math.min(100, (chartHeight - legendHeight) / 3 + xAxisTopHeight)
       }
     } else {
       // If header is OUTER, always adjust hight dymanically
-      legendTopMargin = Math.min(100, Math.max(0, (chartHeight - legendHeight)) / 3 + xAxisTopHeight)
+      legendTopMargin = Math.min(100, Math.max(0, (chartHeight - legendHeight)) / 3)
     }
 
-    legendDiv.style('margin-top', legendTopMargin + 'px')
+    conditionalApplyTransition(legendDiv, elementTransition, animateNextUpdate)
+      .style('margin-top', legendTopMargin + 'px')
 
     // UPDATE STYLES
     updateStyles()
@@ -733,7 +733,6 @@
       .classed('hidden', true)
 
     const legendClone = hiddenDiv.append('div')
-      // .style('padding-top', (15 * imageScaling) + 'px')
       .style('padding-left', (0 * imageScaling) + 'px')
 
     // Reconstruct copy of legend from the DOM element, only keeping the relevant parts
@@ -744,7 +743,6 @@
     legendClone.selectAll('.legend__row-text')
       .style('max-width', null)
       .style('text-overflow', null)
-      .style('padding-right', (15 * imageScaling) + 'px')
 
     const oldWidth = legendClone.node().offsetWidth
     const oldHeight = legendClone.node().offsetHeight
