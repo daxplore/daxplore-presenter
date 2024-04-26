@@ -35,7 +35,7 @@
   // CHART
   let chartContainer, chart, chartG
   // LEGEND
-  let legendDiv, legendQuestionHeader, legendQuestionOptionTable, legendMissingData
+  let legendDiv, legendQuestionHeader, legendQuestionOptionTable, legendMissingData, legendTopMargin
   // BUTTONS
   let saveImageButton
   // TOOLTIP
@@ -170,10 +170,11 @@
     legendMissingData.append('div')
       .attr('class', 'legend__color-square')
       .style('background-color', missingDataColor)
+    const missingText = dax.text('explorer.chart.frequency_bar_vertical.legend.missing_data')
     legendMissingData.append('div')
       .attr('class', 'legend__row-text')
-      .text(dax.text('explorer.chart.frequency_bar_vertical.legend.missing_data'))
-      .attr('title', dax.text('explorer.chart.frequency_bar_vertical.legend.missing_data'))
+      .text(missingText)
+      .attr('title', missingText)
 
     // SAVE IMAGE BUTTON
     // TODO create general save button manager
@@ -517,14 +518,18 @@
     const chartHeight = chart.node().getBoundingClientRect().height
     const legendHeight = legendDiv.node().getBoundingClientRect().height
     const headerHeight = headerDiv.node().getBoundingClientRect().height
-    let legendTopMargin = 0
-    if (legendHeight * 1.1 > headerHeight + chartHeight) {
-      // If the legend is larger than the other components, leave it at the top
-      legendTopMargin = Math.max(10, headerHeight - 30)
+    legendTopMargin = 0
+    if (dax.settings('explorer.header.position') === 'INNER') {
+      if (legendHeight * 1.1 > headerHeight + chartHeight) {
+        // If the legend is larger than the other components, leave it at the top
+        legendTopMargin = Math.max(10, headerHeight - 30)
+      } else {
+        // Otherwise, adjust the height dynamically
+        legendTopMargin = headerHeight + Math.min(100, (chartHeight - legendHeight) / 3 + xAxisTopHeight)
+      }
     } else {
-      // Otherwise, adjust the height dynamically
-      legendTopMargin = headerHeight
-      legendTopMargin += Math.min(100, (chartHeight - legendHeight) / 3)
+      // If header is OUTER, always adjust hight dymanically
+      legendTopMargin = Math.min(100, Math.max(0, (chartHeight - legendHeight)) / 3 + xAxisTopHeight)
     }
 
     legendDiv.style('margin-top', legendTopMargin + 'px')
@@ -687,16 +692,10 @@
       .classed('hidden', true)
       .style('justify-content', 'center')
       .style('text-align', 'center')
-      .style('white-space', 'nowrap')
 
     const headerClone = hiddenDiv
       .append(function () { return headerDiv.node().cloneNode(true) })
-      .style('padding-left', '1000px')
-      .style('padding-right', '1000px')
-      .style('width', '1000px')
-
-    headerClone.select('.header-section__freq-tooltip')
-      .remove()
+      .style('width', (saveImageCanvasWidth - 150) + 'px')
 
     const oldWidth = headerClone.node().offsetWidth
     const oldHeight = headerClone.node().offsetHeight
@@ -708,6 +707,8 @@
     const translateY = (newHeight - oldHeight) / 2
     headerClone
       .style('transform', 'translate(' + translateX + 'px,' + translateY + 'px) scale(' + imageScaling + ')')
+      .style('margin', 0)
+      .style('padding', 0)
 
     domtoimage.toPng(headerClone.node(), { bgcolor: 'white', width: newWidth, height: newHeight })
       .then(function (dataUrl) {
@@ -732,7 +733,7 @@
       .classed('hidden', true)
 
     const legendClone = hiddenDiv.append('div')
-      .style('padding-top', (15 * imageScaling) + 'px')
+      // .style('padding-top', (15 * imageScaling) + 'px')
       .style('padding-left', (0 * imageScaling) + 'px')
 
     // Reconstruct copy of legend from the DOM element, only keeping the relevant parts
@@ -741,8 +742,8 @@
     legendClone.append(function () { return questionHeaderCopy })
     legendClone.append(function () { return legendQuestionOptionTable.node().cloneNode(true) })
     legendClone.selectAll('.legend__row-text')
-      .style('max-width', 'inherit')
-      .style('text-overflow', 'inherit')
+      .style('max-width', null)
+      .style('text-overflow', null)
       .style('padding-right', (15 * imageScaling) + 'px')
 
     const oldWidth = legendClone.node().offsetWidth
@@ -778,6 +779,7 @@
     const widthAdjust = 10
     const initialAvailablelWidth = availableWidth
     // Set width of actual chart before making a copy
+    animateNextUpdate = false
     exports.setSize(saveImageCanvasWidth)
     // Make copy of chart element
     const chartCopy = d3.select(chart.node().cloneNode(true))
@@ -790,9 +792,6 @@
 
     chartCopy.selectAll('text')
       .style('font-family', '"VartaBase64", "Varta", sans-serif')
-
-    // Restore size of actual chart
-    exports.setSize(initialAvailablelWidth)
 
     chartCopy.select('g').attr('transform', 'translate(' + (margin.left + leftAdjust) + ',' + margin.top + ')')
 
@@ -809,6 +808,9 @@
     const source = (new XMLSerializer()).serializeToString(chartCopy.node())
     const blob = new Blob([doctype + source], { type: 'image/svg+xml;charset=utf-8' })
     img.src = window.URL.createObjectURL(blob)
+
+    // Restore size of actual chart
+    exports.setSize(initialAvailablelWidth)
   }
 
   function composeAndSaveImage (headerImg, legendImg, chartImg) {
@@ -818,9 +820,19 @@
       .attr('height', chartImg.height)
 
     const imgMargin = { top: 20 * imageScaling, right: 20 * imageScaling, bottom: 20 * imageScaling, left: 0 * imageScaling }
-
     const completeWidth = imgMargin.left + chartImg.width + imgMargin.right + legendImg.width
-    const completeHeight = imgMargin.top + headerImg.height + Math.max(chartImg.height, legendImg.height) + imgMargin.bottom
+    const headerHeight = headerImg.height
+
+    let legendTop
+    if (legendImg.height * 1.1 > headerHeight + chartImg.height) {
+      // If the legend is larger than the other components, leave it at the top
+      legendTop = 0
+    } else {
+      // Otherwise, adjust the height dynamically
+      legendTop = headerHeight + Math.min(100, Math.max(0, chartImg.height - legendImg.height) / 3 + xAxisTopHeight)
+    }
+
+    const completeHeight = imgMargin.top + headerImg.height + Math.max(chartImg.height, legendImg.height + legendTop) + imgMargin.bottom
     const canvasCompleteSelection = d3.select('body').append('canvas')
       .attr('width', completeWidth + 'px')
       .attr('height', completeHeight + 'px')
@@ -846,7 +858,7 @@
     ctx.drawImage(chartImg, imgMargin.left, imgMargin.top + headerImg.height)
 
     // Draw legend img to canvas
-    ctx.drawImage(legendImg, chartImg.width, imgMargin.top + headerImg.height + 100)
+    ctx.drawImage(legendImg, chartImg.width, imgMargin.top + legendTop)
 
     let watermarkText = dax.text('explorer.image.watermark')
     const date = new Date()

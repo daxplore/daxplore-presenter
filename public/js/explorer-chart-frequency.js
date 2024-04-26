@@ -59,6 +59,8 @@
     // CALCULATE RELEVANT DATA
     singleTimepointMode = dax.data.isAllSingleTimepoint()
 
+    selectedPerspectiveOptions = []
+
     // TRANSITIONS
     timepointTransition = d3.transition()
       .duration(singleTimepointMode ? 0 : 300)
@@ -764,7 +766,7 @@
       }
     }
     // Adjust the widths so they sum up to 1
-    const totalWidth = tpWidths.reduce(function (a, b) { return a + b })
+    const totalWidth = tpWidths.reduce(function (a, b) { return a + b }, 0)
     tpWidthsAdditive = []
     let widthSum = 0
     for (let tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
