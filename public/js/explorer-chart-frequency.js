@@ -27,8 +27,6 @@
   // If no question has more than 1 timepoint display all frequency charts in single timepoint mode.
   // If at least one question has more than 1 timepoint show all charts with timepoints.
   let singleTimepointMode
-  // TRANSITIONS
-  let timepointTransition
   // HEADER
   let headerDiv, headerMain, headerSub, headerTooltip
   // SCALES AND AXISES
@@ -60,11 +58,6 @@
     singleTimepointMode = dax.data.isAllSingleTimepoint()
 
     selectedPerspectiveOptions = []
-
-    // TRANSITIONS
-    timepointTransition = d3.transition()
-      .duration(singleTimepointMode ? 0 : 300)
-      .ease(d3.easeLinear)
 
     if (!singleTimepointMode) {
       margin.bottom += 40
@@ -629,7 +622,7 @@
     for (let tpIndex = 0; tpIndex < timepoints.length; tpIndex++) {
       const tp = timepoints[tpIndex]
       // Animate the bar rows for the current timepoint
-      let rows = d3.selectAll('.freq-optionrow-section-tp' + tp)
+      const rows = chart.selectAll('.freq-optionrow-section-tp' + tp)
       // Stop all current bar row animations
       rows.interrupt().selectAll('*').interrupt()
       // Update row colors
@@ -648,16 +641,13 @@
           return barColor
         })
         .attr('stroke', function (d) { return barStrokeColor(d.key, tpIndex) })
-      // Select rows with or without transition
-      rows = instantAnimation ? rows : rows.transition(timepointTransition)
+
       rows.attr('width', tpWidthsAdditive[tpIndex] * xScale.bandwidth())
 
       // Timepoint tick wrappers
-      let wrappers = d3.selectAll('.freq-bar-timetick-wrapper-' + tp)
+      const wrappers = chart.selectAll('.freq-bar-timetick-wrapper-' + tp)
       // Stop all wrapper animations
       wrappers.interrupt().selectAll('*').interrupt()
-      // Select timepoint wrappers with or without transition
-      wrappers = instantAnimation ? wrappers : wrappers.transition(timepointTransition)
       // Update timepoint wrapper positions
       wrappers
         .attr('transform', function (d) {
@@ -667,11 +657,9 @@
         })
 
       // Timepoint ticks
-      let ticks = d3.selectAll('.freq-bar-timetick-' + tp)
+      const ticks = chart.selectAll('.freq-bar-timetick-' + tp)
       // Stop all tick animations
       ticks.interrupt().selectAll('*').interrupt()
-      // Select timepoint ticks with or without transition
-      ticks = instantAnimation ? ticks : ticks.transition(timepointTransition)
       // Update timepoint tick positions, rotations and color
       ticks
         .attr('transform', function () {
