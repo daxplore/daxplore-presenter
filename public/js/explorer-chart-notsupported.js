@@ -64,7 +64,7 @@
   function displayChartElements (show) {
     chartContainer.style('display', show ? null : 'none')
     innerHeaderDiv.style('display', show ? 'none' : null)
-    chartMouseoverWrapper.style('paddin-top', '0', null)
+    chartMouseoverWrapper.style('padding-top', '0', null)
   }
 
   // Update the size and position of all chart elements.
