@@ -24,7 +24,7 @@
   // COLORS
   let colorCount
   // HEADER
-  let headerDiv, headerMain, headerSub
+  let headerDiv, headerMain, headerSub, headerInnerDiv
   // SCALES AND AXISES
   // let xScale, xAxis, xAxisElement
   let xScale, xAxisScale
@@ -67,6 +67,7 @@
       .attr('class', 'header-section__main')
     headerSub = headerDiv.append('div')
       .attr('class', 'header-section__sub')
+    headerInnerDiv = d3.select('.header-inner')
 
     // INITIALIZE CHART
     // base div element
@@ -556,16 +557,18 @@
 
     tooltipBody.html(tooltipHtml)
 
-    const headerHeight = headerDiv.node().getBoundingClientRect().height
+    const innerHeaderHeight = (dax.settings('explorer.header.position') === 'INNER')
+      ? headerInnerDiv.node().getBoundingClientRect().height
+      : 0
 
     tooltipArrow
       .style('border-left-color', null)
-      .style('top', (yScale(option.rowKey) - tooltipBarArrowDistance + headerHeight) + 'px')
+      .style('top', (yScale(option.rowKey) - tooltipBarArrowDistance + innerHeaderHeight) + 'px')
 
     const tooltipArrowBB = tooltipArrow.node().getBoundingClientRect()
     const tooltipBodyBB = tooltipBody.node().getBoundingClientRect()
     tooltipBody
-      .style('top', (yScale(option.rowKey) - tooltipBodyBB.height - tooltipBarArrowDistance + tooltipArrowBB.height / 2 + headerHeight - 2) + 'px')
+      .style('top', (yScale(option.rowKey) - tooltipBodyBB.height - tooltipBarArrowDistance + tooltipArrowBB.height / 2 + innerHeaderHeight - 2) + 'px')
   }
 
   // Update tooltip X position on bar
