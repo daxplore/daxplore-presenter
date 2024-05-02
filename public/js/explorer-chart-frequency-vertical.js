@@ -532,6 +532,7 @@
       legendTopMargin = Math.min(100, Math.max(0, (chartHeight - legendHeight)) / 3)
     }
 
+    legendDiv.interrupt()
     conditionalApplyTransition(legendDiv, elementTransition, animateNextUpdate)
       .style('margin-top', legendTopMargin + 'px')
 
