@@ -186,11 +186,11 @@
 
     secondaryButtons.enter()
       .append('div')
-        .classed('peropt-second-button peropt-second-button dashed-button perspective-button', true)
+        .classed('peropt-second-button dashed-button perspective-button', true)
         .text(function (d) {
           switch (d.type) {
           case 'perspective': return dax.data.getQuestionShortText(d.id)
-          case 'none':return dax.text('explorer.perspective_picker.secondary_perspective.button.none')
+          case 'none': return dax.text('explorer.perspective_picker.secondary_perspective.button.none')
           }
         })
         .on('click', function (d) {
@@ -287,6 +287,10 @@
     }
     const changed = selectedPerspectiveID !== perspectiveID || forceUpdate
     selectedPerspectiveID = perspectiveID
+    if (dax.data.isSamePerspective(selectedPerspectiveID, selectedSecondaryPerspectiveID)) {
+      // If primary and secondary perspective are the same, set the secondary perspective to "none"
+      setSelectedSecondaryPerspective(null)
+    }
 
     if (changed) {
       d3.selectAll('.pervarpicker-varoption')
@@ -575,6 +579,10 @@
   }
 
   function setSelectedSecondaryPerspective (perspectiveID) {
+    if (dax.data.isSamePerspective(perspectiveID, selectedPerspectiveID)) {
+      // If primary and secondary perspective are the same, set the secondary perspective to "none"
+      perspectiveID = null
+    }
     const oldSecondaryPerspective = selectedSecondaryPerspectiveID
     selectedSecondaryPerspectiveID = perspectiveID
     updateElements(selectedSecondaryPerspectiveID !== oldSecondaryPerspective)
@@ -603,7 +611,11 @@
         return d.id === selectedSecondaryPerspectiveID
       })
       .classed('peropt-second-button--redundant', function (d) {
-        return d.type === 'perspective' && d.id === selectedPerspectiveID
+        // Gray out button if the primary and secondary perspectives are the same.
+        if (d.type !== 'perspective') {
+          return false
+        }
+        return dax.data.isSamePerspective(d.id, selectedPerspectiveID)
       })
   }
 })(window.dax = window.dax || {})

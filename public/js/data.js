@@ -108,6 +108,36 @@
     return questionMeta[questionID].type === 'COMBINED_PERSPECTIVE'
   }
 
+  /**
+   * Get the questionID:s that are used to make up a combined perspective.
+   * Only valid to call for perspectives where isCombinedPerspective(questionID) is true.
+   */
+  exports.getCombinedSubPerspectives =
+  function (questionID) {
+    return questionMeta[questionID].columns_combined
+  }
+
+  /**
+   * Check if two perspectives are "the same", taking into consideration that a combined
+   * perspective will be built from one or more other sub-perspectives.
+   */
+  exports.isSamePerspective =
+  function (questionIDA, questionIDB) {
+    if (questionIDA === questionIDB) { return true }
+    if (questionIDA === null || questionIDB === null) { return false }
+    if (!exports.isCombinedPerspective(questionIDA) && !exports.isCombinedPerspective(questionIDB)) { return false }
+    const perspectivesA = exports.isCombinedPerspective(questionIDA) ? exports.getCombinedSubPerspectives(questionIDA) : [questionIDA]
+    const perspectivesB = exports.isCombinedPerspective(questionIDB) ? exports.getCombinedSubPerspectives(questionIDB) : [questionIDB]
+    for (const pA of perspectivesA) {
+      for (const pB of perspectivesB) {
+        if (pA === pB) {
+          return true
+        }
+      }
+    }
+    return false
+  }
+
   exports.getQuestionDescription =
   function (questionID) {
     return questionMeta[questionID].description
