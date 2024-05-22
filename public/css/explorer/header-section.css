@@ -37,6 +37,6 @@
   margin-top: 1px;
 }
 
-.header-inner > .header-section {
-  padding-top: 6px;
+.header-inner>.header-section {
+  padding-top: 13px;
 }
