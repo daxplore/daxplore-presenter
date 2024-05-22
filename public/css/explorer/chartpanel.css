@@ -1,5 +1,5 @@
 .chart-mouseover-wrapper {
-  padding-top: 5px;
+  position: absolute;
 }
 
 .chart {
@@ -8,14 +8,6 @@
 
 .chart-perspective-column {
   overflow: hidden;
-}
-
-@media all and (-ms-high-contrast: none),
-(-ms-high-contrast: active) {
-  /* IE11 CSS styles go here */
-  .chart-perspective-column {
-    overflow-y: visible !important;
-  }
 }
 
 .chart-scroll {

@@ -9,6 +9,7 @@
   const paddingInner = 0.3
   const paddingOuter = 0.3
   const tooltipBarArrowDistance = 7
+  const bandWidth = 20
 
   const referenceLineHoverWidth = 10 // width of the reference line mouseover area
 
@@ -265,7 +266,6 @@
   function displayChartElements (show) {
     headerDiv.style('display', show ? null : 'none')
     chartContainer.style('display', show ? null : 'none')
-    // legendDiv.style('display', show ? null : 'none')
     saveImageButton.style('display', show ? null : 'none')
   }
 
@@ -276,7 +276,6 @@
     chart.interrupt().selectAll('*').interrupt()
 
     // CALCULATE HEIGHT
-    const bandWidth = 20
     // rearranged equation from d3's source file band.js, ignoring the floor call
     // https://github.com/d3/d3-scale/blob/fd07dd8ceeaeaec612f675050ac134243b406f64/src/band.js#L26
     const barSectionHeight = Math.max(1, selectedOptionsData.length - paddingInner + paddingOuter * 2) * bandWidth / (1 - paddingInner)
@@ -471,12 +470,13 @@
       tooltipText += dax.text('explorer.chart.mean_bar_horizontal.tooltip.respondents', option.count)
     }
 
+    const chartTop = chart.node().getBoundingClientRect().y
     tooltipArrow
       .classed('meanprofile__tooltip-arrow--right', false)
       .classed('meanprofile__tooltip-arrow--down', true)
       .style('border-bottom-color', option.nodata ? '#DDD' : dax.colors.colorTooltipBackground(option.mean, questionReferenceValue, questionReferenceDirection))
       .style('border-left-color', null)
-      .style('top', (yScale(option.type + '|' + option.index) - tooltipBarArrowDistance) + 'px')
+      .style('top', (yScale(option.type + '|' + option.index) + chartTop - (bandWidth / 2) - tooltipBarArrowDistance) + 'px')
 
     tooltipBody.html(tooltipText) // TODO construct elements via d3 instead of string->html
 
@@ -498,7 +498,7 @@
 
     const tooltipBodyBB = tooltipBody.node().getBoundingClientRect()
     tooltipBody
-      .style('top', (yScale(option.type + '|' + option.index) - tooltipBodyBB.height - tooltipBarArrowDistance + tooltipArrowBB.height / 2 - 2) + 'px')
+      .style('top', (yScale(option.type + '|' + option.index) + chartTop - (bandWidth / 2) - tooltipBodyBB.height - tooltipBarArrowDistance + tooltipArrowBB.height / 2 - 2) + 'px')
 
     tooltipBarMove()
     if (option.type === 'DATA') {
@@ -510,8 +510,7 @@
   function tooltipBarMove () {
     const tooltipBodyBB = tooltipBody.node().getBoundingClientRect()
     const tooltipArrowBB = tooltipArrow.node().getBoundingClientRect()
-    const chartLeft = chart.node().getBoundingClientRect().left + window.scrollX
-    let mouseX = d3.event.pageX - chartLeft
+    let mouseX = d3.event.pageX
     if (mouseX - tooltipBodyBB.width / 2 < 0) {
       mouseX = tooltipBodyBB.width / 2
     }
@@ -534,9 +533,10 @@
     tooltipBody.append('span')
       .text(dax.common.integerFormat(questionReferenceValue))
 
+    const chartLeft = chart.node().getBoundingClientRect().x
     const tooltipBodyBB = tooltipBody.node().getBoundingClientRect()
     const tooltipArrowBB = tooltipArrow.node().getBoundingClientRect()
-    const leftPosition = margin.left + yAxisWidth + xScale(questionReferenceValue) - tooltipBarArrowDistance
+    const leftPosition = chartLeft + margin.left + yAxisWidth + xScale(questionReferenceValue) - tooltipBarArrowDistance
 
     tooltipBody
       .style('left', (leftPosition - tooltipBodyBB.width - tooltipArrowBB.width / 2 - 2) + 'px')
@@ -554,8 +554,7 @@
   function tooltipReferenceLineMove () {
     const tooltipBodyBB = tooltipBody.node().getBoundingClientRect()
     const tooltipArrowBB = tooltipArrow.node().getBoundingClientRect()
-    const chartTop = chart.node().getBoundingClientRect().top + window.pageYOffset
-    const mouseY = d3.event.pageY - chartTop + 5
+    const mouseY = d3.event.pageY
     tooltipBody.style('top', (mouseY - tooltipBodyBB.height / 2) + 'px')
     tooltipArrow.style('top', (mouseY - tooltipArrowBB.height / 2 + 2) + 'px')
   }
@@ -653,12 +652,6 @@
 
       const chartCtx = canvasChart.getContext('2d')
       chartCtx.drawImage(img, 0, 0)
-
-      // const longText = dax.data.getQuestionFullText(questionID)
-      // headerMain.text(shortText)
-      // headerSub
-      //   .text(longText)
-      //   .style('display', longText === '' || shortText === longText ? 'none' : null)
 
       const headerText = dax.data.getQuestionShortText(questionID)
       const headerPaddingTop = 5 * imageScaling

@@ -562,22 +562,22 @@
       ? headerInnerDiv.node().getBoundingClientRect().height
       : 0
 
+    const chartTop = chart.node().getBoundingClientRect().y
     tooltipArrow
       .style('border-left-color', null)
-      .style('top', (yScale(option.rowKey) - tooltipBarArrowDistance + innerHeaderHeight) + 'px')
+      .style('top', (chartTop + yScale(option.rowKey) - tooltipBarArrowDistance + innerHeaderHeight) + 'px')
 
     const tooltipArrowBB = tooltipArrow.node().getBoundingClientRect()
     const tooltipBodyBB = tooltipBody.node().getBoundingClientRect()
     tooltipBody
-      .style('top', (yScale(option.rowKey) - tooltipBodyBB.height - tooltipBarArrowDistance + tooltipArrowBB.height / 2 + innerHeaderHeight - 2) + 'px')
+      .style('top', (chartTop + yScale(option.rowKey) - tooltipBodyBB.height - tooltipBarArrowDistance + tooltipArrowBB.height / 2 + innerHeaderHeight - 2) + 'px')
   }
 
   // Update tooltip X position on bar
   function tooltipBarMove () {
     const tooltipBodyBB = tooltipBody.node().getBoundingClientRect()
     const tooltipArrowBB = tooltipArrow.node().getBoundingClientRect()
-    const chartLeft = chart.node().getBoundingClientRect().left + window.scrollX
-    const mouseX = d3.event.pageX - chartLeft
+    const mouseX = d3.event.pageX
     tooltipBody.style('left', (mouseX - tooltipBodyBB.width / 2) + 'px')
     tooltipArrow.style('left', (mouseX - tooltipArrowBB.width / 2) + 'px')
   }
