@@ -896,8 +896,19 @@
     // Reconstruct copy of legend from the DOM element, only keeping the relevant parts
     const questionHeaderCopy = legendQuestionHeader.node().cloneNode(true)
     d3.select(questionHeaderCopy).style('margin-top', '10px')
+    d3.select('body').append(function () { return legendMissingData.node().cloneNode(true) })
     legendClone.append(function () { return questionHeaderCopy })
     legendClone.append(function () { return legendQuestionOptionTable.node().cloneNode(true) })
+    if (hasMissingData || hasMissingTimepoint) {
+      legendClone.append('div').style('height', (imageScaling * 7) + 'px')
+    }
+    if (hasMissingData) {
+      legendClone.append(function () { return legendMissingData.node().cloneNode(true) })
+    }
+    if (hasMissingTimepoint) {
+      legendClone.append(function () { return legendMissingTimepoint.node().cloneNode(true) })
+    }
+
     legendClone.selectAll('.legend__row-text')
       .style('max-width', 'inherit')
       .style('text-overflow', 'inherit')
