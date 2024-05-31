@@ -816,42 +816,41 @@
     // 3. Call other function to populate the image element with the actual image
     // 4. The onload function is called, doing the next image in sequence
 
-    // Load header image
-    const headerImg = new Image()
-    headerImg.onload = function () {
-      // Header image is loaded!
-      // Load legend image:
-      const legendImg = new Image()
-      legendImg.onload = function () {
-        // Legend image is loaded!
-        // Load chart image
-        const chartImg = new Image()
-        chartImg.onload = function () {
-          // Chart image is loaded!
+    // Load chart image
+    const chartImg = new Image()
+    chartImg.onload = function () {
+      // Chart image is loaded!
+      // Load header image
+      const headerImg = new Image()
+      headerImg.onload = function () {
+        // Header image is loaded!
+        // Load legend image:
+        const legendImg = new Image()
+        legendImg.onload = function () {
+          // Legend image is loaded!
           // Build and save the complete image
           composeAndSaveImage(headerImg, legendImg, chartImg)
         }
-        generateChartImage(chartImg)
+        generateLegendImage(legendImg)
       }
-      generateLegendImage(legendImg)
+      generateHeaderImage(headerImg, chartImg.width / imageScaling)
     }
-    generateHeaderImage(headerImg)
+    generateChartImage(chartImg)
   }
 
   // Takes an empty image element and loads an image of the header into it
-  function generateHeaderImage (img) {
+  function generateHeaderImage (img, maxWidth) {
     // Add the temporary copy of the legend to the DOM
     const hiddenDiv = d3.select('body').append('div')
       .classed('hidden', true)
       .style('justify-content', 'center')
       .style('text-align', 'center')
-      .style('white-space', 'nowrap')
+      .style('overflow', 'hidden')
+      .style('width', maxWidth + 'px')
 
     const headerClone = hiddenDiv
       .append(function () { return headerDiv.node().cloneNode(true) })
-      .style('padding-left', '1000px')
-      .style('padding-right', '1000px')
-      .style('width', '1000px')
+      .style('width', maxWidth + 'px')
 
     headerClone.select('.header-section__freq-tooltip')
       .remove()
