@@ -364,9 +364,17 @@
     legendQuestionSubHeader.text('Procent som svarade:') // TODO externalize
 
     // Set new data for the legends
+    const currentOptionsMap = new Map()
+    const usedIndices = new Set()
+    currentOptions.forEach(option => {
+      currentOptionsMap[option.index] = option
+      usedIndices.add(option.index)
+    })
+    const optionsNested = dax.data.getPerspectiveOptionIndicesNestedOrder(perspectiveID).filter(id => usedIndices.has(id))
+    const optionsData = optionsNested.map(id => currentOptionsMap[id])
     const perspectiveOptionRows = legendPerspectiveOptionTable.selectAll('.legend__row')
       .data(
-        currentOptions, // data
+        optionsData, // data
         function (option) { return option.index } // key function, mapping a specific DOM element to a specific option index
       )
 
