@@ -583,8 +583,14 @@
     // LEGEND
     // Set the vertical position and height of the legend area
     // The position of the legend div is then adjusted via flex parameters relative the defined area
-    legendDiv
-      .style('height', (chartBB.height + headerDiv.node().getBoundingClientRect().height) + 'px')
+    // but if the legend is bigger than the chart, leave the legend height unset
+    const headerChartHeight = chartBB.height + headerDiv.node().getBoundingClientRect().height
+    legendDiv.style('height', null) // reset legend height
+    const legendHeight = legendDiv.node().getBoundingClientRect().height
+    if (headerChartHeight > legendHeight) {
+      legendDiv
+        .style('height', headerChartHeight + 'px')
+    }
 
     // Update Y axis zoom button
     zoomYButton.classed('explorer-dichtimeline__zoom-y--unzoom', zoomY)

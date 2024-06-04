@@ -605,8 +605,13 @@
     // LEGEND
     // Set the vertical position and height of the legend area
     // The position of the legend div is then adjusted via flex parameters relative the defined area
-    legendDiv
-      .style('height', chartBB.height + 'px')
+    // but if the legend is bigger than the chart, leave the legend height unset
+    legendDiv.style('height', null) // reset legend height
+    const legendHeight = legendDiv.node().getBoundingClientRect().height
+    if (chartBB.height > legendHeight) {
+      legendDiv
+        .style('height', chartBB.height + 'px')
+    }
 
     // UPDATE TIMEPOINT SPECIFIC POSITIONS
     // Set timepoint to current timepoint to update timepoint related positions
