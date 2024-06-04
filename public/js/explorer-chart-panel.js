@@ -32,7 +32,7 @@
           const classes = this.classList
           for (let i = 0; i < classes.length; i++) {
             if (classes[i] === 'freq' || classes[i] === 'mean' || classes[i] === 'dich') {
-              setSelectedTab(classes[i].toUpperCase())
+              exports.setSelectedTab(classes[i].toUpperCase())
             }
           }
         })
@@ -81,6 +81,16 @@
   exports.getSelectedTab =
   function () {
     return selectedTab
+  }
+
+  // Setter for selected tab
+  exports.setSelectedTab =
+  function (tab) {
+    if (selectedTab === tab) {
+      return
+    }
+    selectedTab = tab
+    dax.explorer.selectionUpdateCallback(true)
   }
 
   exports.chartSetQueryDefinition =
@@ -179,14 +189,6 @@
     }
 
     dax.explorer.updateChartPanelSize()
-  }
-
-  function setSelectedTab (tab) {
-    if (selectedTab === tab) {
-      return
-    }
-    selectedTab = tab
-    dax.explorer.selectionUpdateCallback(true)
   }
 
   exports.updateChartPanelSize =

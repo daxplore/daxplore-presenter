@@ -39,6 +39,13 @@
     const totalSelected = def.flags.indexOf('TOTAL') !== -1
     dax.explorer.perspectiveSetQueryDefinition(def.perspective, def.perspectiveSecondary, def.perspectiveOptions, totalSelected)
 
+    // Set selected tab, default to first available tab
+    let tab = def.tab
+    const question = dax.explorer.getSelectedQuestion()
+    if (questionMap[question].displaytypes.indexOf(tab) === -1) {
+      tab = questionMap[question].displaytypes[0]
+    }
+    dax.explorer.setSelectedTab(tab)
     // After the hash -> queryDefinition -> update element chain, get the true hash representing this new state
     const actualHash = getCurrentStateHash()
 
@@ -74,7 +81,7 @@
       tab = questionMap[question].displaytypes[0]
     }
 
-    return dax.querydefinition.encodeString(question, perspective, perspectiveOptions, [tab])
+    return dax.querydefinition.encodeString(question, perspective, perspectiveOptions, tab, [])
   }
 
   // Send a message to iframe parent to allow the outer page to update window hash

@@ -74,6 +74,10 @@
     if (typeof optionsString === 'string') {
       optionsArray = optionsString.split(',').map(function (o) { return Number(o) })
     }
+
+    // Get tab
+    const tabString = urlParams.get('t')
+
     // Get and parse query flags
     const flagString = urlParams.get('f')
     const flagArray = decodeQueryDefinitionFlags(flagString)
@@ -84,13 +88,14 @@
       perspective: perspective,
       perspectiveSecondary: perspectiveSecondary,
       perspectiveOptions: optionsArray,
+      tab: tabString,
       flags: flagArray,
     }
   }
 
   // Takes query definition elements and creates an encoded query definition string
   exports.encodeString =
-  function (question, perspectives, perspectiveOptions, flags) {
+  function (question, perspectives, perspectiveOptions, tab, flags) {
     const queryDefinitionItems = []
     queryDefinitionItems.push('q=' + question)
     queryDefinitionItems.push('p=' + perspectives.join(','))
@@ -99,6 +104,7 @@
     if (Array.isArray(perspectiveOptions) && perspectiveOptions.length > 0) {
       queryDefinitionItems.push('o=' + perspectiveOptions.join(','))
     }
+    queryDefinitionItems.push('t=' + tab)
 
     // Add f = bit flags for flags
     if (Array.isArray(flags) && flags.length > 0) {
